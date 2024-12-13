@@ -4,6 +4,7 @@ let
 in pkgs.mkShellNoCC {
   packages = with pkgs; [
     yq
+    jdk17
   ];
 }
 
