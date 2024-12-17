@@ -23,17 +23,6 @@ class ApplicationTest {
     }
 
     @Test
-    fun testHealthcheck() = testApplication {
-        application {
-            module()
-        }
-        client.get("/healthcheck").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Status: OK", body())
-        }
-    }
-
-    @Test
     fun jsonTestGet() = testApplication {
         application {
             module()

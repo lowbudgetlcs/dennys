@@ -2,6 +2,7 @@ package com.lowbudgetlcs
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -9,19 +10,8 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     routing {
-        route("/") {
-            get {
-                call.respondText("Hello World!")
-            }
-        }
-        healthCheck()
+        staticResources("/", "client/dist")
         jsonTest()
-    }
-}
-
-fun Route.healthCheck() {
-    get("/healthcheck") {
-        call.respond(HttpStatusCode.OK, "Status: OK")
     }
 }
 
