@@ -10,7 +10,7 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     routing {
-        staticResources("/", "client/dist")
+        staticResources("/", "client/build")
         jsonTest()
     }
 }
