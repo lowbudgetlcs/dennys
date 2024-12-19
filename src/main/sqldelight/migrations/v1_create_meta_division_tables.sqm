@@ -1,0 +1,12 @@
+CREATE TABLE meta (
+  id INT PRIMARY KEY,
+  season_name VARCHAR(20) NOT NULL,
+  provider_id INT
+);
+
+CREATE TABLE divisions (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20) UNIQUE,
+  tournament_id INT,
+  team_count INT
+);
