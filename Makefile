@@ -13,9 +13,6 @@ build:
 run:
 	docker run -p $(PORT):$(PORT) --name $(APP_NAME)-container $(APP_NAME)
 
-logs:
-	docker logs -f $(APP_NAME)-container
-
 # Stop the Docker container
 stop:
 	docker stop $(APP_NAME)-container || true

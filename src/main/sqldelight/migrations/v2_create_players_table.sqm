@@ -1,0 +1,5 @@
+CREATE TABLE players (
+  id SERIAL PRIMARY KEY,
+  riot_puuid CHAR(78) UNIQUE,
+  summoner_name VARCHAR(25)
+);
