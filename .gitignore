@@ -37,5 +37,4 @@ out/
 ### VS Code ###
 .vscode/
 
-**/database.properties
-.env
+**/database.yaml

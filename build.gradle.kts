@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 val kotlinVersion = "2.1.0"
 val ktorVersion = "3.0.2"
 val logbackVersion = "1.4.14"
@@ -5,7 +7,7 @@ val logbackVersion = "1.4.14"
 plugins {
     kotlin("jvm") version ("2.1.0")
     id("application")
-    id("org.jetbrains.kotlin.plugin.serialization") version("2.1.0")
+    id("org.jetbrains.kotlin.plugin.serialization") version ("2.1.0")
     id("com.gradleup.shadow") version "8.3.0"
     id("app.cash.sqldelight") version "2.0.2"
 }
@@ -25,6 +27,12 @@ repositories {
     mavenCentral()
 }
 
+tasks {
+    "shadowJar"(ShadowJar::class) {
+        mergeServiceFiles()
+    }
+}
+
 sqldelight {
     databases {
         create("LblcsDatabase") {
@@ -37,6 +45,9 @@ sqldelight {
 }
 
 dependencies {
+    // Configuration
+    implementation("com.sksamuel.hoplite:hoplite-core:2.9.0")
+    implementation("com.sksamuel.hoplite:hoplite-yaml:2.9.0")
     // Ktor
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
