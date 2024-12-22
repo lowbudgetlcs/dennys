@@ -1,0 +1,75 @@
+name: Deploy to Prod
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  env:
+    uses: ./.github/workflows/build-env.yaml
+
+  build:
+    needs: env
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download env artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: env
+
+      - name: Import env
+        shell: bash
+        run: |
+          while read env; do
+            echo $env >> $GITHUB_ENV
+          done <<< $(cat .env.art)
+
+      - uses: actions/checkout@v4
+
+      - name: Build configuration files
+        run: |
+          touch src/main/resources/database.yaml
+          yq '.databases.lblcs.url = "${{ secrets.POSTGRES_JDBC_URL }}"' -i src/main/resources/database.yaml
+          yq '.databases.lblcs.password = ${{ secrets.POSTGRES_PASSWORD }} -i src/main/resources/database.yaml
+
+      - name: Build the Docker image
+        run: |
+          docker build . --file Dockerfile --tag ${{ env.APP }}:latest
+          docker tag ${{ env.APP }}:latest lblcs/${{ env.APP }}:latest
+          docker tag ${{ env.APP }}:latest lblcs/${{ env.APP }}:${{ env.VERSION }}
+
+      - name: Push Docker Image
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PAT }}
+          docker push lblcs/${{ env.APP }}:${{ env.VERSION }}
+          docker push lblcs/${{ env.APP }}:latest
+          docker logout
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download env artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: env
+
+      - name: Import env
+        shell: bash
+        run: |
+          while read env; do
+            echo $env >> $GITHUB_ENV
+          done <<< $( cat .env.art)
+
+      - name: Execute docker compose on prod server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd docker/lblcs/${{ env.APP }}
+            docker-compose down
+            docker-compose pull
+            docker-compose up -d
