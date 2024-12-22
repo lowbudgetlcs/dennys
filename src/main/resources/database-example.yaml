@@ -1,4 +1,4 @@
 databases:
     lblcs:
         url: jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres?user=postgres.jwfpkyitfejbjnejveit&prepareThreshold=0
-        password: UIrGiUP6ZLpgE8
+        password:
