@@ -1,5 +1,7 @@
 package com.lowbudgetlcs
 
+import com.lowbudgetlcs.routes.jsontest.TestJson
+import com.lowbudgetlcs.routes.riot.RiotCallback
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -23,17 +25,6 @@ class ApplicationTest {
     }
 
     @Test
-    fun testHealthcheck() = testApplication {
-        application {
-            module()
-        }
-        client.get("/healthcheck").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Status: OK", body())
-        }
-    }
-
-    @Test
     fun jsonTestGet() = testApplication {
         application {
             module()
@@ -44,10 +35,10 @@ class ApplicationTest {
             }
         }
         client.get("/json-test").apply {
-            val results = body<List<JsonTest>>()
+            val results = body<List<TestJson>>()
             assertEquals(HttpStatusCode.OK, status)
 
-            val expected = listOf(JsonTest("Title", 1))
+            val expected = listOf(TestJson("Title", 1))
             assertContentEquals(expected, results)
         }
     }
@@ -62,12 +53,12 @@ class ApplicationTest {
                 json()
             }
         }
-        val body = listOf(JsonTest("Title", 1))
+        val body = listOf(TestJson("Title", 1))
         client.post("/json-test") {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             setBody(body)
         }.apply {
-            val results = body<List<JsonTest>>()
+            val results = body<List<TestJson>>()
             assertEquals(HttpStatusCode.OK, status)
             assertContentEquals(body, results)
         }
@@ -83,7 +74,7 @@ class ApplicationTest {
                 json()
             }
         }
-        val body = listOf(JsonTest("Title", 0))
+        val body = listOf(TestJson("Title", 0))
         client.post("/json-test") {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             setBody(body)
@@ -92,4 +83,24 @@ class ApplicationTest {
         }
     }
 
+    @Test
+    fun riotCallbackPost() = testApplication {
+        application {
+            module()
+        }
+        val client = createClient {
+            install(ContentNegotiation) {
+                json()
+            }
+        }
+        val body = RiotCallback(startTime = 1000, shortCode = "ABCD", metaData = "", gameId = 1001)
+        client.post("/riot/callback") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json)
+            setBody(body)
+        }.apply{
+            val response = body<RiotCallback>()
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(body, response)
+        }
+    }
 }

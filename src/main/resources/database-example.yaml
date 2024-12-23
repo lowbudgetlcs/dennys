@@ -1,5 +1,5 @@
-databases:
-    lblcs:
-        name:
-        url:
-        password:
+lblcs:
+    url: jdbc:postgresql://XYZ
+    password: XYZ
+local:
+    url: jdbc:sqlite:XYZ

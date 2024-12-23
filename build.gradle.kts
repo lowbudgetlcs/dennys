@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val kotlinVersion = "2.1.0"
 val ktorVersion = "3.0.2"
-val logbackVersion = "1.4.14"
+val logbackVersion = "1.5.15"
 
 plugins {
     kotlin("jvm") version ("2.1.0")
@@ -38,7 +38,12 @@ sqldelight {
         create("LblcsDatabase") {
             packageName.set("$group")
             dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
-            srcDirs.setFrom("src/main/sqldelight")
+            srcDirs.setFrom("src/main/sqldelight/lblcs")
+            deriveSchemaFromMigrations.set(true)
+        }
+        create("LocalDatabase") {
+            packageName.set("$group")
+            srcDirs.setFrom("src/main/sqldelight/local")
             deriveSchemaFromMigrations.set(true)
         }
     }
@@ -56,7 +61,9 @@ dependencies {
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
     implementation("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     // Database
+    implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
     implementation("app.cash.sqldelight:jdbc-driver:2.0.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:42.7.2")

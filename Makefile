@@ -5,13 +5,18 @@ DOCKERFILE = $(shell yq '.app.build.dockerfile' $(CONFIG_FILE))
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_FILE))
 
 .PHONY: build run stop clean erase rebuild ps psa test
+# Mount local sqlite db
+mount:
+	docker volume create local
+
+
 # Build the Docker image
 build:
 	docker build -t $(APP_NAME) -f $(DOCKERFILE) .
 
 # Run the Docker container
 run:
-	docker run -p $(PORT):$(PORT) --name $(APP_NAME)-container $(APP_NAME)
+	docker run -p $(PORT):$(PORT) -v ./db/local.db:/app/db/local.db --name $(APP_NAME)-container $(APP_NAME)
 
 # Stop the Docker container
 stop:
