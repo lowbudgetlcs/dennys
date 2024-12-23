@@ -1,11 +1,14 @@
 package com.lowbudgetlcs.routes.jsontest
 
+import com.lowbudgetlcs.RabbitMQBridge
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 fun Application.jsonTestRoutes() {
     routing {
@@ -27,6 +30,7 @@ fun Application.jsonTestRoutes() {
             post {
                 val body = call.receive<List<TestJson>>()
                 call.respond(HttpStatusCode.OK, body)
+                RabbitMQBridge("CALLBACK").emit(Json.encodeToString(body))
             }
         }
     }

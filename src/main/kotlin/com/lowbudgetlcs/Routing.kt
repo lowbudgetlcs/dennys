@@ -13,6 +13,6 @@ fun Application.configureRouting() {
     }
     rootRoutes()
     jsonTestRoutes()
-    riotRoutes()
+    riotRoutes(RabbitMQBridge("CALLBACK"))
 }
 

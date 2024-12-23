@@ -4,11 +4,7 @@ APP_NAME = $(shell yq '.app.name' $(CONFIG_FILE))
 DOCKERFILE = $(shell yq '.app.build.dockerfile' $(CONFIG_FILE))
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_FILE))
 
-.PHONY: build run stop clean erase rebuild ps psa test
-# Mount local sqlite db
-mount:
-	docker volume create local
-
+.PHONY: build run stop clean erase rebuild ps psa test deploy
 
 # Build the Docker image
 build:
@@ -31,7 +27,11 @@ clean:
 erase: stop clean
 
 # Rebuild the Docker image
-rebuild: stop clean build
+rebuild: erase build
+
+# Deploy with compose
+deploy:
+	docker compose up
 
 # List running containers
 ps:
