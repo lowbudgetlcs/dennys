@@ -1,14 +1,13 @@
 # Config
 CONFIG_FILE = ./src/main/resources/application.yaml
-APP_NAME = $(shell yq '.app.name' $(CONFIG_FILE))
-DOCKERFILE = $(shell yq '.app.build.dockerfile' $(CONFIG_FILE))
+APP_NAME = dennys
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_FILE))
 
 .PHONY: build run stop clean erase rebuild ps psa test deploy
 
 # Build the Docker image
 build:
-	docker build -t $(APP_NAME) -f $(DOCKERFILE) .
+	docker build -t $(APP_NAME) -f Dockerfile .
 
 # Run the Docker container
 run:
