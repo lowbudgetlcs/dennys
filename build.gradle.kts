@@ -35,15 +35,10 @@ tasks {
 
 sqldelight {
     databases {
-        create("LblcsDatabase") {
+        create("Database") {
             packageName.set("$group")
             dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
-            srcDirs.setFrom("src/main/sqldelight/lblcs")
-            deriveSchemaFromMigrations.set(true)
-        }
-        create("LocalDatabase") {
-            packageName.set("$group")
-            srcDirs.setFrom("src/main/sqldelight/local")
+            srcDirs.setFrom("src/main/sqldelight")
             deriveSchemaFromMigrations.set(true)
         }
     }

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.routes.*
 import com.lowbudgetlcs.routes.jsontest.jsonTestRoutes
 import com.lowbudgetlcs.routes.riot.riotRoutes
+import com.lowbudgetlcs.routes.rootRoutes
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -13,6 +13,5 @@ fun Application.configureRouting() {
     }
     rootRoutes()
     jsonTestRoutes()
-    riotRoutes(RabbitMQBridge("CALLBACK"))
+    riotRoutes()
 }
-

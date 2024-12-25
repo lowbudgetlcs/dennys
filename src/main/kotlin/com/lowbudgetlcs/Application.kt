@@ -11,7 +11,6 @@ fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() = runBlocking {
     logger.info("Performing opening duties...")
-    // Configure Database
     configureRouting()
     // Start Tournament Engine and Stat Daemons
     launch {

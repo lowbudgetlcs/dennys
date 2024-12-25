@@ -12,7 +12,11 @@ build:
 
 # Run the Docker container
 run:
-	docker run -p $(PORT):$(PORT) -v ./db/local.db:/app/db/local.db --name $(APP_NAME)-container $(APP_NAME)
+	docker run \
+	-p $(PORT):$(PORT) \
+	-v ./db/local.db:/app/db/local.db \
+	--network=rabbitmq.docker \
+	--name $(APP_NAME)-container $(APP_NAME)
 
 # Stop the Docker container
 stop:

@@ -1,13 +1,19 @@
 package com.lowbudgetlcs
 
 import com.rabbitmq.client.*
+import com.sksamuel.hoplite.ConfigLoaderBuilder
+import com.sksamuel.hoplite.addResourceSource
 import io.ktor.util.logging.*
 
+data class RabbitMQConfig(val host: String)
+
 class RabbitMQBridge(private val queue: String) {
+    private val config =
+        ConfigLoaderBuilder.default().build().loadConfigOrThrow<RabbitMQConfig>("/rabbitmq.yaml")
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.RabbitMQBridge")
     private val factory by lazy {
         ConnectionFactory().apply {
-            host = "rabbitmq"
+            host = config.host
             isAutomaticRecoveryEnabled = true
             networkRecoveryInterval = 15000
         }
@@ -19,13 +25,11 @@ class RabbitMQBridge(private val queue: String) {
         }
     }
 
-    val channel: Channel by lazy {
-        connection.createChannel().apply {
-            queueDeclare("CALLBACK", true, false, false, null)
-            basicQos(1)
-        }.also {
-            logger.debug("Created new messageq channel.")
-        }
+    val channel: Channel = connection.createChannel().apply {
+        queueDeclare("CALLBACK", true, false, false, null)
+        basicQos(1)
+    }.also {
+        logger.debug("Created new messageq channel.")
     }
 
     fun emit(message: String) {

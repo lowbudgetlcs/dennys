@@ -1,0 +1,3 @@
+lblcs:
+    url: ${LBLCS_DB_URL}
+    pass: ${LBLCS_DB_PW}

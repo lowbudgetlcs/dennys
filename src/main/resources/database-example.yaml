@@ -1,5 +1,0 @@
-lblcs:
-    url: jdbc:postgresql://XYZ
-    password: XYZ
-local:
-    url: jdbc:sqlite:XYZ

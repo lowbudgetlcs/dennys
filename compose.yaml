@@ -3,8 +3,6 @@ services:
     build: .
     image: dennys:latest
     container_name: dennys-container
-    volumes:
-      - ./db/local.db:/app/db/local.db
     ports:
       - "9292:9292"
     networks:

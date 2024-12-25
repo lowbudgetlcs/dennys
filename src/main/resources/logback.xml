@@ -4,9 +4,9 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="TRACE">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="io.netty" level="TRACE"/>
-    <logger name="com.lowbudgetlcs" level="TRACE"/>
+    <logger name="com.lowbudgetlcs" level="DEBUG"/>
 </configuration>
