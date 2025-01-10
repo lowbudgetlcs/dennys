@@ -1,4 +1,4 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.bridges
 
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import no.stelar7.api.r4j.basic.APICredentials

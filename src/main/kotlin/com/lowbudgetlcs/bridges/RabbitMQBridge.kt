@@ -1,8 +1,7 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.bridges
 
 import com.rabbitmq.client.*
 import com.sksamuel.hoplite.ConfigLoaderBuilder
-import com.sksamuel.hoplite.addResourceSource
 import io.ktor.util.logging.*
 
 data class RabbitMQConfig(val host: String)

@@ -1,6 +1,7 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.bridges
 
 import app.cash.sqldelight.driver.jdbc.asJdbcDriver
+import com.lowbudgetlcs.Database
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.Masked
 import com.sksamuel.hoplite.addResourceSource

@@ -1,0 +1,4 @@
+selectTeamId:
+    SELECT team_id
+    FROM players
+    WHERE riot_puuid = ?;

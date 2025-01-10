@@ -1,5 +1,6 @@
 package com.lowbudgetlcs
 
+import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.routes.jsontest.jsonTestRoutes
 import com.lowbudgetlcs.routes.riot.riotRoutes
 import com.lowbudgetlcs.routes.rootRoutes
@@ -13,5 +14,6 @@ fun Application.configureRouting() {
     }
     rootRoutes()
     jsonTestRoutes()
-    riotRoutes()
+    val bridge = RabbitMQBridge("CALLBACK")
+    riotRoutes(bridge)
 }

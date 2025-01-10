@@ -1,0 +1,4 @@
+updateGameOutcome:
+  UPDATE games
+  SET winner_id = ?, loser_id = ?
+  WHERE shortcode = ?;

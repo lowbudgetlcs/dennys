@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.routes.riot
 
-import com.lowbudgetlcs.RabbitMQBridge
+import com.lowbudgetlcs.bridges.RabbitMQBridge
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
@@ -14,8 +14,7 @@ import kotlinx.serialization.json.Json
 
 private val logger = KtorSimpleLogger("com.lowbudgetlcs.routes.riot.Riot")
 
-fun Application.riotRoutes() {
-    val bridge = RabbitMQBridge("CALLBACK");
+fun Application.riotRoutes(bridge: RabbitMQBridge) {
     install(StatusPages) {
         exception<RequestValidationException> { call, cause ->
             logger.warn("Request Failed validation: $cause")

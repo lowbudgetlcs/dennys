@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.routes.jsontest
 
-import com.lowbudgetlcs.RabbitMQBridge
+import com.lowbudgetlcs.bridges.RabbitMQBridge
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
