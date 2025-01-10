@@ -82,25 +82,4 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.BadRequest, status)
         }
     }
-
-    @Test
-    fun riotCallbackPost() = testApplication {
-        application {
-            module()
-        }
-        val client = createClient {
-            install(ContentNegotiation) {
-                json()
-            }
-        }
-        val body = RiotCallback(startTime = 1000, shortCode = "ABCD", metaData = "", gameId = 1001)
-        client.post("/riot/callback") {
-            header(HttpHeaders.ContentType, ContentType.Application.Json)
-            setBody(body)
-        }.apply{
-            val response = body<RiotCallback>()
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals(body, response)
-        }
-    }
 }

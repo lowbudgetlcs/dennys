@@ -1,4 +1,15 @@
-updateGameOutcome:
+selectGameByShortcode:
+    SELECT *
+    FROM games
+    WHERE shortcode = ?;
+
+setWinnerLoserById:
   UPDATE games
   SET winner_id = ?, loser_id = ?
-  WHERE shortcode = ?;
+  WHERE id = ?
+  RETURNING id;
+
+countWinsBySeries:
+    SELECT COUNT(id)
+    FROM games
+    WHERE series_id = ? AND winner_id = ?;

@@ -1,3 +1,9 @@
-selectAll:
+selectById:
     SELECT *
-    FROM series;
+    FROM series
+    WHERE id = ?;
+
+setWinner:
+  UPDATE series
+  SET winner_id = ?
+  WHERE id = ?;
