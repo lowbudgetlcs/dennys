@@ -23,8 +23,9 @@ application {
 }
 
 repositories {
-    google()
     mavenCentral()
+    google()
+    maven("https://jitpack.io")
 }
 
 tasks {
@@ -64,6 +65,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.2")
     // Rabbitmq
     implementation("com.rabbitmq:amqp-client:5.21.0")
+    // Riot4J
+    implementation("com.github.stelar7:R4J:2.5.5")
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
