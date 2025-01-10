@@ -29,7 +29,6 @@ class TournamentEngine {
                 // Update game row with game outcome
                 lblcs.gamesQueries.selectGameByShortcode(callback.shortCode).executeAsOneOrNull()?.let { game ->
                     val match = riot.match(callback.gameId)
-                    // Write match data to STAT queue to be processed to prevent multiple Riot API requests?
                     val winner = getTeamId(match.participants.filter { participant -> participant.didWin() })
                     val loser = getTeamId(match.participants.filter { participant -> !participant.didWin() })
                     if (winner == -1 || loser == -1) return@DeliverCallback // Missing team IDs

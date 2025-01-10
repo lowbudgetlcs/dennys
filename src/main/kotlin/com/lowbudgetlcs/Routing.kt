@@ -14,6 +14,7 @@ fun Application.configureRouting() {
     }
     rootRoutes()
     jsonTestRoutes()
-    val bridge = RabbitMQBridge("CALLBACK")
-    riotRoutes(bridge)
+    val callbackQueue = RabbitMQBridge("CALLBACK")
+    val statQueue = RabbitMQBridge("STATS")
+    riotRoutes(listOf(callbackQueue, statQueue))
 }

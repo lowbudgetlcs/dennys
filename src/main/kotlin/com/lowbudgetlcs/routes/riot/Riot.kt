@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 
 private val logger = KtorSimpleLogger("com.lowbudgetlcs.routes.riot.Riot")
 
-fun Application.riotRoutes(bridge: RabbitMQBridge) {
+fun Application.riotRoutes(messageqs: List<RabbitMQBridge>) {
     install(StatusPages) {
         exception<RequestValidationException> { call, cause ->
             logger.warn("Request Failed validation: $cause")
@@ -30,7 +30,7 @@ fun Application.riotRoutes(bridge: RabbitMQBridge) {
             route("/callback") {
                 post {
                     val callback = call.receive<RiotCallback>()
-                    bridge.emit(Json.encodeToString(callback))
+                    for (queue in messageqs) queue.emit(Json.encodeToString(callback))
                     call.respond(HttpStatusCode.OK, callback)
                 }
             }

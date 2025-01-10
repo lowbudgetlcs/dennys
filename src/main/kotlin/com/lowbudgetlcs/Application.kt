@@ -16,5 +16,8 @@ fun Application.module() = runBlocking {
     launch {
         TournamentEngine().main()
     }
+    launch {
+        StatDaemon().main()
+    }
     logger.info("Denny's is open!")
 }

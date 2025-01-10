@@ -25,7 +25,7 @@ class RabbitMQBridge(private val queue: String) {
     }
 
     val channel: Channel = connection.createChannel().apply {
-        queueDeclare("CALLBACK", true, false, false, null)
+        queueDeclare(queue, true, false, false, null)
         basicQos(1)
     }.also {
         logger.debug("Created new messageq channel.")
