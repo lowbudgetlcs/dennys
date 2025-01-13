@@ -1,0 +1,36 @@
+insertPlayerData:
+    INSERT INTO player_game_data (player_performance_id, kills, deaths, assists, level, gold, vision_score, damage, healing, shielding, damage_taken, self_mitigated_damage, damage_to_turrets, longest_life, double_kills, triple_kills, quadra_kills, penta_kills, cs, champion_name, item0, item1, item2, item3, item4, item5, trinket, keystone_rune, secondary_tree, summoner1, summoner2)
+    VALUES (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+    )
+    RETURNING id;

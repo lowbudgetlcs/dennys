@@ -1,4 +1,9 @@
-selectTeamId:
+selectByPuuid:
+    SELECT *
+    FROM players
+    WHERE riot_puuid = ?;
+
+selectTeamIdByPuuid:
     SELECT team_id
     FROM players
     WHERE riot_puuid = ?;

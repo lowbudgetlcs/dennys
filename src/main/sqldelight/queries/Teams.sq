@@ -1,0 +1,4 @@
+selectDivisionId:
+    SELECT division_id
+    FROM teams
+    WHERE id = ?;

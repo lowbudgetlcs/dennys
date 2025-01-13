@@ -1,0 +1,10 @@
+savePerformance:
+    INSERT INTO player_performances (player_id, game_id, team_id, division_id)
+    VALUES
+        (
+            (SELECT id FROM players WHERE riot_puuid = :puuid),
+            :gameId,
+            (SELECT team_id FROM players WHERE riot_puuid = :puuid),
+            (SELECT division_id FROM teams WHERE team_id = (SELECT team_id FROM players WHERE riot_puuid = :puuid))
+        )
+    RETURNING id;
