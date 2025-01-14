@@ -14,7 +14,10 @@ import kotlinx.serialization.json.Json
 
 private val logger = KtorSimpleLogger("com.lowbudgetlcs.routes.riot.Riot")
 
-fun Application.riotRoutes(messageqs: List<RabbitMQBridge>) {
+fun Application.riotRoutes() {
+    val messageqs = mutableListOf<RabbitMQBridge>()
+    messageqs.add(RabbitMQBridge("CALLBACK"))
+    messageqs.add(RabbitMQBridge("STATS"))
     install(StatusPages) {
         exception<RequestValidationException> { call, cause ->
             logger.warn("Request Failed validation: $cause")

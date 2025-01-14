@@ -8,6 +8,7 @@ import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
@@ -17,7 +18,7 @@ class TournamentEngine {
     private val lblcs = DatabaseBridge().db
 
     fun main() {
-        logger.info("TournamentEngine running...")
+        logger.info("TournamentEngine starting...")
         val messageq = RabbitMQBridge(queue)
         val riot = RiotBridge()
         logger.debug("Listening on $queue...")
@@ -29,37 +30,45 @@ class TournamentEngine {
                 lblcs.transaction {
                     // Update game row with game outcome
                     lblcs.gamesQueries.selectGameByShortcode(callback.shortCode).executeAsOneOrNull()?.let { game ->
-                        val match = riot.match(callback.gameId)
-                        val winner = getTeamId(match.participants.filter { participant -> participant.didWin() })
-                        val loser = getTeamId(match.participants.filter { participant -> !participant.didWin() })
-                        if (winner == -1 || loser == -1) throw Throwable("Invalid teamId.") // Missing team IDs
-                        when (lblcs.gamesQueries.setWinnerLoserById(
-                            winner, loser, game.id
-                        ).executeAsOneOrNull()) {
-                            null -> logger.warn("No game ID returned- likely result was not recorded.")
-                            else -> logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
-                        }
-                        // Check if series needs updating
-                        val series = lblcs.seriesQueries.selectById(game.series_id).executeAsOne()
-                        val winCondition = if (series.playoffs) 2 else 3
-                        val (team1: Int, team2: Int) = Pair(winner, loser)
-                        val team1Wins =
-                            lblcs.gamesQueries.countWinsBySeries(game.series_id, team1).executeAsOneOrNull() ?: 0
-                        val team2Wins =
-                            lblcs.gamesQueries.countWinsBySeries(game.series_id, team2).executeAsOneOrNull() ?: 0
-                        when (winCondition) {
-                            team1Wins.toInt() -> lblcs.seriesQueries.setWinner(team1, series.id)
-                            team2Wins.toInt() -> lblcs.seriesQueries.setWinner(team2, series.id)
-                            // Otherwise, series has not concluded
+                        riot.match(callback.gameId)?.let { match ->
+                            val winner = getTeamId(match.participants.filter { participant -> participant.didWin() })
+                            val loser = getTeamId(match.participants.filter { participant -> !participant.didWin() })
+                            if (winner == -1 || loser == -1) throw Throwable("Invalid teamId.") // Missing team IDs
+                            when (lblcs.gamesQueries.updateWinnerLoserCallback(
+                                winner = winner,
+                                loser = loser,
+                                id = game.id,
+                                result = Json.encodeToString<RiotCallback>(callback)
+                            ).executeAsOneOrNull()) {
+                                null -> logger.warn("No game ID returned- likely result was not recorded.")
+                                else -> logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
+                            }
+                            // Check if series needs updating
+                            val series = lblcs.seriesQueries.selectById(game.series_id).executeAsOne()
+                            // Magic number yayyyy! Playoff games aren't best of 5, I need to do this better
+                            val winCondition = if (series.playoffs) 3 else 2
+                            val (team1: Int, team2: Int) = Pair(winner, loser)
+                            val team1Wins =
+                                lblcs.gamesQueries.countWinsBySeries(game.series_id, team1).executeAsOneOrNull() ?: 0
+                            val team2Wins =
+                                lblcs.gamesQueries.countWinsBySeries(game.series_id, team2).executeAsOneOrNull() ?: 0
+                            when (winCondition) {
+                                team1Wins.toInt() -> lblcs.seriesQueries.setWinnerLoser(team1, team2, series.id)
+                                team2Wins.toInt() -> lblcs.seriesQueries.setWinnerLoser(team2, team1, series.id)
+                                // Otherwise, series has not concluded
+                            }
                         }
                     }
                 }
                 messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
             } catch (e: SerializationException) {
+                // Generally is an application error- we do not want to lose the message
                 logger.error("[x] Error while decoding message: {}", message)
                 logger.error(e.message)
             } catch (e: IllegalArgumentException) {
                 logger.warn("[x] Message was not valid Riot Callback: {}.", message)
+                // Delete invalid messages
+                messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
             }
         }
         messageq.listen(readRiotCallback)

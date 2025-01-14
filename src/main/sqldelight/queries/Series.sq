@@ -3,7 +3,9 @@ selectById:
     FROM series
     WHERE id = ?;
 
-setWinner:
+setWinnerLoser:
   UPDATE series
-  SET winner_id = ?
+  SET
+    winner_id = :winner,
+    loser_id = :loser
   WHERE id = ?;

@@ -3,10 +3,10 @@ selectGameByShortcode:
     FROM games
     WHERE shortcode = ?;
 
-setWinnerLoserById:
+updateWinnerLoserCallback:
   UPDATE games
-  SET winner_id = ?, loser_id = ?
-  WHERE id = ?
+  SET winner_id = :winner, loser_id = :loser, callback_result = :result
+  WHERE id = :id
   RETURNING id;
 
 countWinsBySeries:

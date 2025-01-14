@@ -2,19 +2,19 @@ package com.lowbudgetlcs.bridges
 
 import com.rabbitmq.client.*
 import com.sksamuel.hoplite.ConfigLoaderBuilder
+import com.sksamuel.hoplite.ExperimentalHoplite
 import io.ktor.util.logging.*
 
 data class RabbitMQConfig(val host: String)
 
 class RabbitMQBridge(private val queue: String) {
-    private val config =
-        ConfigLoaderBuilder.default().build().loadConfigOrThrow<RabbitMQConfig>("/rabbitmq.yaml")
+    @OptIn(ExperimentalHoplite::class)
+    private val config = ConfigLoaderBuilder.default().withExplicitSealedTypes().build().loadConfigOrThrow<RabbitMQConfig>("/rabbitmq.yaml")
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.RabbitMQBridge")
     private val factory by lazy {
         ConnectionFactory().apply {
             host = config.host
             isAutomaticRecoveryEnabled = true
-            networkRecoveryInterval = 15000
         }
     }
 
