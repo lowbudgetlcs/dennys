@@ -12,7 +12,7 @@ import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
-class StatDaemon {
+class StatDaemon : Worker{
     private val queue = "STATS"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.StatDaemon")
     private val db = LblcsDatabaseBridge().db
@@ -102,5 +102,9 @@ class StatDaemon {
             }
         }
         messageq.listen(readRiotCallback)
+    }
+
+    override fun start() {
+        this.main()
     }
 }

@@ -12,11 +12,15 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.LOLMatch
 data class RiotConfig(val apiKey: String, val useStub: Boolean)
 
 class RiotBridge {
-    private val logger = KtorSimpleLogger("com.lowbudgetlcs.RiotBridge")
+    companion object {
+        private val logger = KtorSimpleLogger("com.lowbudgetlcs.RiotBridge")
 
-    @OptIn(ExperimentalHoplite::class)
-    private val config = ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/riot.yaml").build()
-        .loadConfigOrThrow<RiotConfig>()
+        @OptIn(ExperimentalHoplite::class)
+        private val config =
+            ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/riot.yaml").build()
+                .loadConfigOrThrow<RiotConfig>()
+    }
+
     private val riot by lazy { R4J(APICredentials(config.apiKey)) }
     fun match(gameId: Long): LOLMatch? = try {
         riot.loLAPI.matchAPI.getMatch(RegionShard.AMERICAS, "NA1_$gameId")

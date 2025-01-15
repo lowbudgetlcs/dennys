@@ -9,21 +9,23 @@ import io.ktor.util.logging.*
 data class RabbitMQConfig(val host: String)
 
 class RabbitMQBridge(private val queue: String) {
-    @OptIn(ExperimentalHoplite::class)
-    private val config =
-        ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/rabbitmq.yaml").build()
-            .loadConfigOrThrow<RabbitMQConfig>()
-    private val logger = KtorSimpleLogger("com.lowbudgetlcs.RabbitMQBridge")
-    private val factory by lazy {
-        ConnectionFactory().apply {
-            host = config.host
-            isAutomaticRecoveryEnabled = true
+    companion object {
+        @OptIn(ExperimentalHoplite::class)
+        private val config =
+            ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/rabbitmq.yaml").build()
+                .loadConfigOrThrow<RabbitMQConfig>()
+        private val logger = KtorSimpleLogger("com.lowbudgetlcs.RabbitMQBridge")
+        private val factory by lazy {
+            ConnectionFactory().apply {
+                host = config.host
+                isAutomaticRecoveryEnabled = true
+            }
         }
-    }
 
-    private val connection: Connection by lazy {
-        factory.newConnection().also {
-            logger.debug("Created new RabbitMQ connection.")
+        private val connection: Connection by lazy {
+            factory.newConnection().also {
+                logger.debug("Created new RabbitMQ connection.")
+            }
         }
     }
 

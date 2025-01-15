@@ -16,7 +16,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
-class TournamentEngine {
+class TournamentEngine : Worker {
     private val queue = "CALLBACK"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.TournamentEngine")
     private val db = LblcsDatabaseBridge().db
@@ -86,5 +86,9 @@ class TournamentEngine {
             }
         }
         return -1
+    }
+
+    override fun start() {
+        this.main()
     }
 }
