@@ -1,3 +1,17 @@
+selectAll:
+    SELECT id,name,logo,captain_id,division_id
+    FROM teams;
+
+updateTeam:
+    UPDATE teams
+    SET name = :name, logo = :logo, captain_id = :captain_id, division_id = :division_id
+    RETURNING *;
+
+selectById:
+    SELECT id,name,logo,captain_id,division_id
+    FROM teams
+    WHERE id = :id;
+
 selectDivisionId:
     SELECT division_id
     FROM teams

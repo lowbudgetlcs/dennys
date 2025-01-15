@@ -3,13 +3,16 @@ package com.lowbudgetlcs.bridges
 import com.rabbitmq.client.*
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.ExperimentalHoplite
+import com.sksamuel.hoplite.addResourceSource
 import io.ktor.util.logging.*
 
 data class RabbitMQConfig(val host: String)
 
 class RabbitMQBridge(private val queue: String) {
     @OptIn(ExperimentalHoplite::class)
-    private val config = ConfigLoaderBuilder.default().withExplicitSealedTypes().build().loadConfigOrThrow<RabbitMQConfig>("/rabbitmq.yaml")
+    private val config =
+        ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/rabbitmq.yaml").build()
+            .loadConfigOrThrow<RabbitMQConfig>()
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.RabbitMQBridge")
     private val factory by lazy {
         ConnectionFactory().apply {

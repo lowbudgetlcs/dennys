@@ -2,6 +2,7 @@ package com.lowbudgetlcs.bridges
 
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.ExperimentalHoplite
+import com.sksamuel.hoplite.addResourceSource
 import io.ktor.util.logging.*
 import no.stelar7.api.r4j.basic.APICredentials
 import no.stelar7.api.r4j.basic.constants.api.regions.RegionShard
@@ -14,8 +15,8 @@ class RiotBridge {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.RiotBridge")
 
     @OptIn(ExperimentalHoplite::class)
-    private val config =
-        ConfigLoaderBuilder.default().withExplicitSealedTypes().build().loadConfigOrThrow<RiotConfig>("/riot.yaml")
+    private val config = ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/riot.yaml").build()
+        .loadConfigOrThrow<RiotConfig>()
     private val riot by lazy { R4J(APICredentials(config.apiKey)) }
     fun match(gameId: Long): LOLMatch? = try {
         riot.loLAPI.matchAPI.getMatch(RegionShard.AMERICAS, "NA1_$gameId")

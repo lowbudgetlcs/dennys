@@ -1,6 +1,5 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.bridges.DatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.routes.riot.RiotCallback
@@ -13,7 +12,6 @@ import kotlinx.serialization.json.Json
 class StatDaemon {
     private val queue = "STATS"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.StatDaemon")
-    private val lblcs = DatabaseBridge().db
 
     fun main() {
         logger.info("StatDaemon running...")
@@ -29,6 +27,9 @@ class StatDaemon {
                     // Process Team data first to cause errors as early as possible
                     riot.match(callback.gameId)?.let { match ->
 //                        lblcs.gameDumpsQueries.dump(game.id, Json.encodeToString<LOLMatch>(match))
+                        for (team in match.teams) {
+
+                        }
                         for (player in match.participants) {
                             logger.debug("Processing player data for code '{}'.", callback.shortCode)
                             try {

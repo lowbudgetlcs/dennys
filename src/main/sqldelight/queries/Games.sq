@@ -1,13 +1,18 @@
-selectGameByShortcode:
-    SELECT *
+readById:
+    SELECT id,shortcode,game_num,winner_id,loser_id,callback_result,created_at,series_id
+    FROM games
+    WHERE id = :id;
+
+readByShortcode:
+    SELECT id,shortcode,game_num,winner_id,loser_id,callback_result,created_at,series_id
     FROM games
     WHERE shortcode = ?;
 
-updateWinnerLoserCallback:
-  UPDATE games
-  SET winner_id = :winner, loser_id = :loser, callback_result = :result
-  WHERE id = :id
-  RETURNING id;
+updateGame:
+    UPDATE games
+    SET winner_id=:winner_id,loser_id=:loser_id,callback_result=:callback_result
+    WHERE id = :id
+    RETURNING id;
 
 countWinsBySeries:
     SELECT COUNT(id)

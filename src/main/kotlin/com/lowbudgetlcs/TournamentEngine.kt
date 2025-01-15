@@ -1,8 +1,10 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.bridges.DatabaseBridge
+import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
+import com.lowbudgetlcs.repositories.GameRepositoryImpl
+import com.lowbudgetlcs.repositories.PlayerRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
@@ -15,33 +17,34 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 class TournamentEngine {
     private val queue = "CALLBACK"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.TournamentEngine")
-    private val lblcs = DatabaseBridge().db
+    private val db = LblcsDatabaseBridge.db
+    private val riot = RiotBridge()
+    private val games = GameRepositoryImpl()
+    private val players = PlayerRepositoryImpl()
 
     fun main() {
         logger.info("TournamentEngine starting...")
         val messageq = RabbitMQBridge(queue)
-        val riot = RiotBridge()
         logger.debug("Listening on $queue...")
         val readRiotCallback = DeliverCallback { _, delivery: Delivery ->
             val message = String(delivery.body, charset("UTF-8"))
             logger.debug("[x] Recieved Message: {}", message)
             try {
                 val callback = Json.decodeFromString<RiotCallback>(message)
-                lblcs.transaction {
-                    // Update game row with game outcome
-                    lblcs.gamesQueries.selectGameByShortcode(callback.shortCode).executeAsOneOrNull()?.let { game ->
-                        riot.match(callback.gameId)?.let { match ->
-                            val winner = getTeamId(match.participants.filter { participant -> participant.didWin() })
-                            val loser = getTeamId(match.participants.filter { participant -> !participant.didWin() })
+                riot.match(callback.gameId)?.let { match ->
+                    db.transaction {
+                        // Update game row with game outcome
+                        games.readByShortcode(callback.shortCode)?.let { game ->
+                            val winner = fetchTeamId(match.participants.filter { it.didWin() })
+                            val loser = fetchTeamId(match.participants.filter { !it.didWin() })
                             if (winner == -1 || loser == -1) throw Throwable("Invalid teamId.") // Missing team IDs
-                            when (lblcs.gamesQueries.updateWinnerLoserCallback(
-                                winner = winner,
-                                loser = loser,
-                                id = game.id,
-                                result = Json.encodeToString<RiotCallback>(callback)
-                            ).executeAsOneOrNull()) {
-                                null -> logger.warn("No game ID returned- likely result was not recorded.")
-                                else -> logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
+                            if (games.updateWinnerLoserCallbackById(
+                                    winner, loser, Json.encodeToString<RiotCallback>(callback), game.id
+                                )
+                            ) {
+                                logger.warn("No game ID returned- likely result was not recorded.")
+                            } else {
+                                logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
                             }
                             // Check if series needs updating
                             val series = lblcs.seriesQueries.selectById(game.series_id).executeAsOne()
@@ -70,21 +73,16 @@ class TournamentEngine {
                 // Delete invalid messages
                 messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
             }
+            messageq.listen(readRiotCallback)
         }
-        messageq.listen(readRiotCallback)
     }
 
-    // Given a list of MatchParticipants, fetch the team id from the database
-    // I am nearly positive there is a way to do this in a single query rather than (potentially) 5.
-    private fun getTeamId(players: List<MatchParticipant>): Int {
-        for (player in players) {
-            lblcs.playersQueries.selectTeamIdByPuuid(player.puuid).executeAsOneOrNull()?.let {
-                it.team_id?.let { teamId ->
-                    return teamId
-                }
+    fun fetchTeamId(participants: List<MatchParticipant>): Int {
+        for (participant in participants) {
+            players.readByPuuid(participant.puuid)?.let { player ->
+                if (player.team_id != null) return player.team_id
             }
         }
-        logger.warn("No players in match exist in database.")
         return -1
     }
 }

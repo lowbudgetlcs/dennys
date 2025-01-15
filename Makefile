@@ -1,7 +1,10 @@
 # Config
-CONFIG_FILE = ./src/main/resources/application.yaml
+CONFIG_ROOT = ./src/main/resources/
 APP_NAME = dennys
-PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_FILE))
+PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_ROOT)/application.yaml)
+RIOT_API_KEY = $(shell yq '.apiKey' $(CONFIG_ROOT)/riot.local.yaml)
+LBLCS_DB_URL = $(shell yq '.lblcs.url' $(CONFIG_ROOT)/database.local.yaml)
+LBLCS_DB_PW = $(shell yq '.lblcs.pass' $(CONFIG_ROOT)/database.local.yaml)
 
 .PHONY: build run stop clean erase rebuild ps psa test deploy
 
@@ -12,6 +15,9 @@ build:
 # Run the Docker container
 run:
 	docker run \
+	-e LBLCS_DB_URL=$(LBLCS_DB_URL) \
+	-e LBLCS_DB_PW=$(LBLCS_DB_PW) \
+	-e RIOT_API_KEY=$(RIOT_API_KEY) \
 	-p $(PORT):$(PORT) \
 	--network=rabbitmq.docker \
 	--name $(APP_NAME)-container $(APP_NAME)
