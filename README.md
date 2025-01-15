@@ -8,15 +8,11 @@ Here are some useful links to get you started:
 
 ## Configuration
 
-There are currently 3 configuration files in use:
+This application depends on 3 environment variables:
 
-- `application.yaml`: This configures the Ktor API as well as stores some information used for the Makefile. This is
-checked into source control.
-
-- `rabbitmq.yaml`: This configures the RabbitMQ client connections. This is stored in source control.
-
-- `database.local.yaml` & `database.yaml`: These files store the database secrets. They cascade, with database.yaml.local
-taking precedence. `database.local.yaml` is not checked into source control, so it can be used locally for development.
+- `RIOT_API_KEY` : Riot API token
+- `LBLCS_DB_URL` : JDBC connection string to the LBLCS database
+- `LBLCSL_DB_PW` : Password for LBLCS database
 
 ## Building & Running
 
