@@ -69,7 +69,7 @@ jobs:
           script: |
             cd docker/lblcs/${{ env.APP }}
             echo LBLCS_DB_URL="${{ secrets.POSTGRES_URL }}" > .env
-            echo LBLCS_DB_PW="${{ secrets.POSTGRES_PW }}" >> .env
+            echo LBLCS_DB_PW="${{ secrets.POSTGRES_DB_PW }}" >> .env
             echo RIOT_API_KEY="${{ secrets.RIOT_API_TOKEN }}" >> .env
             docker-compose down
             docker-compose pull
