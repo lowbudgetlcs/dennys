@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.players
 
 import migrations.Players
 

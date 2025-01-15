@@ -1,6 +1,7 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
+import com.lowbudgetlcs.repositories.Repository
 import migrations.Players
 
 

@@ -14,7 +14,7 @@ updateGame:
     WHERE id = :id
     RETURNING id;
 
-countWinsBySeries:
+countWinsInSeriesByTeam:
     SELECT COUNT(id)
     FROM games
-    WHERE series_id = ? AND winner_id = ?;
+    WHERE series_id = :series_id AND winner_id = :winner_id;

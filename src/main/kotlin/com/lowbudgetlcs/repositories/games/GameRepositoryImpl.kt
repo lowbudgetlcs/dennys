@@ -1,6 +1,7 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.games
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
+import com.lowbudgetlcs.repositories.Repository
 import migrations.Games
 
 class GameRepositoryImpl : GameRepository, Repository<Games, Int> {
@@ -27,4 +28,7 @@ class GameRepositoryImpl : GameRepository, Repository<Games, Int> {
         lblcs.gamesQueries.updateGame(
             winner_id = winnerId, loser_id = loserId, callback_result = callback, id = id
         ).executeAsOneOrNull() != null
+
+    override fun countTeamWinsBySeries(seriesId: Int, winnerId: Int) =
+        lblcs.gamesQueries.countWinsInSeriesByTeam(seriesId, winnerId).executeAsOneOrNull()?.toInt() ?: 0
 }

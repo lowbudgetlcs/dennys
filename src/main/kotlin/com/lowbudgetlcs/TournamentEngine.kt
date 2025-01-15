@@ -3,8 +3,9 @@ package com.lowbudgetlcs
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
-import com.lowbudgetlcs.repositories.GameRepositoryImpl
-import com.lowbudgetlcs.repositories.PlayerRepositoryImpl
+import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
+import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
+import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
@@ -19,8 +20,9 @@ class TournamentEngine {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.TournamentEngine")
     private val db = LblcsDatabaseBridge.db
     private val riot = RiotBridge()
-    private val games = GameRepositoryImpl()
-    private val players = PlayerRepositoryImpl()
+    private val gamesR = GameRepositoryImpl()
+    private val playersR = PlayerRepositoryImpl()
+    private val seriesR = SeriesRepositoryImpl()
 
     fun main() {
         logger.info("TournamentEngine starting...")
@@ -34,11 +36,11 @@ class TournamentEngine {
                 riot.match(callback.gameId)?.let { match ->
                     db.transaction {
                         // Update game row with game outcome
-                        games.readByShortcode(callback.shortCode)?.let { game ->
+                        gamesR.readByShortcode(callback.shortCode)?.let { game ->
                             val winner = fetchTeamId(match.participants.filter { it.didWin() })
                             val loser = fetchTeamId(match.participants.filter { !it.didWin() })
                             if (winner == -1 || loser == -1) throw Throwable("Invalid teamId.") // Missing team IDs
-                            if (games.updateWinnerLoserCallbackById(
+                            if (gamesR.updateWinnerLoserCallbackById(
                                     winner, loser, Json.encodeToString<RiotCallback>(callback), game.id
                                 )
                             ) {
@@ -47,18 +49,17 @@ class TournamentEngine {
                                 logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
                             }
                             // Check if series needs updating
-                            val series = lblcs.seriesQueries.selectById(game.series_id).executeAsOne()
-                            // Magic number yayyyy! Playoff games aren't best of 5, I need to do this better
-                            val winCondition = if (series.playoffs) 3 else 2
-                            val (team1: Int, team2: Int) = Pair(winner, loser)
-                            val team1Wins =
-                                lblcs.gamesQueries.countWinsBySeries(game.series_id, team1).executeAsOneOrNull() ?: 0
-                            val team2Wins =
-                                lblcs.gamesQueries.countWinsBySeries(game.series_id, team2).executeAsOneOrNull() ?: 0
-                            when (winCondition) {
-                                team1Wins.toInt() -> lblcs.seriesQueries.setWinnerLoser(team1, team2, series.id)
-                                team2Wins.toInt() -> lblcs.seriesQueries.setWinnerLoser(team2, team1, series.id)
-                                // Otherwise, series has not concluded
+                            seriesR.readById(game.series_id)?.let { series ->
+                                // Magic number yayyyy! Playoff games aren't best of 5, I need to do this better
+                                val winCondition = if (series.playoffs) 3 else 2
+                                val (team1: Int, team2: Int) = Pair(winner, loser)
+                                val team1Wins = gamesR.countTeamWinsBySeries(game.series_id, team1)
+                                val team2Wins = gamesR.countTeamWinsBySeries(game.series_id, team2)
+                                when (winCondition) {
+                                    team1Wins -> seriesR.updateWinnerLoserById(team1, team2, series.id)
+                                    team2Wins -> seriesR.updateWinnerLoserById(team1, team2, series.id)
+                                    // Otherwise, series has not concluded
+                                }
                             }
                         }
                     }
@@ -73,13 +74,13 @@ class TournamentEngine {
                 // Delete invalid messages
                 messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
             }
-            messageq.listen(readRiotCallback)
         }
+        messageq.listen(readRiotCallback)
     }
 
-    fun fetchTeamId(participants: List<MatchParticipant>): Int {
+    private fun fetchTeamId(participants: List<MatchParticipant>): Int {
         for (participant in participants) {
-            players.readByPuuid(participant.puuid)?.let { player ->
+            playersR.readByPuuid(participant.puuid)?.let { player ->
                 if (player.team_id != null) return player.team_id
             }
         }
