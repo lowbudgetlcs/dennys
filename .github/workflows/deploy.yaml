@@ -29,8 +29,6 @@ jobs:
       - name: Build configuration files
         run: |
           touch src/main/resources/database.yaml
-          yq '.databases.lblcs.url = "${{ secrets.POSTGRES_JDBC_URL }}"' -i src/main/resources/database.yaml
-          yq '.databases.lblcs.password = ${{ secrets.POSTGRES_PASSWORD }} -i src/main/resources/database.yaml
 
       - name: Build the Docker image
         run: |
@@ -70,6 +68,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd docker/lblcs/${{ env.APP }}
+            echo LBLCS_DB_URL="${{ secrets.POSTGRES_URL }}" > .env
+            echo LBLCS_DB_PW="${{ secrets.POSTGRES_PW }}" >> .env
+            echo RIOT_API_KEY="${{ secrets.RIOT_API_TOKEN }}" >> .env
             docker-compose down
             docker-compose pull
             docker-compose up -d
