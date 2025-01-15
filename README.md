@@ -5,41 +5,25 @@ This project was created using the [Ktor Project Generator](https://start.ktor.i
 Here are some useful links to get you started:
 
 - [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
 
-## Features
+## Configuration
 
-Here's a list of features included in this project:
+There are currently 3 configuration files in use:
 
-| Name                                                                   | Description                                                                        |
-| ------------------------------------------------------------------------|------------------------------------------------------------------------------------ |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-| [Call Logging](https://start.ktor.io/p/call-logging)                   | Logs client requests                                                               |
-| [Default Headers](https://start.ktor.io/p/default-headers)             | Adds a default set of headers to HTTP responses                                    |
-| [Request Validation](https://start.ktor.io/p/request-validation)       | Adds validation for incoming requests                                              |
-| [AutoHeadResponse](https://start.ktor.io/p/auto-head-response)         | Provides automatic responses for HEAD requests                                     |
+- `application.yaml`: This configures the Ktor API as well as stores some information used for the Makefile. This is
+checked into source control.
+
+- `rabbitmq.yaml`: This configures the RabbitMQ client connections. This is stored in source control.
+
+- `database.local.yaml` & `database.yaml`: These files store the database secrets. They cascade, with database.yaml.local
+taking precedence. `database.local.yaml` is not checked into source control, so it can be used locally for development.
 
 ## Building & Running
 
-To build or run the project, use one of the following tasks:
+The `Makefile` contains many useful commands to build/run this application locally, as well as quickly run the tests. 
 
-| Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`              | Run the tests                                                        |
-| `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `run`                         | Run the server                                                       |
-| `runDocker`                   | Run using the local docker image                                     |
+- `make build` and `make rebuild` will build the docker image from source.
 
-If the server starts successfully, you'll see the following output:
+- `make run` will run the previously built Docker image.
 
-```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
-```
-
+- `make test` will run tests in src/test locally- this requires jdk17 installed, as it does not run in Docker.

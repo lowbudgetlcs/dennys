@@ -1,0 +1,19 @@
+selectAll:
+    SELECT id,riot_puuid,summoner_name,team_id
+    FROM players;
+
+updateSummonerNameByPuuid:
+    UPDATE players
+    SET summoner_name = :summoner_name
+    WHERE riot_puuid = :puuid
+    RETURNING *;
+
+selectByPuuid:
+    SELECT *
+    FROM players
+    WHERE riot_puuid = ?;
+
+selectTeamIdByPuuid:
+    SELECT team_id
+    FROM players
+    WHERE riot_puuid = ?;

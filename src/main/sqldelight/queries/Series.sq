@@ -1,3 +1,12 @@
-selectAll:
-    SELECT *
-    FROM series;
+readById:
+    SELECT id,division_id,winner_id,loser_id,playoffs
+    FROM series
+    WHERE id = :id;
+
+updateWinnerLoserById:
+  UPDATE series
+  SET
+    winner_id = :winner_id,
+    loser_id = :loser_id
+  WHERE id = :id
+  RETURNING id;

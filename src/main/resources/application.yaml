@@ -4,7 +4,3 @@ ktor:
             - com.lowbudgetlcs.ApplicationKt.module
     deployment:
         port: 9292
-app:
-    name: dennys
-    build:
-        dockerfile: Dockerfile

@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val kotlinVersion = "2.1.0"
 val ktorVersion = "3.0.2"
-val logbackVersion = "1.4.14"
+val logbackVersion = "1.5.15"
 
 plugins {
     kotlin("jvm") version ("2.1.0")
@@ -17,14 +17,12 @@ version = "0.0.1"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 repositories {
-    google()
     mavenCentral()
+    google()
+    maven("https://jitpack.io")
 }
 
 tasks {
@@ -35,7 +33,7 @@ tasks {
 
 sqldelight {
     databases {
-        create("LblcsDatabase") {
+        create("Database") {
             packageName.set("$group")
             dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
             srcDirs.setFrom("src/main/sqldelight")
@@ -56,10 +54,16 @@ dependencies {
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
     implementation("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     // Database
+    implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
     implementation("app.cash.sqldelight:jdbc-driver:2.0.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:42.7.2")
+    // Rabbitmq
+    implementation("com.rabbitmq:amqp-client:5.21.0")
+    // Riot4J
+    implementation("com.github.stelar7:R4J:2.5.5")
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

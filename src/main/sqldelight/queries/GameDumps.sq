@@ -1,0 +1,3 @@
+dump:
+    INSERT INTO game_dumps
+    VALUES (DEFAULT, game_id = :gameId, dump = :dump);
