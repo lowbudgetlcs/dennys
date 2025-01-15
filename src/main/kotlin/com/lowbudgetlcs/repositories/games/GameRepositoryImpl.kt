@@ -5,7 +5,7 @@ import com.lowbudgetlcs.repositories.Repository
 import migrations.Games
 
 class GameRepositoryImpl : GameRepository, Repository<Games, Int> {
-    private val lblcs = LblcsDatabaseBridge.db
+    private val lblcs = LblcsDatabaseBridge().db
     override fun readAll(): List<Games> {
         TODO("Not yet implemented")
     }

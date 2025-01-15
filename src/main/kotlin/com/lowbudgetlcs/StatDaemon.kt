@@ -1,7 +1,10 @@
 package com.lowbudgetlcs
 
+import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
+import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
+import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
@@ -12,6 +15,9 @@ import kotlinx.serialization.json.Json
 class StatDaemon {
     private val queue = "STATS"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.StatDaemon")
+    private val db = LblcsDatabaseBridge().db
+    private val games = GameRepositoryImpl()
+    private val players = PlayerRepositoryImpl()
 
     fun main() {
         logger.info("StatDaemon running...")
@@ -23,22 +29,19 @@ class StatDaemon {
             logger.debug("[x] Recieved Message: {}", message)
             try {
                 val callback = Json.decodeFromString<RiotCallback>(message)
-                lblcs.gamesQueries.selectGameByShortcode(callback.shortCode).executeAsOneOrNull()?.let { game ->
-                    // Process Team data first to cause errors as early as possible
-                    riot.match(callback.gameId)?.let { match ->
+                riot.match(callback.gameId)?.let { match ->
+                    games.readByShortcode(callback.shortCode)?.let { game ->
+                        // Process Team data first to cause errors as early as possible
 //                        lblcs.gameDumpsQueries.dump(game.id, Json.encodeToString<LOLMatch>(match))
-                        for (team in match.teams) {
-
-                        }
+//                        for (team in match.teams) {
+//
+//                        }
                         for (player in match.participants) {
                             logger.debug("Processing player data for code '{}'.", callback.shortCode)
                             try {
-                                lblcs.transaction {
-                                    lblcs.playerPerformancesQueries.savePerformance(
-                                        puuid = player.puuid,
-                                        gameId = game.id,
-                                    ).executeAsOne().let { performanceId ->
-                                        lblcs.playerDataQueries.insertPlayerData(
+                                db.transaction {
+                                    players.createPerformance(player.puuid, game.id)?.let { performanceId ->
+                                        players.createGameData(
                                             performanceId,
                                             player.kills,
                                             player.deaths,
@@ -70,15 +73,15 @@ class StatDaemon {
                                             player.perks.perkStyles[1].style,
                                             player.summoner1Id,
                                             player.summoner2Id
-                                        ).executeAsOne()
+                                        )
                                     }
-                                    logger.debug(
-                                        "Successfully processed player '{}#{}' ({})",
-                                        player.riotIdName,
-                                        player.riotIdTagline,
-                                        callback.shortCode
-                                    )
                                 }
+                                logger.debug(
+                                    "Successfully processed player '{}#{}' ({})",
+                                    player.riotIdName,
+                                    player.riotIdTagline,
+                                    callback.shortCode
+                                )
                             } catch (e: Throwable) {
                                 logger.error(
                                     "Transaction failed for '{}' ({}')",

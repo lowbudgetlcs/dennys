@@ -10,6 +10,7 @@ import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
+import kotlinx.coroutines.delay
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,7 +19,7 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 class TournamentEngine {
     private val queue = "CALLBACK"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.TournamentEngine")
-    private val db = LblcsDatabaseBridge.db
+    private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
     private val gamesR = GameRepositoryImpl()
     private val playersR = PlayerRepositoryImpl()
@@ -44,9 +45,9 @@ class TournamentEngine {
                                     winner, loser, Json.encodeToString<RiotCallback>(callback), game.id
                                 )
                             ) {
-                                logger.warn("No game ID returned- likely result was not recorded.")
-                            } else {
                                 logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
+                            } else {
+                                logger.warn("No game ID returned- likely result was not recorded.")
                             }
                             // Check if series needs updating
                             seriesR.readById(game.series_id)?.let { series ->

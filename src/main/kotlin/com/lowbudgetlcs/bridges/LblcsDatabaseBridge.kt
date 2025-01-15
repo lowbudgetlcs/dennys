@@ -12,25 +12,26 @@ import com.zaxxer.hikari.HikariDataSource
 data class DatabaseConfig(val lblcs: Lblcs)
 data class Lblcs(val url: Masked, val pass: Masked)
 
-object LblcsDatabaseBridge {
-    @OptIn(ExperimentalHoplite::class)
-    private val config =
-        ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/database.yaml").build()
-            .loadConfigOrThrow<DatabaseConfig>()
+class LblcsDatabaseBridge {
+    companion object {
+        @OptIn(ExperimentalHoplite::class)
+        private val config =
+            ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/database.yaml").build()
+                .loadConfigOrThrow<DatabaseConfig>()
 
-    private val driver by lazy {
-        HikariConfig().apply {
-            jdbcUrl = config.lblcs.url.value
-            password = config.lblcs.pass.value
-            maximumPoolSize = 15
-            minimumIdle = 1
-            idleTimeout = 10000
-            connectionTimeout = 30000
-        }.let {
-            HikariDataSource(it).asJdbcDriver()
+        private val driver by lazy {
+            HikariConfig().apply {
+                jdbcUrl = config.lblcs.url.value
+                password = config.lblcs.pass.value
+                maximumPoolSize = 15
+                minimumIdle = 1
+                idleTimeout = 10000
+                connectionTimeout = 30000
+            }.let {
+                HikariDataSource(it).asJdbcDriver()
+            }
         }
     }
-    val db by lazy {
-        Database(driver)
-    }
+
+    val db = Database(driver)
 }

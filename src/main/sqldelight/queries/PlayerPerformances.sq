@@ -1,4 +1,4 @@
-savePerformance:
+createPerformance:
     INSERT INTO player_performances
     VALUES
         (

@@ -12,15 +12,9 @@ fun Application.module() {
     logger.info("Performing opening duties...")
     configureRouting()
     // Start Tournament Engine and Stat Daemons
-    launch {
-        TournamentEngine().main()
-    }
-    launch {
-        TournamentEngine().main()
-    }
-    launch {
-        StatDaemon().main()
-    }
+//    launch {
+//        TournamentEngine().main()
+//    }
     launch {
         StatDaemon().main()
     }

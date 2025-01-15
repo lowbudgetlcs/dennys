@@ -5,7 +5,7 @@ import com.lowbudgetlcs.repositories.Repository
 import migrations.Teams
 
 class TeamRepositoryImpl : TeamRepository, Repository<Teams, Int> {
-    private val lblcs = LblcsDatabaseBridge.db
+    private val lblcs = LblcsDatabaseBridge().db
 
     override fun readAll() = lblcs.teamsQueries.selectAll().executeAsList()
 
