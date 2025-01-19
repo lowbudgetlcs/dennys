@@ -3,10 +3,10 @@ readById:
     FROM series
     WHERE id = :id;
 
-updateWinnerLoserById:
+updateSeries:
   UPDATE series
   SET
     winner_id = :winner_id,
     loser_id = :loser_id
   WHERE id = :id
-  RETURNING id;
+  RETURNING id,division_id,winner_id,loser_id,playoffs;

@@ -1,13 +1,15 @@
 package com.lowbudgetlcs.repositories.players
 
-import migrations.Players
+import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.Player
+import com.lowbudgetlcs.models.PlayerId
+import com.lowbudgetlcs.repositories.Repository
 
-interface PlayerRepository {
-    fun updateSummonerNameByPuuid(puuid: String, summonerName: String): Players?
-    fun readByPuuid(puuid: String): Players?
-    fun createPerformance(puuid: String, gameId: Int): Int?
-    fun createGameData(
-        performanceId: Int,
+interface PlayerRepository : Repository<Player, PlayerId> {
+    fun readByPuuid(puuid: String): Player?
+    fun createPlayerData(
+        player: Player,
+        game: Game,
         kills: Int,
         deaths: Int,
         assists: Int,
@@ -38,5 +40,5 @@ interface PlayerRepository {
         secondaryKeystone: Int,
         summoner1: Int,
         summoner2: Int
-    ): Boolean
+    ): Player
 }

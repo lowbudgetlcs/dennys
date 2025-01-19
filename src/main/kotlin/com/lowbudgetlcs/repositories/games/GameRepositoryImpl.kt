@@ -1,34 +1,48 @@
 package com.lowbudgetlcs.repositories.games
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.repositories.Repository
+import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.GameId
+import com.lowbudgetlcs.models.SeriesId
+import com.lowbudgetlcs.models.TeamId
+import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.routes.riot.RiotCallback
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import migrations.Games
 
-class GameRepositoryImpl : GameRepository, Repository<Games, Int> {
+class GameRepositoryImpl : GameRepository {
     private val lblcs = LblcsDatabaseBridge().db
-    override fun readAll(): List<Games> {
+    override fun readAll(): List<Game> = lblcs.gamesQueries.readAll().executeAsList().map { transform(it) }
+
+    override fun readByCriteria(criteria: Criteria<Game>): List<Game> = criteria.meetCriteria(readAll())
+
+    override fun readById(id: GameId): Game? =
+        lblcs.gamesQueries.readById(id.id).executeAsOneOrNull()?.let { transform(it) }
+
+    override fun create(entity: Game): Game {
         TODO("Not yet implemented")
     }
 
-    override fun readById(id: Int) = lblcs.gamesQueries.readById(id).executeAsOneOrNull()
+    override fun update(entity: Game): Game = lblcs.gamesQueries.updateGame(
+        winner_id = entity.winner?.id,
+        loser_id = entity.loser?.id,
+        callback_result = Json.encodeToString(entity.callbackResult),
+        id = entity.id.id
+    ).executeAsOne().let { transform(it) }
 
-    override fun create(entity: Games): Games {
+    override fun delete(entity: Game): Game {
         TODO("Not yet implemented")
     }
 
-    override fun update(entity: Games): Games = TODO("Not yet implemented")
-
-    override fun delete(entity: Games): Games {
-        TODO("Not yet implemented")
-    }
-
-    override fun readByShortcode(shortCode: String) = lblcs.gamesQueries.readByShortcode(shortCode).executeAsOneOrNull()
-
-    override fun updateWinnerLoserCallbackById(winnerId: Int, loserId: Int, callback: String, id: Int): Boolean =
-        lblcs.gamesQueries.updateGame(
-            winner_id = winnerId, loser_id = loserId, callback_result = callback, id = id
-        ).executeAsOneOrNull() != null
-
-    override fun countTeamWinsBySeries(seriesId: Int, winnerId: Int) =
-        lblcs.gamesQueries.countWinsInSeriesByTeam(seriesId, winnerId).executeAsOneOrNull()?.toInt() ?: 0
+    private fun transform(row: Games): Game = Game(
+        GameId(row.id),
+        row.shortcode,
+        row.game_num,
+        row.winner_id?.let { TeamId(it) },
+        row.loser_id?.let { TeamId(it) },
+        row.callback_result?.let { Json.decodeFromString<RiotCallback>(it) },
+        row.created_at,
+        SeriesId(row.series_id)
+    )
 }

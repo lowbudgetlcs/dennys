@@ -1,3 +1,8 @@
+readByPlayerId:
+    SELECT id,player_id,game_id,team_id,division_id
+    FROM player_performances
+    WHERE id = :id;
+
 createPerformance:
     INSERT INTO player_performances
     VALUES

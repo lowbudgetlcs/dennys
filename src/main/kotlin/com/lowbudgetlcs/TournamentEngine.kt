@@ -3,16 +3,19 @@ package com.lowbudgetlcs
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
+import com.lowbudgetlcs.models.TeamId
+import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
+import com.lowbudgetlcs.repositories.games.SeriesCriteria
+import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
+import com.lowbudgetlcs.repositories.games.TeamWinCriteria
 import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
-import kotlinx.coroutines.delay
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
@@ -25,7 +28,7 @@ class TournamentEngine : Worker {
     private val playersR = PlayerRepositoryImpl()
     private val seriesR = SeriesRepositoryImpl()
 
-    fun main() {
+    private fun main() {
         logger.info("TournamentEngine starting...")
         val messageq = RabbitMQBridge(queue)
         logger.debug("Listening on $queue...")
@@ -37,28 +40,30 @@ class TournamentEngine : Worker {
                 riot.match(callback.gameId)?.let { match ->
                     db.transaction {
                         // Update game row with game outcome
-                        gamesR.readByShortcode(callback.shortCode)?.let { game ->
+                        gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
                             val winner = fetchTeamId(match.participants.filter { it.didWin() })
                             val loser = fetchTeamId(match.participants.filter { !it.didWin() })
-                            if (winner == -1 || loser == -1) throw Throwable("Invalid teamId.") // Missing team IDs
-                            if (gamesR.updateWinnerLoserCallbackById(
-                                    winner, loser, Json.encodeToString<RiotCallback>(callback), game.id
+                            if (winner == null || loser == null) throw Throwable("Invalid teamId.") // Missing team IDs
+                            gamesR.update(
+                                game.copy(
+                                    winner = winner, loser = loser, callbackResult = callback
                                 )
-                            ) {
-                                logger.debug("Successfully updated code :'{}' outcome.", callback.shortCode)
-                            } else {
-                                logger.warn("No game ID returned- likely result was not recorded.")
-                            }
+                            )
                             // Check if series needs updating
-                            seriesR.readById(game.series_id)?.let { series ->
+                            val (team1, team2) = Pair(winner, loser)
+                            seriesR.readById(game.series)?.let { series ->
                                 // Magic number yayyyy! Playoff games aren't best of 5, I need to do this better
                                 val winCondition = if (series.playoffs) 3 else 2
-                                val (team1: Int, team2: Int) = Pair(winner, loser)
-                                val team1Wins = gamesR.countTeamWinsBySeries(game.series_id, team1)
-                                val team2Wins = gamesR.countTeamWinsBySeries(game.series_id, team2)
+
+                                val team1Wins = gamesR.readByCriteria(
+                                    AndCriteria(TeamWinCriteria(team1), SeriesCriteria(game.series))
+                                ).size
+                                val team2Wins = gamesR.readByCriteria(
+                                    AndCriteria(TeamWinCriteria(team2), SeriesCriteria(game.series))
+                                ).size
                                 when (winCondition) {
-                                    team1Wins -> seriesR.updateWinnerLoserById(team1, team2, series.id)
-                                    team2Wins -> seriesR.updateWinnerLoserById(team1, team2, series.id)
+                                    team1Wins -> seriesR.update(series.copy(winner = team1, loser = team2))
+                                    team2Wins -> seriesR.update(series.copy(loser = team1, winner = team2))
                                     // Otherwise, series has not concluded
                                 }
                             }
@@ -79,13 +84,13 @@ class TournamentEngine : Worker {
         messageq.listen(readRiotCallback)
     }
 
-    private fun fetchTeamId(participants: List<MatchParticipant>): Int {
+    private fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
         for (participant in participants) {
             playersR.readByPuuid(participant.puuid)?.let { player ->
-                if (player.team_id != null) return player.team_id
+                if (player.team != null) return player.team
             }
         }
-        return -1
+        return null
     }
 
     override fun start() {

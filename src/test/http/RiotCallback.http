@@ -1,5 +1,5 @@
 ### Game1
-POST http://localhost:9292/riot/callback
+POST https://api.lowbudgetlcs.com/riot/callback
 Content-Type: application/json
 
 {

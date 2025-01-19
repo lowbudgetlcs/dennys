@@ -1,6 +1,17 @@
-selectAll:
+readAll:
     SELECT id,riot_puuid,summoner_name,team_id
     FROM players;
+
+readById:
+    SELECT id,riot_puuid,summoner_name,team_id
+    FROM players
+    WHERE id = :id;
+
+updatePlayer:
+    UPDATE players
+    SET summoner_name = :summoner_name
+    WHERE id = :id
+    RETURNING id,riot_puuid,summoner_name,team_id;
 
 updateSummonerNameByPuuid:
     UPDATE players
