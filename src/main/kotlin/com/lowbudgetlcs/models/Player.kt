@@ -1,14 +1,18 @@
 package com.lowbudgetlcs.models
 
+import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import kotlinx.serialization.Serializable
+import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
+
+@Serializable
+data class PlayerId(val id: Int)
 
 @Serializable
 data class Player(
     val id: PlayerId,
-    val summonerName: String?,
+    val summonerName: String,
     val puuid: String,
     val team: TeamId?,
-    val performances: List<PlayerPerformance>,
     val gameData: List<PlayerGameData>
 )
 
@@ -46,16 +50,12 @@ data class PlayerGameData(
     val summoner2: Int
 )
 
-@Serializable
-data class PlayerPerformance(
-    val gameId: GameId, val teamId: TeamId, val divisionId: DivisionId
-)
-
-@Serializable
-data class PlayerGameDataId(val id: Int)
-
-@Serializable
-data class PlayerPerformanceId(val id: Int)
-
-@Serializable
-data class PlayerId(val id: Int)
+fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
+    val playersR = PlayerRepositoryImpl()
+    for (participant in participants) {
+        playersR.readByPuuid(participant.puuid)?.let { player ->
+            if (player.team != null) return player.team
+        }
+    }
+    return null
+}

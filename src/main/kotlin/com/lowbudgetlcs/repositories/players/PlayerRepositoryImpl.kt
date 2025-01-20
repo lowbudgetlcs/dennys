@@ -33,15 +33,6 @@ class PlayerRepositoryImpl : PlayerRepository {
     override fun readByPuuid(puuid: String): Player? =
         lblcs.playersQueries.selectByPuuid(puuid).executeAsOneOrNull()?.let { transform(it) }
 
-    private fun readPlayerPerformances(playerId: PlayerId): List<PlayerPerformance> =
-        lblcs.playerPerformancesQueries.readByPlayerId(playerId.id).executeAsList().let { perf ->
-            perf.map {
-                PlayerPerformance(
-                    GameId(it.game_id), TeamId(it.team_id), DivisionId(it.division_id)
-                )
-            }
-        }
-
     private fun readPlayerGameData(playerId: PlayerId): List<PlayerGameData> =
         lblcs.playerDataQueries.readByPlayerId(playerId.id).executeAsList().let { data ->
             data.map {
@@ -81,82 +72,17 @@ class PlayerRepositoryImpl : PlayerRepository {
         }
 
     override fun createPlayerData(
-        player: Player,
-        game: Game,
-        kills: Int,
-        deaths: Int,
-        assists: Int,
-        championLevel: Int,
-        goldEarned: Long,
-        visionScore: Long,
-        totalDamageToChampions: Long,
-        totalHealsOnTeammates: Long,
-        totalDamageShieldedOnTeammates: Long,
-        totalDamageTaken: Long,
-        damageSelfMitigated: Long,
-        damageDealtToTurrets: Long,
-        longestTimeSpentLiving: Long,
-        doubleKills: Short,
-        tripleKills: Short,
-        quadraKills: Short,
-        pentaKills: Short,
-        cs: Int,
-        championName: String,
-        item0: Int,
-        item1: Int,
-        item2: Int,
-        item3: Int,
-        item4: Int,
-        item5: Int,
-        item6: Int,
-        keystone: Int,
-        secondaryKeystone: Int,
-        summoner1: Int,
-        summoner2: Int
+        player: Player, game: Game, data: PlayerGameData
     ): Player {
         lblcs.transaction {
             createPlayerGameData(
-                player,
-                createPerformance(player, game),
-                kills,
-                deaths,
-                assists,
-                championLevel,
-                goldEarned,
-                visionScore,
-                totalDamageToChampions,
-                totalHealsOnTeammates,
-                totalDamageShieldedOnTeammates,
-                totalDamageTaken,
-                damageSelfMitigated,
-                damageDealtToTurrets,
-                longestTimeSpentLiving,
-                doubleKills,
-                tripleKills,
-                quadraKills,
-                pentaKills,
-                cs,
-                championName,
-                item0,
-                item1,
-                item2,
-                item3,
-                item4,
-                item5,
-                item6,
-                keystone,
-                secondaryKeystone,
-                summoner1,
-                summoner2
+                createPerformance(player, game), data
             )
-        }
-        val performances by lazy {
-            readPlayerPerformances(player.id)
         }
         val gameData by lazy {
             readPlayerGameData(player.id)
         }
-        return player.copy(performances = performances, gameData = gameData)
+        return player.copy(gameData = gameData)
     }
 
     private fun createPerformance(player: Player, game: Game): PlayerPerformanceId =
@@ -165,78 +91,42 @@ class PlayerRepositoryImpl : PlayerRepository {
         }
 
     private fun createPlayerGameData(
-        player: Player,
-        performance: PlayerPerformanceId,
-        kills: Int,
-        deaths: Int,
-        assists: Int,
-        championLevel: Int,
-        goldEarned: Long,
-        visionScore: Long,
-        totalDamageToChampions: Long,
-        totalHealsOnTeammates: Long,
-        totalDamageShieldedOnTeammates: Long,
-        totalDamageTaken: Long,
-        damageSelfMitigated: Long,
-        damageDealtToTurrets: Long,
-        longestTimeSpentLiving: Long,
-        doubleKills: Short,
-        tripleKills: Short,
-        quadraKills: Short,
-        pentaKills: Short,
-        cs: Int,
-        championName: String,
-        item0: Int,
-        item1: Int,
-        item2: Int,
-        item3: Int,
-        item4: Int,
-        item5: Int,
-        item6: Int,
-        keystone: Int,
-        secondaryKeystone: Int,
-        summoner1: Int,
-        summoner2: Int
-    ): PlayerGameDataId = lblcs.playerDataQueries.createPlayerData(
+        performance: PlayerPerformanceId, data: PlayerGameData
+    ) = lblcs.playerDataQueries.createPlayerData(
         performance.id,
-        kills,
-        deaths,
-        assists,
-        championLevel,
-        goldEarned,
-        visionScore,
-        totalDamageToChampions,
-        totalHealsOnTeammates,
-        totalDamageShieldedOnTeammates,
-        totalDamageTaken,
-        damageSelfMitigated,
-        damageDealtToTurrets,
-        longestTimeSpentLiving,
-        doubleKills,
-        tripleKills,
-        quadraKills,
-        pentaKills,
-        cs,
-        championName,
-        item0,
-        item1,
-        item2,
-        item3,
-        item4,
-        item5,
-        item6,
-        keystone,
-        secondaryKeystone,
-        summoner1,
-        summoner2
-    ).executeAsOne().let {
-        PlayerGameDataId(it)
-    }
+        data.kills,
+        data.deaths,
+        data.assists,
+        data.championLevel,
+        data.goldEarned,
+        data.visionScore,
+        data.totalDamageToChampions,
+        data.totalHealsOnTeammates,
+        data.totalDamageShieldedOnTeammates,
+        data.totalDamageTaken,
+        data.damageSelfMitigated,
+        data.damageDealtToTurrets,
+        data.longestTimeSpentLiving,
+        data.doubleKills,
+        data.tripleKills,
+        data.quadraKills,
+        data.pentaKills,
+        data.cs,
+        data.championName,
+        data.item0,
+        data.item1,
+        data.item2,
+        data.item3,
+        data.item4,
+        data.item5,
+        data.item6,
+        data.keystone,
+        data.secondaryKeystone,
+        data.summoner1,
+        data.summoner2
+    ).executeAsOne()
 
     private fun transform(entity: Players): Player {
-        val performances by lazy {
-            readPlayerPerformances(PlayerId(entity.id))
-        }
         val gameData by lazy {
             readPlayerGameData(PlayerId(entity.id))
         }
@@ -245,7 +135,6 @@ class PlayerRepositoryImpl : PlayerRepository {
             entity.summoner_name,
             entity.riot_puuid,
             entity.team_id?.let { TeamId(it) },
-            performances,
             gameData,
         )
     }

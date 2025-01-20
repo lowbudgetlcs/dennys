@@ -3,7 +3,14 @@ package com.lowbudgetlcs.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Series(val id: SeriesId, val division: DivisionId, val winner: TeamId?, val loser: TeamId?, val playoffs: Boolean)
+data class SeriesId(val id: Int)
 
 @Serializable
-data class SeriesId(val id: Int)
+data class Series(
+    val id: SeriesId,
+    val division: DivisionId,
+    val winner: TeamId?,
+    val loser: TeamId?,
+    val playoffs: Boolean
+)
+

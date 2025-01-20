@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
 
 @Serializable
+data class GameId(val id: Int)
+
+@Serializable
 data class Game(
     val id: GameId,
     val shortCode: String,
@@ -13,10 +16,6 @@ data class Game(
     val winner: TeamId?,
     val loser: TeamId?,
     val callbackResult: RiotCallback?,
-    @Contextual
-    val createdAt: OffsetDateTime,
+    @Contextual val createdAt: OffsetDateTime,
     val series: SeriesId,
 )
-
-@Serializable
-data class GameId(val id: Int)

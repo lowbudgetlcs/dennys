@@ -3,13 +3,12 @@ package com.lowbudgetlcs
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
-import com.lowbudgetlcs.models.TeamId
+import com.lowbudgetlcs.models.fetchTeamId
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
 import com.lowbudgetlcs.repositories.games.SeriesCriteria
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
 import com.lowbudgetlcs.repositories.games.TeamWinCriteria
-import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
@@ -17,7 +16,6 @@ import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
 class TournamentEngine : Worker {
     private val queue = "CALLBACK"
@@ -25,7 +23,6 @@ class TournamentEngine : Worker {
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
     private val gamesR = GameRepositoryImpl()
-    private val playersR = PlayerRepositoryImpl()
     private val seriesR = SeriesRepositoryImpl()
 
     private fun main() {
@@ -82,15 +79,6 @@ class TournamentEngine : Worker {
             }
         }
         messageq.listen(readRiotCallback)
-    }
-
-    private fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
-        for (participant in participants) {
-            playersR.readByPuuid(participant.puuid)?.let { player ->
-                if (player.team != null) return player.team
-            }
-        }
-        return null
     }
 
     override fun start() {
