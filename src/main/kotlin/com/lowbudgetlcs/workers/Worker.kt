@@ -1,4 +1,4 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.workers
 
 interface Worker {
     fun start()

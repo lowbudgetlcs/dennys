@@ -1,4 +1,4 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
@@ -20,7 +20,7 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 
 class StatDaemon : Worker {
     private val queue = "STATS"
-    private val logger = KtorSimpleLogger("com.lowbudgetlcs.StatDaemon")
+    private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
     private val gamesR = GameRepositoryImpl()
     private val playersR = PlayerRepositoryImpl()
     private val teamsR = TeamRepositoryImpl()

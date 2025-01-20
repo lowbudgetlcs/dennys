@@ -1,4 +1,4 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
@@ -19,7 +19,7 @@ import kotlinx.serialization.json.Json
 
 class TournamentEngine : Worker {
     private val queue = "CALLBACK"
-    private val logger = KtorSimpleLogger("com.lowbudgetlcs.TournamentEngine")
+    private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.TournamentEngine")
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
     private val gamesR = GameRepositoryImpl()
