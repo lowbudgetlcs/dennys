@@ -2,12 +2,13 @@ package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
-import com.lowbudgetlcs.models.Game
-import com.lowbudgetlcs.models.PlayerGameData
-import com.lowbudgetlcs.models.fetchTeamId
+import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.repositories.games.GameRepository
 import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
+import com.lowbudgetlcs.repositories.players.PlayerRepository
 import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
+import com.lowbudgetlcs.repositories.teams.TeamRepository
 import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.DeliverCallback
@@ -15,15 +16,16 @@ import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import no.stelar7.api.r4j.basic.constants.types.lol.TeamType
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 
 class StatDaemon : Worker {
     private val queue = "STATS"
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
-    private val gamesR = GameRepositoryImpl()
-    private val playersR = PlayerRepositoryImpl()
-    private val teamsR = TeamRepositoryImpl()
+    private val gamesR: GameRepository = GameRepositoryImpl()
+    private val playersR: PlayerRepository = PlayerRepositoryImpl()
+    private val teamsR: TeamRepository = TeamRepositoryImpl()
 
     private fun main() {
         logger.info("StatDaemon running...")
@@ -42,7 +44,10 @@ class StatDaemon : Worker {
                         // Process Team data first to cause errors as early as possible
                         match.teams.forEach { team ->
                             processTeam(
-                                team, match.participants.filter { it.team === team.teamId }, game
+                                team,
+                                match.participants.filter { it.team === team.teamId },
+                                game,
+                                match.gameDuration.toLong()
                             )
                         }
                         match.participants.forEach { processPlayer(it, game) }
@@ -63,24 +68,43 @@ class StatDaemon : Worker {
         this.main()
     }
 
-    private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game) {
+    private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
         fetchTeamId(players)?.let { teamId ->
             logger.debug("Processing team data for '{}' ('{}')", teamId, game.shortCode)
             teamsR.readById(teamId)?.let { t ->
                 try {
+                    val side = if (team.teamId === TeamType.BLUE) RiftSide.BLUE else RiftSide.RED
                     teamsR.createTeamData(
-                        t,
-                        game,
-                        team.teamId,
-                        team.didWin(),
-                        players.sumOf { it.goldEarned },
-                        team.objectives,
+                        t, game, TeamGameData(
+                            team.didWin(), side, players.sumOf { it.goldEarned }, length, kills = Objective(
+                                kills = team.objectives["champion"]?.kills ?: 0,
+                                first = team.objectives["champion"]?.isFirst ?: false
+                            ), barons = Objective(
+                                kills = team.objectives["baron"]?.kills ?: 0,
+                                first = team.objectives["baron"]?.isFirst ?: false
+                            ), grubs = Objective(
+                                kills = team.objectives["horde"]?.kills ?: 0,
+                                first = team.objectives["horde"]?.isFirst ?: false
+                            ), dragons = Objective(
+                                kills = team.objectives["dragon"]?.kills ?: 0,
+                                first = team.objectives["dragon"]?.isFirst ?: false
+                            ), heralds = Objective(
+                                kills = team.objectives["riftHerald"]?.kills ?: 0,
+                                first = team.objectives["riftHerald"]?.isFirst ?: false
+                            ), towers = Objective(
+                                kills = team.objectives["tower"]?.kills ?: 0,
+                                first = team.objectives["tower"]?.isFirst ?: false
+                            ), inhibitors = Objective(
+                                kills = team.objectives["inhibitor"]?.kills ?: 0,
+                                first = team.objectives["inhibitor"]?.isFirst ?: false
+                            )
+                        )
+                    )
+                    logger.debug(
+                        "Successfully processed team '{}' ('{}')", t.name, game.shortCode
                     )
                 } catch (e: Throwable) {
-                    logger.error(
-                        "Transaction failed for '{}' ('{}')", t.name, game.shortCode
-                    )
-                    logger.error(e.message)
+                    transactionError(e, t.name, game.shortCode)
                 }
             }
         }
@@ -133,10 +157,12 @@ class StatDaemon : Worker {
                 game.shortCode
             )
         } catch (e: Throwable) {
-            logger.error(
-                "Transaction failed for '{}' ('{}')", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode
-            )
-            logger.error(e.message)
+            transactionError(e, "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         }
+    }
+
+    private fun transactionError(e: Throwable, target: String, context: String) {
+        logger.error("Transaction failed for '{}' ('{}')", target, context)
+        logger.error(e.message)
     }
 }

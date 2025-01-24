@@ -9,7 +9,8 @@ CREATE TABLE teams (
 ALTER TABLE teams
   ADD CONSTRAINT fk_captain_id
   FOREIGN KEY (captain_id)
-  REFERENCES players(id);
+  REFERENCES players(id)
+  ON DELETE SET NULL;
 
 ALTER TABLE players
   ADD COLUMN team_id INT

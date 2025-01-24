@@ -3,17 +3,63 @@ package com.lowbudgetlcs.repositories.players
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.repositories.Criteria
+import migrations.Player_game_data
 import migrations.Players
 
 
 class PlayerRepositoryImpl : PlayerRepository {
 
+    override fun Players.toPlayer(): Player {
+        val gameData by lazy {
+            readPlayerGameData(PlayerId(this.id))
+        }
+        return Player(
+            PlayerId(this.id),
+            this.summoner_name,
+            this.riot_puuid,
+            this.team_id?.let { TeamId(it) },
+            gameData,
+        )
+    }
+
+    override fun Player_game_data.toPlayerGameData() = PlayerGameData(
+        this.kills,
+        this.deaths,
+        this.assists,
+        this.level,
+        this.gold,
+        this.vision_score,
+        this.damage,
+        this.healing,
+        this.shielding,
+        this.damage_taken,
+        this.self_mitigated_damage,
+        this.damage_to_turrets,
+        this.longest_life,
+        this.double_kills,
+        this.triple_kills,
+        this.quadra_kills,
+        this.penta_kills,
+        this.cs,
+        this.champion_name,
+        this.item0,
+        this.item1,
+        this.item2,
+        this.item3,
+        this.item4,
+        this.item5,
+        this.trinket,
+        this.keystone_rune,
+        this.secondary_tree,
+        this.summoner1,
+        this.summoner2
+    )
+
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun readAll(): List<Player> = lblcs.playersQueries.readAll().executeAsList().map { transform(it) }
+    override fun readAll(): List<Player> = lblcs.playersQueries.readAll().executeAsList().map { it.toPlayer() }
 
-    override fun readById(id: PlayerId): Player? =
-        lblcs.playersQueries.readById(id.id).executeAsOneOrNull()?.let { transform(it) }
+    override fun readById(id: PlayerId): Player? = lblcs.playersQueries.readById(id.id).executeAsOneOrNull()?.toPlayer()
 
     override fun readByCriteria(criteria: Criteria<Player>): List<Player> {
         TODO("Not yet implemented")
@@ -24,50 +70,19 @@ class PlayerRepositoryImpl : PlayerRepository {
     }
 
     override fun update(entity: Player): Player =
-        lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOne().let { transform(it) }
+        lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOne().toPlayer()
 
     override fun delete(entity: Player): Player {
         TODO("Not yet implemented")
     }
 
     override fun readByPuuid(puuid: String): Player? =
-        lblcs.playersQueries.selectByPuuid(puuid).executeAsOneOrNull()?.let { transform(it) }
+        lblcs.playersQueries.readByPuuid(puuid).executeAsOneOrNull()?.toPlayer()
 
     private fun readPlayerGameData(playerId: PlayerId): List<PlayerGameData> =
-        lblcs.playerDataQueries.readByPlayerId(playerId.id).executeAsList().let { data ->
+        lblcs.playersQueries.readGameDataByPlayerId(playerId.id).executeAsList().let { data ->
             data.map {
-                PlayerGameData(
-                    it.kills,
-                    it.deaths,
-                    it.assists,
-                    it.level,
-                    it.gold,
-                    it.vision_score,
-                    it.damage,
-                    it.healing,
-                    it.shielding,
-                    it.damage_taken,
-                    it.self_mitigated_damage,
-                    it.damage_to_turrets,
-                    it.longest_life,
-                    it.double_kills,
-                    it.triple_kills,
-                    it.quadra_kills,
-                    it.penta_kills,
-                    it.cs,
-                    it.champion_name,
-                    it.item0,
-                    it.item1,
-                    it.item2,
-                    it.item3,
-                    it.item4,
-                    it.item5,
-                    it.trinket,
-                    it.keystone_rune,
-                    it.secondary_tree,
-                    it.summoner1,
-                    it.summoner2
-                )
+                it.toPlayerGameData()
             }
         }
 
@@ -86,13 +101,13 @@ class PlayerRepositoryImpl : PlayerRepository {
     }
 
     private fun createPerformance(player: Player, game: Game): PlayerPerformanceId =
-        lblcs.playerPerformancesQueries.createPerformance(player.puuid, game.id.id).executeAsOne().let {
+        lblcs.playersQueries.createPerformance(player.puuid, game.id.id).executeAsOne().let {
             PlayerPerformanceId(it)
         }
 
     private fun createPlayerGameData(
         performance: PlayerPerformanceId, data: PlayerGameData
-    ) = lblcs.playerDataQueries.createPlayerData(
+    ) = lblcs.playersQueries.createPlayerData(
         performance.id,
         data.kills,
         data.deaths,
@@ -125,17 +140,4 @@ class PlayerRepositoryImpl : PlayerRepository {
         data.summoner1,
         data.summoner2
     ).executeAsOne()
-
-    private fun transform(entity: Players): Player {
-        val gameData by lazy {
-            readPlayerGameData(PlayerId(entity.id))
-        }
-        return Player(
-            PlayerId(entity.id),
-            entity.summoner_name,
-            entity.riot_puuid,
-            entity.team_id?.let { TeamId(it) },
-            gameData,
-        )
-    }
 }

@@ -10,7 +10,7 @@ LBLCS_DB_PW = $(shell yq '.lblcs.pass' $(CONFIG_ROOT)/database.local.yaml)
 
 # Build the Docker image
 build:
-	docker build -t $(APP_NAME) -f Dockerfile .
+	DOCKER_BUILDKIT=1 docker build -t $(APP_NAME) -f Dockerfile .
 
 # Run the Docker container
 run:
