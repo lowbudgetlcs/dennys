@@ -4,5 +4,4 @@ import com.lowbudgetlcs.models.Division
 import com.lowbudgetlcs.models.DivisionId
 import com.lowbudgetlcs.repositories.Repository
 
-interface DivisionRepository : Repository<Division, DivisionId> {
-}
+interface DivisionRepository : Repository<Division, DivisionId>

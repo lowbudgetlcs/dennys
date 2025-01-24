@@ -4,5 +4,4 @@ import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.GameId
 import com.lowbudgetlcs.repositories.Repository
 
-interface GameRepository : Repository<Game, GameId> {
-}
+interface GameRepository : Repository<Game, GameId>

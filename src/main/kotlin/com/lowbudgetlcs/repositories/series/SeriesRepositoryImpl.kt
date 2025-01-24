@@ -9,36 +9,36 @@ import com.lowbudgetlcs.repositories.Criteria
 
 class SeriesRepositoryImpl : SeriesRepository {
     private val lblcs = LblcsDatabaseBridge().db
-    override fun readAll(): List<Series> {
-        TODO("Not yet implemented")
-    }
-
-    override fun readByCriteria(criteria: Criteria<Series>): List<Series> {
-        TODO("Not yet implemented")
-    }
-
-    override fun delete(entity: Series): Series {
-        TODO("Not yet implemented")
-    }
-
-    override fun update(entity: Series): Series =
-        lblcs.seriesQueries.updateSeries(entity.winner?.id, entity.loser?.id, entity.id.id).executeAsOneOrNull().let {
-            if (it != null) return transform(it)
-            return entity
-        }
 
     override fun create(entity: Series): Series {
         TODO("Not yet implemented")
     }
 
-    override fun readById(id: SeriesId): Series? =
-        lblcs.seriesQueries.readById(id.id).executeAsOneOrNull()?.let { transform(it) }
+    override fun readAll(): List<Series> {
+        TODO("Not yet implemented")
+    }
 
-    private fun transform(entity: migrations.Series): Series = Series(
-        SeriesId(entity.id),
-        DivisionId(entity.division_id),
-        entity.winner_id?.let { TeamId(it) },
-        entity.loser_id?.let { TeamId(it) },
-        entity.playoffs
+    override fun readById(id: SeriesId): Series? = lblcs.seriesQueries.readById(id.id).executeAsOneOrNull()?.toSeries()
+
+    override fun readByCriteria(criteria: Criteria<Series>): List<Series> {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(entity: Series): Series =
+        lblcs.seriesQueries.updateSeries(entity.winner?.id, entity.loser?.id, entity.id.id).executeAsOneOrNull().let {
+            if (it != null) return it.toSeries()
+            return entity
+        }
+
+    override fun delete(entity: Series): Series {
+        TODO("Not yet implemented")
+    }
+
+    private fun migrations.Series.toSeries(): Series = Series(
+        SeriesId(this.id),
+        DivisionId(this.division_id),
+        this.winner_id?.let { TeamId(it) },
+        this.loser_id?.let { TeamId(it) },
+        this.playoffs
     )
 }

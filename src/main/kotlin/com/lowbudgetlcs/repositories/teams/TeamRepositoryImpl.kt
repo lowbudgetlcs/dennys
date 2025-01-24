@@ -9,32 +9,9 @@ import migrations.Teams
 class TeamRepositoryImpl : TeamRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun Teams.toTeam(): Team {
-        val teamData by lazy {
-            readTeamData(TeamId(id))
-        }
-        return Team(
-            TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
-            DivisionId(
-                it
-            )
-        }, teamData
-        )
+    override fun create(entity: Team): Team {
+        TODO("Not yet implemented")
     }
-
-    override fun Team_game_data.toTeamGameData(): TeamGameData = TeamGameData(
-        win = this.win,
-        side = if(side == "BLUE") RiftSide.BLUE else RiftSide.RED,
-        gold = this.gold,
-        gameLength = this.game_length.toLong(),
-        kills = Objective(kills = this.kills, first = this.first_blood),
-        barons = Objective(kills = this.barons, first = this.first_baron),
-        grubs = Objective(kills = this.grubs, first = this.first_grub),
-        dragons = Objective(kills = this.dragons, first = this.first_dragon),
-        heralds = Objective(kills = this.heralds, first = this.first_herald),
-        towers = Objective(kills = this.towers, first = this.first_tower),
-        inhibitors = Objective(kills = this.inhibitors, first = this.first_inhibitor)
-    )
 
     override fun createTeamData(
         team: Team, game: Game, data: TeamGameData
@@ -46,6 +23,20 @@ class TeamRepositoryImpl : TeamRepository {
             readTeamData(team.id)
         }
         return team.copy(teamData = teamData)
+    }
+
+    override fun readAll(): List<Team> = lblcs.teamsQueries.readAll().executeAsList().map { it.toTeam() }
+
+    override fun readById(id: TeamId) = lblcs.teamsQueries.readById(id.id).executeAsOneOrNull()?.toTeam()
+
+    override fun readByCriteria(criteria: Criteria<Team>): List<Team> = criteria.meetCriteria(readAll())
+
+    override fun update(entity: Team): Team =
+        lblcs.teamsQueries.updateTeam(entity.name, entity.logo, entity.captain?.id, entity.division?.id)
+            .executeAsOneOrNull().let { it?.toTeam() ?: entity }
+
+    override fun delete(entity: Team): Team {
+        TODO("Not yet implemented")
     }
 
     private fun createTeamPerformance(team: Team, game: Game) =
@@ -75,28 +66,37 @@ class TeamRepositoryImpl : TeamRepository {
         ).executeAsOne()
     }
 
-    override fun readAll(): List<Team> = lblcs.teamsQueries.readAll().executeAsList().map { it.toTeam() }
-
-    override fun delete(entity: Team): Team {
-        TODO("Not yet implemented")
-    }
-
-    override fun update(entity: Team): Team =
-        lblcs.teamsQueries.updateTeam(entity.name, entity.logo, entity.captain?.id, entity.division?.id)
-            .executeAsOneOrNull().let { it?.toTeam() ?: entity }
-
-    override fun create(entity: Team): Team {
-        TODO("Not yet implemented")
-    }
-
-    override fun readById(id: TeamId) = lblcs.teamsQueries.readById(id.id).executeAsOneOrNull()?.toTeam()
-
-    override fun readByCriteria(criteria: Criteria<Team>): List<Team> = criteria.meetCriteria(readAll())
-
     private fun readTeamData(teamId: TeamId): List<TeamGameData> =
         lblcs.teamsQueries.readTeamDataById(teamId.id).executeAsList().let { data ->
             data.map {
                 it.toTeamGameData()
             }
         }
+
+    private fun Teams.toTeam(): Team {
+        val teamData by lazy {
+            readTeamData(TeamId(id))
+        }
+        return Team(
+            TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
+                DivisionId(
+                    it
+                )
+            }, teamData
+        )
+    }
+
+    private fun Team_game_data.toTeamGameData(): TeamGameData = TeamGameData(
+        win = this.win,
+        side = if (side == "BLUE") RiftSide.BLUE else RiftSide.RED,
+        gold = this.gold,
+        gameLength = this.game_length.toLong(),
+        kills = Objective(kills = this.kills, first = this.first_blood),
+        barons = Objective(kills = this.barons, first = this.first_baron),
+        grubs = Objective(kills = this.grubs, first = this.first_grub),
+        dragons = Objective(kills = this.dragons, first = this.first_dragon),
+        heralds = Objective(kills = this.heralds, first = this.first_herald),
+        towers = Objective(kills = this.towers, first = this.first_tower),
+        inhibitors = Objective(kills = this.inhibitors, first = this.first_inhibitor)
+    )
 }

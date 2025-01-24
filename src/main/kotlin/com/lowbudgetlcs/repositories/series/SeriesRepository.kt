@@ -4,5 +4,4 @@ import com.lowbudgetlcs.models.Series
 import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.repositories.Repository
 
-interface SeriesRepository : Repository<Series, SeriesId> {
-}
+interface SeriesRepository : Repository<Series, SeriesId>

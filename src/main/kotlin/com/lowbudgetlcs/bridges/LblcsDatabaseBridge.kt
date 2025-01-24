@@ -1,16 +1,13 @@
 package com.lowbudgetlcs.bridges
 
-import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.driver.jdbc.asJdbcDriver
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.models.RiftSide
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.ExperimentalHoplite
 import com.sksamuel.hoplite.Masked
 import com.sksamuel.hoplite.addResourceSource
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import migrations.Team_game_data
 
 data class DatabaseConfig(val lblcs: Lblcs)
 data class Lblcs(val url: Masked, val pass: Masked)

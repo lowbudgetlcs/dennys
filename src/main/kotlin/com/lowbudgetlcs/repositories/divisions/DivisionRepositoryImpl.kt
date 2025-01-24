@@ -6,6 +6,10 @@ import com.lowbudgetlcs.repositories.Criteria
 import com.lowbudgetlcs.repositories.Repository
 
 class DivisionRepositoryImpl : DivisionRepository, Repository<Division, DivisionId> {
+    override fun create(entity: Division): Division {
+        TODO("Not yet implemented")
+    }
+
     override fun readAll(): List<Division> {
         TODO("Not yet implemented")
     }
@@ -14,7 +18,7 @@ class DivisionRepositoryImpl : DivisionRepository, Repository<Division, Division
         TODO("Not yet implemented")
     }
 
-    override fun delete(entity: Division): Division {
+    override fun readByCriteria(criteria: Criteria<Division>): List<Division> {
         TODO("Not yet implemented")
     }
 
@@ -22,11 +26,7 @@ class DivisionRepositoryImpl : DivisionRepository, Repository<Division, Division
         TODO("Not yet implemented")
     }
 
-    override fun create(entity: Division): Division {
-        TODO("Not yet implemented")
-    }
-
-    override fun readByCriteria(criteria: Criteria<Division>): List<Division> {
+    override fun delete(entity: Division): Division {
         TODO("Not yet implemented")
     }
 }
