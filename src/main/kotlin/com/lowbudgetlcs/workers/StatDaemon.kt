@@ -11,7 +11,6 @@ import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import com.lowbudgetlcs.repositories.teams.TeamRepository
 import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
-import com.rabbitmq.client.DeliverCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
@@ -20,52 +19,51 @@ import no.stelar7.api.r4j.basic.constants.types.lol.TeamType
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 
-class StatDaemon : Worker {
-    private val queue = "STATS"
+class StatDaemon(override val queue: String) : RabbitMQWorker {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
+    private val messageq = RabbitMQBridge(queue)
+    private val riot = RiotBridge()
     private val gamesR: GameRepository = GameRepositoryImpl()
     private val playersR: PlayerRepository = PlayerRepositoryImpl()
     private val teamsR: TeamRepository = TeamRepositoryImpl()
 
-    private fun main() {
+    override fun start() {
         logger.info("StatDaemon running...")
-        val messageq = RabbitMQBridge(queue)
-        val riot = RiotBridge()
         logger.debug("Listening on $queue...")
-        val readRiotCallback = DeliverCallback { _, delivery: Delivery ->
-            val message = String(delivery.body, charset("UTF-8"))
-            logger.debug("[x] Recieved Message: {}", message)
-            try {
-                val callback = Json.decodeFromString<RiotCallback>(message)
-                riot.match(callback.gameId)?.let { match ->
-                    gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
-                        // I DO NOT WANT TO WRITE MY OWN SERIALIZER FOR THIS ITS LIKE 500 FIELDS AHAHAHAHAHHA!
-                        // lblcs.gameDumpsQueries.dump(game.id, Json.encodeToString<LOLMatch>(match))
-                        // Process Team data first to cause errors as early as possible
-                        match.teams.forEach { team ->
-                            processTeam(
-                                team,
-                                match.participants.filter { it.team === team.teamId },
-                                game,
-                                match.gameDuration.toLong()
-                            )
-                        }
-                        match.participants.forEach { processPlayer(it, game) }
-                    }
-                }
-                messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
-            } catch (e: SerializationException) {
-                logger.error("[x] Error while decoding message: {}", message)
-                logger.error(e.message)
-            } catch (e: IllegalArgumentException) {
-                logger.warn("[x] Message was not valid Riot Callback: {}.", message)
-            }
+        messageq.listen { _, delivery ->
+            processMessage(delivery)
         }
-        messageq.listen(readRiotCallback)
     }
 
-    override fun start() {
-        this.main()
+    override fun processMessage(delivery: Delivery) {
+        val message = String(delivery.body, charset("UTF-8"))
+        logger.debug("[x] Recieved Message: {}", message)
+        try {
+            val callback = Json.decodeFromString<RiotCallback>(message)
+            processRiotCallback(callback)
+            messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
+        } catch (e: SerializationException) {
+            logger.error("[x] Error while decoding message: {}", message)
+            logger.error(e.message)
+        } catch (e: IllegalArgumentException) {
+            logger.warn("[x] Message was not valid Riot Callback: {}.", message)
+        }
+    }
+
+    private fun processRiotCallback(callback: RiotCallback) {
+        riot.match(callback.gameId)?.let { match ->
+            gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
+                // I DO NOT WANT TO WRITE MY OWN SERIALIZER FOR THIS ITS LIKE 500 FIELDS AHAHAHAHAHHA!
+                // lblcs.gameDumpsQueries.dump(game.id, Json.encodeToString<LOLMatch>(match))
+                // Process Team data first to cause errors as early as possible
+                match.teams.forEach { team ->
+                    processTeam(
+                        team, match.participants.filter { it.team === team.teamId }, game, match.gameDuration.toLong()
+                    )
+                }
+                match.participants.forEach { processPlayer(it, game) }
+            }
+        }
     }
 
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {

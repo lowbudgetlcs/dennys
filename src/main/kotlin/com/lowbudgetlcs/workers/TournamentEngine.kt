@@ -34,7 +34,7 @@ class TournamentEngine(override val queue: String) : Worker {
         }
     }
 
-    private fun processMessage(delivery: Delivery) {
+    override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
         logger.debug("[x] Recieved Message: {}", message)
         try {
