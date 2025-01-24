@@ -3,15 +3,15 @@ POST http://localhost:9292/riot/callback
 Content-Type: application/json
 
 {
-    "startTime": 1725325774610,
-    "shortCode": "NA04e01-e599e041-7e3e-48fc-bb53-9e3ebb127555",
-    "metaData": "{\"gameNum\":1,\"seriesId\":11}",
-    "gameId": 5102531894,
-    "gameName": "12998ced-fecc-463b-8c29-73b760109bc4",
-    "gameType": "CUSTOM",
-    "gameMap": 11,
-    "gameMode": "CLASSIC",
-    "region": "NA1"
+  "startTime": 1725325774610,
+  "shortCode": "NA04e01-e599e041-7e3e-48fc-bb53-9e3ebb127555",
+  "metaData": "{\"gameNum\":1,\"seriesId\":11}",
+  "gameId": 5102531894,
+  "gameName": "12998ced-fecc-463b-8c29-73b760109bc4",
+  "gameType": "CUSTOM",
+  "gameMap": 11,
+  "gameMode": "CLASSIC",
+  "region": "NA1"
 }
 
 ### Game2
@@ -19,13 +19,13 @@ POST http://localhost:9292/riot/callback
 Content-Type: application/json
 
 {
-    "startTime": 1725328855381,
-    "shortCode": "NA04e01-7704f893-f01f-4f1d-be97-cb4468e91a4d",
-    "metaData": "{\"gameNum\":2,\"seriesId\":11}",
-    "gameId": 5102573449,
-    "gameName": "bd35f7a4-7daf-40bb-b9c2-b53e691a368a",
-    "gameType": "CUSTOM",
-    "gameMap": 11,
-    "gameMode": "CLASSIC",
-    "region": "NA1"
+  "startTime": 1725328855381,
+  "shortCode": "NA04e01-7704f893-f01f-4f1d-be97-cb4468e91a4d",
+  "metaData": "{\"gameNum\":2,\"seriesId\":11}",
+  "gameId": 5102573449,
+  "gameName": "bd35f7a4-7daf-40bb-b9c2-b53e691a368a",
+  "gameType": "CUSTOM",
+  "gameMap": 11,
+  "gameMode": "CLASSIC",
+  "region": "NA1"
 }

@@ -1,5 +1,7 @@
 package com.lowbudgetlcs.repositories.series
 
-interface SeriesRepository {
-    fun updateWinnerLoserById(winnerId: Int, loserId: Int, seriesId: Int): Boolean
-}
+import com.lowbudgetlcs.models.Series
+import com.lowbudgetlcs.models.SeriesId
+import com.lowbudgetlcs.repositories.Repository
+
+interface SeriesRepository : Repository<Series, SeriesId>

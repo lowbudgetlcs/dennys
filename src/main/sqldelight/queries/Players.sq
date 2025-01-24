@@ -1,19 +1,74 @@
-selectAll:
+readAll:
     SELECT id,riot_puuid,summoner_name,team_id
     FROM players;
 
-updateSummonerNameByPuuid:
-    UPDATE players
-    SET summoner_name = :summoner_name
-    WHERE riot_puuid = :puuid
-    RETURNING *;
+readById:
+    SELECT id,riot_puuid,summoner_name,team_id
+    FROM players
+    WHERE id = :id;
 
-selectByPuuid:
+readByPuuid:
     SELECT *
     FROM players
     WHERE riot_puuid = ?;
 
-selectTeamIdByPuuid:
-    SELECT team_id
-    FROM players
-    WHERE riot_puuid = ?;
+updatePlayer:
+    UPDATE players
+    SET summoner_name = :summoner_name
+    WHERE id = :id
+    RETURNING id,riot_puuid,summoner_name,team_id;
+
+createPerformance:
+    INSERT INTO player_performances
+    VALUES
+        (
+            DEFAULT,
+            (SELECT id FROM players WHERE riot_puuid = :puuid),
+            :gameId,
+            (SELECT team_id FROM players WHERE riot_puuid = :puuid),
+            (SELECT division_id FROM teams WHERE id = (SELECT team_id FROM players WHERE riot_puuid = :puuid))
+        )
+    RETURNING id;
+
+readGameDataByPlayerId:
+  SELECT pd.id, pd.player_performance_id, pd.kills, pd.deaths, pd.assists, pd.level, pd.gold, pd.vision_score, pd.damage, pd.healing, pd.shielding, pd.damage_taken, pd.self_mitigated_damage, pd.damage_to_turrets, pd.longest_life, pd.double_kills, pd.triple_kills, pd.quadra_kills, pd.penta_kills, pd.cs, pd.champion_name, pd.item0, pd.item1, pd.item2, pd.item3, pd.item4, pd.item5, pd.trinket, pd.keystone_rune, pd.secondary_tree, pd.summoner1, pd.summoner2
+  FROM player_game_data pd
+  JOIN player_performances pp ON pp.id = pd.player_performance_id
+  WHERE pp.player_id = :player_id;
+
+createPlayerData:
+    INSERT INTO player_game_data (player_performance_id, kills, deaths, assists, level, gold, vision_score, damage, healing, shielding, damage_taken, self_mitigated_damage, damage_to_turrets, longest_life, double_kills, triple_kills, quadra_kills, penta_kills, cs, champion_name, item0, item1, item2, item3, item4, item5, trinket, keystone_rune, secondary_tree, summoner1, summoner2)
+    VALUES (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+    )
+    RETURNING id;

@@ -1,7 +1,6 @@
 package com.lowbudgetlcs
 
 import com.lowbudgetlcs.routes.jsontest.TestJson
-import com.lowbudgetlcs.routes.riot.RiotCallback
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*

@@ -1,0 +1,8 @@
+build/
+.gradle/
+.idea/
+*.iml
+.kotlin
+.github
+Makefile
+README.md

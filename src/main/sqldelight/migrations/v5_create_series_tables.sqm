@@ -3,7 +3,7 @@ CREATE TABLE series (
   division_id INT NOT NULL,
   winner_id INT,
   loser_id INT,
-  playoffs BOOLEAN DEFAULT FALSE
+  playoffs BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 ALTER TABLE series
@@ -23,10 +23,16 @@ ALTER TABLE series
 
 CREATE TABLE team_to_series (
   id SERIAL PRIMARY KEY,
-  team_id INT NOT NULL
+  team_id INT NOT NULL,
+  series_id INT NOT NULL
 );
 
 ALTER TABLE team_to_series
   ADD CONSTRAINT fk_team_id
   FOREIGN KEY (team_id)
   REFERENCES teams(id);
+
+ALTER TABLE team_to_series
+  ADD CONSTRAINT fk_series_id
+  FOREIGN KEY (series_id)
+  REFERENCES series(id);
