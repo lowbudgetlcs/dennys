@@ -7,26 +7,29 @@ import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.models.fetchTeamId
 import com.lowbudgetlcs.repositories.AndCriteria
-import com.lowbudgetlcs.repositories.games.GameRepository
-import com.lowbudgetlcs.repositories.games.SeriesCriteria
-import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
-import com.lowbudgetlcs.repositories.games.TeamWinCriteria
+import com.lowbudgetlcs.repositories.games.*
 import com.lowbudgetlcs.repositories.series.SeriesRepository
+import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
-class TournamentEngine(
-    override val queue: String,
-    private val gamesR: GameRepository,
-    private val seriesR: SeriesRepository
-) : RabbitMQWorker {
+class TournamentEngine private constructor(
+    override val queue: String, private val gamesR: GameRepository, private val seriesR: SeriesRepository
+) : AbstractWorker(), RabbitMQWorker {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.TournamentEngine")
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
+
+    companion object {
+        fun createInstance(queue: String): TournamentEngine =
+            TournamentEngine(queue, GameRepositoryImpl(), SeriesRepositoryImpl())
+    }
+
+    override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue)
 
     override fun start() {
         logger.info("TournamentEngine starting...")

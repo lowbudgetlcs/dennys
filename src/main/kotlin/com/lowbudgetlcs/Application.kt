@@ -1,9 +1,5 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
-import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
-import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
-import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
 import com.lowbudgetlcs.workers.StatDaemon
 import com.lowbudgetlcs.workers.TournamentEngine
 import io.ktor.server.application.*
@@ -18,14 +14,11 @@ fun Application.module() {
     logger.info("Performing opening duties...")
     configureRouting()
     // Start Tournament Engine and Stat Daemons- this is a perfect opportunity for a builder pattern.
-    for (i in 1..3) launch { TournamentEngine("CALLBACK", GameRepositoryImpl(), SeriesRepositoryImpl()).start() }
-    for (i in 1..3) launch {
-        StatDaemon(
-            "STATS",
-            GameRepositoryImpl(),
-            PlayerRepositoryImpl(),
-            TeamRepositoryImpl()
-        ).start()
+    launch {
+        StatDaemon.createInstance("STATS").launchInstances(3)
+    }
+    launch {
+        TournamentEngine.createInstance("CALLBACK").launchInstances(3)
     }
     logger.info("Denny's is open!")
 }

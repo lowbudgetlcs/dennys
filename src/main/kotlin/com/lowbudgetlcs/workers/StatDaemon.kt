@@ -4,9 +4,12 @@ import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.repositories.games.GameRepository
+import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
 import com.lowbudgetlcs.repositories.players.PlayerRepository
+import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import com.lowbudgetlcs.repositories.teams.TeamRepository
+import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
@@ -16,15 +19,23 @@ import no.stelar7.api.r4j.basic.constants.types.lol.TeamType
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 
-class StatDaemon(
+class StatDaemon private constructor(
     override val queue: String,
     private val gamesR: GameRepository,
     private val playersR: PlayerRepository,
     private val teamsR: TeamRepository
-) : RabbitMQWorker {
+) : AbstractWorker(), RabbitMQWorker {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
     private val messageq = RabbitMQBridge(queue)
     private val riot = RiotBridge()
+
+    companion object {
+        fun createInstance(queue: String): StatDaemon = StatDaemon(
+            queue, GameRepositoryImpl(), PlayerRepositoryImpl(), TeamRepositoryImpl()
+        )
+    }
+
+    override fun createInstance(instanceId: Int): StatDaemon = Companion.createInstance(queue)
 
     override fun start() {
         logger.info("StatDaemon running...")
