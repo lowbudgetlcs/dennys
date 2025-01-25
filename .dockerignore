@@ -6,3 +6,4 @@ build/
 .github
 Makefile
 README.md
+compose.yaml

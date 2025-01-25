@@ -55,6 +55,7 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
     // Database
     implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
     implementation("app.cash.sqldelight:jdbc-driver:2.0.2")

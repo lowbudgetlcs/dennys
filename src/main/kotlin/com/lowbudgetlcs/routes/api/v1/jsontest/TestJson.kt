@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.routes.jsontest
+package com.lowbudgetlcs.routes.api.v1.jsontest
 
 import kotlinx.serialization.Serializable
 

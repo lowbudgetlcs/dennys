@@ -1,6 +1,6 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.routes.jsontest.TestJson
+import com.lowbudgetlcs.routes.api.v1.jsontest.TestJson
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -33,7 +33,7 @@ class ApplicationTest {
                 json()
             }
         }
-        client.get("/json-test").apply {
+        client.get("/api/v1/json-test").apply {
             val results = body<List<TestJson>>()
             assertEquals(HttpStatusCode.OK, status)
 
@@ -53,7 +53,7 @@ class ApplicationTest {
             }
         }
         val body = listOf(TestJson("Title", 1))
-        client.post("/json-test") {
+        client.post("/api/v1/json-test") {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             setBody(body)
         }.apply {
@@ -74,7 +74,7 @@ class ApplicationTest {
             }
         }
         val body = listOf(TestJson("Title", 0))
-        client.post("/json-test") {
+        client.post("/api/v1/json-test") {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             setBody(body)
         }.apply {

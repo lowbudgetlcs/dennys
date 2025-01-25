@@ -1,6 +1,7 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.routes.jsontest.jsonTestRoutes
+import com.lowbudgetlcs.routes.api.apiRoutes
+import com.lowbudgetlcs.routes.login.loginRoutes
 import com.lowbudgetlcs.routes.riot.riotRoutes
 import com.lowbudgetlcs.routes.rootRoutes
 import io.ktor.serialization.kotlinx.json.*
@@ -12,6 +13,7 @@ fun Application.configureRouting() {
         json()
     }
     rootRoutes()
-    jsonTestRoutes()
     riotRoutes()
+    loginRoutes()
+    apiRoutes()
 }

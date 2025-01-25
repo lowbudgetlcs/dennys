@@ -1,0 +1,10 @@
+### Request protected content
+GET http://localhost:9292/api/v1/authtest
+
+
+### Request protected content with credentials
+GET http://localhost:9292/api/v1/authtest
+Authorization: Basic c2VpcjpwYXNzd29yZA
+
+###
+GET http://localhost:9292/api/v1/json-test
