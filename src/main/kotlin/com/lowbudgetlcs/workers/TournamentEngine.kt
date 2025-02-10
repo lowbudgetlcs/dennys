@@ -3,9 +3,9 @@ package com.lowbudgetlcs.workers
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
-import com.lowbudgetlcs.models.Game
-import com.lowbudgetlcs.models.TeamId
-import com.lowbudgetlcs.models.fetchTeamId
+import com.lowbudgetlcs.entities.Game
+import com.lowbudgetlcs.entities.TeamId
+import com.lowbudgetlcs.entities.fetchTeamId
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
 import com.lowbudgetlcs.repositories.series.SeriesRepository
@@ -83,8 +83,8 @@ class TournamentEngine private constructor(
 
     private fun updateSeries(game: Game, team1: TeamId, team2: TeamId) {
         seriesR.readById(game.series)?.let { series ->
-            // Magic number yayyyy! Playoff games aren't best of 5, I need to do this better
-            val winCondition = if (series.playoffs) 3 else 2
+            // Magic number yayyyy! This needs an actual solution- for now the app only supports Bo3.
+            val winCondition = 2
             val team1Wins = gamesR.readByCriteria(
                 AndCriteria(TeamWinCriteria(team1), SeriesCriteria(game.series))
             ).size

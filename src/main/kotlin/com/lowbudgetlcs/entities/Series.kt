@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models
+package com.lowbudgetlcs.entities
 
 import kotlinx.serialization.Serializable
 
@@ -11,6 +11,5 @@ data class Series(
     val division: DivisionId,
     val winner: TeamId?,
     val loser: TeamId?,
-    val playoffs: Boolean
 )
 

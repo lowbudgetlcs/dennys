@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.repositories.series
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.models.DivisionId
-import com.lowbudgetlcs.models.Series
-import com.lowbudgetlcs.models.SeriesId
-import com.lowbudgetlcs.models.TeamId
+import com.lowbudgetlcs.entities.DivisionId
+import com.lowbudgetlcs.entities.Series
+import com.lowbudgetlcs.entities.SeriesId
+import com.lowbudgetlcs.entities.TeamId
 import com.lowbudgetlcs.repositories.Criteria
 
 class SeriesRepositoryImpl : SeriesRepository {
@@ -39,6 +39,5 @@ class SeriesRepositoryImpl : SeriesRepository {
         DivisionId(this.division_id),
         this.winner_id?.let { TeamId(it) },
         this.loser_id?.let { TeamId(it) },
-        this.playoffs
     )
 }

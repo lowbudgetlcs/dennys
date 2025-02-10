@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models
+package com.lowbudgetlcs.entities
 
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import kotlinx.serialization.Contextual

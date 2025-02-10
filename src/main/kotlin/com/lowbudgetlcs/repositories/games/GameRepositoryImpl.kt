@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.repositories.games
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.models.Game
-import com.lowbudgetlcs.models.GameId
-import com.lowbudgetlcs.models.SeriesId
-import com.lowbudgetlcs.models.TeamId
+import com.lowbudgetlcs.entities.Game
+import com.lowbudgetlcs.entities.GameId
+import com.lowbudgetlcs.entities.SeriesId
+import com.lowbudgetlcs.entities.TeamId
 import com.lowbudgetlcs.repositories.Criteria
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import kotlinx.serialization.encodeToString

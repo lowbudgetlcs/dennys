@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models
+package com.lowbudgetlcs.entities
 
 import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
 import kotlinx.serialization.Serializable

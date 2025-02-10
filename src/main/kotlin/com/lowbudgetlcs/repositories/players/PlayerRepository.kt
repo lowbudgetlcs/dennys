@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.players
 
-import com.lowbudgetlcs.models.Game
-import com.lowbudgetlcs.models.Player
-import com.lowbudgetlcs.models.PlayerGameData
-import com.lowbudgetlcs.models.PlayerId
+import com.lowbudgetlcs.entities.Game
+import com.lowbudgetlcs.entities.Player
+import com.lowbudgetlcs.entities.PlayerGameData
+import com.lowbudgetlcs.entities.PlayerId
 import com.lowbudgetlcs.repositories.Repository
 import kotlinx.serialization.Serializable
 

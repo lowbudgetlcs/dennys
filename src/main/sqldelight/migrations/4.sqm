@@ -1,6 +1,6 @@
 CREATE TABLE games (
   id SERIAL PRIMARY KEY,
-  shortcode VARCHAR(100) UNIQUE NOT NULL,
+  shortcode TEXT UNIQUE NOT NULL,
   game_num INT NOT NULL,
   winner_id INT,
   loser_id INT,

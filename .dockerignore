@@ -1,8 +1,13 @@
 build/
+.git
+.github
 .gradle/
 .idea/
-*.iml
 .kotlin
-.github
+.env*
+
+*.iml
 Makefile
 README.md
+compose.yaml
+shell.nix

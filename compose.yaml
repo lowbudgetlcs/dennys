@@ -1,14 +1,24 @@
 services:
   dennys:
-    build: .
-    image: dennys:latest
+    image: dennys:dev
     container_name: dennys-container
     ports:
       - "9292:9292"
+    env_file: .env
+    environment:
+      - LBLCS_JDBC_URL=${LBLCS_JDBC_URL}
+      - LBLCS_JDBC_PW=${LBLCS_JDBC_PW}
+      - RIOT_API_TOKEN=${RIOT_API_TOKEN}
+    networks:
+      - rabbitmq.docker
+  rabbitmq:
+    image: rabbitmq:3.13.4
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
     networks:
       - rabbitmq.docker
 
 networks:
   rabbitmq.docker:
     name: rabbitmq.docker
-    external: true

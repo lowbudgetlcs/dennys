@@ -54,7 +54,7 @@ CREATE TABLE team_game_data (
   win BOOLEAN NOT NULL,
   side TEXT NOT NULL,
   gold INT NOT NULL,
-  game_length INT NOT NULL,
+  game_length BIGINT NOT NULL,
   kills INT NOT NULL,
   barons INT NOT NULL DEFAULT 0,
   dragons INT NOT NULL DEFAULT 0,

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.teams
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.repositories.Criteria
 import migrations.Team_game_data
 import migrations.Teams
@@ -48,7 +48,7 @@ class TeamRepositoryImpl : TeamRepository {
             data.win,
             data.side.name,
             data.gold,
-            data.gameLength.toInt(),
+            data.gameLength,
             data.kills.kills,
             data.barons.kills,
             data.dragons.kills,
@@ -90,7 +90,7 @@ class TeamRepositoryImpl : TeamRepository {
         win = this.win,
         side = if (side == "BLUE") RiftSide.BLUE else RiftSide.RED,
         gold = this.gold,
-        gameLength = this.game_length.toLong(),
+        gameLength = this.game_length,
         kills = Objective(kills = this.kills, first = this.first_blood),
         barons = Objective(kills = this.barons, first = this.first_baron),
         grubs = Objective(kills = this.grubs, first = this.first_grub),

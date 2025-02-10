@@ -1,3 +1,0 @@
-select:
-    SELECT *
-    FROM divisions;

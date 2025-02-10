@@ -1,5 +1,5 @@
 readById:
-    SELECT id,division_id,winner_id,loser_id,playoffs
+    SELECT id,division_id,winner_id,loser_id
     FROM series
     WHERE id = :id;
 
@@ -9,4 +9,4 @@ updateSeries:
     winner_id = :winner_id,
     loser_id = :loser_id
   WHERE id = :id
-  RETURNING id,division_id,winner_id,loser_id,playoffs;
+  RETURNING id,division_id,winner_id,loser_id;

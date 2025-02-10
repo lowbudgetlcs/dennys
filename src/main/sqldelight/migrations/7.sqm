@@ -3,3 +3,4 @@ CREATE TABLE game_dumps (
   game_id INT REFERENCES games(id) UNIQUE NOT NULL,
   dump JSONB NOT NULL
 );
+

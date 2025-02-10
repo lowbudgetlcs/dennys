@@ -2,7 +2,7 @@ package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
-import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.repositories.games.GameRepository
 import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria

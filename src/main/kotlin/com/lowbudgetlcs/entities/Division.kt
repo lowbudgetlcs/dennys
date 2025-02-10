@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models
+package com.lowbudgetlcs.entities
 
 import kotlinx.serialization.Serializable
 

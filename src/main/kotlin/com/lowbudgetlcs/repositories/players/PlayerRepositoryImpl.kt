@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.repositories.Criteria
 import migrations.Player_game_data
 import migrations.Players

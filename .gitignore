@@ -38,3 +38,5 @@ out/
 .vscode/
 
 **/*.local.yaml
+.env*
+!.env.example

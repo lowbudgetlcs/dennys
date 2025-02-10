@@ -1,35 +1,35 @@
 # Config
 CONFIG_ROOT = ./src/main/resources/
 APP_NAME = dennys
+TAG = dev
+CONTAINER_NAME = $(APP_NAME)-container
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_ROOT)/application.yaml)
-RIOT_API_KEY = $(shell yq '.apiKey' $(CONFIG_ROOT)/riot.local.yaml)
-LBLCS_DB_URL = $(shell yq '.lblcs.url' $(CONFIG_ROOT)/database.local.yaml)
-LBLCS_DB_PW = $(shell yq '.lblcs.pass' $(CONFIG_ROOT)/database.local.yaml)
 
-.PHONY: build run stop clean erase rebuild ps psa test deploy
+.PHONY: build run stop clean erase rebuild ps psa test all build-debug 
 
 # Build the Docker image
 build:
-	DOCKER_BUILDKIT=1 docker build -t $(APP_NAME) -f Dockerfile .
+	docker build -t $(APP_NAME):$(TAG) -f Dockerfile .
+
+# Build without cacheing and readable output
+build-debug:
+	docker build --no-cache --progress-plain -t $(APP_NAME):$(TAG) -f Dockerfile .
 
 # Run the Docker container
 run:
-	docker run \
-	-e LBLCS_DB_URL=$(LBLCS_DB_URL) \
-	-e LBLCS_DB_PW=$(LBLCS_DB_PW) \
-	-e RIOT_API_KEY=$(RIOT_API_KEY) \
-	-p $(PORT):$(PORT) \
-	--network=rabbitmq.docker \
-	--name $(APP_NAME)-container $(APP_NAME)
+	docker-compose up
+
+# Refresh
+all: erase build run
 
 # Stop the Docker container
 stop:
-	docker stop $(APP_NAME)-container || true
-	docker rm $(APP_NAME)-container || true
+	docker stop $(CONTAINER_NAME) || true
+	docker rm $(CONTAINER_NAME) || true
 
 # Clean up the Docker image
 clean:
-	docker rmi $(APP_NAME) || true
+	docker rmi $(APP_NAME):$(TAG) || true
 
 # Stop and Clean docker files
 erase: stop clean
@@ -37,17 +37,6 @@ erase: stop clean
 # Rebuild the Docker image
 rebuild: erase build
 
-# Deploy with compose
-deploy:
-	docker compose up
-
-# List running containers
-ps:
-	docker ps
-
-# List all containers
-psa:
-	docker ps -a
-
+# Run tests (not containerized)
 test:
 	./gradlew test
