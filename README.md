@@ -11,25 +11,14 @@ Here are some useful links to get you started:
 
 This application depends on 3 environment variables:
 
-`Set in /src/main/resources/riot.local.yaml`
+`Set in /src/main/resources/riot.yaml`
 - `RIOT_API_KEY` : Riot API token
 
-`Set in /src/main/resources/database.local.yaml`
+`Set in /src/main/resources/database.yaml`
 - `LBLCS_JDBC_URL` : JDBC connection string to the LBLCS database
 - `LBLCS_JDBC_PW` : Password for LBLCS database
 
-For example,
-
-`/src/main/resources/database.local.yaml:'
-
-```yaml
-lblcs:
-  url: XXX
-  pass: ZZZ
-```
-
-These local config values are picked up by the commands in `Makefile` to
-configure the application at runtime.
+These local config values are picked up by docker compose via the .env file.
 
 ## Building & Running
 
