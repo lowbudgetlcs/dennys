@@ -11,7 +11,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import migrations.Games
 
-class GameRepositoryImpl : GameRepository {
+class GameRepositoryImpl : IGameRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     override fun create(entity: Game): Game {

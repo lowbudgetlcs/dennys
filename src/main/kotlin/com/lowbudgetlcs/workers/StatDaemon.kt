@@ -3,12 +3,12 @@ package com.lowbudgetlcs.workers
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.*
-import com.lowbudgetlcs.repositories.games.GameRepository
+import com.lowbudgetlcs.repositories.games.IGameRepository
 import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
-import com.lowbudgetlcs.repositories.players.PlayerRepository
+import com.lowbudgetlcs.repositories.players.IPlayerRepository
 import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
-import com.lowbudgetlcs.repositories.teams.TeamRepository
+import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
@@ -21,9 +21,9 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 
 class StatDaemon private constructor(
     override val queue: String,
-    private val gamesR: GameRepository,
-    private val playersR: PlayerRepository,
-    private val teamsR: TeamRepository
+    private val gamesR: IGameRepository,
+    private val playersR: IPlayerRepository,
+    private val teamsR: ITeamRepository
 ) : AbstractWorker(), RabbitMQWorker {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
     private val messageq = RabbitMQBridge(queue)

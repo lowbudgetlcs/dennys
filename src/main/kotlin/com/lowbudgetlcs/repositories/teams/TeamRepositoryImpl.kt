@@ -6,7 +6,7 @@ import com.lowbudgetlcs.repositories.Criteria
 import migrations.Team_game_data
 import migrations.Teams
 
-class TeamRepositoryImpl : TeamRepository {
+class TeamRepositoryImpl : ITeamRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     override fun create(entity: Team): Team {
