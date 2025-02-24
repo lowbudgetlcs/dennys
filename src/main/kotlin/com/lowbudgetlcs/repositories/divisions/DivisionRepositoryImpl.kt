@@ -3,9 +3,9 @@ package com.lowbudgetlcs.repositories.divisions
 import com.lowbudgetlcs.entities.Division
 import com.lowbudgetlcs.entities.DivisionId
 import com.lowbudgetlcs.repositories.Criteria
-import com.lowbudgetlcs.repositories.Repository
+import com.lowbudgetlcs.repositories.IRepository
 
-class DivisionRepositoryImpl : DivisionRepository, Repository<Division, DivisionId> {
+class DivisionRepositoryImpl : IDivisionRepository, IRepository<Division, DivisionId> {
     override fun create(entity: Division): Division {
         TODO("Not yet implemented")
     }

@@ -8,7 +8,7 @@ import com.lowbudgetlcs.entities.TeamId
 import com.lowbudgetlcs.entities.fetchTeamId
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
-import com.lowbudgetlcs.repositories.series.SeriesRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
@@ -17,7 +17,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
 class TournamentEngine private constructor(
-    override val queue: String, private val gamesR: GameRepository, private val seriesR: SeriesRepository
+    override val queue: String, private val gamesR: IGameRepository, private val seriesR: ISeriesRepository
 ) : AbstractWorker(), RabbitMQWorker {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.TournamentEngine")
     private val messageq = RabbitMQBridge(queue)

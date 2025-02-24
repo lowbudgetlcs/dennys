@@ -7,7 +7,7 @@ import migrations.Player_game_data
 import migrations.Players
 
 
-class PlayerRepositoryImpl : PlayerRepository {
+class PlayerRepositoryImpl : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     override fun create(entity: Player): Player {
