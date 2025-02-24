@@ -15,7 +15,7 @@ data class RabbitMQConfig(val host: String)
  */
 class RabbitMQBridge(private val queue: String) {
     /**
-     * One-time RabbitMQ configuration. Runs once on startup.
+     * One-time RabbitMQ configuration.
      */
     companion object {
         @OptIn(ExperimentalHoplite::class)
