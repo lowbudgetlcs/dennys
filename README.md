@@ -19,6 +19,11 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
+   <a href="https://github.com/lowbudgetlcs/dennys">
+      <img src="https://i.imgur.com/qcJ33LS.png" alt="Logo" width="80" height="80" />
+   </a>
+   
+<div align="center">
 <h3 align="center">dennys</h3>
 
   <p align="center">
