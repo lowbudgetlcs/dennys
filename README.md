@@ -31,7 +31,6 @@
     <br />
     <a href="https://github.com/lowbudgetlcs/dennys"><strong>Explore the docs »</strong></a>
     <br />
-    &middot;
     <a href="https://github.com/lowbudgetlcs/dennys/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
     <a href="https://github.com/lowbudgetlcs/dennys/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
