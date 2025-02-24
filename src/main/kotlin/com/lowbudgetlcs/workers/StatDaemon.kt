@@ -3,13 +3,13 @@ package com.lowbudgetlcs.workers
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.repositories.games.AllGamesLBLCS
 import com.lowbudgetlcs.repositories.games.IGameRepository
-import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
+import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
-import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
+import com.lowbudgetlcs.repositories.teams.AllTeamsLBLCS
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
-import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
@@ -31,7 +31,7 @@ class StatDaemon private constructor(
 
     companion object {
         fun createInstance(queue: String): StatDaemon = StatDaemon(
-            queue, GameRepositoryImpl(), PlayerRepositoryImpl(), TeamRepositoryImpl()
+            queue, AllGamesLBLCS(), AllPlayersLBLCS(), AllTeamsLBLCS()
         )
     }
 
@@ -77,7 +77,7 @@ class StatDaemon private constructor(
     }
 
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
-        fetchTeamId(players)?.let { teamId ->
+        playersR.fetchTeamId(players)?.let { teamId ->
             logger.debug("Processing team data for '{}' ('{}')", teamId, game.shortCode)
             teamsR.readById(teamId)?.let { t ->
                 try {
