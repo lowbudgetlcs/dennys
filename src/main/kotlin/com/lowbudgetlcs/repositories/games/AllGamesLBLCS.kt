@@ -35,6 +35,9 @@ class AllGamesLBLCS : IGameRepository {
         TODO("Not yet implemented")
     }
 
+    /**
+     * Returns a [Game] derived from [Games].
+     */
     private fun Games.toGame(): Game = Game(
         GameId(this.id),
         this.shortcode,
