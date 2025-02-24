@@ -9,7 +9,7 @@ import migrations.Teams
 class AllTeamsLBLCS : ITeamRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Team): Team? {
+    override fun save(entity: Team): Team? {
         TODO("Not yet implemented")
     }
 

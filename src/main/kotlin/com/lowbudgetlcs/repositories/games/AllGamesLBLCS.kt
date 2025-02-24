@@ -14,7 +14,7 @@ import migrations.Games
 class AllGamesLBLCS : IGameRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Game): Game? {
+    override fun save(entity: Game): Game? {
         TODO("Not yet implemented")
     }
 

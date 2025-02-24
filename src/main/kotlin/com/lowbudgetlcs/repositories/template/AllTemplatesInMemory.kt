@@ -11,7 +11,7 @@ class AllTemplatesInMemory : ITemplateRepository {
     override fun readByCriteria(criteria: ICriteria<Template>): List<Template> =
         criteria.meetCriteria(templates.values.toList())
 
-    override fun create(entity: Template): Template? {
+    override fun save(entity: Template): Template? {
         if (templates[entity.id] != null) return null
         templates[entity.id] = entity
         return entity

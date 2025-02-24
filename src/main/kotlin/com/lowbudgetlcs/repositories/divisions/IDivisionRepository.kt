@@ -2,6 +2,6 @@ package com.lowbudgetlcs.repositories.divisions
 
 import com.lowbudgetlcs.entities.Division
 import com.lowbudgetlcs.entities.DivisionId
-import com.lowbudgetlcs.repositories.IRepository
+import com.lowbudgetlcs.repositories.IEntityRepository
 
-interface IDivisionRepository : IRepository<Division, DivisionId>
+interface IDivisionRepository : IEntityRepository<Division, DivisionId>

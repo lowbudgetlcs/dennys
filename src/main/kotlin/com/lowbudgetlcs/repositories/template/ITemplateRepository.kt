@@ -1,5 +1,5 @@
 package com.lowbudgetlcs.repositories.template
 
-import com.lowbudgetlcs.repositories.IRepository
+import com.lowbudgetlcs.repositories.IEntityRepository
 
-interface ITemplateRepository : IRepository<Template, TemplateKey>
+interface ITemplateRepository : IEntityRepository<Template, TemplateKey>

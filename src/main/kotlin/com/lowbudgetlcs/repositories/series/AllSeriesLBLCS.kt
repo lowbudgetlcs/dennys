@@ -10,7 +10,7 @@ import com.lowbudgetlcs.repositories.ICriteria
 class AllSeriesLBLCS : ISeriesRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Series): Series? {
+    override fun save(entity: Series): Series? {
         TODO("Not yet implemented")
     }
 

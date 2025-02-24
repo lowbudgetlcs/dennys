@@ -11,7 +11,7 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 class AllPlayersLBLCS : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Player): Player? {
+    override fun save(entity: Player): Player? {
         TODO("Not yet implemented")
     }
 
