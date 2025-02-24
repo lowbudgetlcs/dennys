@@ -63,19 +63,26 @@ class TournamentEngine private constructor(
 
     private fun processRiotCallback(callback: RiotCallback) {
         riot.match(callback.gameId)?.let { match ->
-            db.transaction {
-                val (winner, loser) = match.participants.partition { it.didWin() }.let { (winners, losers) ->
-                    playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
+            try {
+                // We throw an exception to cancel the database transaction.
+                db.transaction {
+                    val (winner, loser) = match.participants.partition { it.didWin() }.let { (winners, losers) ->
+                        playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
+                    }
+                    if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
+                    updateGame(callback, winner, loser)?.let {
+                        updateSeries(
+                            it, winner, loser
+                        )
+                    }
                 }
-                if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
-                updateSeries(
-                    updateGame(callback, winner, loser), winner, loser
-                )
+            } catch (e: IllegalArgumentException) {
+                logger.warn("Could not fetch one or both TeamIds.")
             }
         }
     }
 
-    private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game {
+    private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game? {
         gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).first().let { game ->
             return gamesR.update(
                 game.copy(
@@ -95,11 +102,21 @@ class TournamentEngine private constructor(
             val team2Wins = gamesR.readByCriteria(
                 AndCriteria(TeamWinCriteria(team2), SeriesCriteria(game.series))
             ).size
+
+            fun logWin(team: TeamId) = logger.debug("Team {} wins series {}.", team, series.id)
             when (winCondition) {
-                team1Wins -> seriesR.update(series.copy(winner = team1, loser = team2))
-                team2Wins -> seriesR.update(series.copy(loser = team1, winner = team2))
+                team1Wins -> {
+                    seriesR.update(series.copy(winner = team1, loser = team2))
+                    logWin(team1)
+                }
+
+                team2Wins -> {
+                    seriesR.update(series.copy(loser = team1, winner = team2))
+                    logWin(team2)
+                }
                 // Otherwise, series has not concluded
                 else -> {
+                    logger.debug("Series {} has not concluded.", series.id)
                 }
             }
         }
