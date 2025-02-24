@@ -14,7 +14,7 @@ abstract class AbstractWorker : Worker {
         val jobs = List(count) { instanceId ->
             launch {
                 val worker = createInstance(instanceId)
-                logger.info("Launching instance $instanceId of ${worker::class::simpleName}")
+                logger.info("Launching instance $instanceId of ${worker::class.simpleName}")
                 worker.start()
             }
         }

@@ -22,6 +22,15 @@ These local config values are picked up by docker compose via the .env file.
 
 ## Building & Running
 
+Before the application can run, the postgres database migration init script 
+relies on sql files in `build/resources/migrations/`. These migrations are 
+created with the `GenerateMainDatabaseMigrations` gradle task, easily accessible 
+in the Gradle menu in Intellij. This task MUST be run everytime a sqldelight 
+query or migration is changed.
+
+When a code change is made, deleting the container is not enough. You must also
+rebuild the docker image, which takes about a minute.
+
 The `Makefile` contains many useful commands to build/run this application locally, as well as quickly run the tests. 
 
 - `make build` and `make rebuild` will build the docker image from source.
@@ -31,12 +40,6 @@ dependencies.
 
 - `make run-dev` will run everything as well as a pgadmin instance
 
-Note that the postgres database migration init script relies on sql files in
-`build/resources/migrations/`. These migrations are created with the
-`GenerateMainDatabaseMigrations` gradle task, easily accessible in the sidebar
-Gradle menu in Intellij. THis task MUST be run everytime a sqldelight migration
-is added, otherwise the schema changes will not be reflected in the container
-db.
 
 - `make test` will run tests in src/test locally- this requires jdk17 installed, as it does not run in Docker.
 
