@@ -23,7 +23,7 @@ run:
 	docker-compose up dennys rabbitmq postgres
 
 # Run all dev containers
-run-dev:
+dev:
 	docker-compose up
 
 # Refresh containers and app image
@@ -48,7 +48,7 @@ rebuild: erase build
 refresh: erase drop-db build run
 
 # Cleans local database
-drop-db:
+drop:
 	docker volume rm $(APP_NAME)_pgdata
 
 # Run tests (not containerized)

@@ -130,7 +130,7 @@ If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there 
    git remote -v # confirm the changes
    ```
 You can now run the project with `make run`. This will create a local postgres database. As well as this, 
-`make run-dev` will run a [pgadmin](https://www.pgadmin.org/) instance to easily look at the local database.
+`make dev` will run a [pgadmin](https://www.pgadmin.org/) instance to easily look at the local database.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -144,11 +144,11 @@ The `Makefile` contains many useful commands to build/run this application local
 * `make migrations` - Generates valid sql files in ./build/resources/migrations for initializing local postgres database. This command must be run each time a schema change occurs.
 * `make build` and `make rebuild` - Builds an application image from source. `rebuild` will delete old images.
 * `make run` - Runs docker-compose up on the application and its dependencies.
-* `make run-dev` - Same as `make run`, but with a pgadmin instance.
+* `make dev` - Same as `make run`, but with a pgadmin instance.
 * `make test` - Runs tests locally. Does not use Docker.
 * `make debug-build` - Runs a build with plaintext output. This is useful to debug build-time failures.
 * `make stop` - Stops all containers, and removes them. It is a good habit to run this after ctrl-C-ing `make run`.
-* `make drop-db` - Deletes the pgdata volume. Do this to re-run the initialization scripts, usually after a schema change.
+* `make drop` - Deletes the pgdata volume. Do this to re-run the initialization scripts, usually after a schema change.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
