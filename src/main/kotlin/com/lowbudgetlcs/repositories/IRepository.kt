@@ -32,9 +32,12 @@ interface IRepository<T, K> {
     /**
      * Create the given entity in storage.
      *
+     * Enforces entity uniquness on [entity]'s id property.
+     *
      * @param[entity] An instance of [T] to create in storage.
+     * @return The new entity in storage, or null if it already exists.
      */
-    fun create(entity: T): T
+    fun create(entity: T): T?
 
     /**
      * Update the given entity in storage.
@@ -42,8 +45,9 @@ interface IRepository<T, K> {
      * Uses [entity]'s id to fetch in storage.
      *
      * @param[entity] The entity to update in storage.
+     * @return The new entity in storage, or null if it does not exist.
      */
-    fun update(entity: T): T
+    fun update(entity: T): T?
 
     /**
      * Delete the given entity in storage.
@@ -51,6 +55,7 @@ interface IRepository<T, K> {
      * Uses [entity]'s id to fetch in storage.
      *
      * @param[entity] The entity to delete in storage.
+     * @return The entity that was deleted, or null if the entity does not exist.
      */
-    fun delete(entity: T): T
+    fun delete(entity: T): T?
 }

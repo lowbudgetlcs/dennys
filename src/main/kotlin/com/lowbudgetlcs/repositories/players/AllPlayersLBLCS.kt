@@ -11,7 +11,7 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 class AllPlayersLBLCS : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Player): Player {
+    override fun create(entity: Player): Player? {
         TODO("Not yet implemented")
     }
 
@@ -40,10 +40,10 @@ class AllPlayersLBLCS : IPlayerRepository {
     override fun readByPuuid(puuid: String): Player? =
         lblcs.playersQueries.readByPuuid(puuid).executeAsOneOrNull()?.toPlayer()
 
-    override fun update(entity: Player): Player =
-        lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOne().toPlayer()
+    override fun update(entity: Player): Player? =
+        lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOneOrNull()?.toPlayer()
 
-    override fun delete(entity: Player): Player {
+    override fun delete(entity: Player): Player? {
         TODO("Not yet implemented")
     }
 

@@ -4,17 +4,17 @@ package com.lowbudgetlcs.entities
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TeamId(val id: Int)
-
-@Serializable
 data class Team(
-    val id: TeamId,
+    override val id: TeamId,
     val name: String,
     val logo: String?,
     val captain: PlayerId?,
     val division: DivisionId?,
     val teamData: List<TeamGameData>
-)
+) : Entity<TeamId>
+
+@Serializable
+data class TeamId(val id: Int)
 
 @Serializable
 data class TeamGameData(

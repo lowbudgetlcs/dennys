@@ -10,7 +10,7 @@ import com.lowbudgetlcs.repositories.ICriteria
 class AllSeriesLBLCS : ISeriesRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Series): Series {
+    override fun create(entity: Series): Series? {
         TODO("Not yet implemented")
     }
 
@@ -24,13 +24,11 @@ class AllSeriesLBLCS : ISeriesRepository {
         TODO("Not yet implemented")
     }
 
-    override fun update(entity: Series): Series =
-        lblcs.seriesQueries.updateSeries(entity.winner?.id, entity.loser?.id, entity.id.id).executeAsOneOrNull().let {
-            if (it != null) return it.toSeries()
-            return entity
-        }
+    override fun update(entity: Series): Series? =
+        lblcs.seriesQueries.updateSeries(entity.winner?.id, entity.loser?.id, entity.id.id).executeAsOneOrNull()
+            ?.toSeries()
 
-    override fun delete(entity: Series): Series {
+    override fun delete(entity: Series): Series? {
         TODO("Not yet implemented")
     }
 

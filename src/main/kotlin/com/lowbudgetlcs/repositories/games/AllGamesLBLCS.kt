@@ -14,7 +14,7 @@ import migrations.Games
 class AllGamesLBLCS : IGameRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Game): Game {
+    override fun create(entity: Game): Game? {
         TODO("Not yet implemented")
     }
 
@@ -24,14 +24,14 @@ class AllGamesLBLCS : IGameRepository {
 
     override fun readByCriteria(criteria: ICriteria<Game>): List<Game> = criteria.meetCriteria(readAll())
 
-    override fun update(entity: Game): Game = lblcs.gamesQueries.updateGame(
+    override fun update(entity: Game): Game? = lblcs.gamesQueries.updateGame(
         winner_id = entity.winner?.id,
         loser_id = entity.loser?.id,
         callback_result = Json.encodeToString(entity.callbackResult),
         id = entity.id.id
-    ).executeAsOne().toGame()
+    ).executeAsOneOrNull()?.toGame()
 
-    override fun delete(entity: Game): Game {
+    override fun delete(entity: Game): Game? {
         TODO("Not yet implemented")
     }
 

@@ -6,11 +6,8 @@ import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
 
 @Serializable
-data class GameId(val id: Int)
-
-@Serializable
 data class Game(
-    val id: GameId,
+    override val id: GameId,
     val shortCode: String,
     val gameNumber: Int,
     val winner: TeamId?,
@@ -18,4 +15,7 @@ data class Game(
     val callbackResult: RiotCallback?,
     @Contextual val createdAt: OffsetDateTime,
     val series: SeriesId,
-)
+) : Entity<GameId>
+
+@Serializable
+data class GameId(val id: Int)

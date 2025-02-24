@@ -9,7 +9,7 @@ import migrations.Teams
 class AllTeamsLBLCS : ITeamRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Team): Team {
+    override fun create(entity: Team): Team? {
         TODO("Not yet implemented")
     }
 
@@ -31,11 +31,11 @@ class AllTeamsLBLCS : ITeamRepository {
 
     override fun readByCriteria(criteria: ICriteria<Team>): List<Team> = criteria.meetCriteria(readAll())
 
-    override fun update(entity: Team): Team =
+    override fun update(entity: Team): Team? =
         lblcs.teamsQueries.updateTeam(entity.name, entity.logo, entity.captain?.id, entity.division?.id)
-            .executeAsOneOrNull().let { it?.toTeam() ?: entity }
+            .executeAsOneOrNull()?.toTeam()
 
-    override fun delete(entity: Team): Team {
+    override fun delete(entity: Team): Team? {
         TODO("Not yet implemented")
     }
 
@@ -79,10 +79,10 @@ class AllTeamsLBLCS : ITeamRepository {
         }
         return Team(
             TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
-                DivisionId(
-                    it
-                )
-            }, teamData
+            DivisionId(
+                it
+            )
+        }, teamData
         )
     }
 

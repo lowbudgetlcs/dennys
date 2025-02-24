@@ -6,7 +6,7 @@ import com.lowbudgetlcs.repositories.ICriteria
 import com.lowbudgetlcs.repositories.IRepository
 
 class AllDivisionsLBLCS : IDivisionRepository, IRepository<Division, DivisionId> {
-    override fun create(entity: Division): Division {
+    override fun create(entity: Division): Division? {
         TODO("Not yet implemented")
     }
 
@@ -22,11 +22,11 @@ class AllDivisionsLBLCS : IDivisionRepository, IRepository<Division, DivisionId>
         TODO("Not yet implemented")
     }
 
-    override fun update(entity: Division): Division {
+    override fun update(entity: Division): Division? {
         TODO("Not yet implemented")
     }
 
-    override fun delete(entity: Division): Division {
+    override fun delete(entity: Division): Division? {
         TODO("Not yet implemented")
     }
 }
