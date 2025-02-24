@@ -5,9 +5,10 @@ import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
+import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
 
-class PlayerRepositoryImpl : IPlayerRepository {
+class AllPlayersLBLCS : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     override fun create(entity: Player): Player {
@@ -44,6 +45,15 @@ class PlayerRepositoryImpl : IPlayerRepository {
 
     override fun delete(entity: Player): Player {
         TODO("Not yet implemented")
+    }
+
+    override fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
+        for (participant in participants) {
+            this.readByPuuid(participant.puuid)?.let { player ->
+                if (player.team != null) return player.team
+            }
+        }
+        return null
     }
 
     private fun createPerformance(player: Player, game: Game): PlayerPerformanceId =

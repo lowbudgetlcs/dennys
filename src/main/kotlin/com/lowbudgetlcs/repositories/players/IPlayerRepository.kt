@@ -1,11 +1,9 @@
 package com.lowbudgetlcs.repositories.players
 
-import com.lowbudgetlcs.entities.Game
-import com.lowbudgetlcs.entities.Player
-import com.lowbudgetlcs.entities.PlayerGameData
-import com.lowbudgetlcs.entities.PlayerId
+import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.repositories.IRepository
 import kotlinx.serialization.Serializable
+import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
 @Serializable
 data class PlayerPerformanceId(val id: Int)
@@ -16,4 +14,5 @@ interface IPlayerRepository : IRepository<Player, PlayerId> {
     ): Player
 
     fun readByPuuid(puuid: String): Player?
+    fun fetchTeamId(participants: List<MatchParticipant>): TeamId?
 }
