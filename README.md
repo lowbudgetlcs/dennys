@@ -29,20 +29,22 @@ The `Makefile` contains many useful commands to build/run this application local
 - `make run` will run the previously built Docker image as well as several
 dependencies.
 
+- `make run-dev` will run everything as well as a pgadmin instance
+
+Note that the postgres database migration init script relies on sql files in
+`build/resources/migrations/`. These migrations are created with the
+`GenerateMainDatabaseMigrations` gradle task, easily accessible in the sidebar
+Gradle menu in Intellij. THis task MUST be run everytime a sqldelight migration
+is added, otherwise the schema changes will not be reflected in the container
+db.
+
 - `make test` will run tests in src/test locally- this requires jdk17 installed, as it does not run in Docker.
 
-- `make dev` will run the docker container as well as a pgadmin instance to
-interact with the database.
+- `make debug-build` will run a docker build with readable output, useful for
+debugging build failures.
 
-After you successfully run the container, make sure to run the database
-migration script at least once.
+- `make stop` will stop each container, then remove them. This command must be
+run to actually stop the dependency containers after a ctrl-C to kill Dennys.
 
-```bash
-./db/migrate.sh
-```
-
-## Dependencies
-
-This application depends on the RabbitMQ message broker, which can be run as a
-container with the accompanying compose file. This behavior is the default of
-the Makefile `run` and `run-dev` command.
+- `make drop-db` will delete the pgdata volume. This will nuke the local
+database.
