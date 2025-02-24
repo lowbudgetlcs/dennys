@@ -32,6 +32,9 @@ class AllSeriesLBLCS : ISeriesRepository {
         TODO("Not yet implemented")
     }
 
+    /**
+     * Returns a [Series] derived from [migrations.Series].
+     */
     private fun migrations.Series.toSeries(): Series = Series(
         SeriesId(this.id),
         DivisionId(this.division_id),
