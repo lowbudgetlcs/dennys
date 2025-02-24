@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories
 
 /**
- * A data-source agnostic contract for repositories holding
+ * A data-source agnostic contract for repositories containing
  * objects of type [T].
  */
 interface IRepository<T> {
