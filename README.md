@@ -4,8 +4,6 @@ This project was created using the [Ktor Project Generator](https://start.ktor.i
 
 Here are some useful links to get you started:
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [RabbitMQ BASIC Example](https://www.rabbitmq.com/tutorials/tutorial-one-java)
 
 ## Configuration
 
@@ -39,7 +37,6 @@ The `Makefile` contains many useful commands to build/run this application local
 dependencies.
 
 - `make run-dev` will run everything as well as a pgadmin instance
-
 
 - `make test` will run tests in src/test locally- this requires jdk17 installed, as it does not run in Docker.
 

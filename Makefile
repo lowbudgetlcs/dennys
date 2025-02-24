@@ -5,7 +5,10 @@ TAG = dev
 CONTAINER_NAME = $(APP_NAME)-container
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_ROOT)/application.yaml)
 
-.PHONY: build run run-dev stop clean erase rebuild ps psa test all build-debug drop-db
+.PHONY: build run run-dev stop clean erase rebuild ps psa test all build-debug drop-db migrations
+
+migrations:
+	./gradlew generateMainDatabaseMigrations
 
 # Build the Docker image
 build:
