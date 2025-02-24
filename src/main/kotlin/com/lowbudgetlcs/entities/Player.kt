@@ -2,14 +2,25 @@ package com.lowbudgetlcs.entities
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents a player. [summonerName] is not safe to cache as it can
+ * change with no warning. [puuid] is encrypted on a per-riot-token basis
+ * but is immutable.
+ */
 @Serializable
 data class Player (
     override val id: PlayerId, val summonerName: String, val puuid: String, val team: TeamId?, val gameData: List<PlayerGameData>
 ): Entity<PlayerId>
 
+/**
+ * ID type for [Player]s.
+ */
 @Serializable
 data class PlayerId(val id: Int)
 
+/**
+ * Represents in-game stats owned by a [Player].
+ */
 @Serializable
 data class PlayerGameData(
     val kills: Int,
