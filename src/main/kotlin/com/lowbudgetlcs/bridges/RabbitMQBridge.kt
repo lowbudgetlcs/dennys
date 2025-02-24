@@ -9,7 +9,14 @@ import java.net.ConnectException
 
 data class RabbitMQConfig(val host: String)
 
+/**
+ * Connects to RabbitMQ with automatic retry logic. Allows messages to be emitted to [queue],
+ * or conversely listen on [queue].
+ */
 class RabbitMQBridge(private val queue: String) {
+    /**
+     * One-time RabbitMQ configuration. Runs once on startup.
+     */
     companion object {
         @OptIn(ExperimentalHoplite::class)
         private val config =
@@ -24,6 +31,10 @@ class RabbitMQBridge(private val queue: String) {
         }
     }
 
+    /**
+     * Creates a RabbitMQ [Connection]. This is a long-lived connection that should live for the
+     * entire lifecyle of the object.
+     */
     private fun connect(): Connection {
         var attempt = 0
         while (attempt < 5) {
@@ -41,6 +52,9 @@ class RabbitMQBridge(private val queue: String) {
         throw IllegalStateException("This should never be reached") // Just in case
     }
 
+    /**
+     * Lightweight connection object allowing read and writes to [queue].
+     */
     val channel: Channel = connect().createChannel().apply {
         queueDeclare(queue, true, false, false, null)
         basicQos(1)
@@ -48,6 +62,9 @@ class RabbitMQBridge(private val queue: String) {
         logger.debug("Created new messageq channel.")
     }
 
+    /**
+     * Write [message] onto [queue].
+     */
     fun emit(message: String) {
         channel.basicPublish("", queue, MessageProperties.PERSISTENT_TEXT_PLAIN, message.toByteArray(charset("UTF-8")))
             .also {
@@ -55,6 +72,9 @@ class RabbitMQBridge(private val queue: String) {
             }
     }
 
+    /**
+     * Listen on [queue] and call [callback] on all messages recieved.
+     */
     fun listen(callback: DeliverCallback) {
         channel.run {
             basicConsume(queue, false, callback) { _ -> }
