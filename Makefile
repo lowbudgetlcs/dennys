@@ -5,25 +5,25 @@ TAG = dev
 CONTAINER_NAME = $(APP_NAME)-container
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_ROOT)/application.yaml)
 
-.PHONY: build run run-dev stop clean erase rebuild ps psa test all build-debug 
+.PHONY: build run run-dev stop clean erase rebuild ps psa test all build-debug drop-db
 
 # Build the Docker image
 build:
 	docker build -t $(APP_NAME):$(TAG) -f Dockerfile .
 
 # Build without cacheing and readable output
-build-debug:
+debug-build:
 	docker build --no-cache --progress-plain -t $(APP_NAME):$(TAG) -f Dockerfile .
 
 # Run the Docker container
 run:
-	docker-compose up dennys
+	docker-compose up dennys rabbitmq postgres
 
 # Run all dev containers
 run-dev:
 	docker-compose up
 
-# Refresh
+# Refresh containers and app image
 all: erase build run
 
 # Stop the Docker container
@@ -40,6 +40,13 @@ erase: stop clean
 
 # Rebuild the Docker image
 rebuild: erase build
+
+# A full refresh. WARNING: Deletes all data stored in the postgres data volume
+refresh: erase drop-db build run
+
+# Cleans local database
+drop-db:
+	docker volume rm $(APP_NAME)_pgdata
 
 # Run tests (not containerized)
 test:
