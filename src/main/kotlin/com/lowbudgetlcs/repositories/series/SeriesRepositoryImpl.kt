@@ -5,7 +5,7 @@ import com.lowbudgetlcs.entities.DivisionId
 import com.lowbudgetlcs.entities.Series
 import com.lowbudgetlcs.entities.SeriesId
 import com.lowbudgetlcs.entities.TeamId
-import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.repositories.ICriteria
 
 class SeriesRepositoryImpl : ISeriesRepository {
     private val lblcs = LblcsDatabaseBridge().db
@@ -20,7 +20,7 @@ class SeriesRepositoryImpl : ISeriesRepository {
 
     override fun readById(id: SeriesId): Series? = lblcs.seriesQueries.readById(id.id).executeAsOneOrNull()?.toSeries()
 
-    override fun readByCriteria(criteria: Criteria<Series>): List<Series> {
+    override fun readByCriteria(criteria: ICriteria<Series>): List<Series> {
         TODO("Not yet implemented")
     }
 

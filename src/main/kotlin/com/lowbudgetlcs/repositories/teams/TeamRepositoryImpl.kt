@@ -2,7 +2,7 @@ package com.lowbudgetlcs.repositories.teams
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.entities.*
-import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Team_game_data
 import migrations.Teams
 
@@ -29,7 +29,7 @@ class TeamRepositoryImpl : ITeamRepository {
 
     override fun readById(id: TeamId) = lblcs.teamsQueries.readById(id.id).executeAsOneOrNull()?.toTeam()
 
-    override fun readByCriteria(criteria: Criteria<Team>): List<Team> = criteria.meetCriteria(readAll())
+    override fun readByCriteria(criteria: ICriteria<Team>): List<Team> = criteria.meetCriteria(readAll())
 
     override fun update(entity: Team): Team =
         lblcs.teamsQueries.updateTeam(entity.name, entity.logo, entity.captain?.id, entity.division?.id)

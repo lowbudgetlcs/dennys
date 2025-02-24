@@ -2,7 +2,7 @@ package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.entities.*
-import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
 
@@ -32,7 +32,7 @@ class PlayerRepositoryImpl : IPlayerRepository {
 
     override fun readById(id: PlayerId): Player? = lblcs.playersQueries.readById(id.id).executeAsOneOrNull()?.toPlayer()
 
-    override fun readByCriteria(criteria: Criteria<Player>): List<Player> {
+    override fun readByCriteria(criteria: ICriteria<Player>): List<Player> {
         TODO("Not yet implemented")
     }
 
