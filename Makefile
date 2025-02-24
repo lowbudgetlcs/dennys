@@ -5,7 +5,7 @@ TAG = dev
 CONTAINER_NAME = $(APP_NAME)-container
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_ROOT)/application.yaml)
 
-.PHONY: build run stop clean erase rebuild ps psa test all build-debug 
+.PHONY: build run run-dev stop clean erase rebuild ps psa test all build-debug 
 
 # Build the Docker image
 build:
@@ -17,6 +17,10 @@ build-debug:
 
 # Run the Docker container
 run:
+	docker-compose up dennys
+
+# Run all dev containers
+run-dev:
 	docker-compose up
 
 # Refresh
@@ -24,8 +28,8 @@ all: erase build run
 
 # Stop the Docker container
 stop:
-	docker stop $(CONTAINER_NAME) || true
-	docker rm $(CONTAINER_NAME) || true
+	docker stop $(CONTAINER_NAME) postgres-dennys rabbitmq-dennys pgadmin-dennys || true
+	docker rm $(CONTAINER_NAME) postgres-dennys rabbitmq-dennys pgadmin-dennys || true
 
 # Clean up the Docker image
 clean:

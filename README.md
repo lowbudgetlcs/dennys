@@ -26,12 +26,23 @@ The `Makefile` contains many useful commands to build/run this application local
 
 - `make build` and `make rebuild` will build the docker image from source.
 
-- `make run` will run the previously built Docker image.
+- `make run` will run the previously built Docker image as well as several
+dependencies.
 
 - `make test` will run tests in src/test locally- this requires jdk17 installed, as it does not run in Docker.
+
+- `make dev` will run the docker container as well as a pgadmin instance to
+interact with the database.
+
+After you successfully run the container, make sure to run the database
+migration script at least once.
+
+```bash
+./db/migrate.sh
+```
 
 ## Dependencies
 
 This application depends on the RabbitMQ message broker, which can be run as a
-container with the accompanying compose file. The Makefile uses the `yq` utility
-to parse some basic configuration information.
+container with the accompanying compose file. This behavior is the default of
+the Makefile `run` and `run-dev` command.
