@@ -13,11 +13,15 @@ class AllTeamsLBLCS : ITeamRepository {
         TODO("Not yet implemented")
     }
 
-    override fun createTeamData(
+    override fun saveTeamData(
         team: Team, game: Game, data: TeamGameData
-    ): Team {
-        lblcs.transaction {
-            createTeamGameData(createTeamPerformance(team, game), data)
+    ): Team? {
+        try {
+            lblcs.transaction {
+                saveTeamGameData(saveTeamPerformance(team, game), data)
+            }
+        } catch (e: Throwable) {
+            return null
         }
         val teamData by lazy {
             readTeamData(team.id)
@@ -39,10 +43,22 @@ class AllTeamsLBLCS : ITeamRepository {
         TODO("Not yet implemented")
     }
 
-    private fun createTeamPerformance(team: Team, game: Game) =
+    /**
+     * Saves team game data derived from [team] and [game] to storage and returns
+     * its [TeamPerformanceId]. Throws an exception if insertion fails.
+     * @throws NullPointerException
+     * @throws IllegalStateException
+     */
+    private fun saveTeamPerformance(team: Team, game: Game): TeamPerformanceId =
         TeamPerformanceId(lblcs.teamsQueries.createPerformance(team.id.id, game.id.id).executeAsOne())
 
-    private fun createTeamGameData(performance: TeamPerformanceId, data: TeamGameData) {
+    /**
+     * Saves [performance] and [data] to storage and returns an [Int]. Throws
+     * an exception if insertion fails.
+     * @throws NullPointerException
+     * @throws IllegalStateException
+     */
+    private fun saveTeamGameData(performance: TeamPerformanceId, data: TeamGameData) {
         lblcs.teamsQueries.createGameData(
             performance.id,
             data.win,
@@ -63,9 +79,12 @@ class AllTeamsLBLCS : ITeamRepository {
             data.heralds.first,
             data.towers.first,
             data.inhibitors.first
-        ).executeAsOne()
+        ).executeAsOneOrNull()
     }
 
+    /**
+     * Returns a list of [TeamGameData] belonging to the team with id [teamId].
+     */
     private fun readTeamData(teamId: TeamId): List<TeamGameData> =
         lblcs.teamsQueries.readTeamDataById(teamId.id).executeAsList().let { data ->
             data.map {
@@ -73,6 +92,9 @@ class AllTeamsLBLCS : ITeamRepository {
             }
         }
 
+    /**
+     * Returns a [Team] derived from [Teams]. [Team.teamData] is lazy-loaded.
+     */
     private fun Teams.toTeam(): Team {
         val teamData by lazy {
             readTeamData(TeamId(id))
@@ -86,6 +108,9 @@ class AllTeamsLBLCS : ITeamRepository {
         )
     }
 
+    /**
+     * Returns a [TeamGameData] derived from [Team_game_data].
+     */
     private fun Team_game_data.toTeamGameData(): TeamGameData = TeamGameData(
         win = this.win,
         side = if (side == "BLUE") RiftSide.BLUE else RiftSide.RED,

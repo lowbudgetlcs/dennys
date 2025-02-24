@@ -11,7 +11,11 @@ import kotlinx.serialization.Serializable
 data class TeamPerformanceId(val id: Int)
 
 interface ITeamRepository : IEntityRepository<Team, TeamId> {
-    fun createTeamData(
+    /**
+     * Saves [data] owned by [team] derived from [game] to storage. Returns [team] with
+     * the new data if it succeeds, null otherwise.
+     */
+    fun saveTeamData(
         team: Team, game: Game, data: TeamGameData
-    ): Team
+    ): Team?
 }

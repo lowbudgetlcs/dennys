@@ -10,7 +10,7 @@ data class PlayerPerformanceId(val id: Int)
 
 interface IPlayerRepository : IEntityRepository<Player, PlayerId> {
     /**
-     * Saves [data] owned by [player] from [game] to storage. Returns [player] with
+     * Saves [data] owned by [player] derived from [game] to storage. Returns [player] with
      * the new data if it succeeds, null otherwise.
      */
     fun savePlayerData(

@@ -82,7 +82,7 @@ class StatDaemon private constructor(
             teamsR.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId === TeamType.BLUE) RiftSide.BLUE else RiftSide.RED
-                    teamsR.createTeamData(
+                    teamsR.saveTeamData(
                         t, game, TeamGameData(
                             team.didWin(), side, players.sumOf { it.goldEarned }, length, kills = Objective(
                                 kills = team.objectives["champion"]?.kills ?: 0,

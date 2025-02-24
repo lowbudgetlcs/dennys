@@ -59,8 +59,10 @@ class AllPlayersLBLCS : IPlayerRepository {
     }
 
     /**
-     * Saves game data derived from [player] and [game] in storage and
-     * returns its [PlayerPerformanceId] if it succeeds, null otherwise.
+     * Saves player game data derived from [player] and [game] in storage and
+     * returns its [PlayerPerformanceId]. Throws an exception if insertion fails.
+     * @throws NullPointerException
+     * @throws IllegalStateException
      */
     private fun savePerformance(player: Player, game: Game): PlayerPerformanceId =
         lblcs.playersQueries.createPerformance(player.puuid, game.id.id).executeAsOne().let {
@@ -68,8 +70,10 @@ class AllPlayersLBLCS : IPlayerRepository {
         }
 
     /**
-     * Saves [performance] and [data] to storage, maintaining a one-to-one relationship
-     * between the two.
+     * Saves [performance] and [data] to storage and returns an [Int].
+     * Throws an exception if insertion fails.
+     * @throws NullPointerException
+     * @throws IllegalStateException
      */
     private fun savePlayerGameData(
         performance: PlayerPerformanceId, data: PlayerGameData
