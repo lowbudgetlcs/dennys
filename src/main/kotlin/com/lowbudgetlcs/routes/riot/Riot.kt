@@ -15,6 +15,8 @@ import kotlinx.serialization.json.Json
 private val logger = KtorSimpleLogger("com.lowbudgetlcs.routes.riot.Riot")
 
 fun Application.riotRoutes() {
+    // List of messageqs to emit callbacks onto. This is basically 'registering service workers',
+    // but really shitty.
     val messageqs = mutableListOf<RabbitMQBridge>()
     messageqs.add(RabbitMQBridge("CALLBACK"))
     messageqs.add(RabbitMQBridge("STATS"))
@@ -33,6 +35,7 @@ fun Application.riotRoutes() {
             route("/callback") {
                 post {
                     val callback = call.receive<RiotCallback>()
+                    // Emit callback onto all registered queues.
                     for (queue in messageqs) queue.emit(Json.encodeToString(callback))
                     call.respond(HttpStatusCode.OK, callback)
                 }
