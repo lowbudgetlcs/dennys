@@ -2,7 +2,6 @@ package com.lowbudgetlcs.entities
 
 import kotlinx.serialization.Serializable
 
-
 /**
  * Represents a Division, of the given [id] and [name].
  * @property tournamentId The Riot-supplied tournament id associated with a [Division]. This is generated
