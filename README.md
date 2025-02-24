@@ -20,8 +20,7 @@
 <br />
 <div align="center">
    <a href="https://github.com/lowbudgetlcs/dennys">
-      <img src="https://i.imgur.com/DvZvfNz.png
-" alt="Logo" width="80" height="80" />
+      <img src="https://i.imgur.com/DvZvfNz.png" alt="Logo" width="80" height="80" />
    </a>
    
 <div align="center">
