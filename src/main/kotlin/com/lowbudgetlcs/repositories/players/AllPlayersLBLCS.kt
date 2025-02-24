@@ -15,13 +15,15 @@ class AllPlayersLBLCS : IPlayerRepository {
         TODO("Not yet implemented")
     }
 
-    override fun createPlayerData(
+    override fun savePlayerData(
         player: Player, game: Game, data: PlayerGameData
-    ): Player {
-        lblcs.transaction {
-            createPlayerGameData(
-                createPerformance(player, game), data
-            )
+    ): Player? {
+        try {
+            lblcs.transaction {
+                savePlayerGameData(savePerformance(player, game), data)
+            }
+        } catch (e: Throwable) {
+            return null
         }
         val gameData by lazy {
             readPlayerGameData(player.id)
@@ -56,14 +58,22 @@ class AllPlayersLBLCS : IPlayerRepository {
         return null
     }
 
-    private fun createPerformance(player: Player, game: Game): PlayerPerformanceId =
+    /**
+     * Saves game data derived from [player] and [game] in storage and
+     * returns its [PlayerPerformanceId] if it succeeds, null otherwise.
+     */
+    private fun savePerformance(player: Player, game: Game): PlayerPerformanceId =
         lblcs.playersQueries.createPerformance(player.puuid, game.id.id).executeAsOne().let {
             PlayerPerformanceId(it)
         }
 
-    private fun createPlayerGameData(
+    /**
+     * Saves [performance] and [data] to storage, maintaining a one-to-one relationship
+     * between the two.
+     */
+    private fun savePlayerGameData(
         performance: PlayerPerformanceId, data: PlayerGameData
-    ) = lblcs.playersQueries.createPlayerData(
+    ): Int = lblcs.playersQueries.createPlayerData(
         performance.id,
         data.kills,
         data.deaths,
@@ -97,6 +107,9 @@ class AllPlayersLBLCS : IPlayerRepository {
         data.summoner2
     ).executeAsOne()
 
+    /**
+     * Returns a list of [PlayerGameData] owned by the [Player] with id [playerId].
+     */
     private fun readPlayerGameData(playerId: PlayerId): List<PlayerGameData> =
         lblcs.playersQueries.readGameDataByPlayerId(playerId.id).executeAsList().let { data ->
             data.map {
@@ -104,6 +117,9 @@ class AllPlayersLBLCS : IPlayerRepository {
             }
         }
 
+    /**
+     * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.
+     */
     private fun Players.toPlayer(): Player {
         val gameData by lazy {
             readPlayerGameData(PlayerId(this.id))
@@ -117,6 +133,9 @@ class AllPlayersLBLCS : IPlayerRepository {
         )
     }
 
+    /**
+     * Returns a [PlayerGameData] derived from [Player_game_data].
+     */
     private fun Player_game_data.toPlayerGameData() = PlayerGameData(
         this.kills,
         this.deaths,

@@ -78,7 +78,7 @@ class StatDaemon private constructor(
 
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
         playersR.fetchTeamId(players)?.let { teamId ->
-            logger.debug("Processing team data for '{}' ('{}')", teamId, game.shortCode)
+            logTransactionMessage("Saving game data for", teamId.toString(), game.shortCode, "...")
             teamsR.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId === TeamType.BLUE) RiftSide.BLUE else RiftSide.RED
@@ -108,9 +108,7 @@ class StatDaemon private constructor(
                             )
                         )
                     )
-                    logger.debug(
-                        "Successfully processed team '{}' ('{}')", t.name, game.shortCode
-                    )
+                    logTransactionMessage("Saved game data for", t.name, game.shortCode)
                 } catch (e: Throwable) {
                     transactionError(e, t.name, game.shortCode)
                 }
@@ -119,12 +117,15 @@ class StatDaemon private constructor(
     }
 
     private fun processPlayer(player: MatchParticipant, game: Game) {
-        logger.debug(
-            "Processing game data for '{}' (code '{}').", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode
+        logTransactionMessage(
+            "Saving game data for",
+            "${player.riotIdName}#${player.riotIdTagline}",
+            game.shortCode,
+            "..."
         )
         try {
             playersR.readByPuuid(player.puuid)?.let { p ->
-                playersR.createPlayerData(
+                playersR.savePlayerData(
                     p, game, PlayerGameData(
                         player.kills,
                         player.deaths,
@@ -159,18 +160,18 @@ class StatDaemon private constructor(
                     )
                 )
             }
-            logger.debug(
-                "Successfully processed player '{}' ('{}')",
-                "${player.riotIdName}#${player.riotIdTagline}",
-                game.shortCode
-            )
+            logTransactionMessage("Saved stats for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         } catch (e: Throwable) {
             transactionError(e, "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         }
     }
 
+    private fun logTransactionMessage(preamble: String, target: String, context: String, closer: String = ".") {
+        logger.debug("{} '{}' ('{}'){}", preamble, target, context, closer)
+    }
+
     private fun transactionError(e: Throwable, target: String, context: String) {
-        logger.error("Transaction failed for '{}' ('{}')", target, context)
+        logger.error("Failed to save stats for '{}' ('{}')", target, context)
         logger.error(e.message)
     }
 }
