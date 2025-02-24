@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories
 
-class AndCriteria<T>(private val criteria1: Criteria<T>, private val criteria2: Criteria<T>) : Criteria<T> {
+class AndCriteria<T>(private val criteria1: ICriteria<T>, private val criteria2: ICriteria<T>) : ICriteria<T> {
     /**
-     * Compose two [Criteria] with an AND operation.
+     * Compose two [ICriteria] with an AND operation.
      *
      * @param[T] The type of objects to be filtered.
      *

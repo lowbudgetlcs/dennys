@@ -2,7 +2,7 @@ package com.lowbudgetlcs.repositories.divisions
 
 import com.lowbudgetlcs.entities.Division
 import com.lowbudgetlcs.entities.DivisionId
-import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.repositories.ICriteria
 import com.lowbudgetlcs.repositories.IRepository
 
 class DivisionRepositoryImpl : IDivisionRepository, IRepository<Division, DivisionId> {
@@ -18,7 +18,7 @@ class DivisionRepositoryImpl : IDivisionRepository, IRepository<Division, Divisi
         TODO("Not yet implemented")
     }
 
-    override fun readByCriteria(criteria: Criteria<Division>): List<Division> {
+    override fun readByCriteria(criteria: ICriteria<Division>): List<Division> {
         TODO("Not yet implemented")
     }
 

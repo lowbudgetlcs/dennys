@@ -6,6 +6,6 @@ package com.lowbudgetlcs.repositories
  * @param[T] The type of objects to be filtered.
  * @return A filtered list of objects of type [T].
  */
-interface Criteria<T> {
+interface ICriteria<T> {
     fun meetCriteria(entities: List<T>): List<T>
 }

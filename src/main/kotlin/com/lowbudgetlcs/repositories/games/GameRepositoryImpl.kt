@@ -5,7 +5,7 @@ import com.lowbudgetlcs.entities.Game
 import com.lowbudgetlcs.entities.GameId
 import com.lowbudgetlcs.entities.SeriesId
 import com.lowbudgetlcs.entities.TeamId
-import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.repositories.ICriteria
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -22,7 +22,7 @@ class GameRepositoryImpl : IGameRepository {
 
     override fun readById(id: GameId): Game? = lblcs.gamesQueries.readById(id.id).executeAsOneOrNull()?.toGame()
 
-    override fun readByCriteria(criteria: Criteria<Game>): List<Game> = criteria.meetCriteria(readAll())
+    override fun readByCriteria(criteria: ICriteria<Game>): List<Game> = criteria.meetCriteria(readAll())
 
     override fun update(entity: Game): Game = lblcs.gamesQueries.updateGame(
         winner_id = entity.winner?.id,

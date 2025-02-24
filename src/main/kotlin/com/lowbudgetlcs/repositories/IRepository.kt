@@ -22,12 +22,12 @@ interface IRepository<T, K> {
     fun readById(id: K): T?
 
     /**
-     * Filter all [T] in storage with a client-supplied [Criteria].
+     * Filter all [T] in storage with a client-supplied [ICriteria].
      *
-     * @param[criteria] Criteria to apply to [T].
+     * @param[criteria] ICriteria to apply to [T].
      * @return A list of [T] that match the given criteria, potentially empty.
      */
-    fun readByCriteria(criteria: Criteria<T>): List<T>
+    fun readByCriteria(criteria: ICriteria<T>): List<T>
 
     /**
      * Create the given entity in storage.
