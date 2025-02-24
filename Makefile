@@ -20,11 +20,11 @@ debug-build:
 
 # Run the Docker container
 run:
-	docker-compose up dennys rabbitmq postgres
+	docker compose up dennys rabbitmq postgres
 
 # Run all dev containers
 dev:
-	docker-compose up
+	docker compose up
 
 # Refresh containers and app image
 all: erase build run
