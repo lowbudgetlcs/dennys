@@ -17,17 +17,27 @@ import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
+/**
+ * This service worker consumes [RiotCallback]s off of [queue] and saves
+ * the result of the finished [Game]. It also checks if the [Series] owning
+ * [Game] is complete. If it is, it saves the result.
+ */
 class TournamentEngine private constructor(
     override val queue: String,
     private val gamesR: IGameRepository,
     private val seriesR: ISeriesRepository,
     private val playersR: IPlayerRepository
-) : AbstractWorker(), RabbitMQWorker {
+) : AbstractWorker(), IMessageQListener {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.TournamentEngine")
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
 
+    /**
+     * Private constructor and companion object prevent direct instantiation.
+     *
+     * This behavior is deprecated and will be removed in future versions.
+     */
     companion object {
         fun createInstance(queue: String): TournamentEngine =
             TournamentEngine(queue, AllGamesLBLCS(), AllSeriesLBLCS(), AllPlayersLBLCS())
@@ -43,6 +53,10 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Consumes [delivery] from [queue] and parses it as a [RiotCallback].
+     * Begins game and series processing.
+     */
     override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
         logger.debug("[x] Recieved Message: {}", message)
@@ -61,6 +75,11 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Fetches a match from the RiotAPI and process the winning and losing teams. Then, saves
+     * the winner, loser, and result of the game. If the series owning said game is complete,
+     * save the winner and loser of the series.
+     */
     private fun processRiotCallback(callback: RiotCallback) {
         riot.match(callback.gameId)?.let { match ->
             try {
@@ -82,6 +101,9 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Updates the game in storage derived from [callback] with a [winner] and [loser].
+     */
     private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game? {
         gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).first().let { game ->
             return gamesR.update(
@@ -92,6 +114,9 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Updates the series in storage that owns [game] with a winner and loser.
+     */
     private fun updateSeries(game: Game, team1: TeamId, team2: TeamId) {
         seriesR.readById(game.series)?.let { series ->
             // Magic number yayyyy! This needs an actual solution- for now the app only supports Bo3.
