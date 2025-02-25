@@ -5,12 +5,13 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
 
-@Serializable
-data class GameId(val id: Int)
-
+/**
+ * Represents a Game. Games are owned by [Series]. When a [Game] is
+ * complete, [winner], [loser] and [callbackResult] are guarunteed non-null.
+ */
 @Serializable
 data class Game(
-    val id: GameId,
+    override val id: GameId,
     val shortCode: String,
     val gameNumber: Int,
     val winner: TeamId?,
@@ -18,4 +19,10 @@ data class Game(
     val callbackResult: RiotCallback?,
     @Contextual val createdAt: OffsetDateTime,
     val series: SeriesId,
-)
+) : Entity<GameId>
+
+/**
+ * ID type for [Game]s.
+ */
+@Serializable
+data class GameId(val id: Int)

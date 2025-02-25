@@ -5,28 +5,42 @@ import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.Game
 import com.lowbudgetlcs.entities.TeamId
-import com.lowbudgetlcs.entities.fetchTeamId
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
-import com.lowbudgetlcs.repositories.series.SeriesRepository
-import com.lowbudgetlcs.repositories.series.SeriesRepositoryImpl
+import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
+import com.lowbudgetlcs.repositories.players.IPlayerRepository
+import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
+/**
+ * This service worker consumes [RiotCallback]s off of [queue] and saves
+ * the result of the finished [Game]. It also checks if the [Series] owning
+ * [Game] is complete. If it is, it saves the result.
+ */
 class TournamentEngine private constructor(
-    override val queue: String, private val gamesR: GameRepository, private val seriesR: SeriesRepository
-) : AbstractWorker(), RabbitMQWorker {
+    override val queue: String,
+    private val gamesR: IGameRepository,
+    private val seriesR: ISeriesRepository,
+    private val playersR: IPlayerRepository
+) : AbstractWorker(), IMessageQListener {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.TournamentEngine")
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
 
+    /**
+     * Private constructor and companion object prevent direct instantiation.
+     *
+     * This behavior is deprecated and will be removed in future versions.
+     */
     companion object {
         fun createInstance(queue: String): TournamentEngine =
-            TournamentEngine(queue, GameRepositoryImpl(), SeriesRepositoryImpl())
+            TournamentEngine(queue, AllGamesLBLCS(), AllSeriesLBLCS(), AllPlayersLBLCS())
     }
 
     override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue)
@@ -39,6 +53,10 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Consumes [delivery] from [queue] and parses it as a [RiotCallback].
+     * Begins game and series processing.
+     */
     override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
         logger.debug("[x] Recieved Message: {}", message)
@@ -57,21 +75,36 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Fetches a match from the RiotAPI and process the winning and losing teams. Then, saves
+     * the winner, loser, and result of the game. If the series owning said game is complete,
+     * save the winner and loser of the series.
+     */
     private fun processRiotCallback(callback: RiotCallback) {
         riot.match(callback.gameId)?.let { match ->
-            db.transaction {
-                val (winner, loser) = match.participants.partition { it.didWin() }.let { (winners, losers) ->
-                    fetchTeamId(winners) to fetchTeamId(losers)
+            try {
+                // We throw an exception to cancel the database transaction.
+                db.transaction {
+                    val (winner, loser) = match.participants.partition { it.didWin() }.let { (winners, losers) ->
+                        playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
+                    }
+                    if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
+                    updateGame(callback, winner, loser)?.let {
+                        updateSeries(
+                            it, winner, loser
+                        )
+                    }
                 }
-                if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
-                updateSeries(
-                    updateGame(callback, winner, loser), winner, loser
-                )
+            } catch (e: IllegalArgumentException) {
+                logger.warn("Could not fetch one or both TeamIds.")
             }
         }
     }
 
-    private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game {
+    /**
+     * Updates the game in storage derived from [callback] with a [winner] and [loser].
+     */
+    private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game? {
         gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).first().let { game ->
             return gamesR.update(
                 game.copy(
@@ -81,6 +114,9 @@ class TournamentEngine private constructor(
         }
     }
 
+    /**
+     * Updates the series in storage that owns [game] with a winner and loser.
+     */
     private fun updateSeries(game: Game, team1: TeamId, team2: TeamId) {
         seriesR.readById(game.series)?.let { series ->
             // Magic number yayyyy! This needs an actual solution- for now the app only supports Bo3.
@@ -91,11 +127,21 @@ class TournamentEngine private constructor(
             val team2Wins = gamesR.readByCriteria(
                 AndCriteria(TeamWinCriteria(team2), SeriesCriteria(game.series))
             ).size
+
+            fun logWin(team: TeamId) = logger.debug("Team {} wins series {}.", team, series.id)
             when (winCondition) {
-                team1Wins -> seriesR.update(series.copy(winner = team1, loser = team2))
-                team2Wins -> seriesR.update(series.copy(loser = team1, winner = team2))
+                team1Wins -> {
+                    seriesR.update(series.copy(winner = team1, loser = team2))
+                    logWin(team1)
+                }
+
+                team2Wins -> {
+                    seriesR.update(series.copy(loser = team1, winner = team2))
+                    logWin(team2)
+                }
                 // Otherwise, series has not concluded
                 else -> {
+                    logger.debug("Series {} has not concluded.", series.id)
                 }
             }
         }

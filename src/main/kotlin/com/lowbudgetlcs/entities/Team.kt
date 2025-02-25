@@ -3,19 +3,28 @@ package com.lowbudgetlcs.entities
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class TeamId(val id: Int)
-
+/**
+ * Represents a team.
+ */
 @Serializable
 data class Team(
-    val id: TeamId,
+    override val id: TeamId,
     val name: String,
     val logo: String?,
     val captain: PlayerId?,
     val division: DivisionId?,
     val teamData: List<TeamGameData>
-)
+) : Entity<TeamId>
 
+/**
+ * ID type for [Team]s.
+ */
+@Serializable
+data class TeamId(val id: Int)
+
+/**
+ * In-game stats owned by a [Team].
+ */
 @Serializable
 data class TeamGameData(
     val win: Boolean,
@@ -31,10 +40,12 @@ data class TeamGameData(
     val inhibitors: Objective
 )
 
-
 @Serializable
 enum class RiftSide { BLUE, RED }
 
+/**
+ * Represents in-game objectives.
+ */
 @Serializable
 data class Objective(
     val kills: Int = 0, val first: Boolean = false

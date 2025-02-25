@@ -38,6 +38,7 @@ sqldelight {
             dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
             srcDirs.setFrom("src/main/sqldelight")
             deriveSchemaFromMigrations.set(true)
+            migrationOutputDirectory = layout.buildDirectory.dir("resources/migrations")
         }
     }
 }

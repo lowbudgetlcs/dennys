@@ -13,7 +13,7 @@ fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module() {
     logger.info("Performing opening duties...")
     configureRouting()
-    // Start Tournament Engine and Stat Daemons- this is a perfect opportunity for a builder pattern.
+    // Start Tournament Engine and Stat Daemons- this is a perfect opportunity for a builer/factory pattern.
     launch {
         StatDaemon.createInstance("STATS").launchInstances(3)
     }

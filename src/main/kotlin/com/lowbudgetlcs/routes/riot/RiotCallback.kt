@@ -2,6 +2,10 @@ package com.lowbudgetlcs.routes.riot
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents a callback that is recieved when a Tournament Match is completed.
+ * [shortCode] and [gameId] are the most relevant fields.
+ */
 @Serializable
 data class RiotCallback(
     val startTime: Long,

@@ -2,25 +2,28 @@ package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.entities.*
-import com.lowbudgetlcs.repositories.Criteria
+import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
+import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
 
-class PlayerRepositoryImpl : PlayerRepository {
+class AllPlayersLBLCS : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
-    override fun create(entity: Player): Player {
+    override fun save(entity: Player): Player? {
         TODO("Not yet implemented")
     }
 
-    override fun createPlayerData(
+    override fun savePlayerData(
         player: Player, game: Game, data: PlayerGameData
-    ): Player {
-        lblcs.transaction {
-            createPlayerGameData(
-                createPerformance(player, game), data
-            )
+    ): Player? {
+        try {
+            lblcs.transaction {
+                savePlayerGameData(savePerformance(player, game), data)
+            }
+        } catch (e: Throwable) {
+            return null
         }
         val gameData by lazy {
             readPlayerGameData(player.id)
@@ -32,28 +35,49 @@ class PlayerRepositoryImpl : PlayerRepository {
 
     override fun readById(id: PlayerId): Player? = lblcs.playersQueries.readById(id.id).executeAsOneOrNull()?.toPlayer()
 
-    override fun readByCriteria(criteria: Criteria<Player>): List<Player> {
+    override fun readByCriteria(criteria: ICriteria<Player>): List<Player> {
         TODO("Not yet implemented")
     }
 
     override fun readByPuuid(puuid: String): Player? =
         lblcs.playersQueries.readByPuuid(puuid).executeAsOneOrNull()?.toPlayer()
 
-    override fun update(entity: Player): Player =
-        lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOne().toPlayer()
+    override fun update(entity: Player): Player? =
+        lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOneOrNull()?.toPlayer()
 
-    override fun delete(entity: Player): Player {
+    override fun delete(entity: Player): Player? {
         TODO("Not yet implemented")
     }
 
-    private fun createPerformance(player: Player, game: Game): PlayerPerformanceId =
+    override fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
+        for (participant in participants) {
+            this.readByPuuid(participant.puuid)?.let { player ->
+                if (player.team != null) return player.team
+            }
+        }
+        return null
+    }
+
+    /**
+     * Saves player game data derived from [player] and [game] in storage and
+     * returns its [PlayerPerformanceId]. Throws an exception if insertion fails.
+     * @throws NullPointerException
+     * @throws IllegalStateException
+     */
+    private fun savePerformance(player: Player, game: Game): PlayerPerformanceId =
         lblcs.playersQueries.createPerformance(player.puuid, game.id.id).executeAsOne().let {
             PlayerPerformanceId(it)
         }
 
-    private fun createPlayerGameData(
+    /**
+     * Saves [performance] and [data] to storage and returns an [Int].
+     * Throws an exception if insertion fails.
+     * @throws NullPointerException
+     * @throws IllegalStateException
+     */
+    private fun savePlayerGameData(
         performance: PlayerPerformanceId, data: PlayerGameData
-    ) = lblcs.playersQueries.createPlayerData(
+    ): Int = lblcs.playersQueries.createPlayerData(
         performance.id,
         data.kills,
         data.deaths,
@@ -87,6 +111,9 @@ class PlayerRepositoryImpl : PlayerRepository {
         data.summoner2
     ).executeAsOne()
 
+    /**
+     * Returns a list of [PlayerGameData] owned by the [Player] with id [playerId].
+     */
     private fun readPlayerGameData(playerId: PlayerId): List<PlayerGameData> =
         lblcs.playersQueries.readGameDataByPlayerId(playerId.id).executeAsList().let { data ->
             data.map {
@@ -94,6 +121,9 @@ class PlayerRepositoryImpl : PlayerRepository {
             }
         }
 
+    /**
+     * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.
+     */
     private fun Players.toPlayer(): Player {
         val gameData by lazy {
             readPlayerGameData(PlayerId(this.id))
@@ -107,6 +137,9 @@ class PlayerRepositoryImpl : PlayerRepository {
         )
     }
 
+    /**
+     * Returns a [PlayerGameData] derived from [Player_game_data].
+     */
     private fun Player_game_data.toPlayerGameData() = PlayerGameData(
         this.kills,
         this.deaths,

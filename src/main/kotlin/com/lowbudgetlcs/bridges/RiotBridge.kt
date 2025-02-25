@@ -11,6 +11,9 @@ import no.stelar7.api.r4j.pojo.lol.match.v5.LOLMatch
 
 data class RiotConfig(val apiKey: String, val useStub: Boolean)
 
+/**
+ * Wrapper for configuring and accessing an [R4J] instance.
+ */
 class RiotBridge {
     companion object {
         private val logger = KtorSimpleLogger("com.lowbudgetlcs.RiotBridge")
@@ -22,6 +25,13 @@ class RiotBridge {
     }
 
     private val riot by lazy { R4J(APICredentials(config.apiKey)) }
+
+    /**
+     * Fetch a [LOLMatch] from the RiotAPI.
+     *
+     * @param[gameId] matchId to send to Riot.
+     * @return An instance of [LOLMatch] if [gameId] exists, null otherwise.
+     */
     fun match(gameId: Long): LOLMatch? = try {
         riot.loLAPI.matchAPI.getMatch(RegionShard.AMERICAS, "NA1_$gameId")
     } catch (e: Throwable) {
@@ -29,6 +39,4 @@ class RiotBridge {
         logger.error(e)
         null
     }
-
-    fun fetchTeams(gameId: Long) = riot.loLAPI.getTournamentAPI(config.useStub)
 }

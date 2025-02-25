@@ -2,11 +2,10 @@ package com.lowbudgetlcs.repositories.divisions
 
 import com.lowbudgetlcs.entities.Division
 import com.lowbudgetlcs.entities.DivisionId
-import com.lowbudgetlcs.repositories.Criteria
-import com.lowbudgetlcs.repositories.Repository
+import com.lowbudgetlcs.repositories.ICriteria
 
-class DivisionRepositoryImpl : DivisionRepository, Repository<Division, DivisionId> {
-    override fun create(entity: Division): Division {
+class AllDivisionsLBLCS : IDivisionRepository {
+    override fun save(entity: Division): Division? {
         TODO("Not yet implemented")
     }
 
@@ -18,15 +17,15 @@ class DivisionRepositoryImpl : DivisionRepository, Repository<Division, Division
         TODO("Not yet implemented")
     }
 
-    override fun readByCriteria(criteria: Criteria<Division>): List<Division> {
+    override fun readByCriteria(criteria: ICriteria<Division>): List<Division> {
         TODO("Not yet implemented")
     }
 
-    override fun update(entity: Division): Division {
+    override fun update(entity: Division): Division? {
         TODO("Not yet implemented")
     }
 
-    override fun delete(entity: Division): Division {
+    override fun delete(entity: Division): Division? {
         TODO("Not yet implemented")
     }
 }

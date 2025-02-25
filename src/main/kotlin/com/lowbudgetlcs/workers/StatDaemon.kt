@@ -3,13 +3,13 @@ package com.lowbudgetlcs.workers
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.*
-import com.lowbudgetlcs.repositories.games.GameRepository
-import com.lowbudgetlcs.repositories.games.GameRepositoryImpl
+import com.lowbudgetlcs.repositories.games.AllGamesLBLCS
+import com.lowbudgetlcs.repositories.games.IGameRepository
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
-import com.lowbudgetlcs.repositories.players.PlayerRepository
-import com.lowbudgetlcs.repositories.players.PlayerRepositoryImpl
-import com.lowbudgetlcs.repositories.teams.TeamRepository
-import com.lowbudgetlcs.repositories.teams.TeamRepositoryImpl
+import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
+import com.lowbudgetlcs.repositories.players.IPlayerRepository
+import com.lowbudgetlcs.repositories.teams.AllTeamsLBLCS
+import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import io.ktor.util.logging.*
@@ -19,19 +19,28 @@ import no.stelar7.api.r4j.basic.constants.types.lol.TeamType
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 
+/**
+ * This service worker consumes [RiotCallback]s off of [queue] and saves player
+ * and team data into storage.
+ */
 class StatDaemon private constructor(
     override val queue: String,
-    private val gamesR: GameRepository,
-    private val playersR: PlayerRepository,
-    private val teamsR: TeamRepository
-) : AbstractWorker(), RabbitMQWorker {
+    private val gamesR: IGameRepository,
+    private val playersR: IPlayerRepository,
+    private val teamsR: ITeamRepository
+) : AbstractWorker(), IMessageQListener {
     private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
     private val messageq = RabbitMQBridge(queue)
     private val riot = RiotBridge()
 
+    /**
+     * Private constructor and companion object prevent direct instantiation.
+     *
+     * This behavior is deprecated and will be removed in future versions.
+     */
     companion object {
         fun createInstance(queue: String): StatDaemon = StatDaemon(
-            queue, GameRepositoryImpl(), PlayerRepositoryImpl(), TeamRepositoryImpl()
+            queue, AllGamesLBLCS(), AllPlayersLBLCS(), AllTeamsLBLCS()
         )
     }
 
@@ -45,6 +54,10 @@ class StatDaemon private constructor(
         }
     }
 
+    /**
+     * Consumes [delivery] from [queue] and parses it as a [RiotCallback].
+     * Begins stat processing.
+     */
     override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
         logger.debug("[x] Recieved Message: {}", message)
@@ -60,6 +73,11 @@ class StatDaemon private constructor(
         }
     }
 
+    /**
+     * Fetches a match from the RiotAPI derived from [callback]. Then, iterates over
+     * each team and saves its game data. Then, iterates over each participant and saves its
+     * game data.
+     */
     private fun processRiotCallback(callback: RiotCallback) {
         riot.match(callback.gameId)?.let { match ->
             gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
@@ -76,13 +94,16 @@ class StatDaemon private constructor(
         }
     }
 
+    /**
+     * Saves game data for a [team] consisting of [players] from [game]. [length] is the game duration.
+     */
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
-        fetchTeamId(players)?.let { teamId ->
-            logger.debug("Processing team data for '{}' ('{}')", teamId, game.shortCode)
+        playersR.fetchTeamId(players)?.let { teamId ->
+            logTransactionMessage("Saving game data for", teamId.toString(), game.shortCode, "...")
             teamsR.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId === TeamType.BLUE) RiftSide.BLUE else RiftSide.RED
-                    teamsR.createTeamData(
+                    teamsR.saveTeamData(
                         t, game, TeamGameData(
                             team.didWin(), side, players.sumOf { it.goldEarned }, length, kills = Objective(
                                 kills = team.objectives["champion"]?.kills ?: 0,
@@ -108,9 +129,7 @@ class StatDaemon private constructor(
                             )
                         )
                     )
-                    logger.debug(
-                        "Successfully processed team '{}' ('{}')", t.name, game.shortCode
-                    )
+                    logTransactionMessage("Saved game data for", t.name, game.shortCode)
                 } catch (e: Throwable) {
                     transactionError(e, t.name, game.shortCode)
                 }
@@ -118,13 +137,16 @@ class StatDaemon private constructor(
         }
     }
 
+    /**
+     * Saves game data for [player] derived from [game].
+     */
     private fun processPlayer(player: MatchParticipant, game: Game) {
-        logger.debug(
-            "Processing game data for '{}' (code '{}').", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode
+        logTransactionMessage(
+            "Saving game data for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode, "..."
         )
         try {
             playersR.readByPuuid(player.puuid)?.let { p ->
-                playersR.createPlayerData(
+                playersR.savePlayerData(
                     p, game, PlayerGameData(
                         player.kills,
                         player.deaths,
@@ -159,18 +181,24 @@ class StatDaemon private constructor(
                     )
                 )
             }
-            logger.debug(
-                "Successfully processed player '{}' ('{}')",
-                "${player.riotIdName}#${player.riotIdTagline}",
-                game.shortCode
-            )
+            logTransactionMessage("Saved stats for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         } catch (e: Throwable) {
             transactionError(e, "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         }
     }
 
+    /**
+     * Logs debug info during processing.
+     */
+    private fun logTransactionMessage(preamble: String, target: String, context: String, closer: String = ".") {
+        logger.debug("{} '{}' ('{}'){}", preamble, target, context, closer)
+    }
+
+    /**
+     * Logs errors during processing.
+     */
     private fun transactionError(e: Throwable, target: String, context: String) {
-        logger.error("Transaction failed for '{}' ('{}')", target, context)
+        logger.error("Failed to save stats for '{}' ('{}')", target, context)
         logger.error(e.message)
     }
 }

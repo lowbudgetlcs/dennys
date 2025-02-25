@@ -2,6 +2,6 @@ package com.lowbudgetlcs.repositories.series
 
 import com.lowbudgetlcs.entities.Series
 import com.lowbudgetlcs.entities.SeriesId
-import com.lowbudgetlcs.repositories.Repository
+import com.lowbudgetlcs.repositories.IEntityRepository
 
-interface SeriesRepository : Repository<Series, SeriesId>
+interface ISeriesRepository : IEntityRepository<Series, SeriesId>

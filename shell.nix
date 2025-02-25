@@ -5,6 +5,8 @@ in pkgs.mkShellNoCC {
   packages = with pkgs; [
     yq
     jdk17
+    docker
+    gnumake
   ];
 }
 
