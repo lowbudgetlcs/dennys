@@ -201,7 +201,7 @@ Distributed under the GNU General Public License. See `LICENSE.txt` for more inf
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@ruuffian](https://twitter.com/ruuffian) - lblcs.dev@gmail.com
+Liam Mackay - [@ruuffian](https://twitter.com/ruuffian) - lblcs.dev@gmail.com
 
 Project Link: [https://github.com/lowbudgetlcs/dennys](https://github.com/lowbudgetlcs/dennys)
 
