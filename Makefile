@@ -5,7 +5,7 @@ TAG = dev
 CONTAINER_NAME = $(APP_NAME)-container
 PORT = $(shell yq '.ktor.deployment.port' $(CONFIG_ROOT)/application.yaml)
 
-.PHONY: build run run-dev stop clean erase rebuild ps psa test all build-debug drop-db migrations
+.PHONY: build run dev stop clean erase rebuild test all debug-build drop migrations refresh
 
 migrations:
 	./gradlew generateMainDatabaseMigrations generateMainDatabaseInterface 
@@ -45,7 +45,7 @@ erase: stop clean
 rebuild: erase build
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
-refresh: erase drop-db build run
+refresh: erase drop build run
 
 # Cleans local database
 drop:
