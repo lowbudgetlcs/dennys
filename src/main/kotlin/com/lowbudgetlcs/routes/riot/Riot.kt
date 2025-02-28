@@ -37,7 +37,7 @@ fun Application.riotRoutes() {
                     val callback = call.receive<RiotCallback>()
                     // Emit callback onto all registered queues.
                     for (queue in messageqs) queue.emit(Json.encodeToString(callback))
-                    call.respond(HttpStatusCode.OK, callback)
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }
