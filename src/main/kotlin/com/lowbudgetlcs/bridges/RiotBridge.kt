@@ -3,11 +3,12 @@ package com.lowbudgetlcs.bridges
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.ExperimentalHoplite
 import com.sksamuel.hoplite.addResourceSource
-import io.ktor.util.logging.*
 import no.stelar7.api.r4j.basic.APICredentials
 import no.stelar7.api.r4j.basic.constants.api.regions.RegionShard
 import no.stelar7.api.r4j.impl.R4J
 import no.stelar7.api.r4j.pojo.lol.match.v5.LOLMatch
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 data class RiotConfig(val apiKey: String, val useStub: Boolean)
 
@@ -16,7 +17,7 @@ data class RiotConfig(val apiKey: String, val useStub: Boolean)
  */
 class RiotBridge {
     companion object {
-        private val logger = KtorSimpleLogger("com.lowbudgetlcs.RiotBridge")
+        private val logger: Logger = LoggerFactory.getLogger(RiotBridge::class.java)
 
         @OptIn(ExperimentalHoplite::class)
         private val config =
@@ -35,8 +36,7 @@ class RiotBridge {
     fun match(gameId: Long): LOLMatch? = try {
         riot.loLAPI.matchAPI.getMatch(RegionShard.AMERICAS, "NA1_$gameId")
     } catch (e: Throwable) {
-        logger.error("Error while retrieving match '{}'", gameId)
-        logger.error(e)
+        logger.error("❌ Error while retrieving match '$gameId'", e)
         null
     }
 }
