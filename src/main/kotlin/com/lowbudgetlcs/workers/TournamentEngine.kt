@@ -13,9 +13,10 @@ import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
-import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * This service worker consumes [RiotCallback]s off of [queue] and saves
@@ -28,7 +29,7 @@ class TournamentEngine private constructor(
     private val seriesR: ISeriesRepository,
     private val playersR: IPlayerRepository
 ) : AbstractWorker(), IMessageQListener {
-    private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.TournamentEngine")
+    private val logger : Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
@@ -46,8 +47,9 @@ class TournamentEngine private constructor(
     override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue)
 
     override fun start() {
-        logger.info("TournamentEngine starting...")
-        logger.debug("Listening on $queue...")
+        logger.info("🚀 TournamentEngine starting...")
+        logger.debug("📡 Listening on queue: `$queue`")
+
         messageq.listen { _, delivery ->
             processMessage(delivery)
         }
@@ -59,17 +61,17 @@ class TournamentEngine private constructor(
      */
     override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
-        logger.debug("[x] Recieved Message: {}", message)
+        logger.info("📩 Received message: $message")
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
+            logger.info("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
             processRiotCallback(callback)
             messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
             // Generally is an application error- we do not want to lose the message
-            logger.error("[x] Error while decoding message: {}", message)
-            logger.error(e.message)
+            logger.error("❌ Failed to decode message: $message", e)
         } catch (e: IllegalArgumentException) {
-            logger.warn("[x] Message was not valid Riot Callback: {}.", message)
+            logger.warn("🚫 Invalid Riot Callback message: $message.")
             // Delete invalid messages
             messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
         }
@@ -81,6 +83,8 @@ class TournamentEngine private constructor(
      * save the winner and loser of the series.
      */
     private fun processRiotCallback(callback: RiotCallback) {
+        logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
+
         riot.match(callback.gameId)?.let { match ->
             try {
                 // We throw an exception to cancel the database transaction.
@@ -89,6 +93,9 @@ class TournamentEngine private constructor(
                         playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
                     }
                     if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
+
+                    logger.info("🏆 Winner: $winner, ❌ Loser: $loser")
+
                     updateGame(callback, winner, loser)?.let {
                         updateSeries(
                             it, winner, loser
@@ -96,7 +103,7 @@ class TournamentEngine private constructor(
                     }
                 }
             } catch (e: IllegalArgumentException) {
-                logger.warn("Could not fetch one or both TeamIds.")
+                logger.warn("⚠️ Could not fetch one or both TeamIds.")
             }
         }
     }
@@ -105,12 +112,11 @@ class TournamentEngine private constructor(
      * Updates the game in storage derived from [callback] with a [winner] and [loser].
      */
     private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game? {
+        logger.info("📝 Updating game record for shortcode: ${callback.shortCode}")
+
         gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).first().let { game ->
-            return gamesR.update(
-                game.copy(
-                    winner = winner, loser = loser, callbackResult = callback
-                )
-            )
+            val updatedGame = game.copy(winner = winner, loser = loser, callbackResult = callback)
+            return gamesR.update(updatedGame)
         }
     }
 
@@ -128,7 +134,7 @@ class TournamentEngine private constructor(
                 AndCriteria(TeamWinCriteria(team2), SeriesCriteria(game.series))
             ).size
 
-            fun logWin(team: TeamId) = logger.debug("Team {} wins series {}.", team, series.id)
+            fun logWin(team: TeamId) = logger.debug("🏅 Team $team wins series ${series.id}!")
             when (winCondition) {
                 team1Wins -> {
                     seriesR.update(series.copy(winner = team1, loser = team2))
@@ -141,7 +147,7 @@ class TournamentEngine private constructor(
                 }
                 // Otherwise, series has not concluded
                 else -> {
-                    logger.debug("Series {} has not concluded.", series.id)
+                    logger.info("⏳ Series ${series.id} is still ongoing...")
                 }
             }
         }
