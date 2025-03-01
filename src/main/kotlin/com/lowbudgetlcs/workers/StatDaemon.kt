@@ -197,7 +197,7 @@ class StatDaemon private constructor(
      * Logs debug info during processing.
      */
     private fun logTransactionMessage(preamble: String, target: String, context: String, closer: String = ".") {
-        logger.info("$preamble '$target' ('$context')$closer")
+        logger.debug("$preamble '$target' ('$context')$closer")
     }
 
     /**
