@@ -34,7 +34,11 @@ class RiotBridge {
      * @return An instance of [LOLMatch] if [gameId] exists, null otherwise.
      */
     fun match(gameId: Long): LOLMatch? = try {
-        riot.loLAPI.matchAPI.getMatch(RegionShard.AMERICAS, "NA1_$gameId")
+        logger.info("🔍 Fetching match data for game ID: $gameId")
+
+        val match = riot.loLAPI.matchAPI.getMatch(RegionShard.AMERICAS, "NA1_$gameId")
+        logger.info("✅ Successfully retrieved match data for game ID: $gameId")
+        match
     } catch (e: Throwable) {
         logger.error("❌ Error while retrieving match '$gameId'", e)
         null
