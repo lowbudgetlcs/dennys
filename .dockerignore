@@ -5,6 +5,8 @@ build/
 .idea/
 .kotlin
 .env*
+gradlew
+gradlew.bat
 
 *.iml
 Makefile
