@@ -4,7 +4,8 @@ import com.rabbitmq.client.*
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.ExperimentalHoplite
 import com.sksamuel.hoplite.addResourceSource
-import io.ktor.util.logging.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.net.ConnectException
 
 data class RabbitMQConfig(val host: String)
@@ -22,7 +23,7 @@ class RabbitMQBridge(private val queue: String) {
         private val config =
             ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/rabbitmq.yaml").build()
                 .loadConfigOrThrow<RabbitMQConfig>()
-        private val logger = KtorSimpleLogger("com.lowbudgetlcs.RabbitMQBridge")
+        private val logger : Logger = LoggerFactory.getLogger(RabbitMQBridge::class.java)
         private val factory by lazy {
             ConnectionFactory().apply {
                 host = config.host
@@ -40,16 +41,15 @@ class RabbitMQBridge(private val queue: String) {
         while (attempt < 5) {
             try {
                 return factory.newConnection().also {
-                    logger.debug("Created new RabbitMQ connection.")
+                    logger.debug("🐇🔌 Successfully connected to RabbitMQ at `${config.host}`.")
                 }
             } catch (e: ConnectException) {
                 attempt++
-                logger.error("Failed to connect to RabbitMQ (attempt $attempt/5), retrying in 5 seconds...")
-                logger.error(e.message)
+                logger.error("❌ Failed to connect to RabbitMQ (attempt $attempt/5), retrying in 5 seconds...", e)
                 Thread.sleep(5000)
             }
         }
-        throw IllegalStateException("This should never be reached") // Just in case
+        throw IllegalStateException("🚨 RabbitMQ connection failed after 5 attempts.")
     }
 
     /**
@@ -59,7 +59,7 @@ class RabbitMQBridge(private val queue: String) {
         queueDeclare(queue, true, false, false, null)
         basicQos(1)
     }.also {
-        logger.debug("Created new messageq channel.")
+        logger.info("📨 Channel established for queue `$queue`.")
     }
 
     /**
@@ -68,7 +68,7 @@ class RabbitMQBridge(private val queue: String) {
     fun emit(message: String) {
         channel.basicPublish("", queue, MessageProperties.PERSISTENT_TEXT_PLAIN, message.toByteArray(charset("UTF-8")))
             .also {
-                logger.debug("Emitted {} on {}.", message, queue)
+                logger.info("📤 Emitted message to queue `$queue`: $message")
             }
     }
 
@@ -76,6 +76,7 @@ class RabbitMQBridge(private val queue: String) {
      * Listen on [queue] and call [callback] on all messages recieved.
      */
     fun listen(callback: DeliverCallback) {
+        logger.info("👂 Listening for messages on queue `$queue`...")
         channel.run {
             basicConsume(queue, false, callback) { _ -> }
         }

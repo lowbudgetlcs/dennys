@@ -12,12 +12,13 @@ import com.lowbudgetlcs.repositories.teams.AllTeamsLBLCS
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
-import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import no.stelar7.api.r4j.basic.constants.types.lol.TeamType
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * This service worker consumes [RiotCallback]s off of [queue] and saves player
@@ -29,7 +30,7 @@ class StatDaemon private constructor(
     private val playersR: IPlayerRepository,
     private val teamsR: ITeamRepository
 ) : AbstractWorker(), IMessageQListener {
-    private val logger = KtorSimpleLogger("com.lowbudgetlcs.workers.StatDaemon")
+    private val logger : Logger = LoggerFactory.getLogger(StatDaemon::class.java)
     private val messageq = RabbitMQBridge(queue)
     private val riot = RiotBridge()
 
@@ -47,8 +48,8 @@ class StatDaemon private constructor(
     override fun createInstance(instanceId: Int): StatDaemon = Companion.createInstance(queue)
 
     override fun start() {
-        logger.info("StatDaemon running...")
-        logger.debug("Listening on $queue...")
+        logger.info("🚀 StatDaemon is running...")
+        logger.debug("📡 Listening on queue: `$queue`")
         messageq.listen { _, delivery ->
             processMessage(delivery)
         }
@@ -60,16 +61,16 @@ class StatDaemon private constructor(
      */
     override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
-        logger.debug("[x] Recieved Message: {}", message)
+        logger.info("📩 Received message from queue: $message")
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
+            logger.info("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
             processRiotCallback(callback)
             messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
-            logger.error("[x] Error while decoding message: {}", message)
-            logger.error(e.message)
+            logger.error("❌ Failed to decode message: $message", e)
         } catch (e: IllegalArgumentException) {
-            logger.warn("[x] Message was not valid Riot Callback: {}.", message)
+            logger.warn("🚫 Invalid Riot Callback message: $message.", e)
         }
     }
 
@@ -79,8 +80,10 @@ class StatDaemon private constructor(
      * game data.
      */
     private fun processRiotCallback(callback: RiotCallback) {
+        logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
         riot.match(callback.gameId)?.let { match ->
             gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
+                logger.info("🎮 Processing match `${match.gameId}` for shortcode `${game.shortCode}`...")
                 // I DO NOT WANT TO WRITE MY OWN SERIALIZER FOR THIS ITS LIKE 500 FIELDS AHAHAHAHAHHA!
                 // lblcs.gameDumpsQueries.dump(game.id, Json.encodeToString<LOLMatch>(match))
                 // Process Team data first to cause errors as early as possible
@@ -89,7 +92,10 @@ class StatDaemon private constructor(
                         team, match.participants.filter { it.team === team.teamId }, game, match.gameDuration.toLong()
                     )
                 }
+
                 match.participants.forEach { processPlayer(it, game) }
+
+                logger.info("✅ Finished processing match `${match.gameId}` for shortcode `${game.shortCode}`")
             }
         }
     }
@@ -99,7 +105,7 @@ class StatDaemon private constructor(
      */
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
         playersR.fetchTeamId(players)?.let { teamId ->
-            logTransactionMessage("Saving game data for", teamId.toString(), game.shortCode, "...")
+            logTransactionMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
             teamsR.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId === TeamType.BLUE) RiftSide.BLUE else RiftSide.RED
@@ -129,7 +135,7 @@ class StatDaemon private constructor(
                             )
                         )
                     )
-                    logTransactionMessage("Saved game data for", t.name, game.shortCode)
+                    logTransactionMessage("✅ Saved game data for", t.name, game.shortCode)
                 } catch (e: Throwable) {
                     transactionError(e, t.name, game.shortCode)
                 }
@@ -142,7 +148,7 @@ class StatDaemon private constructor(
      */
     private fun processPlayer(player: MatchParticipant, game: Game) {
         logTransactionMessage(
-            "Saving game data for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode, "..."
+            "📝 Saving game data for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode, "..."
         )
         try {
             playersR.readByPuuid(player.puuid)?.let { p ->
@@ -181,7 +187,7 @@ class StatDaemon private constructor(
                     )
                 )
             }
-            logTransactionMessage("Saved stats for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
+            logTransactionMessage("✅ Saved stats for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         } catch (e: Throwable) {
             transactionError(e, "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
         }
@@ -191,14 +197,13 @@ class StatDaemon private constructor(
      * Logs debug info during processing.
      */
     private fun logTransactionMessage(preamble: String, target: String, context: String, closer: String = ".") {
-        logger.debug("{} '{}' ('{}'){}", preamble, target, context, closer)
+        logger.debug("$preamble '$target' ('$context')$closer")
     }
 
     /**
      * Logs errors during processing.
      */
     private fun transactionError(e: Throwable, target: String, context: String) {
-        logger.error("Failed to save stats for '{}' ('{}')", target, context)
-        logger.error(e.message)
+        logger.error("❌ Failed to save stats for '$target' ('$context')", e)
     }
 }
