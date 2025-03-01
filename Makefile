@@ -23,7 +23,7 @@ run:
 	docker compose up dennys rabbitmq postgres
 
 # Run all dev containers
-dev:
+dev: migrations
 	docker compose up
 
 # Refresh containers and app image
