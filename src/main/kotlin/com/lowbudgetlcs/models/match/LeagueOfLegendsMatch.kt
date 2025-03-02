@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.entities.match
+package com.lowbudgetlcs.models.match
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
