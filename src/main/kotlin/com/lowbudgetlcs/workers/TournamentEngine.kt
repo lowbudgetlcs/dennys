@@ -9,6 +9,7 @@ import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
 import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
+import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
 import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
@@ -27,9 +28,11 @@ class TournamentEngine private constructor(
     override val queue: String,
     private val gamesR: IGameRepository,
     private val seriesR: ISeriesRepository,
-    private val playersR: IPlayerRepository
+    private val playersR: IPlayerRepository,
+    private val riotMatchRepository: RiotMatchRepository
 ) : AbstractWorker(), IMessageQListener {
-    private val logger : Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
+
+    private val logger: Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
     private val riot = RiotBridge()
@@ -40,11 +43,14 @@ class TournamentEngine private constructor(
      * This behavior is deprecated and will be removed in future versions.
      */
     companion object {
-        fun createInstance(queue: String): TournamentEngine =
-            TournamentEngine(queue, AllGamesLBLCS(), AllSeriesLBLCS(), AllPlayersLBLCS())
+        fun createInstance(
+            queue: String,
+            riotMatchRepository: RiotMatchRepository
+        ): TournamentEngine =
+            TournamentEngine(queue, AllGamesLBLCS(), AllSeriesLBLCS(), AllPlayersLBLCS(), riotMatchRepository)
     }
 
-    override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue)
+    override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue, riotMatchRepository)
 
     override fun start() {
         logger.info("🚀 TournamentEngine starting...")

@@ -15,13 +15,13 @@ class RiotMatchRepositoryImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(RiotMatchRepositoryImpl::class.java)
 
-    override suspend fun getMatch(matchId: Long): LeagueOfLegendsMatch? {
-        val uri = "https://americas.api.riotgames.com/lol/match/v5/matches/NA1_$matchId"
+    override suspend fun getMatch(gameId: Long): LeagueOfLegendsMatch? {
+        val uri = "https://americas.api.riotgames.com/lol/match/v5/matches/NA1_$gameId"
 
         return try {
             rateLimiter.acquire(uri)
 
-            logger.info("🔍 Fetching match data for game ID: $matchId")
+            logger.info("🔍 Fetching match data for game ID: $gameId")
             val response: HttpResponse = apiClient.get(uri)
 
             rateLimiter.updateLimits(response, uri)
@@ -32,10 +32,10 @@ class RiotMatchRepositoryImpl(
             }
 
             val match: LeagueOfLegendsMatch = response.body()
-            logger.info("✅ Successfully retrieved match data for game ID: $matchId")
+            logger.info("✅ Successfully retrieved match data for game ID: $gameId")
             match
         } catch (e: Throwable) {
-            logger.error("❌ Error while retrieving match '$matchId'", e)
+            logger.error("❌ Error while retrieving match '$gameId'", e)
             null
         }
     }
