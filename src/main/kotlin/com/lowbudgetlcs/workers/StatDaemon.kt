@@ -1,7 +1,6 @@
 package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
@@ -38,7 +37,6 @@ class StatDaemon private constructor(
 
     private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
     private val messageq = RabbitMQBridge(queue)
-    private val riot = RiotBridge()
 
     /**
      * Private constructor and companion object prevent direct instantiation.

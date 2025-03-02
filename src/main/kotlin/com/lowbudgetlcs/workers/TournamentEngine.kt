@@ -2,7 +2,6 @@ package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.Game
 import com.lowbudgetlcs.entities.TeamId
 import com.lowbudgetlcs.repositories.AndCriteria
@@ -38,7 +37,6 @@ class TournamentEngine private constructor(
     private val logger: Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
-    private val riot = RiotBridge()
 
     /**
      * Private constructor and companion object prevent direct instantiation.
