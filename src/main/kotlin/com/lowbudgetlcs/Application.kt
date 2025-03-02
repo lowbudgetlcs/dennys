@@ -28,7 +28,7 @@ fun Application.module() {
 
     launch {
         logger.info("📊 Launching StatDaemon instances ($NUM_INSTANCES)...")
-        StatDaemon.createInstance("STATS").launchInstances(NUM_INSTANCES)
+        StatDaemon.createInstance("STATS", riotMatchRepository).launchInstances(NUM_INSTANCES)
         logger.info("✅ StatDaemon instances are running.")
     }
     launch {

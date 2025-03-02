@@ -14,6 +14,9 @@ import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
@@ -71,7 +74,9 @@ class TournamentEngine private constructor(
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
             logger.info("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
-            processRiotCallback(callback)
+            CoroutineScope(Dispatchers.IO).launch {
+                processRiotCallback(callback)
+            }
             messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
             // Generally is an application error- we do not want to lose the message
@@ -88,16 +93,17 @@ class TournamentEngine private constructor(
      * the winner, loser, and result of the game. If the series owning said game is complete,
      * save the winner and loser of the series.
      */
-    private fun processRiotCallback(callback: RiotCallback) {
+    private suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
 
-        riot.match(callback.gameId)?.let { match ->
+        val tournamentMatch = riotMatchRepository.getMatch(callback.gameId)
+        tournamentMatch?.let { match ->
             try {
-                // We throw an exception to cancel the database transaction.
                 db.transaction {
-                    val (winner, loser) = match.participants.partition { it.didWin() }.let { (winners, losers) ->
+                    val (winner, loser) = match.matchInfo.participants.partition { it.win }.let { (winners, losers) ->
                         playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
                     }
+
                     if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
 
                     logger.info("🏆 Winner: $winner, ❌ Loser: $loser")

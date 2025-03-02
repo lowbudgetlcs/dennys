@@ -17,9 +17,9 @@ data class LeagueOfLegendsMatchInfo(
     val gameType: String, // TODO: Make an Enum
     val gameVersion: String,
     val mapId: Int, // TODO: Make an Enum
-    // TODO: particpants implementation here
+    val participants: List<MatchParticipant>,
     val platformId: String, // TODO: Make an Enum
     val queueId: Int, // TODO: Make an Enum
-    // TODO: teams implementation here
+    val teams: List<MatchTeam>,
     val tournamentCode: String
 )

@@ -2,10 +2,10 @@ package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
-import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
 
 class AllPlayersLBLCS : IPlayerRepository {
@@ -51,7 +51,7 @@ class AllPlayersLBLCS : IPlayerRepository {
 
     override fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
         for (participant in participants) {
-            this.readByPuuid(participant.puuid)?.let { player ->
+            this.readByPuuid(participant.playerUniqueUserId)?.let { player ->
                 if (player.team != null) return player.team
             }
         }
