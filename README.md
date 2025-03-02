@@ -214,7 +214,7 @@ Project Link: [https://github.com/lowbudgetlcs/dennys](https://github.com/lowbud
 
 These links were useful when developing.
 
-* [Ktor Documentation](https://ktor.io/docs/home.html)
+* [Ktor Documentation](https://ktor.io/docs/welcome.html)
 * [RabbitMQ BASIC Example](https://www.rabbitmq.com/tutorials/tutorial-one-java)
 * [SQLDelight Documentation](https://sqldelight.github.io/sqldelight/2.0.2/jvm_postgresql/)
 * [Riot API Documentation](https://developer.riotgames.com/apis)
