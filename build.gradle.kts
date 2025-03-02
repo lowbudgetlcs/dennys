@@ -61,6 +61,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
     // Database
     implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
@@ -73,6 +74,11 @@ dependencies {
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
+    testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
+    testImplementation("io.kotest:kotest-assertions-core:5.5.5")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
+    // Mocking library
+    testImplementation("io.mockk:mockk:1.13.5")
 }
