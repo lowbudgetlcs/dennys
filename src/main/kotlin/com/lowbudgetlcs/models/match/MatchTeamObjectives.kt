@@ -5,13 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MatchTeamObjectives(
-    @SerialName("atakhan") val atakhan: MatchTeamObjective,
-    @SerialName("baron") val baron: MatchTeamObjective,
-    @SerialName("champion") val champion: MatchTeamObjective,
-    @SerialName("dragon") val dragon: MatchTeamObjective,
-    @SerialName("horde") val horde: MatchTeamObjective,
-    @SerialName("inhibitor") val inhibitor: MatchTeamObjective,
-    @SerialName("riftHerald") val riftHerald: MatchTeamObjective,
-    @SerialName("tower") val tower: MatchTeamObjective
+    @SerialName("atakhan") val atakhan: MatchTeamObjective? = null,
+    @SerialName("baron") val baron: MatchTeamObjective? = null,
+    @SerialName("champion") val champion: MatchTeamObjective? = null,
+    @SerialName("dragon") val dragon: MatchTeamObjective? = null,
+    @SerialName("horde") val horde: MatchTeamObjective? = null,
+    @SerialName("inhibitor") val inhibitor: MatchTeamObjective? = null,
+    @SerialName("riftHerald") val riftHerald: MatchTeamObjective? = null,
+    @SerialName("tower") val tower: MatchTeamObjective? = null
 )
-

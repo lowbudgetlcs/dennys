@@ -1,9 +1,5 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.http.RiotApiClient
-import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
-import com.lowbudgetlcs.repositories.riot.RiotMatchRepositoryImpl
-import com.lowbudgetlcs.util.RateLimiter
 import com.lowbudgetlcs.workers.StatDaemon
 import com.lowbudgetlcs.workers.TournamentEngine
 import io.ktor.server.application.*
@@ -21,31 +17,19 @@ fun Application.module() {
 
     configureRouting()
 
-    val riotMatchRepository = configureRiotMatchRepository()
-
     // Start Tournament Engine and Stat Daemons- this is a perfect opportunity for a builer/factory pattern.
     logger.info("🏁 Starting background workers...")
 
     launch {
         logger.info("📊 Launching StatDaemon instances ($NUM_INSTANCES)...")
-        StatDaemon.createInstance("STATS", riotMatchRepository).launchInstances(NUM_INSTANCES)
+        StatDaemon.createInstance("STATS").launchInstances(NUM_INSTANCES)
         logger.info("✅ StatDaemon instances are running.")
     }
     launch {
         logger.info("🎮 Launching TournamentEngine instances ($NUM_INSTANCES)...")
-        TournamentEngine.createInstance("CALLBACK", riotMatchRepository).launchInstances(NUM_INSTANCES)
+        TournamentEngine.createInstance("CALLBACK").launchInstances(NUM_INSTANCES)
         logger.info("✅ TournamentEngine instances are running.")
     }
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
-}
-
-fun Application.configureRiotMatchRepository(): RiotMatchRepository {
-    val apiClient = RiotApiClient()
-    val rateLimiter = RateLimiter()
-
-    return RiotMatchRepositoryImpl(
-        apiClient = apiClient,
-        rateLimiter = rateLimiter
-    )
 }
 
