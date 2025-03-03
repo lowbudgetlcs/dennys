@@ -2,17 +2,23 @@ package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.Game
 import com.lowbudgetlcs.entities.TeamId
+import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
 import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
+import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
+import com.lowbudgetlcs.repositories.riot.RiotMatchRepositoryImpl
 import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
+import com.lowbudgetlcs.util.RateLimiter
 import com.rabbitmq.client.Delivery
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
@@ -27,12 +33,13 @@ class TournamentEngine private constructor(
     override val queue: String,
     private val gamesR: IGameRepository,
     private val seriesR: ISeriesRepository,
-    private val playersR: IPlayerRepository
+    private val playersR: IPlayerRepository,
+    private val riotMatchRepository: RiotMatchRepository
 ) : AbstractWorker(), IMessageQListener {
-    private val logger : Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
+
+    private val logger: Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
     private val messageq = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
-    private val riot = RiotBridge()
 
     /**
      * Private constructor and companion object prevent direct instantiation.
@@ -40,8 +47,16 @@ class TournamentEngine private constructor(
      * This behavior is deprecated and will be removed in future versions.
      */
     companion object {
-        fun createInstance(queue: String): TournamentEngine =
-            TournamentEngine(queue, AllGamesLBLCS(), AllSeriesLBLCS(), AllPlayersLBLCS())
+        fun createInstance(
+            queue: String
+        ): TournamentEngine =
+            TournamentEngine(
+                queue,
+                AllGamesLBLCS(),
+                AllSeriesLBLCS(),
+                AllPlayersLBLCS(),
+                RiotMatchRepositoryImpl(RiotApiClient(), RateLimiter())
+            )
     }
 
     override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue)
@@ -65,7 +80,9 @@ class TournamentEngine private constructor(
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
             logger.info("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
-            processRiotCallback(callback)
+            CoroutineScope(Dispatchers.IO).launch {
+                processRiotCallback(callback)
+            }
             messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
             // Generally is an application error- we do not want to lose the message
@@ -82,16 +99,17 @@ class TournamentEngine private constructor(
      * the winner, loser, and result of the game. If the series owning said game is complete,
      * save the winner and loser of the series.
      */
-    private fun processRiotCallback(callback: RiotCallback) {
+    private suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
 
-        riot.match(callback.gameId)?.let { match ->
+        val tournamentMatch = riotMatchRepository.getMatch(callback.gameId)
+        tournamentMatch?.let { match ->
             try {
-                // We throw an exception to cancel the database transaction.
                 db.transaction {
-                    val (winner, loser) = match.participants.partition { it.didWin() }.let { (winners, losers) ->
+                    val (winner, loser) = match.matchInfo.participants.partition { it.win }.let { (winners, losers) ->
                         playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
                     }
+
                     if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
 
                     logger.info("🏆 Winner: $winner, ❌ Loser: $loser")

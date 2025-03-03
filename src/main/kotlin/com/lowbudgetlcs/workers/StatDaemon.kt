@@ -1,22 +1,28 @@
 package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.bridges.RiotBridge
 import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.models.match.MatchParticipant
+import com.lowbudgetlcs.models.match.MatchTeam
+import com.lowbudgetlcs.models.match.TeamType
 import com.lowbudgetlcs.repositories.games.AllGamesLBLCS
 import com.lowbudgetlcs.repositories.games.IGameRepository
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
 import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
+import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
+import com.lowbudgetlcs.repositories.riot.RiotMatchRepositoryImpl
 import com.lowbudgetlcs.repositories.teams.AllTeamsLBLCS
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
+import com.lowbudgetlcs.util.RateLimiter
 import com.rabbitmq.client.Delivery
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import no.stelar7.api.r4j.basic.constants.types.lol.TeamType
-import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
-import no.stelar7.api.r4j.pojo.lol.match.v5.MatchTeam
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -28,11 +34,12 @@ class StatDaemon private constructor(
     override val queue: String,
     private val gamesR: IGameRepository,
     private val playersR: IPlayerRepository,
-    private val teamsR: ITeamRepository
+    private val teamsR: ITeamRepository,
+    private val riotMatchRepository: RiotMatchRepository
 ) : AbstractWorker(), IMessageQListener {
-    private val logger : Logger = LoggerFactory.getLogger(StatDaemon::class.java)
+
+    private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
     private val messageq = RabbitMQBridge(queue)
-    private val riot = RiotBridge()
 
     /**
      * Private constructor and companion object prevent direct instantiation.
@@ -41,7 +48,11 @@ class StatDaemon private constructor(
      */
     companion object {
         fun createInstance(queue: String): StatDaemon = StatDaemon(
-            queue, AllGamesLBLCS(), AllPlayersLBLCS(), AllTeamsLBLCS()
+            queue,
+            AllGamesLBLCS(),
+            AllPlayersLBLCS(),
+            AllTeamsLBLCS(),
+            RiotMatchRepositoryImpl(RiotApiClient(), RateLimiter())
         )
     }
 
@@ -65,7 +76,9 @@ class StatDaemon private constructor(
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
             logger.info("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
-            processRiotCallback(callback)
+            CoroutineScope(Dispatchers.IO).launch {
+                processRiotCallback(callback)
+            }
             messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
             logger.error("❌ Failed to decode message: $message", e)
@@ -79,23 +92,31 @@ class StatDaemon private constructor(
      * each team and saves its game data. Then, iterates over each participant and saves its
      * game data.
      */
-    private fun processRiotCallback(callback: RiotCallback) {
+    private suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
-        riot.match(callback.gameId)?.let { match ->
+
+        val tournamentMatch = riotMatchRepository.getMatch(callback.gameId)
+        tournamentMatch?.let { match ->
             gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
-                logger.info("🎮 Processing match `${match.gameId}` for shortcode `${game.shortCode}`...")
-                // I DO NOT WANT TO WRITE MY OWN SERIALIZER FOR THIS ITS LIKE 500 FIELDS AHAHAHAHAHHA!
-                // lblcs.gameDumpsQueries.dump(game.id, Json.encodeToString<LOLMatch>(match))
-                // Process Team data first to cause errors as early as possible
-                match.teams.forEach { team ->
+                logger.info("🎮 Processing match `${match.matchInfo.gameId}` for shortcode `${game.shortCode}`...")
+
+                match.matchInfo.teams.forEach { team ->
+                    val allPlayersOnSameTeam = match.matchInfo.participants.filter { it.teamId == team.teamId }
+                    val gameDurationAsLong = match.matchInfo.gameDuration.toLong()
+
                     processTeam(
-                        team, match.participants.filter { it.team === team.teamId }, game, match.gameDuration.toLong()
+                        team = team,
+                        players = allPlayersOnSameTeam,
+                        game = game,
+                        length = gameDurationAsLong
                     )
                 }
 
-                match.participants.forEach { processPlayer(it, game) }
+                match.matchInfo.participants.forEach { player ->
+                    processPlayer(player, game)
+                }
 
-                logger.info("✅ Finished processing match `${match.gameId}` for shortcode `${game.shortCode}`")
+                logger.info("✅ Finished processing match `${match.matchInfo.gameId}` for shortcode `${game.shortCode}`")
             }
         }
     }
@@ -108,30 +129,30 @@ class StatDaemon private constructor(
             logTransactionMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
             teamsR.readById(teamId)?.let { t ->
                 try {
-                    val side = if (team.teamId === TeamType.BLUE) RiftSide.BLUE else RiftSide.RED
+                    val side = if (team.teamId == TeamType.BLUE.code) RiftSide.BLUE else RiftSide.RED
                     teamsR.saveTeamData(
                         t, game, TeamGameData(
-                            team.didWin(), side, players.sumOf { it.goldEarned }, length, kills = Objective(
-                                kills = team.objectives["champion"]?.kills ?: 0,
-                                first = team.objectives["champion"]?.isFirst ?: false
+                            team.win, side, players.sumOf { it.goldEarned }, length, kills = Objective(
+                                kills = team.objectives.champion?.kills ?: 0,
+                                first = team.objectives.champion?.firstTaken ?: false
                             ), barons = Objective(
-                                kills = team.objectives["baron"]?.kills ?: 0,
-                                first = team.objectives["baron"]?.isFirst ?: false
+                                kills = team.objectives.baron?.kills ?: 0,
+                                first = team.objectives.baron?.firstTaken ?: false
                             ), grubs = Objective(
-                                kills = team.objectives["horde"]?.kills ?: 0,
-                                first = team.objectives["horde"]?.isFirst ?: false
+                                kills = team.objectives.horde?.kills ?: 0,
+                                first = team.objectives.horde?.firstTaken ?: false
                             ), dragons = Objective(
-                                kills = team.objectives["dragon"]?.kills ?: 0,
-                                first = team.objectives["dragon"]?.isFirst ?: false
+                                kills = team.objectives.dragon?.kills ?: 0,
+                                first = team.objectives.dragon?.firstTaken ?: false
                             ), heralds = Objective(
-                                kills = team.objectives["riftHerald"]?.kills ?: 0,
-                                first = team.objectives["riftHerald"]?.isFirst ?: false
+                                kills = team.objectives.riftHerald?.kills ?: 0,
+                                first = team.objectives.riftHerald?.firstTaken ?: false
                             ), towers = Objective(
-                                kills = team.objectives["tower"]?.kills ?: 0,
-                                first = team.objectives["tower"]?.isFirst ?: false
+                                kills = team.objectives.tower?.kills ?: 0,
+                                first = team.objectives.tower?.firstTaken ?: false
                             ), inhibitors = Objective(
-                                kills = team.objectives["inhibitor"]?.kills ?: 0,
-                                first = team.objectives["inhibitor"]?.isFirst ?: false
+                                kills = team.objectives.inhibitor?.kills ?: 0,
+                                first = team.objectives.inhibitor?.firstTaken ?: false
                             )
                         )
                     )
@@ -148,10 +169,10 @@ class StatDaemon private constructor(
      */
     private fun processPlayer(player: MatchParticipant, game: Game) {
         logTransactionMessage(
-            "📝 Saving game data for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode, "..."
+            "📝 Saving game data for", "${player.riotGameName}#${player.riotTagline}", game.shortCode, "..."
         )
         try {
-            playersR.readByPuuid(player.puuid)?.let { p ->
+            playersR.readByPuuid(player.playerUniqueUserId)?.let { p ->
                 playersR.savePlayerData(
                     p, game, PlayerGameData(
                         player.kills,
@@ -159,18 +180,18 @@ class StatDaemon private constructor(
                         player.assists,
                         player.championLevel,
                         player.goldEarned.toLong(),
-                        player.visionScore.toLong(),
-                        player.totalDamageDealtToChampions.toLong(),
-                        player.totalHealsOnTeammates.toLong(),
-                        player.totalDamageShieldedOnTeammates.toLong(),
-                        player.totalDamageTaken.toLong(),
-                        player.damageSelfMitigated.toLong(),
-                        player.damageDealtToTurrets.toLong(),
-                        player.longestTimeSpentLiving.toLong(),
-                        player.doubleKills.toShort(),
-                        player.tripleKills.toShort(),
-                        player.quadraKills.toShort(),
-                        player.pentaKills.toShort(),
+                        player.visionScore,
+                        player.totalDamageToChampions,
+                        player.totalHealsOnTeammates,
+                        player.totalDamageShieldedOnTeammates,
+                        player.totalDamageTaken,
+                        player.damageSelfMitigated,
+                        player.damageDealtToTurrets,
+                        player.longestTimeSpentLiving,
+                        player.doubleKills,
+                        player.tripleKills,
+                        player.quadraKills,
+                        player.pentaKills,
                         player.totalMinionsKilled + player.neutralMinionsKilled,
                         player.championName,
                         player.item0,
@@ -187,9 +208,9 @@ class StatDaemon private constructor(
                     )
                 )
             }
-            logTransactionMessage("✅ Saved stats for", "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
+            logTransactionMessage("✅ Saved stats for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
         } catch (e: Throwable) {
-            transactionError(e, "${player.riotIdName}#${player.riotIdTagline}", game.shortCode)
+            transactionError(e, "${player.riotGameName}#${player.riotTagline}", game.shortCode)
         }
     }
 
