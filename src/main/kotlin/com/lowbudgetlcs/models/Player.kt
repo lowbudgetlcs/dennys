@@ -56,3 +56,6 @@ data class PlayerGameData(
     val summoner1: Int,
     val summoner2: Int
 )
+
+@Serializable
+data class PlayerPerformanceId(val id: Int)

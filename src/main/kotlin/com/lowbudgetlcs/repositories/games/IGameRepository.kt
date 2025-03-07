@@ -2,6 +2,7 @@ package com.lowbudgetlcs.repositories.games
 
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.GameId
-import com.lowbudgetlcs.repositories.IEntityRepository
+import com.lowbudgetlcs.repositories.IRepository
+import com.lowbudgetlcs.repositories.IUniqueRepository
 
-interface IGameRepository : IEntityRepository<Game, GameId>
+interface IGameRepository : IUniqueRepository<Game, GameId>, IRepository<Game>
