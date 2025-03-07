@@ -103,12 +103,7 @@ class StatDaemon private constructor(
                     val allPlayersOnSameTeam = match.matchInfo.participants.filter { it.teamId == team.teamId }
                     val gameDurationAsLong = match.matchInfo.gameDuration.toLong()
 
-                    processTeam(
-                        team = team,
-                        players = allPlayersOnSameTeam,
-                        game = game,
-                        length = gameDurationAsLong
-                    )
+                    processTeam(team = team, players = allPlayersOnSameTeam, game = game, length = gameDurationAsLong)
                 }
 
                 match.matchInfo.participants.forEach { player ->
@@ -123,7 +118,7 @@ class StatDaemon private constructor(
     /**
      * Saves game data for a [team] consisting of [players] from [game]. [length] is the game duration.
      */
-    private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
+    private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) =
         playersR.fetchTeamId(players)?.let { teamId ->
             logDebugMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
             teamsR.readById(teamId)?.let { t ->
@@ -161,7 +156,7 @@ class StatDaemon private constructor(
                 }
             }
         }
-    }
+
 
     /**
      * Saves game data for [player] derived from [game].
