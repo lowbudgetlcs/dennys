@@ -1,16 +1,14 @@
 package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.models.*
-import com.lowbudgetlcs.models.entities.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
 
 
-class AllPlayersLBLCS : IPlayerRepository {
+class AllPlayersDatabase : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     override fun save(entity: Player): Player? {

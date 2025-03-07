@@ -7,9 +7,6 @@ import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.IEntityRepository
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class TeamPerformanceId(val id: Int)
-
 interface ITeamRepository : IEntityRepository<Team, TeamId> {
     /**
      * Saves [data] owned by [team] derived from [game] to storage. Returns [team] with

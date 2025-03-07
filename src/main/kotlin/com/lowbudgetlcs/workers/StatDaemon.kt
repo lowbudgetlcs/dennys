@@ -8,14 +8,14 @@ import com.lowbudgetlcs.models.entities.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
 import com.lowbudgetlcs.models.match.TeamType
-import com.lowbudgetlcs.repositories.games.AllGamesLBLCS
+import com.lowbudgetlcs.repositories.games.AllGamesDatabase
 import com.lowbudgetlcs.repositories.games.IGameRepository
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
-import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
+import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
 import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
 import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
-import com.lowbudgetlcs.repositories.teams.AllTeamsLBLCS
+import com.lowbudgetlcs.repositories.teams.AllTeamsDatabase
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.lowbudgetlcs.util.RateLimiter
@@ -51,9 +51,9 @@ class StatDaemon private constructor(
     companion object {
         fun createInstance(queue: String): StatDaemon = StatDaemon(
             queue,
-            AllGamesLBLCS(),
-            AllPlayersLBLCS(),
-            AllTeamsLBLCS(),
+            AllGamesDatabase(),
+            AllPlayersDatabase(),
+            AllTeamsDatabase(),
             MatchRepositoryRiot(RiotApiClient(), RateLimiter())
         )
     }

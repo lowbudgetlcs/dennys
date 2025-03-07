@@ -7,7 +7,7 @@ import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.ICriteria
 
-class AllSeriesLBLCS : ISeriesRepository {
+class AllSeriesDatabase : ISeriesRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     override fun save(entity: Series): Series? {

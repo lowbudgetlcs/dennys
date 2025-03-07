@@ -7,11 +7,11 @@ import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
-import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
+import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
 import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
 import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
-import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
+import com.lowbudgetlcs.repositories.series.AllSeriesDatabase
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.lowbudgetlcs.util.RateLimiter
@@ -52,9 +52,9 @@ class TournamentEngine private constructor(
         ): TournamentEngine =
             TournamentEngine(
                 queue,
-                AllGamesLBLCS(),
-                AllSeriesLBLCS(),
-                AllPlayersLBLCS(),
+                AllGamesDatabase(),
+                AllSeriesDatabase(),
+                AllPlayersDatabase(),
                 MatchRepositoryRiot(RiotApiClient(), RateLimiter())
             )
     }

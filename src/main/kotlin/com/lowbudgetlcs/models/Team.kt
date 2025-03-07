@@ -52,3 +52,7 @@ enum class RiftSide { BLUE, RED }
 data class Objective(
     val kills: Int = 0, val first: Boolean = false
 )
+
+@Serializable
+data class TeamPerformanceId(val id: Int)
+
