@@ -1,7 +1,8 @@
 package com.lowbudgetlcs.repositories.series
 
-import com.lowbudgetlcs.entities.Series
-import com.lowbudgetlcs.entities.SeriesId
-import com.lowbudgetlcs.repositories.IEntityRepository
+import com.lowbudgetlcs.models.Series
+import com.lowbudgetlcs.models.SeriesId
+import com.lowbudgetlcs.repositories.IRepository
+import com.lowbudgetlcs.repositories.IUniqueRepository
 
-interface ISeriesRepository : IEntityRepository<Series, SeriesId>
+interface ISeriesRepository : IUniqueRepository<Series, SeriesId>, IRepository<Series>

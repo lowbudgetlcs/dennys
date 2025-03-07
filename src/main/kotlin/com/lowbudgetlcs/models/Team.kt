@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.entities
+package com.lowbudgetlcs.models
 
 
 import kotlinx.serialization.Serializable
@@ -8,19 +8,21 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Team(
-    override val id: TeamId,
+    val id: TeamId,
     val name: String,
     val logo: String?,
     val captain: PlayerId?,
     val division: DivisionId?,
     val teamData: List<TeamGameData>
-) : Entity<TeamId>
+)
 
 /**
  * ID type for [Team]s.
  */
 @Serializable
 data class TeamId(val id: Int)
+
+// TODO: Same comment as 'Player.kt'- this data should be queryable when needed. This solution is so heavy....
 
 /**
  * In-game stats owned by a [Team].
@@ -50,3 +52,7 @@ enum class RiftSide { BLUE, RED }
 data class Objective(
     val kills: Int = 0, val first: Boolean = false
 )
+
+@Serializable
+data class TeamPerformanceId(val id: Int)
+

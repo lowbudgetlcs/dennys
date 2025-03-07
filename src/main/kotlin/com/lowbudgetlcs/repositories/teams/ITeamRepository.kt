@@ -1,16 +1,13 @@
 package com.lowbudgetlcs.repositories.teams
 
-import com.lowbudgetlcs.entities.Game
-import com.lowbudgetlcs.entities.Team
-import com.lowbudgetlcs.entities.TeamGameData
-import com.lowbudgetlcs.entities.TeamId
-import com.lowbudgetlcs.repositories.IEntityRepository
-import kotlinx.serialization.Serializable
+import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.Team
+import com.lowbudgetlcs.models.TeamGameData
+import com.lowbudgetlcs.models.TeamId
+import com.lowbudgetlcs.repositories.IRepository
+import com.lowbudgetlcs.repositories.IUniqueRepository
 
-@Serializable
-data class TeamPerformanceId(val id: Int)
-
-interface ITeamRepository : IEntityRepository<Team, TeamId> {
+interface ITeamRepository : IUniqueRepository<Team, TeamId>, IRepository<Team> {
     /**
      * Saves [data] owned by [team] derived from [game] to storage. Returns [team] with
      * the new data if it succeeds, null otherwise.

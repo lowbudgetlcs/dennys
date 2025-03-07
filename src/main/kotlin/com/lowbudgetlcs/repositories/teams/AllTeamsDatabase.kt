@@ -1,13 +1,46 @@
 package com.lowbudgetlcs.repositories.teams
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Team_game_data
 import migrations.Teams
 
-class AllTeamsLBLCS : ITeamRepository {
+class AllTeamsDatabase : ITeamRepository {
     private val lblcs = LblcsDatabaseBridge().db
+
+    /**
+     * Returns a [Team] derived from [Teams]. [Team.teamData] is lazy-loaded.
+     */
+    private fun Teams.toTeam(): Team {
+        val teamData by lazy {
+            readTeamData(TeamId(id))
+        }
+        return Team(
+            TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
+                DivisionId(
+                    it
+                )
+            }, teamData
+        )
+    }
+
+    /**
+     * Returns a [TeamGameData] derived from [Team_game_data].
+     */
+    private fun Team_game_data.toTeamGameData(): TeamGameData = TeamGameData(
+        win = this.win,
+        side = if (side == "BLUE") RiftSide.BLUE else RiftSide.RED,
+        gold = this.gold,
+        gameLength = this.game_length,
+        kills = Objective(kills = this.kills, first = this.first_blood),
+        barons = Objective(kills = this.barons, first = this.first_baron),
+        grubs = Objective(kills = this.grubs, first = this.first_grub),
+        dragons = Objective(kills = this.dragons, first = this.first_dragon),
+        heralds = Objective(kills = this.heralds, first = this.first_herald),
+        towers = Objective(kills = this.towers, first = this.first_tower),
+        inhibitors = Objective(kills = this.inhibitors, first = this.first_inhibitor)
+    )
 
     override fun save(entity: Team): Team? {
         TODO("Not yet implemented")
@@ -91,37 +124,4 @@ class AllTeamsLBLCS : ITeamRepository {
                 it.toTeamGameData()
             }
         }
-
-    /**
-     * Returns a [Team] derived from [Teams]. [Team.teamData] is lazy-loaded.
-     */
-    private fun Teams.toTeam(): Team {
-        val teamData by lazy {
-            readTeamData(TeamId(id))
-        }
-        return Team(
-            TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
-            DivisionId(
-                it
-            )
-        }, teamData
-        )
-    }
-
-    /**
-     * Returns a [TeamGameData] derived from [Team_game_data].
-     */
-    private fun Team_game_data.toTeamGameData(): TeamGameData = TeamGameData(
-        win = this.win,
-        side = if (side == "BLUE") RiftSide.BLUE else RiftSide.RED,
-        gold = this.gold,
-        gameLength = this.game_length,
-        kills = Objective(kills = this.kills, first = this.first_blood),
-        barons = Objective(kills = this.barons, first = this.first_baron),
-        grubs = Objective(kills = this.grubs, first = this.first_grub),
-        dragons = Objective(kills = this.dragons, first = this.first_dragon),
-        heralds = Objective(kills = this.heralds, first = this.first_herald),
-        towers = Objective(kills = this.towers, first = this.first_tower),
-        inhibitors = Objective(kills = this.inhibitors, first = this.first_inhibitor)
-    )
 }

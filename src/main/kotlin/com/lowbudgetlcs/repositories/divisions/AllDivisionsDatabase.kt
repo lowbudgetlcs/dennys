@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.repositories.divisions
 
-import com.lowbudgetlcs.entities.Division
-import com.lowbudgetlcs.entities.DivisionId
+import com.lowbudgetlcs.models.Division
+import com.lowbudgetlcs.models.DivisionId
 import com.lowbudgetlcs.repositories.ICriteria
 
-class AllDivisionsLBLCS : IDivisionRepository {
+class AllDivisionsDatabase : IDivisionRepository {
     override fun save(entity: Division): Division? {
         TODO("Not yet implemented")
     }

@@ -1,14 +1,12 @@
 package com.lowbudgetlcs.repositories.players
 
-import com.lowbudgetlcs.entities.*
-import com.lowbudgetlcs.repositories.IEntityRepository
-import kotlinx.serialization.Serializable
-import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
+import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.models.match.MatchParticipant
+import com.lowbudgetlcs.repositories.IRepository
+import com.lowbudgetlcs.repositories.IUniqueRepository
 
-@Serializable
-data class PlayerPerformanceId(val id: Int)
 
-interface IPlayerRepository : IEntityRepository<Player, PlayerId> {
+interface IPlayerRepository : IUniqueRepository<Player, PlayerId>, IRepository<Player> {
     /**
      * Saves [data] owned by [player] derived from [game] to storage. Returns [player] with
      * the new data if it succeeds, null otherwise.

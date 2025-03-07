@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.games
 
-import com.lowbudgetlcs.entities.Game
-import com.lowbudgetlcs.entities.SeriesId
+import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.repositories.ICriteria
 
 /**

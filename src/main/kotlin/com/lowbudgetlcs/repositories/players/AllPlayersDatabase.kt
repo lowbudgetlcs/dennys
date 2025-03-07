@@ -1,15 +1,31 @@
 package com.lowbudgetlcs.repositories.players
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
-import no.stelar7.api.r4j.pojo.lol.match.v5.MatchParticipant
 
 
-class AllPlayersLBLCS : IPlayerRepository {
+class AllPlayersDatabase : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
+
+    /**
+     * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.
+     */
+    private fun Players.toPlayer(): Player {
+        val gameData by lazy {
+            readPlayerGameData(PlayerId(this.id))
+        }
+        return Player(
+            PlayerId(this.id),
+            this.summoner_name,
+            this.riot_puuid,
+            this.team_id?.let { TeamId(it) },
+            gameData,
+        )
+    }
 
     override fun save(entity: Player): Player? {
         TODO("Not yet implemented")
@@ -49,9 +65,17 @@ class AllPlayersLBLCS : IPlayerRepository {
         TODO("Not yet implemented")
     }
 
+    /*
+     TODO: This needs a rethink. This is not a deterministic way to fetch the team id. Consider the following:
+        Player A joins Team 1
+        Player A plays a game with Team 1
+        Player A leaves Team 1, Joins Team 2
+        This function is called with Player 1 as the first member
+        Returns Team 2, even thought Team 1 was passed in.
+     */
     override fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
         for (participant in participants) {
-            this.readByPuuid(participant.puuid)?.let { player ->
+            this.readByPuuid(participant.playerUniqueUserId)?.let { player ->
                 if (player.team != null) return player.team
             }
         }
@@ -121,21 +145,6 @@ class AllPlayersLBLCS : IPlayerRepository {
             }
         }
 
-    /**
-     * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.
-     */
-    private fun Players.toPlayer(): Player {
-        val gameData by lazy {
-            readPlayerGameData(PlayerId(this.id))
-        }
-        return Player(
-            PlayerId(this.id),
-            this.summoner_name,
-            this.riot_puuid,
-            this.team_id?.let { TeamId(it) },
-            gameData,
-        )
-    }
 
     /**
      * Returns a [PlayerGameData] derived from [Player_game_data].

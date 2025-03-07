@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.entities
+package com.lowbudgetlcs.models
 
 import kotlinx.serialization.Serializable
 
@@ -8,11 +8,11 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Series(
-    override val id: SeriesId,
+    val id: SeriesId,
     val division: DivisionId,
     val winner: TeamId?,
     val loser: TeamId?,
-) : Entity<SeriesId>
+)
 
 /**
  * ID type for [Series].

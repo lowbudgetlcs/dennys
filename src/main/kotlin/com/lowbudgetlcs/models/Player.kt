@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.entities
+package com.lowbudgetlcs.models
 
 import kotlinx.serialization.Serializable
 
@@ -8,15 +8,17 @@ import kotlinx.serialization.Serializable
  * but is immutable.
  */
 @Serializable
-data class Player (
-    override val id: PlayerId, val summonerName: String, val puuid: String, val team: TeamId?, val gameData: List<PlayerGameData>
-): Entity<PlayerId>
+data class Player(
+    val id: PlayerId, val summonerName: String, val puuid: String, val team: TeamId?, val gameData: List<PlayerGameData>
+)
 
 /**
  * ID type for [Player]s.
  */
 @Serializable
 data class PlayerId(val id: Int)
+
+// TODO: This data probably shouldn't be attached directly on the player model. We should query it when we need it in the PlayerRepository (I think).
 
 /**
  * Represents in-game stats owned by a [Player].
@@ -54,3 +56,6 @@ data class PlayerGameData(
     val summoner1: Int,
     val summoner2: Int
 )
+
+@Serializable
+data class PlayerPerformanceId(val id: Int)
