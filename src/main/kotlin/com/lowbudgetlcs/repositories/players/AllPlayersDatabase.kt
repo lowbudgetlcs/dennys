@@ -65,6 +65,14 @@ class AllPlayersDatabase : IPlayerRepository {
         TODO("Not yet implemented")
     }
 
+    /*
+     TODO: This needs a rethink. This is not a deterministic way to fetch the team id. Consider the following:
+        Player A joins Team 1
+        Player A plays a game with Team 1
+        Player A leaves Team 1, Joins Team 2
+        This function is called with Player 1 as the first member
+        Returns Team 2, even thought Team 1 was passed in.
+     */
     override fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
         for (participant in participants) {
             this.readByPuuid(participant.playerUniqueUserId)?.let { player ->
