@@ -10,6 +10,16 @@ import com.lowbudgetlcs.repositories.ICriteria
 class AllSeriesDatabase : ISeriesRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
+    /**
+     * Returns a [Series] derived from [migrations.Series].
+     */
+    private fun migrations.Series.toSeries(): Series = Series(
+        SeriesId(this.id),
+        DivisionId(this.division_id),
+        this.winner_id?.let { TeamId(it) },
+        this.loser_id?.let { TeamId(it) },
+    )
+
     override fun save(entity: Series): Series? {
         TODO("Not yet implemented")
     }
@@ -31,14 +41,4 @@ class AllSeriesDatabase : ISeriesRepository {
     override fun delete(entity: Series): Series? {
         TODO("Not yet implemented")
     }
-
-    /**
-     * Returns a [Series] derived from [migrations.Series].
-     */
-    private fun migrations.Series.toSeries(): Series = Series(
-        SeriesId(this.id),
-        DivisionId(this.division_id),
-        this.winner_id?.let { TeamId(it) },
-        this.loser_id?.let { TeamId(it) },
-    )
 }

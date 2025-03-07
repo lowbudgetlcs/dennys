@@ -11,6 +11,22 @@ import migrations.Players
 class AllPlayersDatabase : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
+    /**
+     * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.
+     */
+    private fun Players.toPlayer(): Player {
+        val gameData by lazy {
+            readPlayerGameData(PlayerId(this.id))
+        }
+        return Player(
+            PlayerId(this.id),
+            this.summoner_name,
+            this.riot_puuid,
+            this.team_id?.let { TeamId(it) },
+            gameData,
+        )
+    }
+
     override fun save(entity: Player): Player? {
         TODO("Not yet implemented")
     }
@@ -121,21 +137,6 @@ class AllPlayersDatabase : IPlayerRepository {
             }
         }
 
-    /**
-     * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.
-     */
-    private fun Players.toPlayer(): Player {
-        val gameData by lazy {
-            readPlayerGameData(PlayerId(this.id))
-        }
-        return Player(
-            PlayerId(this.id),
-            this.summoner_name,
-            this.riot_puuid,
-            this.team_id?.let { TeamId(it) },
-            gameData,
-        )
-    }
 
     /**
      * Returns a [PlayerGameData] derived from [Player_game_data].

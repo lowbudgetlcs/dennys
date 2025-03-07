@@ -14,6 +14,20 @@ import migrations.Games
 class AllGamesDatabase : IGameRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
+    /**
+     * Returns a [Game] derived from [Games].
+     */
+    private fun Games.toGame(): Game = Game(
+        GameId(this.id),
+        this.shortcode,
+        this.game_num,
+        this.winner_id?.let { TeamId(it) },
+        this.loser_id?.let { TeamId(it) },
+        this.callback_result?.let { Json.decodeFromString<RiotCallback>(it) },
+        this.created_at,
+        SeriesId(this.series_id)
+    )
+
     override fun save(entity: Game): Game? {
         TODO("Not yet implemented")
     }
@@ -34,18 +48,4 @@ class AllGamesDatabase : IGameRepository {
     override fun delete(entity: Game): Game? {
         TODO("Not yet implemented")
     }
-
-    /**
-     * Returns a [Game] derived from [Games].
-     */
-    private fun Games.toGame(): Game = Game(
-        GameId(this.id),
-        this.shortcode,
-        this.game_num,
-        this.winner_id?.let { TeamId(it) },
-        this.loser_id?.let { TeamId(it) },
-        this.callback_result?.let { Json.decodeFromString<RiotCallback>(it) },
-        this.created_at,
-        SeriesId(this.series_id)
-    )
 }
