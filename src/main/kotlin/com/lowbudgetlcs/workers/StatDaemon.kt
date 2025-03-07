@@ -124,33 +124,33 @@ class StatDaemon private constructor(
             teamsR.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId == TeamType.BLUE.code) RiftSide.BLUE else RiftSide.RED
-                    teamsR.saveTeamData(
+                    if (teamsR.saveTeamData(
                         t, game, TeamGameData(
                             team.win, side, players.sumOf { it.goldEarned }, length, kills = Objective(
                                 kills = team.objectives.champion?.kills ?: 0,
-                                first = team.objectives.champion?.firstTaken ?: false
+                                first = team.objectives.champion?.firstTaken == true
                             ), barons = Objective(
                                 kills = team.objectives.baron?.kills ?: 0,
-                                first = team.objectives.baron?.firstTaken ?: false
+                                first = team.objectives.baron?.firstTaken == true
                             ), grubs = Objective(
                                 kills = team.objectives.horde?.kills ?: 0,
-                                first = team.objectives.horde?.firstTaken ?: false
+                                first = team.objectives.horde?.firstTaken == true
                             ), dragons = Objective(
                                 kills = team.objectives.dragon?.kills ?: 0,
-                                first = team.objectives.dragon?.firstTaken ?: false
+                                first = team.objectives.dragon?.firstTaken == true
                             ), heralds = Objective(
                                 kills = team.objectives.riftHerald?.kills ?: 0,
-                                first = team.objectives.riftHerald?.firstTaken ?: false
+                                first = team.objectives.riftHerald?.firstTaken == true
                             ), towers = Objective(
                                 kills = team.objectives.tower?.kills ?: 0,
-                                first = team.objectives.tower?.firstTaken ?: false
+                                first = team.objectives.tower?.firstTaken == true
                             ), inhibitors = Objective(
                                 kills = team.objectives.inhibitor?.kills ?: 0,
-                                first = team.objectives.inhibitor?.firstTaken ?: false
+                                first = team.objectives.inhibitor?.firstTaken == true
                             )
                         )
-                    )
-                    logDebugMessage("✅ Saved game data for", t.name, game.shortCode)
+                    ) != null) logDebugMessage("✅ Saved game data for", t.name, game.shortCode)
+                    else logDebugMessage("❌ Failed to save game data for", t.name, game.shortCode)
                 } catch (e: Throwable) {
                     logError(e, t.name, game.shortCode)
                 }
@@ -167,7 +167,7 @@ class StatDaemon private constructor(
         )
         try {
             playersR.readByPuuid(player.playerUniqueUserId)?.let { p ->
-                playersR.savePlayerData(
+                if (playersR.savePlayerData(
                     p, game, PlayerGameData(
                         player.kills,
                         player.deaths,
@@ -200,9 +200,9 @@ class StatDaemon private constructor(
                         player.summoner1Id,
                         player.summoner2Id
                     )
-                )
+                ) != null) logDebugMessage("✅ Saved stats for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
+                else logDebugMessage("❌ Failed to save stats data for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
             }
-            logDebugMessage("✅ Saved stats for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
         } catch (e: Throwable) {
             logError(e, "${player.riotGameName}#${player.riotTagline}", game.shortCode)
         }
@@ -219,6 +219,6 @@ class StatDaemon private constructor(
      * Logs errors during processing.
      */
     private fun logError(e: Throwable, target: String, context: String) {
-        logger.error("❌ Failed to save stats for '$target' ('$context')", e)
+        logger.error("❌ Error occured for '$target' ('$context')", e)
     }
 }

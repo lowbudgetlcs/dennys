@@ -1,5 +1,6 @@
 services:
   dennys:
+    build: .
     image: dennys:dev
     container_name: dennys-container
     ports:
@@ -9,6 +10,14 @@ services:
       - LBLCS_JDBC_URL=${LBLCS_JDBC_URL}
       - LBLCS_JDBC_PW=${LBLCS_JDBC_PW}
       - RIOT_API_TOKEN=${RIOT_API_TOKEN}
+      - LOG_PATH=/app/logs
+    volumes:
+      - ./logs:/app/logs  # Bind mount for logs
+    logging:
+        driver: json-file
+        options:
+          max-size: "10m"
+          max-file: "5"
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,6 +34,7 @@ services:
       interval: 5s 
       timeout: 30s
       retries: 5
+    attach: false
 
   postgres:
     image: postgres:15-alpine
@@ -54,6 +64,7 @@ services:
       - PGADMIN_DISABLE_POSTFIX=true
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+    attach: false
 
 volumes:
   pgdata:

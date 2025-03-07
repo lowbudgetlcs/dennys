@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd docker/lblcs/${{ env.APP }}
+            cd /lblcs/docker/${{ env.APP }}
             echo LBLCS_JDBC_URL="${{ secrets.LBLCS_JDBC_URL }}" > .env
             echo LBLCS_JDBC_PW="${{ secrets.LBLCS_JDBC_PW }}" >> .env
             echo RIOT_API_TOKEN="${{ secrets.RIOT_API_TOKEN }}" >> .env
