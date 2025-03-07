@@ -28,7 +28,7 @@ class RiotMatchRepositoryTest : StringSpec({
         coEvery { apiClient.get(any()) } returns response
 
         // Create test instance
-        val repository = RiotMatchRepositoryImpl(apiClient, rateLimiter)
+        val repository = MatchRepositoryRiot(apiClient, rateLimiter)
 
         // Run test
         val result = repository.getMatch(5240057151)
@@ -47,7 +47,7 @@ class RiotMatchRepositoryTest : StringSpec({
         every { response.status } returns HttpStatusCode.BadRequest
         coEvery { apiClient.get(any()) } returns response
 
-        val repository = RiotMatchRepositoryImpl(apiClient, rateLimiter)
+        val repository = MatchRepositoryRiot(apiClient, rateLimiter)
 
         // Run test
         val result = repository.getMatch(5240057151)
@@ -63,7 +63,7 @@ class RiotMatchRepositoryTest : StringSpec({
         // Simulate an API failure
         coEvery { apiClient.get(any()) } throws RuntimeException("API error")
 
-        val repository = RiotMatchRepositoryImpl(apiClient, rateLimiter)
+        val repository = MatchRepositoryRiot(apiClient, rateLimiter)
 
         // Run test
         val result = repository.getMatch(5240057151)
