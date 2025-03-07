@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.repositories.players
 
-import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.repositories.IEntityRepository
 import kotlinx.serialization.Serializable

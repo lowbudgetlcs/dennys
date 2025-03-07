@@ -3,6 +3,8 @@ package com.lowbudgetlcs.workers
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.models.*
+import com.lowbudgetlcs.models.entities.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
 import com.lowbudgetlcs.models.match.TeamType
@@ -12,7 +14,7 @@ import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
 import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
 import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
-import com.lowbudgetlcs.repositories.riot.RiotMatchRepositoryImpl
+import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
 import com.lowbudgetlcs.repositories.teams.AllTeamsLBLCS
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
@@ -52,7 +54,7 @@ class StatDaemon private constructor(
             AllGamesLBLCS(),
             AllPlayersLBLCS(),
             AllTeamsLBLCS(),
-            RiotMatchRepositoryImpl(RiotApiClient(), RateLimiter())
+            MatchRepositoryRiot(RiotApiClient(), RateLimiter())
         )
     }
 

@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.teams
 
-import com.lowbudgetlcs.entities.Game
-import com.lowbudgetlcs.entities.Team
-import com.lowbudgetlcs.entities.TeamGameData
-import com.lowbudgetlcs.entities.TeamId
+import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.Team
+import com.lowbudgetlcs.models.TeamGameData
+import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.IEntityRepository
 import kotlinx.serialization.Serializable
 

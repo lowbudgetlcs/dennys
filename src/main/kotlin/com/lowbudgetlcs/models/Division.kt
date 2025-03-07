@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.entities
+package com.lowbudgetlcs.models
 
 import kotlinx.serialization.Serializable
 
@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
  * whenever a [Division] is created, and is generally immutable.
  */
 @Serializable
-data class Division(override val id: DivisionId, val name: String, val tournamentId: Int) : Entity<DivisionId>
+data class Division(val id: DivisionId, val name: String, val tournamentId: Int)
 
 /**
  * ID type for [Division]s.

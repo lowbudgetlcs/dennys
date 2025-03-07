@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.repositories.games
 
-import com.lowbudgetlcs.entities.Game
+import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.repositories.ICriteria
 
 /**

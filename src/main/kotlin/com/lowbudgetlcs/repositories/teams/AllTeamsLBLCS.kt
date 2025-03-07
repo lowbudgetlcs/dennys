@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.teams
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.entities.*
+import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Team_game_data
 import migrations.Teams

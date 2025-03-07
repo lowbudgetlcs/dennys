@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.entities
+package com.lowbudgetlcs.models
 
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import kotlinx.serialization.Contextual
@@ -11,7 +11,7 @@ import java.time.OffsetDateTime
  */
 @Serializable
 data class Game(
-    override val id: GameId,
+    val id: GameId,
     val shortCode: String,
     val gameNumber: Int,
     val winner: TeamId?,
@@ -19,7 +19,7 @@ data class Game(
     val callbackResult: RiotCallback?,
     @Contextual val createdAt: OffsetDateTime,
     val series: SeriesId,
-) : Entity<GameId>
+)
 
 /**
  * ID type for [Game]s.

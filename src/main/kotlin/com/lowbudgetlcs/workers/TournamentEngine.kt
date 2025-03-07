@@ -2,15 +2,15 @@ package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.entities.Game
-import com.lowbudgetlcs.entities.TeamId
+import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
 import com.lowbudgetlcs.repositories.players.AllPlayersLBLCS
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
 import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
-import com.lowbudgetlcs.repositories.riot.RiotMatchRepositoryImpl
+import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
 import com.lowbudgetlcs.repositories.series.AllSeriesLBLCS
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
@@ -55,7 +55,7 @@ class TournamentEngine private constructor(
                 AllGamesLBLCS(),
                 AllSeriesLBLCS(),
                 AllPlayersLBLCS(),
-                RiotMatchRepositoryImpl(RiotApiClient(), RateLimiter())
+                MatchRepositoryRiot(RiotApiClient(), RateLimiter())
             )
     }
 

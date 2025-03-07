@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.repositories.series
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
-import com.lowbudgetlcs.entities.DivisionId
-import com.lowbudgetlcs.entities.Series
-import com.lowbudgetlcs.entities.SeriesId
-import com.lowbudgetlcs.entities.TeamId
+import com.lowbudgetlcs.models.DivisionId
+import com.lowbudgetlcs.models.Series
+import com.lowbudgetlcs.models.SeriesId
+import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.ICriteria
 
 class AllSeriesLBLCS : ISeriesRepository {
