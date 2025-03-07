@@ -122,6 +122,7 @@ class TournamentEngine private constructor(
             } catch (e: IllegalArgumentException) {
                 logger.warn("⚠️ Could not fetch one or both TeamIds.")
             }
+            logger.info("✅ Finished processing match `${match.matchInfo.gameId}` for shortcode `${callback.shortCode}`")
         }
     }
 

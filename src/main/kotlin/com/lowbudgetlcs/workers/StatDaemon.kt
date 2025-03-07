@@ -1,10 +1,8 @@
 package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.entities.*
 import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.*
-import com.lowbudgetlcs.models.entities.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
 import com.lowbudgetlcs.models.match.TeamType
@@ -13,7 +11,6 @@ import com.lowbudgetlcs.repositories.games.IGameRepository
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
 import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
-import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
 import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
 import com.lowbudgetlcs.repositories.teams.AllTeamsDatabase
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
@@ -37,7 +34,7 @@ class StatDaemon private constructor(
     private val gamesR: IGameRepository,
     private val playersR: IPlayerRepository,
     private val teamsR: ITeamRepository,
-    private val riotMatchRepository: RiotMatchRepository
+    private val riotMatchRepository: MatchRepositoryRiot
 ) : AbstractWorker(), IMessageQListener {
 
     private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
@@ -74,10 +71,10 @@ class StatDaemon private constructor(
      */
     override fun processMessage(delivery: Delivery) {
         val message = String(delivery.body, charset("UTF-8"))
-        logger.info("📩 Received message from queue: $message")
+        logger.info("📩 StatDaemon recieved a message!")
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
-            logger.info("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
+            logger.debug("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
             CoroutineScope(Dispatchers.IO).launch {
                 processRiotCallback(callback)
             }
@@ -128,7 +125,7 @@ class StatDaemon private constructor(
      */
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) {
         playersR.fetchTeamId(players)?.let { teamId ->
-            logTransactionMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
+            logDebugMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
             teamsR.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId == TeamType.BLUE.code) RiftSide.BLUE else RiftSide.RED
@@ -158,9 +155,9 @@ class StatDaemon private constructor(
                             )
                         )
                     )
-                    logTransactionMessage("✅ Saved game data for", t.name, game.shortCode)
+                    logDebugMessage("✅ Saved game data for", t.name, game.shortCode)
                 } catch (e: Throwable) {
-                    transactionError(e, t.name, game.shortCode)
+                    logError(e, t.name, game.shortCode)
                 }
             }
         }
@@ -170,7 +167,7 @@ class StatDaemon private constructor(
      * Saves game data for [player] derived from [game].
      */
     private fun processPlayer(player: MatchParticipant, game: Game) {
-        logTransactionMessage(
+        logDebugMessage(
             "📝 Saving game data for", "${player.riotGameName}#${player.riotTagline}", game.shortCode, "..."
         )
         try {
@@ -210,23 +207,23 @@ class StatDaemon private constructor(
                     )
                 )
             }
-            logTransactionMessage("✅ Saved stats for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
+            logDebugMessage("✅ Saved stats for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
         } catch (e: Throwable) {
-            transactionError(e, "${player.riotGameName}#${player.riotTagline}", game.shortCode)
+            logError(e, "${player.riotGameName}#${player.riotTagline}", game.shortCode)
         }
     }
 
     /**
      * Logs debug info during processing.
      */
-    private fun logTransactionMessage(preamble: String, target: String, context: String, closer: String = ".") {
+    private fun logDebugMessage(preamble: String, target: String, context: String, closer: String = ".") {
         logger.debug("$preamble '$target' ('$context')$closer")
     }
 
     /**
      * Logs errors during processing.
      */
-    private fun transactionError(e: Throwable, target: String, context: String) {
+    private fun logError(e: Throwable, target: String, context: String) {
         logger.error("❌ Failed to save stats for '$target' ('$context')", e)
     }
 }
