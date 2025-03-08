@@ -11,6 +11,7 @@ import com.lowbudgetlcs.repositories.games.IGameRepository
 import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
 import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
+import com.lowbudgetlcs.repositories.riot.IMatchRepository
 import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
 import com.lowbudgetlcs.repositories.teams.AllTeamsDatabase
 import com.lowbudgetlcs.repositories.teams.ITeamRepository
@@ -29,16 +30,16 @@ import org.slf4j.LoggerFactory
  * This service worker consumes [RiotCallback]s off of [queue] and saves player
  * and team data into storage.
  */
-class StatDaemon private constructor(
+class StatDaemon(
     override val queue: String,
-    private val gamesR: IGameRepository,
-    private val playersR: IPlayerRepository,
-    private val teamsR: ITeamRepository,
-    private val riotMatchRepository: MatchRepositoryRiot
-) : AbstractWorker(), IMessageQListener {
+    private val gamesRepository: IGameRepository,
+    private val playersRepository: IPlayerRepository,
+    private val teamsRepository: ITeamRepository,
+    private val matchRepository: IMatchRepository
+) : IMessageQListener {
 
     private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
-    private val messageq = RabbitMQBridge(queue)
+    private val messageQueue = RabbitMQBridge(queue)
 
     /**
      * Private constructor and companion object prevent direct instantiation.
@@ -55,12 +56,10 @@ class StatDaemon private constructor(
         )
     }
 
-    override fun createInstance(instanceId: Int): StatDaemon = Companion.createInstance(queue)
-
-    override fun start() {
+    fun start() {
         logger.info("🚀 StatDaemon is running...")
         logger.debug("📡 Listening on queue: `$queue`")
-        messageq.listen { _, delivery ->
+        messageQueue.listen { _, delivery ->
             processMessage(delivery)
         }
     }
@@ -78,7 +77,7 @@ class StatDaemon private constructor(
             CoroutineScope(Dispatchers.IO).launch {
                 processRiotCallback(callback)
             }
-            messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
+            messageQueue.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
             logger.error("❌ Failed to decode message: $message", e)
         } catch (e: IllegalArgumentException) {
@@ -94,9 +93,9 @@ class StatDaemon private constructor(
     private suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
 
-        val tournamentMatch = riotMatchRepository.getMatch(callback.gameId)
+        val tournamentMatch = matchRepository.getMatch(callback.gameId)
         tournamentMatch?.let { match ->
-            gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
+            gamesRepository.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
                 logger.info("🎮 Processing match `${match.matchInfo.gameId}` for shortcode `${game.shortCode}`...")
 
                 match.matchInfo.teams.forEach { team ->
@@ -119,12 +118,12 @@ class StatDaemon private constructor(
      * Saves game data for a [team] consisting of [players] from [game]. [length] is the game duration.
      */
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) =
-        playersR.fetchTeamId(players)?.let { teamId ->
+        playersRepository.fetchTeamId(players)?.let { teamId ->
             logDebugMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
-            teamsR.readById(teamId)?.let { t ->
+            teamsRepository.readById(teamId)?.let { t ->
                 try {
                     val side = if (team.teamId == TeamType.BLUE.code) RiftSide.BLUE else RiftSide.RED
-                    if (teamsR.saveTeamData(
+                    if (teamsRepository.saveTeamData(
                         t, game, TeamGameData(
                             team.win, side, players.sumOf { it.goldEarned }, length, kills = Objective(
                                 kills = team.objectives.champion?.kills ?: 0,
@@ -166,8 +165,8 @@ class StatDaemon private constructor(
             "📝 Saving game data for", "${player.riotGameName}#${player.riotTagline}", game.shortCode, "..."
         )
         try {
-            playersR.readByPuuid(player.playerUniqueUserId)?.let { p ->
-                if (playersR.savePlayerData(
+            playersRepository.readByPuuid(player.playerUniqueUserId)?.let { p ->
+                if (playersRepository.savePlayerData(
                     p, game, PlayerGameData(
                         player.kills,
                         player.deaths,
