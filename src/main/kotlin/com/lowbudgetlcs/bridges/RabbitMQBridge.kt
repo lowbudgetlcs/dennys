@@ -23,7 +23,7 @@ class RabbitMQBridge(private val queue: String) {
         private val config =
             ConfigLoaderBuilder.default().withExplicitSealedTypes().addResourceSource("/rabbitmq.yaml").build()
                 .loadConfigOrThrow<RabbitMQConfig>()
-        private val logger : Logger = LoggerFactory.getLogger(RabbitMQBridge::class.java)
+        private val logger: Logger = LoggerFactory.getLogger(RabbitMQBridge::class.java)
         private val factory by lazy {
             ConnectionFactory().apply {
                 host = config.host

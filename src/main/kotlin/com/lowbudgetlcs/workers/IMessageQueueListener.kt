@@ -5,7 +5,7 @@ import com.rabbitmq.client.Delivery
 /**
  * Defines properties and behavior for service workers listening on message queues.
  */
-interface IMessageQListener {
+interface IMessageQueueListener {
     /**
      * Name of the queue emitted/listened on.
      */
