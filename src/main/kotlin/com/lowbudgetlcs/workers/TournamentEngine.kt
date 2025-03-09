@@ -2,18 +2,14 @@ package com.lowbudgetlcs.workers
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
-import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.AndCriteria
 import com.lowbudgetlcs.repositories.games.*
-import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
 import com.lowbudgetlcs.repositories.players.IPlayerRepository
-import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
-import com.lowbudgetlcs.repositories.series.AllSeriesDatabase
+import com.lowbudgetlcs.repositories.riot.IMatchRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
-import com.lowbudgetlcs.util.RateLimiter
 import com.rabbitmq.client.Delivery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,43 +24,23 @@ import org.slf4j.LoggerFactory
  * the result of the finished [Game]. It also checks if the [Series] owning
  * [Game] is complete. If it is, it saves the result.
  */
-class TournamentEngine private constructor(
+class TournamentEngine(
     override val queue: String,
-    private val gamesR: IGameRepository,
-    private val seriesR: ISeriesRepository,
-    private val playersR: IPlayerRepository,
-    private val riotMatchRepository: MatchRepositoryRiot
-) : AbstractWorker(), IMessageQListener {
+    private val gamesRepository: IGameRepository,
+    private val seriesRepository: ISeriesRepository,
+    private val playersRepository: IPlayerRepository,
+    private val matchRepository: IMatchRepository
+) : IMessageQueueListener {
 
     private val logger: Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
-    private val messageq = RabbitMQBridge(queue)
+    private val messageQueue = RabbitMQBridge(queue)
     private val db = LblcsDatabaseBridge().db
+    private val scope = CoroutineScope(Dispatchers.IO)
 
-    /**
-     * Private constructor and companion object prevent direct instantiation.
-     *
-     * This behavior is deprecated and will be removed in future versions.
-     */
-    companion object {
-        fun createInstance(
-            queue: String
-        ): TournamentEngine =
-            TournamentEngine(
-                queue,
-                AllGamesDatabase(),
-                AllSeriesDatabase(),
-                AllPlayersDatabase(),
-                MatchRepositoryRiot(RiotApiClient(), RateLimiter())
-            )
-    }
-
-    override fun createInstance(instanceId: Int): AbstractWorker = Companion.createInstance(queue)
-
-    override fun start() {
+    fun start() {
         logger.info("🚀 TournamentEngine starting...")
         logger.debug("📡 Listening on queue: `$queue`")
-
-        messageq.listen { _, delivery ->
+        messageQueue.listen { _, delivery ->
             processMessage(delivery)
         }
     }
@@ -79,17 +55,17 @@ class TournamentEngine private constructor(
         try {
             val callback = Json.decodeFromString<RiotCallback>(message)
             logger.debug("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 processRiotCallback(callback)
             }
-            messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
+            messageQueue.channel.basicAck(delivery.envelope.deliveryTag, false)
         } catch (e: SerializationException) {
             // Generally is an application error- we do not want to lose the message
             logger.error("❌ Failed to decode message: $message", e)
         } catch (e: IllegalArgumentException) {
             logger.warn("🚫 Invalid Riot Callback message: $message.")
             // Delete invalid messages
-            messageq.channel.basicAck(delivery.envelope.deliveryTag, false)
+            messageQueue.channel.basicAck(delivery.envelope.deliveryTag, false)
         }
     }
 
@@ -101,12 +77,12 @@ class TournamentEngine private constructor(
     private suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}...")
 
-        val tournamentMatch = riotMatchRepository.getMatch(callback.gameId)
+        val tournamentMatch = matchRepository.getMatch(callback.gameId)
         tournamentMatch?.let { match ->
             try {
                 db.transaction {
                     val (winner, loser) = match.matchInfo.participants.partition { it.win }.let { (winners, losers) ->
-                        playersR.fetchTeamId(winners) to playersR.fetchTeamId(losers)
+                        playersRepository.fetchTeamId(winners) to playersRepository.fetchTeamId(losers)
                     }
 
                     if (winner == null || loser == null) throw IllegalArgumentException("TeamId not found.")
@@ -132,9 +108,9 @@ class TournamentEngine private constructor(
     private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game? {
         logger.info("📝 Updating game record for shortcode: ${callback.shortCode}...")
 
-        gamesR.readByCriteria(ShortcodeCriteria(callback.shortCode)).first().let { game ->
+        gamesRepository.readByCriteria(ShortcodeCriteria(callback.shortCode)).first().let { game ->
             val updatedGame = game.copy(winner = winner, loser = loser, callbackResult = callback)
-            return gamesR.update(updatedGame)
+            return gamesRepository.update(updatedGame)
         }
     }
 
@@ -143,26 +119,26 @@ class TournamentEngine private constructor(
      */
     private fun updateSeries(game: Game, team1: TeamId, team2: TeamId) {
         logger.info("📝 Updating series record for derived from: ${game.id}...")
-        seriesR.readById(game.series)?.let { series ->
+        seriesRepository.readById(game.series)?.let { series ->
             logger.debug("\uD83D\uDCDD Updating series record: {}...", series.id)
             // Magic number yayyyy! This needs an actual solution- for now the app only supports Bo3.
             val winCondition = 2
-            val team1Wins = gamesR.readByCriteria(
+            val team1Wins = gamesRepository.readByCriteria(
                 AndCriteria(TeamWinCriteria(team1), SeriesCriteria(game.series))
             ).size
-            val team2Wins = gamesR.readByCriteria(
+            val team2Wins = gamesRepository.readByCriteria(
                 AndCriteria(TeamWinCriteria(team2), SeriesCriteria(game.series))
             ).size
 
             fun logWin(team: TeamId) = logger.debug("\uD83C\uDFC5 Team {} wins series {}!", team, series.id)
             when (winCondition) {
                 team1Wins -> {
-                    seriesR.update(series.copy(winner = team1, loser = team2))
+                    seriesRepository.update(series.copy(winner = team1, loser = team2))
                     logWin(team1)
                 }
 
                 team2Wins -> {
-                    seriesR.update(series.copy(loser = team1, winner = team2))
+                    seriesRepository.update(series.copy(loser = team1, winner = team2))
                     logWin(team2)
                 }
                 // Otherwise, series has not concluded
