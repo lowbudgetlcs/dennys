@@ -21,7 +21,6 @@ data class MatchParticipant(
     @SerialName("assists") val assists: Int,
     @SerialName("champLevel") val championLevel: Int,
     @SerialName("goldEarned") val goldEarned: Int,
-    @SerialName("visionScore") val visionScore: Long,
     @SerialName("totalDamageDealtToChampions") val totalDamageToChampions: Long,
     @SerialName("totalHealsOnTeammates") val totalHealsOnTeammates: Long,
     @SerialName("totalDamageShieldedOnTeammates") val totalDamageShieldedOnTeammates: Long,
@@ -57,5 +56,23 @@ data class MatchParticipant(
     @SerialName("summoner2Id") val summoner2Id: Int,
 
     // **Win Status**
-    @SerialName("win") val win: Boolean
+    @SerialName("win") val win: Boolean,
+
+    // **Player Interactions - Pings**
+    @SerialName("allInPings") val allInPings: Short,
+    @SerialName("assistMePings") val assistMePings: Short,
+    @SerialName("commandPings") val commandPings: Short,
+    @SerialName("enemyMissingPings") val enemyMissingPings: Short,
+    @SerialName("enemyVisionPings") val enemyVisionPings: Short,
+    @SerialName("holdPings") val holdPings: Short,
+    @SerialName("getBackPings") val getBackPings: Short,
+    @SerialName("onMyWayPings") val onMyWayPings: Short,
+    @SerialName("needVisionPings") val needVisionPings: Short,
+    @SerialName("pushPings") val pushPings: Short,
+
+    // **Vision Stats**
+    @SerialName("visionScore") val visionScore: Short,
+    @SerialName("pinkWardsPlaced") val pinkWardsPlaced: Short,
+    @SerialName("wardsKilled") val wardsKilled: Short,
+    @SerialName("wardsPlaced") val wardsPlaced: Short
 )
