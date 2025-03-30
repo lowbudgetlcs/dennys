@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.models.match
 
+import com.lowbudgetlcs.models.match.runes.MatchParticipantPerks
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
