@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories.riot
+package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.match.LeagueOfLegendsMatch
@@ -8,12 +8,12 @@ import io.ktor.client.statement.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class MatchRepositoryRiot(
+class RiotMatchRepository(
     private val apiClient: RiotApiClient,
     private val rateLimiter: RateLimiter
 ) : IMatchRepository {
 
-    private val logger: Logger = LoggerFactory.getLogger(MatchRepositoryRiot::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(RiotMatchRepository::class.java)
 
     override suspend fun getMatch(gameId: Long): LeagueOfLegendsMatch? {
         val uri = "https://americas.api.riotgames.com/lol/match/v5/matches/NA1_$gameId"

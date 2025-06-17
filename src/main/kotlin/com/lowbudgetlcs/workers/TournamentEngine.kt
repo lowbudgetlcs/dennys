@@ -4,11 +4,11 @@ import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.TeamId
-import com.lowbudgetlcs.repositories.AndCriteria
+import com.lowbudgetlcs.repositories.IGameRepository
 import com.lowbudgetlcs.repositories.games.*
-import com.lowbudgetlcs.repositories.players.IPlayerRepository
-import com.lowbudgetlcs.repositories.riot.IMatchRepository
-import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.IMatchRepository
+import com.lowbudgetlcs.repositories.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import kotlinx.coroutines.CoroutineScope

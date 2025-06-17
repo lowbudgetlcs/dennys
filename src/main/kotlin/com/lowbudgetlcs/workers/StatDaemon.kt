@@ -5,11 +5,10 @@ import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
 import com.lowbudgetlcs.models.match.TeamType
-import com.lowbudgetlcs.repositories.games.IGameRepository
-import com.lowbudgetlcs.repositories.games.ShortcodeCriteria
-import com.lowbudgetlcs.repositories.players.IPlayerRepository
-import com.lowbudgetlcs.repositories.riot.IMatchRepository
-import com.lowbudgetlcs.repositories.teams.ITeamRepository
+import com.lowbudgetlcs.repositories.IGameRepository
+import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.IMatchRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
 import kotlinx.coroutines.CoroutineScope

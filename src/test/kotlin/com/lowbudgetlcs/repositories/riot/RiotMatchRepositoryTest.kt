@@ -2,6 +2,7 @@ package com.lowbudgetlcs.repositories.riot
 
 import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.match.LeagueOfLegendsMatch
+import com.lowbudgetlcs.repositories.RiotMatchRepository
 import com.lowbudgetlcs.util.RateLimiter
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -28,7 +29,7 @@ class RiotMatchRepositoryTest : StringSpec({
         coEvery { apiClient.get(any()) } returns response
 
         // Create test instance
-        val repository = MatchRepositoryRiot(apiClient, rateLimiter)
+        val repository = RiotMatchRepository(apiClient, rateLimiter)
 
         // Run test
         val result = repository.getMatch(5240057151)
@@ -47,7 +48,7 @@ class RiotMatchRepositoryTest : StringSpec({
         every { response.status } returns HttpStatusCode.BadRequest
         coEvery { apiClient.get(any()) } returns response
 
-        val repository = MatchRepositoryRiot(apiClient, rateLimiter)
+        val repository = RiotMatchRepository(apiClient, rateLimiter)
 
         // Run test
         val result = repository.getMatch(5240057151)
@@ -63,7 +64,7 @@ class RiotMatchRepositoryTest : StringSpec({
         // Simulate an API failure
         coEvery { apiClient.get(any()) } throws RuntimeException("API error")
 
-        val repository = MatchRepositoryRiot(apiClient, rateLimiter)
+        val repository = RiotMatchRepository(apiClient, rateLimiter)
 
         // Run test
         val result = repository.getMatch(5240057151)

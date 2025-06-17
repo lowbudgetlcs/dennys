@@ -1,12 +1,11 @@
-package com.lowbudgetlcs.repositories.teams
+package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.models.*
-import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Team_game_data
 import migrations.Teams
 
-class AllTeamsDatabase : ITeamRepository {
+class DatabaseTeamRepository : ITeamRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     /**
@@ -42,10 +41,6 @@ class AllTeamsDatabase : ITeamRepository {
         inhibitors = Objective(kills = this.inhibitors, first = this.first_inhibitor)
     )
 
-    override fun save(entity: Team): Team? {
-        TODO("Not yet implemented")
-    }
-
     override fun saveTeamData(
         team: Team, game: Game, data: TeamGameData
     ): Team? {
@@ -62,19 +57,13 @@ class AllTeamsDatabase : ITeamRepository {
         return team.copy(teamData = teamData)
     }
 
-    override fun readAll(): List<Team> = lblcs.teamsQueries.readAll().executeAsList().map { it.toTeam() }
+    override fun getAll(): List<Team> = lblcs.teamsQueries.readAll().executeAsList().map { it.toTeam() }
 
-    override fun readById(id: TeamId) = lblcs.teamsQueries.readById(id.id).executeAsOneOrNull()?.toTeam()
-
-    override fun readByCriteria(criteria: ICriteria<Team>): List<Team> = criteria.meetCriteria(readAll())
+    override fun get(id: TeamId): Team? = lblcs.teamsQueries.readById(id.id).executeAsOneOrNull()?.toTeam()
 
     override fun update(entity: Team): Team? =
         lblcs.teamsQueries.updateTeam(entity.name, entity.logo, entity.captain?.id, entity.division?.id)
             .executeAsOneOrNull()?.toTeam()
-
-    override fun delete(entity: Team): Team? {
-        TODO("Not yet implemented")
-    }
 
     /**
      * Saves team game data derived from [team] and [game] to storage and returns

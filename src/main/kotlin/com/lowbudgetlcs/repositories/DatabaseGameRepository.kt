@@ -1,17 +1,16 @@
-package com.lowbudgetlcs.repositories.games
+package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.GameId
 import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.models.TeamId
-import com.lowbudgetlcs.repositories.ICriteria
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import migrations.Games
 
-class AllGamesDatabase : IGameRepository {
+class DatabaseGameRepository : IGameRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     /**
@@ -28,15 +27,9 @@ class AllGamesDatabase : IGameRepository {
         SeriesId(this.series_id)
     )
 
-    override fun save(entity: Game): Game? {
-        TODO("Not yet implemented")
-    }
+    override fun getAll(): List<Game> = lblcs.gamesQueries.readAll().executeAsList().map { it.toGame() }
 
-    override fun readAll(): List<Game> = lblcs.gamesQueries.readAll().executeAsList().map { it.toGame() }
-
-    override fun readById(id: GameId): Game? = lblcs.gamesQueries.readById(id.id).executeAsOneOrNull()?.toGame()
-
-    override fun readByCriteria(criteria: ICriteria<Game>): List<Game> = criteria.meetCriteria(readAll())
+    override fun get(id: GameId): Game? = lblcs.gamesQueries.readById(id.id).executeAsOneOrNull()?.toGame()
 
     override fun update(entity: Game): Game? = lblcs.gamesQueries.updateGame(
         winner_id = entity.winner?.id,
@@ -44,8 +37,4 @@ class AllGamesDatabase : IGameRepository {
         callback_result = Json.encodeToString(entity.callbackResult),
         id = entity.id.id
     ).executeAsOneOrNull()?.toGame()
-
-    override fun delete(entity: Game): Game? {
-        TODO("Not yet implemented")
-    }
 }

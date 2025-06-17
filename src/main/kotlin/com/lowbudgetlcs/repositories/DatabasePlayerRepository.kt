@@ -1,14 +1,13 @@
-package com.lowbudgetlcs.repositories.players
+package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
-import com.lowbudgetlcs.repositories.ICriteria
 import migrations.Player_game_data
 import migrations.Players
 
 
-class AllPlayersDatabase : IPlayerRepository {
+class DatabasePlayerRepository : IPlayerRepository {
     private val lblcs = LblcsDatabaseBridge().db
 
     /**
@@ -27,10 +26,6 @@ class AllPlayersDatabase : IPlayerRepository {
         )
     }
 
-    override fun save(entity: Player): Player? {
-        TODO("Not yet implemented")
-    }
-
     override fun savePlayerData(
         player: Player, game: Game, data: PlayerGameData
     ): Player? {
@@ -47,23 +42,14 @@ class AllPlayersDatabase : IPlayerRepository {
         return player.copy(gameData = gameData)
     }
 
-    override fun readAll(): List<Player> = lblcs.playersQueries.readAll().executeAsList().map { it.toPlayer() }
+    override fun getAll(): List<Player> = lblcs.playersQueries.readAll().executeAsList().map { it.toPlayer() }
 
-    override fun readById(id: PlayerId): Player? = lblcs.playersQueries.readById(id.id).executeAsOneOrNull()?.toPlayer()
+    override fun get(id: PlayerId): Player? = lblcs.playersQueries.readById(id.id).executeAsOneOrNull()?.toPlayer()
 
-    override fun readByCriteria(criteria: ICriteria<Player>): List<Player> {
-        TODO("Not yet implemented")
-    }
-
-    override fun readByPuuid(puuid: String): Player? =
-        lblcs.playersQueries.readByPuuid(puuid).executeAsOneOrNull()?.toPlayer()
+    override fun get(puuid: String): Player? = lblcs.playersQueries.readByPuuid(puuid).executeAsOneOrNull()?.toPlayer()
 
     override fun update(entity: Player): Player? =
         lblcs.playersQueries.updatePlayer(entity.summonerName, entity.id.id).executeAsOneOrNull()?.toPlayer()
-
-    override fun delete(entity: Player): Player? {
-        TODO("Not yet implemented")
-    }
 
     /*
      TODO: This needs a rethink. This is not a deterministic way to fetch the team id. Consider the following:
@@ -75,7 +61,7 @@ class AllPlayersDatabase : IPlayerRepository {
      */
     override fun fetchTeamId(participants: List<MatchParticipant>): TeamId? {
         for (participant in participants) {
-            this.readByPuuid(participant.playerUniqueUserId)?.let { player ->
+            this.get(participant.playerUniqueUserId)?.let { player ->
                 if (player.team != null) return player.team
             }
         }

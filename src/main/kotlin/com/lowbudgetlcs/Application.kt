@@ -1,11 +1,11 @@
 package com.lowbudgetlcs
 
 import com.lowbudgetlcs.http.RiotApiClient
-import com.lowbudgetlcs.repositories.games.AllGamesDatabase
-import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
-import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
-import com.lowbudgetlcs.repositories.series.AllSeriesDatabase
-import com.lowbudgetlcs.repositories.teams.AllTeamsDatabase
+import com.lowbudgetlcs.repositories.DatabaseGameRepository
+import com.lowbudgetlcs.repositories.DatabasePlayerRepository
+import com.lowbudgetlcs.repositories.RiotMatchRepository
+import com.lowbudgetlcs.repositories.DatabaseSeriesRepository
+import com.lowbudgetlcs.repositories.DatabaseTeamRepository
 import com.lowbudgetlcs.util.RateLimiter
 import com.lowbudgetlcs.workers.StatDaemon
 import com.lowbudgetlcs.workers.TournamentEngine
@@ -29,18 +29,18 @@ fun Application.module() {
 
     val statDaemon = StatDaemon(
         queue = STAT_DAEMON_QUEUE,
-        gamesRepository = AllGamesDatabase(),
-        playersRepository = AllPlayersDatabase(),
-        teamsRepository = AllTeamsDatabase(),
-        matchRepository = MatchRepositoryRiot(RiotApiClient(), RateLimiter())
+        gamesRepository = DatabaseGameRepository(),
+        playersRepository = DatabasePlayerRepository(),
+        teamsRepository = DatabaseTeamRepository(),
+        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
     )
 
     val tournamentEngine = TournamentEngine(
         queue = TOURNAMENT_ENGINE_QUEUE,
-        gamesRepository = AllGamesDatabase(),
-        seriesRepository = AllSeriesDatabase(),
-        playersRepository = AllPlayersDatabase(),
-        matchRepository = MatchRepositoryRiot(RiotApiClient(), RateLimiter())
+        gamesRepository = DatabaseGameRepository(),
+        seriesRepository = DatabaseSeriesRepository(),
+        playersRepository = DatabasePlayerRepository(),
+        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
     )
 
     CoroutineScope(Dispatchers.IO).launch {
