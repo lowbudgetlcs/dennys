@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.workers
+package com.lowbudgetlcs.routes.riot
 
 import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.models.Game
@@ -7,7 +7,6 @@ import com.lowbudgetlcs.repositories.IGameRepository
 import com.lowbudgetlcs.repositories.IMatchRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.routes.riot.RiotCallback
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

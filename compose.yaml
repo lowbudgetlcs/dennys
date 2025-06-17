@@ -21,20 +21,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-
-  rabbitmq:
-    image: rabbitmq:3.13.4
-    container_name: rabbitmq-dennys
-    ports:
-      - "5672:5672"
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 5s 
-      timeout: 30s
-      retries: 5
-    attach: false
 
   postgres:
     image: postgres:15-alpine
@@ -64,7 +50,6 @@ services:
       - PGADMIN_DISABLE_POSTFIX=true
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-    attach: false
 
 volumes:
   pgdata:

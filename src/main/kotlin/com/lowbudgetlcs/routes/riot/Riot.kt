@@ -1,11 +1,9 @@
 package com.lowbudgetlcs.routes.riot
 
-import com.lowbudgetlcs.database
+import com.lowbudgetlcs.LblcsDatabase
 import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.util.RateLimiter
-import com.lowbudgetlcs.workers.StatDaemon
-import com.lowbudgetlcs.workers.TournamentEngine
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
@@ -32,26 +30,27 @@ fun Application.riotRoutes() {
             call.respond(HttpStatusCode.InternalServerError)
         }
     }
+    logger.info("📂 Setting up Riot API routes...")
     routing {
         route("/riot") {
-            logger.info("📂 Setting up Riot API routes...")
             route("/callback") {
                 post {
                     val callback = call.receive<RiotCallback>()
                     logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
                     // Emit callback onto all registered queues.
-                    StatDaemon(
-                        gamesRepository = DatabaseGameRepository(database()),
-                        playersRepository = DatabasePlayerRepository(database()),
-                        teamsRepository = DatabaseTeamRepository(database()),
-                        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
-                    ).processRiotCallback(callback)
+                    val database = LblcsDatabase().db
                     TournamentEngine(
-                        gamesRepository = DatabaseGameRepository(database()),
-                        seriesRepository = DatabaseSeriesRepository(database()),
-                        playersRepository = DatabasePlayerRepository(database()),
+                        gamesRepository = DatabaseGameRepository(database),
+                        seriesRepository = DatabaseSeriesRepository(database),
+                        playersRepository = DatabasePlayerRepository(database),
                         matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter()),
-                        database()
+                        database
+                    ).processRiotCallback(callback)
+                    StatDaemon(
+                        gamesRepository = DatabaseGameRepository(database),
+                        playersRepository = DatabasePlayerRepository(database),
+                        teamsRepository = DatabaseTeamRepository(database),
+                        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
                     ).processRiotCallback(callback)
                     logger.info("✅ Callback successfully processed!")
                     call.respond(HttpStatusCode.OK)

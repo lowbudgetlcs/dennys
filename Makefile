@@ -20,7 +20,7 @@ debug-build:
 
 # Run the Docker container
 run:
-	docker compose up dennys rabbitmq postgres
+	docker compose up dennys postgres
 
 # Run all dev containers
 dev: migrations
@@ -31,8 +31,8 @@ all: erase build run
 
 # Stop the Docker container
 stop:
-	docker stop $(CONTAINER_NAME) postgres-dennys rabbitmq-dennys pgadmin-dennys || true
-	docker rm $(CONTAINER_NAME) postgres-dennys rabbitmq-dennys pgadmin-dennys || true
+	docker stop $(CONTAINER_NAME) postgres-dennys pgadmin-dennys || true
+	docker rm $(CONTAINER_NAME) postgres-dennys pgadmin-dennys || true
 
 # Clean up the Docker image
 clean:

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.workers
+package com.lowbudgetlcs.routes.riot
 
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
@@ -8,9 +8,6 @@ import com.lowbudgetlcs.repositories.IGameRepository
 import com.lowbudgetlcs.repositories.IMatchRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.ITeamRepository
-import com.lowbudgetlcs.routes.riot.RiotCallback
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
