@@ -1,21 +1,16 @@
 package com.lowbudgetlcs.workers
 
-import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
 import com.lowbudgetlcs.models.match.TeamType
 import com.lowbudgetlcs.repositories.IGameRepository
-import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.IMatchRepository
+import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.ITeamRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
-import com.rabbitmq.client.Delivery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -24,45 +19,14 @@ import org.slf4j.LoggerFactory
  * and team data into storage.
  */
 class StatDaemon(
-    override val queue: String,
     private val gamesRepository: IGameRepository,
     private val playersRepository: IPlayerRepository,
     private val teamsRepository: ITeamRepository,
     private val matchRepository: IMatchRepository
-) : IMessageQueueListener {
+) {
 
     private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
-    private val messageQueue = RabbitMQBridge(queue)
     private val scope = CoroutineScope(Dispatchers.IO)
-
-    fun start() {
-        logger.info("🚀 StatDaemon is running...")
-        logger.debug("📡 Listening on queue: `$queue`")
-        messageQueue.listen { _, delivery ->
-            processMessage(delivery)
-        }
-    }
-
-    /**
-     * Consumes [delivery] from [queue] and parses it as a [RiotCallback].
-     * Begins stat processing.
-     */
-    override fun processMessage(delivery: Delivery) {
-        val message = String(delivery.body, charset("UTF-8"))
-        logger.info("📩 StatDaemon recieved a message!")
-        try {
-            val callback = Json.decodeFromString<RiotCallback>(message)
-            logger.debug("✅ Successfully decoded RiotCallback for game ID: ${callback.gameId}")
-            scope.launch {
-                processRiotCallback(callback)
-            }
-            messageQueue.channel.basicAck(delivery.envelope.deliveryTag, false)
-        } catch (e: SerializationException) {
-            logger.error("❌ Failed to decode message: $message", e)
-        } catch (e: IllegalArgumentException) {
-            logger.warn("🚫 Invalid Riot Callback message: $message.", e)
-        }
-    }
 
     /**
      * Fetches a match from the RiotAPI derived from [callback]. Then, iterates over
@@ -71,23 +35,17 @@ class StatDaemon(
      */
     private suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
-
-        val tournamentMatch = matchRepository.getMatch(callback.gameId)
-        tournamentMatch?.let { match ->
-            gamesRepository.readByCriteria(ShortcodeCriteria(callback.shortCode)).firstOrNull()?.let { game ->
+        matchRepository.getMatch(callback.gameId)?.let { match ->
+            gamesRepository.get(shortcode = callback.shortCode)?.let { game ->
                 logger.info("🎮 Processing match `${match.matchInfo.gameId}` for shortcode `${game.shortCode}`...")
-
                 match.matchInfo.teams.forEach { team ->
                     val allPlayersOnSameTeam = match.matchInfo.participants.filter { it.teamId == team.teamId }
                     val gameDurationAsLong = match.matchInfo.gameDuration.toLong()
-
                     processTeam(team = team, players = allPlayersOnSameTeam, game = game, length = gameDurationAsLong)
                 }
-
                 match.matchInfo.participants.forEach { player ->
                     processPlayer(player, game)
                 }
-
                 logger.info("✅ Finished processing match `${match.matchInfo.gameId}` for shortcode `${game.shortCode}`")
             }
         }
@@ -98,8 +56,8 @@ class StatDaemon(
      */
     private fun processTeam(team: MatchTeam, players: List<MatchParticipant>, game: Game, length: Long) =
         playersRepository.fetchTeamId(players)?.let { teamId ->
-            logDebugMessage("📝 Saving game data for", teamId.toString(), game.shortCode, "...")
-            teamsRepository.readById(teamId)?.let { t ->
+            logger.debug("\uD83D\uDCDD Saving game data for {} ({}...", teamId, game.shortCode)
+            teamsRepository.get(id = teamId)?.let { t ->
                 try {
                     val side = if (team.teamId == TeamType.BLUE.code) RiftSide.BLUE else RiftSide.RED
                     if (teamsRepository.saveTeamData(
@@ -128,10 +86,10 @@ class StatDaemon(
                                 )
                             )
                         ) != null
-                    ) logDebugMessage("✅ Saved game data for", t.name, game.shortCode)
-                    else logDebugMessage("❌ Failed to save game data for", t.name, game.shortCode)
+                    ) logger.debug("✅ Saved game data for ${t.name} (${game.shortCode}).")
+                    else logger.debug("❌ Failed to save game data for ${t.name} (${game.shortCode}.)")
                 } catch (e: Throwable) {
-                    logError(e, t.name, game.shortCode)
+                    logger.error("Exception: ", e)
                 }
             }
         }
@@ -141,11 +99,11 @@ class StatDaemon(
      * Saves game data for [player] derived from [game].
      */
     private fun processPlayer(player: MatchParticipant, game: Game) {
-        logDebugMessage(
-            "📝 Saving game data for", "${player.riotGameName}#${player.riotTagline}", game.shortCode, "..."
+        logger.debug(
+            "📝 Saving game data for ${player.riotGameName}#${player.riotTagline} (game.shortCode)..."
         )
         try {
-            playersRepository.readByPuuid(player.playerUniqueUserId)?.let { p ->
+            playersRepository.get(puuid = player.playerUniqueUserId)?.let { p ->
                 if (playersRepository.savePlayerData(
                         p, game, PlayerGameData(
                             player.kills,
@@ -180,29 +138,11 @@ class StatDaemon(
                             player.summoner2Id
                         )
                     ) != null
-                ) logDebugMessage("✅ Saved stats for", "${player.riotGameName}#${player.riotTagline}", game.shortCode)
-                else logDebugMessage(
-                    "❌ Failed to save stats data for",
-                    "${player.riotGameName}#${player.riotTagline}",
-                    game.shortCode
-                )
+                ) logger.debug("✅ Saved stats for ${player.riotGameName}#${player.riotTagline} (${game.shortCode}).")
+                else logger.debug("❌ Failed to save stats data for ${player.riotGameName}#${player.riotTagline} (game.shortCode).")
             }
         } catch (e: Throwable) {
-            logError(e, "${player.riotGameName}#${player.riotTagline}", game.shortCode)
+            logger.error("Exception occured:", e)
         }
-    }
-
-    /**
-     * Logs debug info during processing.
-     */
-    private fun logDebugMessage(preamble: String, target: String, context: String, closer: String = ".") {
-        logger.debug("$preamble '$target' ('$context')$closer")
-    }
-
-    /**
-     * Logs errors during processing.
-     */
-    private fun logError(e: Throwable, target: String, context: String) {
-        logger.error("❌ Error occured for '$target' ('$context')", e)
     }
 }

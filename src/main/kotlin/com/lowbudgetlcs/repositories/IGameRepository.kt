@@ -10,6 +10,9 @@ interface IGameRepository {
     /* Fetch a single Game from storage, null if not found */
     fun get(id: GameId): Game?
 
+    /* Fetch a single game shortcode from storage, null if not found */
+    fun get(shortcode: String): Game?
+
     /* Update a Game in storage, returning the new object or null if the operation fails. */
     fun update(entity: Game): Game?
 }
