@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
+import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.GameId
 import com.lowbudgetlcs.models.SeriesId
@@ -10,8 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import migrations.Games
 
-class DatabaseGameRepository : IGameRepository {
-    private val lblcs = LblcsDatabaseBridge().db
+class DatabaseGameRepository(private val lblcs: Database) : IGameRepository {
 
     /**
      * Returns a [Game] derived from [Games].

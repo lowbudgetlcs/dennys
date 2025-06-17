@@ -1,14 +1,13 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
+import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import migrations.Player_game_data
 import migrations.Players
 
 
-class DatabasePlayerRepository : IPlayerRepository {
-    private val lblcs = LblcsDatabaseBridge().db
+class DatabasePlayerRepository(private val lblcs: Database) : IPlayerRepository {
 
     /**
      * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.

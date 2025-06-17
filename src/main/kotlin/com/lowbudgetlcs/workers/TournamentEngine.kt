@@ -1,13 +1,11 @@
 package com.lowbudgetlcs.workers
 
-import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
 import com.lowbudgetlcs.bridges.RabbitMQBridge
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.IGameRepository
-import com.lowbudgetlcs.repositories.games.*
-import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.IMatchRepository
+import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.ISeriesRepository
 import com.lowbudgetlcs.routes.riot.RiotCallback
 import com.rabbitmq.client.Delivery
@@ -34,7 +32,6 @@ class TournamentEngine(
 
     private val logger: Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
     private val messageQueue = RabbitMQBridge(queue)
-    private val db = LblcsDatabaseBridge().db
     private val scope = CoroutineScope(Dispatchers.IO)
 
     fun start() {

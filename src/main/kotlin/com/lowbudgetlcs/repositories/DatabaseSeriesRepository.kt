@@ -1,13 +1,12 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
+import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.models.DivisionId
 import com.lowbudgetlcs.models.Series
 import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.models.TeamId
 
-class DatabaseSeriesRepository : ISeriesRepository {
-    private val lblcs = LblcsDatabaseBridge().db
+class DatabaseSeriesRepository(private val lblcs: Database) : ISeriesRepository {
 
     /**
      * Returns a [Series] derived from [migrations.Series].

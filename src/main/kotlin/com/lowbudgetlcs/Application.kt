@@ -29,17 +29,17 @@ fun Application.module() {
 
     val statDaemon = StatDaemon(
         queue = STAT_DAEMON_QUEUE,
-        gamesRepository = DatabaseGameRepository(),
-        playersRepository = DatabasePlayerRepository(),
-        teamsRepository = DatabaseTeamRepository(),
+        gamesRepository = DatabaseGameRepository(database()),
+        playersRepository = DatabasePlayerRepository(database()),
+        teamsRepository = DatabaseTeamRepository(database()),
         matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
     )
 
     val tournamentEngine = TournamentEngine(
         queue = TOURNAMENT_ENGINE_QUEUE,
-        gamesRepository = DatabaseGameRepository(),
-        seriesRepository = DatabaseSeriesRepository(),
-        playersRepository = DatabasePlayerRepository(),
+        gamesRepository = DatabaseGameRepository(database()),
+        seriesRepository = DatabaseSeriesRepository(database()),
+        playersRepository = DatabasePlayerRepository(database()),
         matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
     )
 

@@ -1,12 +1,11 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.bridges.LblcsDatabaseBridge
+import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.models.*
 import migrations.Team_game_data
 import migrations.Teams
 
-class DatabaseTeamRepository : ITeamRepository {
-    private val lblcs = LblcsDatabaseBridge().db
+class DatabaseTeamRepository(private val lblcs: Database) : ITeamRepository {
 
     /**
      * Returns a [Team] derived from [Teams]. [Team.teamData] is lazy-loaded.
@@ -17,10 +16,10 @@ class DatabaseTeamRepository : ITeamRepository {
         }
         return Team(
             TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
-                DivisionId(
-                    it
-                )
-            }, teamData
+            DivisionId(
+                it
+            )
+        }, teamData
         )
     }
 
