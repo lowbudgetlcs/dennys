@@ -68,9 +68,6 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:42.7.2")
 
-    // Rabbitmq
-    implementation("com.rabbitmq:amqp-client:5.21.0")
-
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("io.kotest:kotest-runner-junit5:5.5.5")

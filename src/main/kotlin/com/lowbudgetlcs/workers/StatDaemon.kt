@@ -26,14 +26,13 @@ class StatDaemon(
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
-    private val scope = CoroutineScope(Dispatchers.IO)
 
     /**
      * Fetches a match from the RiotAPI derived from [callback]. Then, iterates over
      * each team and saves its game data. Then, iterates over each participant and saves its
      * game data.
      */
-    private suspend fun processRiotCallback(callback: RiotCallback) {
+    suspend fun processRiotCallback(callback: RiotCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
         matchRepository.getMatch(callback.gameId)?.let { match ->
             gamesRepository.get(shortcode = callback.shortCode)?.let { game ->

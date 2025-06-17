@@ -29,6 +29,12 @@ class DatabaseGameRepository(private val lblcs: Database) : IGameRepository {
     override fun getAll(): List<Game> = lblcs.gamesQueries.readAll().executeAsList().map { it.toGame() }
 
     override fun get(id: GameId): Game? = lblcs.gamesQueries.readById(id.id).executeAsOneOrNull()?.toGame()
+    override fun get(shortcode: String): Game? = lblcs.gamesQueries.readByShortcode(shortcode).executeAsOneOrNull()?.toGame()
+
+    override fun get(
+        team: TeamId,
+        series: SeriesId
+    ): List<Game> = lblcs.gamesQueries.winsInSeriesByTeam(series_id = series.id, winner_id = team.id).executeAsList().map { it.toGame() }
 
     override fun update(entity: Game): Game? = lblcs.gamesQueries.updateGame(
         winner_id = entity.winner?.id,

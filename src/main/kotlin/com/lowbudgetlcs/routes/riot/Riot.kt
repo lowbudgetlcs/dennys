@@ -1,6 +1,11 @@
 package com.lowbudgetlcs.routes.riot
 
-import com.lowbudgetlcs.bridges.RabbitMQBridge
+import com.lowbudgetlcs.database
+import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.repositories.*
+import com.lowbudgetlcs.util.RateLimiter
+import com.lowbudgetlcs.workers.StatDaemon
+import com.lowbudgetlcs.workers.TournamentEngine
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
@@ -17,15 +22,6 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Application.riotRoutes() {
     logger.info("🚀 Initializing Riot routes...")
-
-    // List of messageqs to emit callbacks onto. This is basically 'registering service workers',
-    // but really shitty.
-    val messageqs = mutableListOf<RabbitMQBridge>()
-    messageqs.add(RabbitMQBridge("CALLBACK"))
-    messageqs.add(RabbitMQBridge("STATS"))
-
-    logger.info("📡 Registered queues: $messageqs")
-
     install(StatusPages) {
         exception<RequestValidationException> { call, cause ->
             logger.warn("⚠️ Request failed validation: ${cause.message}")
@@ -44,7 +40,19 @@ fun Application.riotRoutes() {
                     val callback = call.receive<RiotCallback>()
                     logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
                     // Emit callback onto all registered queues.
-                    for (queue in messageqs) queue.emit(Json.encodeToString(callback))
+                    StatDaemon(
+                        gamesRepository = DatabaseGameRepository(database()),
+                        playersRepository = DatabasePlayerRepository(database()),
+                        teamsRepository = DatabaseTeamRepository(database()),
+                        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
+                    ).processRiotCallback(callback)
+                    TournamentEngine(
+                        gamesRepository = DatabaseGameRepository(database()),
+                        seriesRepository = DatabaseSeriesRepository(database()),
+                        playersRepository = DatabasePlayerRepository(database()),
+                        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter()),
+                        database()
+                    ).processRiotCallback(callback)
                     logger.info("✅ Callback successfully processed!")
                     call.respond(HttpStatusCode.OK)
                 }

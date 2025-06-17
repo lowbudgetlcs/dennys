@@ -27,32 +27,6 @@ fun Application.module() {
 
     configureRouting()
 
-    val statDaemon = StatDaemon(
-        queue = STAT_DAEMON_QUEUE,
-        gamesRepository = DatabaseGameRepository(database()),
-        playersRepository = DatabasePlayerRepository(database()),
-        teamsRepository = DatabaseTeamRepository(database()),
-        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
-    )
-
-    val tournamentEngine = TournamentEngine(
-        queue = TOURNAMENT_ENGINE_QUEUE,
-        gamesRepository = DatabaseGameRepository(database()),
-        seriesRepository = DatabaseSeriesRepository(database()),
-        playersRepository = DatabasePlayerRepository(database()),
-        matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
-    )
-
-    CoroutineScope(Dispatchers.IO).launch {
-        logger.info("📊 Launching StatDaemon...")
-        statDaemon.start()
-    }
-
-    CoroutineScope(Dispatchers.IO).launch {
-        logger.info("🎮 Launching TournamentEngine...")
-        tournamentEngine.start()
-    }
-
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
 }
 
