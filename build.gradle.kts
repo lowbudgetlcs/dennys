@@ -1,6 +1,6 @@
-val kotlinVersion = "2.1.0"
-val ktorVersion = "3.0.2"
-val logbackVersion = "1.5.15"
+val kotlinVersion = "2.1.21"
+val ktorVersion = "3.1.3"
+val logbackVersion = "1.5.18"
 
 plugins {
     kotlin("jvm") version ("2.1.0")

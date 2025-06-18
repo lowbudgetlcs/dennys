@@ -4,7 +4,7 @@ services:
     image: dennys:dev
     container_name: dennys-container
     ports:
-      - "9292:9292"
+      - "127.0.0.1:9292:9292"
     env_file: .env
     environment:
       - LBLCS_JDBC_URL=${LBLCS_JDBC_URL}
@@ -27,10 +27,10 @@ services:
     image: postgres:15-alpine
     container_name: postgres-dennys
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     user: postgres
     environment:
-      - POSTGRES_PASSWORD=dev-password
+      - POSTGRES_PASSWORD=dev
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./build/resources/migrations:/docker-entrypoint-initdb.d
@@ -44,10 +44,10 @@ services:
     image: dpage/pgadmin4:9.0
     container_name: pgadmin-dennys
     ports: 
-      - "8888:80"
+      - "127.0.0.1:8888:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=lblcs.dev@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=pgadmin-dev
+      - PGADMIN_DEFAULT_EMAIL=dev@dev.com
+      - PGADMIN_DEFAULT_PASSWORD=dev
       - PGADMIN_DISABLE_POSTFIX=true
     volumes:
       - pgadmin-data:/var/lib/pgadmin
