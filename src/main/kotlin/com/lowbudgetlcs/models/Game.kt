@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.models
 
-import com.lowbudgetlcs.routes.riot.Callback
+import com.lowbudgetlcs.models.PostMatchCallback
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
@@ -16,7 +16,7 @@ data class Game(
     val gameNumber: Int,
     val winner: TeamId?,
     val loser: TeamId?,
-    val callbackResult: Callback?,
+    val callbackResult: PostMatchCallback?,
     @Contextual val createdAt: OffsetDateTime,
     val series: SeriesId,
 )

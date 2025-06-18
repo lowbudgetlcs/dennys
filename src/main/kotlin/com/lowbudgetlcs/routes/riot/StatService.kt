@@ -12,7 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * This service worker consumes [Callback]s off of [queue] and saves player
+ * This service worker consumes [PostMatchCallback]s off of [queue] and saves player
  * and team data into storage.
  */
 class StatService(
@@ -29,7 +29,7 @@ class StatService(
      * each team and saves its game data. Then, iterates over each participant and saves its
      * game data.
      */
-    suspend fun process(callback: Callback) {
+    suspend fun process(callback: PostMatchCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
         matchRepository.getMatch(callback.gameId)?.let { match ->
             gamesRepository.get(shortcode = callback.shortCode)?.let { game ->

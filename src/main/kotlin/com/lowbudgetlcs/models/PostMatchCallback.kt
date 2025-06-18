@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.routes.riot
+package com.lowbudgetlcs.models
 
 import kotlinx.serialization.Serializable
 
@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * [shortCode] and [gameId] are the most relevant fields.
  */
 @Serializable
-data class Callback(
+data class PostMatchCallback(
     val startTime: Long,
     val shortCode: String,
     val metaData: String,

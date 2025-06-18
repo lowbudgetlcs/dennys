@@ -2,6 +2,7 @@ package com.lowbudgetlcs.routes.riot
 
 import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.models.Game
+import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.models.TeamId
 import com.lowbudgetlcs.repositories.IGameRepository
 import com.lowbudgetlcs.repositories.IMatchRepository
@@ -11,7 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * This service worker consumes [Callback]s off of [queue] and saves
+ * This service worker consumes [com.lowbudgetlcs.models.PostMatchCallback]s off of [queue] and saves
  * the result of the finished [Game]. It also checks if the [Series] owning
  * [Game] is complete. If it is, it saves the result.
  */
@@ -30,7 +31,7 @@ class TournamentService(
      * the winner, loser, and result of the game. If the series owning said game is complete,
      * save the winner and loser of the series.
      */
-    suspend fun process(callback: Callback) {
+    suspend fun process(callback: PostMatchCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}...")
         val tournamentMatch = matchRepository.getMatch(callback.gameId)
         tournamentMatch?.let { match ->
@@ -60,7 +61,7 @@ class TournamentService(
     /**
      * Updates the game in storage derived from [callback] with a [winner] and [loser].
      */
-    private fun updateGame(callback: Callback, winner: TeamId, loser: TeamId): Game? {
+    private fun updateGame(callback: PostMatchCallback, winner: TeamId, loser: TeamId): Game? {
         logger.info("📝 Updating game record for shortcode: ${callback.shortCode}...")
 
         gamesRepository.get(shortcode = callback.shortCode)?.let { game ->

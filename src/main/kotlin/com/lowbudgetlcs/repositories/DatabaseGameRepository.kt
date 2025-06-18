@@ -5,7 +5,7 @@ import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.GameId
 import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.models.TeamId
-import com.lowbudgetlcs.routes.riot.Callback
+import com.lowbudgetlcs.models.PostMatchCallback
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import migrations.Games
@@ -21,7 +21,7 @@ class DatabaseGameRepository(private val lblcs: Database) : IGameRepository {
         this.game_num,
         this.winner_id?.let { TeamId(it) },
         this.loser_id?.let { TeamId(it) },
-        this.callback_result?.let { Json.decodeFromString<Callback>(it) },
+        this.callback_result?.let { Json.decodeFromString<PostMatchCallback>(it) },
         this.created_at,
         SeriesId(this.series_id)
     )

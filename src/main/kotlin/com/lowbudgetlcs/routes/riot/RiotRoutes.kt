@@ -2,6 +2,7 @@ package com.lowbudgetlcs.routes.riot
 
 import com.lowbudgetlcs.LblcsDatabase
 import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.util.RateLimiter
 import io.ktor.http.*
@@ -33,7 +34,7 @@ fun Application.riotRoutes() {
     routing {
         route("/riot-callback") {
             post {
-                val callback = call.receive<Callback>()
+                val callback = call.receive<PostMatchCallback>()
                 logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
                 // Emit callback onto all registered queues.
                 val database = LblcsDatabase().db
