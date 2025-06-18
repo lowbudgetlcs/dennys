@@ -16,10 +16,10 @@ class DatabaseTeamRepository(private val lblcs: Database) : ITeamRepository {
         }
         return Team(
             TeamId(id), name, logo, captain_id?.let { PlayerId(it) }, division_id?.let {
-            DivisionId(
-                it
-            )
-        }, teamData
+                DivisionId(
+                    it
+                )
+            }, teamData
         )
     }
 

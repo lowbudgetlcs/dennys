@@ -12,24 +12,24 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * This service worker consumes [RiotCallback]s off of [queue] and saves player
+ * This service worker consumes [Callback]s off of [queue] and saves player
  * and team data into storage.
  */
-class StatDaemon(
+class StatService(
     private val gamesRepository: IGameRepository,
     private val playersRepository: IPlayerRepository,
     private val teamsRepository: ITeamRepository,
     private val matchRepository: IMatchRepository
 ) {
 
-    private val logger: Logger = LoggerFactory.getLogger(StatDaemon::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(StatService::class.java)
 
     /**
      * Fetches a match from the RiotAPI derived from [callback]. Then, iterates over
      * each team and saves its game data. Then, iterates over each participant and saves its
      * game data.
      */
-    suspend fun processRiotCallback(callback: RiotCallback) {
+    suspend fun process(callback: Callback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
         matchRepository.getMatch(callback.gameId)?.let { match ->
             gamesRepository.get(shortcode = callback.shortCode)?.let { game ->

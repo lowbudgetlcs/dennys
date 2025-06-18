@@ -1,15 +1,14 @@
 package com.lowbudgetlcs
 
 import app.cash.sqldelight.driver.jdbc.asJdbcDriver
-import com.lowbudgetlcs.config.DatabaseConfigLoader
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 
-class LblcsDatabase {
+class LblcsDatabase(private val config: DatabaseConfig = configBinder.bindOrThrow<DatabaseConfig>("database")) {
     private val driver by lazy {
         HikariConfig().apply {
-            jdbcUrl = DatabaseConfigLoader.config.url.value
-            password = DatabaseConfigLoader.config.pass.value
+            jdbcUrl = config.url.value
+            password = config.password.value
             maximumPoolSize = 15
             minimumIdle = 1
             idleTimeout = 10000

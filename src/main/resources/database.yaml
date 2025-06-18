@@ -1,2 +1,0 @@
-url: ${LBLCS_JDBC_URL}
-pass: ${LBLCS_JDBC_PW}

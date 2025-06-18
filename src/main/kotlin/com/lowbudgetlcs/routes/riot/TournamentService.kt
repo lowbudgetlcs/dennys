@@ -11,11 +11,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * This service worker consumes [RiotCallback]s off of [queue] and saves
+ * This service worker consumes [Callback]s off of [queue] and saves
  * the result of the finished [Game]. It also checks if the [Series] owning
  * [Game] is complete. If it is, it saves the result.
  */
-class TournamentEngine(
+class TournamentService(
     private val gamesRepository: IGameRepository,
     private val seriesRepository: ISeriesRepository,
     private val playersRepository: IPlayerRepository,
@@ -23,14 +23,14 @@ class TournamentEngine(
     private val db: Database
 ) {
 
-    private val logger: Logger = LoggerFactory.getLogger(TournamentEngine::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(TournamentService::class.java)
 
     /**
      * Fetches a match from the RiotAPI and process the winning and losing teams. Then, saves
      * the winner, loser, and result of the game. If the series owning said game is complete,
      * save the winner and loser of the series.
      */
-    suspend fun processRiotCallback(callback: RiotCallback) {
+    suspend fun process(callback: Callback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}...")
         val tournamentMatch = matchRepository.getMatch(callback.gameId)
         tournamentMatch?.let { match ->
@@ -60,7 +60,7 @@ class TournamentEngine(
     /**
      * Updates the game in storage derived from [callback] with a [winner] and [loser].
      */
-    private fun updateGame(callback: RiotCallback, winner: TeamId, loser: TeamId): Game? {
+    private fun updateGame(callback: Callback, winner: TeamId, loser: TeamId): Game? {
         logger.info("📝 Updating game record for shortcode: ${callback.shortCode}...")
 
         gamesRepository.get(shortcode = callback.shortCode)?.let { game ->

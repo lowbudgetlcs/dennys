@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * [shortCode] and [gameId] are the most relevant fields.
  */
 @Serializable
-data class RiotCallback(
+data class Callback(
     val startTime: Long,
     val shortCode: String,
     val metaData: String,

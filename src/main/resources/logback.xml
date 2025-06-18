@@ -28,13 +28,13 @@
     </appender>
 
     <!-- Logger levels -->
-    <logger name="com.zaxxer.hikari" level="WARN" />
-    <logger name="com.rabbitmq" level="WARN" />
-    <logger name="io.netty" level="INFO" />
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="com.rabbitmq" level="WARN"/>
+    <logger name="io.netty" level="INFO"/>
 
     <!-- Root Logger -->
     <root level="DEBUG">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>

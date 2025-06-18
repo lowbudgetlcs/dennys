@@ -26,10 +26,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Build configuration files
-        run: |
-          touch src/main/resources/database.yaml
-
       - name: Build the Docker image
         run: |
           docker build . --file Dockerfile --tag ${{ env.APP }}:latest

@@ -10,6 +10,7 @@ services:
       - LBLCS_JDBC_URL=${LBLCS_JDBC_URL}
       - LBLCS_JDBC_PW=${LBLCS_JDBC_PW}
       - RIOT_API_TOKEN=${RIOT_API_TOKEN}
+      - RIOT_USE_STUBS=${RIOT_USE_STUBS}
       - LOG_PATH=/app/logs
     volumes:
       - ./logs:/app/logs  # Bind mount for logs

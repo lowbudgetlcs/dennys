@@ -5,7 +5,7 @@ import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.GameId
 import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.models.TeamId
-import com.lowbudgetlcs.routes.riot.RiotCallback
+import com.lowbudgetlcs.routes.riot.Callback
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import migrations.Games
@@ -21,7 +21,7 @@ class DatabaseGameRepository(private val lblcs: Database) : IGameRepository {
         this.game_num,
         this.winner_id?.let { TeamId(it) },
         this.loser_id?.let { TeamId(it) },
-        this.callback_result?.let { Json.decodeFromString<RiotCallback>(it) },
+        this.callback_result?.let { Json.decodeFromString<Callback>(it) },
         this.created_at,
         SeriesId(this.series_id)
     )
@@ -29,12 +29,14 @@ class DatabaseGameRepository(private val lblcs: Database) : IGameRepository {
     override fun getAll(): List<Game> = lblcs.gamesQueries.readAll().executeAsList().map { it.toGame() }
 
     override fun get(id: GameId): Game? = lblcs.gamesQueries.readById(id.id).executeAsOneOrNull()?.toGame()
-    override fun get(shortcode: String): Game? = lblcs.gamesQueries.readByShortcode(shortcode).executeAsOneOrNull()?.toGame()
+    override fun get(shortcode: String): Game? =
+        lblcs.gamesQueries.readByShortcode(shortcode).executeAsOneOrNull()?.toGame()
 
     override fun get(
         team: TeamId,
         series: SeriesId
-    ): List<Game> = lblcs.gamesQueries.winsInSeriesByTeam(series_id = series.id, winner_id = team.id).executeAsList().map { it.toGame() }
+    ): List<Game> = lblcs.gamesQueries.winsInSeriesByTeam(series_id = series.id, winner_id = team.id).executeAsList()
+        .map { it.toGame() }
 
     override fun update(entity: Game): Game? = lblcs.gamesQueries.updateGame(
         winner_id = entity.winner?.id,

@@ -1,2 +1,0 @@
-apiKey: ${RIOT_API_TOKEN}
-useStub: false
