@@ -1,13 +1,12 @@
-FROM gradle:8.9-jdk17 AS build
-WORKDIR /app
+FROM eclipse-temurin:17-jdk AS build
 COPY build.gradle.kts settings.gradle.kts ./
-RUN gradle dependencies --no-daemon || true
-COPY src ./src
-RUN gradle shadowJar --no-daemon
+COPY gradlew ./
+RUN ./gradlew dependencies --no-daemon || true
+COPY . .
+RUN ./gradlew installDist --no-daemon
 
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/build/libs/*-all.jar app.jar
+COPY --from=build /build/install/dennys ./
 
-CMD ["java", "-jar", "app.jar"]
-
+CMD ["./bin/dennys"]
