@@ -6,7 +6,7 @@ import com.lowbudgetlcs.repositories.players.AllPlayersDatabase
 import com.lowbudgetlcs.repositories.riot.MatchRepositoryRiot
 import com.lowbudgetlcs.repositories.series.AllSeriesDatabase
 import com.lowbudgetlcs.repositories.teams.AllTeamsDatabase
-import com.lowbudgetlcs.util.RateLimiter
+import com.lowbudgetlcs.http.RateLimiter
 import com.lowbudgetlcs.workers.StatDaemon
 import com.lowbudgetlcs.workers.TournamentEngine
 import io.ktor.server.application.*

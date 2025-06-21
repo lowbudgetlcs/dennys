@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.models.match
 
-import com.lowbudgetlcs.util.InstantSerializer
+import com.lowbudgetlcs.models.InstantSerializer
 import kotlinx.serialization.Serializable
 import java.time.Instant
 
