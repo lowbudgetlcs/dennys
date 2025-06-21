@@ -1,4 +1,4 @@
-FROM gradle-8.9:17-jdk AS build
+FROM gradle:8.9-jdk17 AS build
 COPY build.gradle.kts settings.gradle.kts ./
 RUN gradle build --no-daemon
 COPY . .
