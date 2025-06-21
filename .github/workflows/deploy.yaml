@@ -2,6 +2,11 @@ name: Deploy to Prod
 
 on:
   push:
+    paths-ignore:
+      - 'logs/'
+      - '**/*.md'
+      - '**/*.txt'
+      - '**/*.nix'
     branches: [ "main" ]
 
 jobs:
@@ -71,7 +76,7 @@ jobs:
             echo LBLCS_JDBC_URL="${{ secrets.LBLCS_JDBC_URL }}" > .env
             echo LBLCS_JDBC_PW="${{ secrets.LBLCS_JDBC_PW }}" >> .env
             echo RIOT_API_TOKEN="${{ secrets.RIOT_API_TOKEN }}" >> .env
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker compose down
+            docker compose pull
+            docker compose up -d
             rm -f ./.env
