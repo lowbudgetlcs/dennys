@@ -5,7 +5,7 @@ RUN gradle dependencies --no-daemon || true
 COPY src ./src
 RUN gradle shadowJar --no-daemon
 
-FROM openjdk:17-jdk-alpine
+FROM amazoncorretto:17-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*-all.jar app.jar
 
