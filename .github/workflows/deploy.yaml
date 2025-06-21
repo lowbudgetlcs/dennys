@@ -10,12 +10,13 @@ on:
     branches: [ "main" ]
 
 jobs:
+  
   env:
     uses: ./.github/workflows/build-env.yaml
 
   build:
+    runs-on: samantha
     needs: env
-    runs-on: ubuntu-latest
     steps:
       - name: Download env artifact
         uses: actions/download-artifact@v4
@@ -37,22 +38,18 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: lblcs/${{ env.APP }}:latest
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: samantha
     steps:
       - name: Download env artifact
         uses: actions/download-artifact@v4
@@ -67,13 +64,7 @@ jobs:
           done <<< $( cat .env.art)
 
       - name: Execute docker compose on prod server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
+        run: |
             cd /lblcs/docker/${{ env.APP }}
             echo LBLCS_JDBC_URL="${{ secrets.LBLCS_JDBC_URL }}" > .env
             echo LBLCS_JDBC_PW="${{ secrets.LBLCS_JDBC_PW }}" >> .env
