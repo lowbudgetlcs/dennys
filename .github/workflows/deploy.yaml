@@ -2,15 +2,21 @@ name: Deploy to Prod
 
 on:
   push:
+    paths-ignore:
+      - 'logs/'
+      - '**/*.md'
+      - '**/*.txt'
+      - '**/*.nix'
     branches: [ "main" ]
 
 jobs:
+  
   env:
     uses: ./.github/workflows/build-env.yaml
 
   build:
-    needs: env
     runs-on: ubuntu-latest
+    needs: env
     steps:
       - name: Download env artifact
         uses: actions/download-artifact@v4
@@ -25,23 +31,25 @@ jobs:
           done <<< $(cat .env.art)
 
       - uses: actions/checkout@v4
+                
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
 
-      - name: Build configuration files
-        run: |
-          touch src/main/resources/database.yaml
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-      - name: Build the Docker image
-        run: |
-          docker build . --file Dockerfile --tag ${{ env.APP }}:latest
-          docker tag ${{ env.APP }}:latest lblcs/${{ env.APP }}:latest
-          docker tag ${{ env.APP }}:latest lblcs/${{ env.APP }}:${{ env.VERSION }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Push Docker Image
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PAT }}
-          docker push lblcs/${{ env.APP }}:${{ env.VERSION }}
-          docker push lblcs/${{ env.APP }}:latest
-          docker logout
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/arm64
+          push: true
+          tags: lblcs/${{ env.APP }}:latest
 
   deploy:
     needs: build
@@ -71,7 +79,7 @@ jobs:
             echo LBLCS_JDBC_URL="${{ secrets.LBLCS_JDBC_URL }}" > .env
             echo LBLCS_JDBC_PW="${{ secrets.LBLCS_JDBC_PW }}" >> .env
             echo RIOT_API_TOKEN="${{ secrets.RIOT_API_TOKEN }}" >> .env
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker compose down
+            docker compose pull
+            docker compose up -d
             rm -f ./.env
