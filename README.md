@@ -97,7 +97,6 @@ To get a local copy up and running follow these simple example steps.
 * docker 
 * gnumake
 * jdk17
-* yq
 
 If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there is a convenient [shell.nix](./shell.nix) file to install all prereqs.
 
@@ -116,21 +115,12 @@ If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there 
    ```sh
    RIOT_API_TOKEN = 'ENTER YOUR API TOKEN';
    ```
-5. Build a local application image
+5. Build a local image
    ```sh
    make build
    ```
-6. Generate the sql migrations for a local database
-    ```sh
-    make migrations
-    ```
-7. Change git remote url to avoid accidental pushes to base project
-   ```sh
-   git remote set-url origin github_username/repo_name
-   git remote -v # confirm the changes
-   ```
-You can now run the project with `make run`. This will create a local postgres database. As well as this, 
-`make dev` will run a [pgadmin](https://www.pgadmin.org/) instance to easily look at the local database.
+You can now run the project with `make run`. This will also create, instantiate,
+and run a a local postgres database. It also starts an instance of [pgadmin](https://www.pgadmin.org/).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -141,14 +131,12 @@ You can now run the project with `make run`. This will create a local postgres d
 
 The `Makefile` contains many useful commands to build/run this application locally- the following are short descriptions of each.
 
-* `make migrations` - Generates valid sql files in ./build/resources/migrations for initializing local postgres database. This command must be run each time a schema change occurs.
-* `make build` and `make rebuild` - Builds an application image from source. `rebuild` will delete old images.
-* `make run` - Runs docker-compose up on the application and its dependencies.
-* `make dev` - Same as `make run`, but with a pgadmin instance.
-* `make test` - Runs tests locally. Does not use Docker.
+* `make build` - Builds an application image from source.
 * `make debug-build` - Runs a build with plaintext output. This is useful to debug build-time failures.
+* `make run` - Runs docker-compose up on the application and its dependencies.
+* `make test` - Runs tests in docker container.
 * `make stop` - Stops all containers, and removes them. It is a good habit to run this after ctrl-C-ing `make run`.
-* `make drop` - Deletes the pgdata volume. Do this to re-run the initialization scripts, usually after a schema change.
+* `make drop` - Deletes the volumes used by pgAdmin and postgres.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

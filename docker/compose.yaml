@@ -25,12 +25,14 @@ services:
       - "127.0.0.1:5432:5432"
     user: postgres
     environment:
-      - POSTGRES_PASSWORD=dev
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
     volumes:
       # DB Data
       - pgdata:/var/lib/postgresql/data
       # DB Init Scripts
-      - ./build/resources/migrations:/docker-entrypoint-initdb.d
+      - ./docker/postgres:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
       interval: 5s 
@@ -38,17 +40,22 @@ services:
       retries: 3
 
   pgadmin:
-    image: dpage/pgadmin4:9.0
+    image: dpage/pgadmin4:9.4
     container_name: pgadmin-dennys
     ports: 
       - "127.0.0.1:8888:80"
     environment:
       - PGADMIN_DEFAULT_EMAIL=dev@dev.com
-      - PGADMIN_DEFAULT_PASSWORD=dev
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD=False
       - PGADMIN_DISABLE_POSTFIX=true
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
-      # Site Data
-      - pgadmin-data:/var/lib/pgadmin
+      # Configure DB
+      - ./docker/pgAdmin/servers.json:/pgadmin4/servers.json
 
 volumes:
   pgdata:

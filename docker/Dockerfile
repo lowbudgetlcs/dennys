@@ -12,7 +12,8 @@ RUN gradle --no-daemon installDist
 
 FROM gradle:8.9-jdk17 AS test
 WORKDIR /test
-COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY --from=dependencies /cache /home/gradle/.gradle
+COPY . .
 RUN gradle test
 
 FROM amazoncorretto:17-alpine AS app
