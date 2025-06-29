@@ -19,11 +19,11 @@ stop:
 
 # Build the application
 build:
-	docker build -t $(APP_NAME):$(TAG) --target app .
+	docker build -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile .
 
 # Build without caching and readable output
 debug-build:
-	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) .
+	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) -f ./docker/Dockerfile . 
 
 # Run all containers
 run: migrations
@@ -43,4 +43,4 @@ drop:
 
 # Run tests
 test:
-	docker build -t dennys:test --progress=plain --no-cache --target test .
+	docker build -t dennys:test --progress=plain --no-cache --target test -f ./docker/Dockerfile .
