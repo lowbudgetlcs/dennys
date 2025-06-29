@@ -1,54 +1,44 @@
 # Config
 APP_NAME = dennys
-TAG = dev
+TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
 .PHONY: all erase clean stop build debug-build run dev migrations rebuild refresh drop test
 
 # Refresh containers and app image
-all: erase build run
-
-# Stop and Clean docker files
-erase: stop clean
+all: clean build run
 
 # Clean up the Docker image
-clean:
+clean: stop
 	docker rmi $(APP_NAME):$(TAG) || true
 
 # Stop the Docker container
 stop:
-	docker stop $(CONTAINER_NAME) postgres-dennys pgadmin-dennys || true
-	docker rm $(CONTAINER_NAME) postgres-dennys pgadmin-dennys || true
+	docker compose down
 
-# Build the Docker image
+# Build the application
 build:
-	docker build -t $(APP_NAME):$(TAG) -f Dockerfile .
+	docker build -t $(APP_NAME):$(TAG) --target app .
 
-# Build without cacheing and readable output
+# Build without caching and readable output
 debug-build:
-	docker build --progress=plain -t $(APP_NAME):$(TAG) -f Dockerfile .
+	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) .
 
-# Run the Docker container
+# Run all containers
 run:
-	docker compose up dennys postgres
-
-# Run all dev containers
-dev: migrations
-	docker compose up
+	docker compose up --attach dennys
 
 migrations:
-	./gradlew generateMainDatabaseMigrations generateMainDatabaseInterface 
-
-# Rebuild the Docker image
-rebuild: erase build
+	./gradlew generateMainDatabaseMigrations 
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
-refresh: erase drop build run
+refresh: clean drop build run
 
 # Cleans local database
 drop:
 	docker volume rm $(APP_NAME)_pgdata
+	docker volume rm $(APP_NAME)_pgadmin-dat
 
-# Run tests (not containerized)
+# Run tests
 test:
-	./gradlew test
+	docker build -t dennys:test --progress=plain --no-cache --target test .

@@ -1,7 +1,10 @@
 services:
   dennys:
-    build: .
-    image: dennys:dev
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    image: dennys:local
     container_name: dennys-container
     ports:
       - "127.0.0.1:9292:9292"
@@ -11,14 +14,6 @@ services:
       - LBLCS_JDBC_PW=${LBLCS_JDBC_PW}
       - RIOT_API_TOKEN=${RIOT_API_TOKEN}
       - RIOT_USE_STUBS=${RIOT_USE_STUBS}
-      - LOG_PATH=/app/logs
-    volumes:
-      - ./logs:/app/logs  # Bind mount for logs
-    logging:
-        driver: json-file
-        options:
-          max-size: "10m"
-          max-file: "5"
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,7 +27,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=dev
     volumes:
+      # DB Data
       - pgdata:/var/lib/postgresql/data
+      # DB Init Scripts
       - ./build/resources/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
@@ -50,6 +47,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=dev
       - PGADMIN_DISABLE_POSTFIX=true
     volumes:
+      # Site Data
       - pgadmin-data:/var/lib/pgadmin
 
 volumes:
