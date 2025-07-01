@@ -9,18 +9,15 @@ import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-class RiotApiClient(
-    private val client: HttpClient = defaultClient(),
-    private val rateLimiter: RateLimiter = RateLimiter(),
-    private val apiKey: String = RiotConfigLoader.config.apiKey
-) {
-    companion object {
-        fun defaultClient(): HttpClient = HttpClient(CIO) {
-            install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true })
-            }
+object RiotApiClient {
+
+    val riotHttpClient: HttpClient = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json { ignoreUnknownKeys = true })
         }
     }
+    val rateLimiter: RateLimiter = RateLimiter()
+    val apiKey: String = RiotConfigLoader.config.apiKey
 
     /*
     The RateLimiting functionality is baked into the HttpClient, so
@@ -28,7 +25,7 @@ class RiotApiClient(
      */
     suspend fun get(url: String): HttpResponse {
         rateLimiter.acquire(url)
-        val response = client.get(url) {
+        val response = riotHttpClient.get(url) {
             headers {
                 append("X-Riot-Token", apiKey)
             }
