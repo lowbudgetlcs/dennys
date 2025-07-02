@@ -2,9 +2,11 @@ name: Run tests on PRs
 
 on:
   pull_request:
-    - 'main'
+    branches: 
+      - 'main'
   push:
-    - 'dev/**'
+    branches:
+      - 'dev/**'
 
 jobs:
   test:
