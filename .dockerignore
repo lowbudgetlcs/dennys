@@ -5,11 +5,15 @@ build/
 .idea/
 .kotlin
 .env*
-gradlew
 gradlew.bat
+gradlew
+logs/
+gradle/
 
 *.iml
 Makefile
 README.md
+LICENSE.txt
 compose.yaml
 shell.nix
+VERSION

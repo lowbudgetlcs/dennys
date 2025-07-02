@@ -1,0 +1,62 @@
+services:
+  dennys:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    image: dennys:local
+    container_name: dennys-container
+    ports:
+      - "127.0.0.1:9292:9292"
+    env_file: .env
+    environment:
+      - LBLCS_JDBC_URL=${LBLCS_JDBC_URL}
+      - LBLCS_JDBC_PW=${LBLCS_JDBC_PW}
+      - RIOT_API_TOKEN=${RIOT_API_TOKEN}
+      - RIOT_USE_STUBS=${RIOT_USE_STUBS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-dennys
+    ports:
+      - "127.0.0.1:5432:5432"
+    user: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      # DB Data
+      - pgdata:/var/lib/postgresql/data
+      # DB Init Scripts
+      - ./docker/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
+      interval: 5s 
+      timeout: 10s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4:9.4
+    container_name: pgadmin-dennys
+    ports: 
+      - "127.0.0.1:8888:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=dev@dev.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD=False
+      - PGADMIN_DISABLE_POSTFIX=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Configure DB
+      - ./docker/pgAdmin/servers.json:/pgadmin4/servers.json
+
+volumes:
+  pgdata:
+  pgadmin-data:

@@ -95,7 +95,7 @@ data class MatchParticipant(
 
     // **Vision Stats**
     @SerialName("visionScore") val visionScore: Long,
-    @SerialName("pinkWardsPlaced") val pinkWardsPlaced: Short,
+    @SerialName("detectorWardsPlaced") val detectorWardsPlaced: Short,
     @SerialName("wardsKilled") val wardsKilled: Short,
     @SerialName("wardsPlaced") val wardsPlaced: Short
 )
