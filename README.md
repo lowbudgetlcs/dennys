@@ -138,6 +138,44 @@ The `Makefile` contains many useful commands to build/run this application local
 * `make stop` - Stops all containers, and removes them. It is a good habit to run this after ctrl-C-ing `make run`.
 * `make drop` - Deletes the volumes used by pgAdmin and postgres.
 
+
+Below are example post-match callbacks Riot will send- these are compatible with
+the dev database provided:
+
+Game 1:
+
+```
+{
+  "startTime": 1725325774610,
+  "shortCode": "NA04e01-e599e041-7e3e-48fc-bb53-9e3ebb127555",
+  "metaData": "{\"gameNum\":1,\"seriesId\":11}",
+  "gameId": 5102531894,
+  "gameName": "12998ced-fecc-463b-8c29-73b760109bc4",
+  "gameType": "CUSTOM",
+  "gameMap": 11,
+  "gameMode": "CLASSIC",
+  "region": "NA1"
+}
+```
+
+Game 2:
+
+```
+{
+  "startTime": 1725328855381,
+  "shortCode": "NA04e01-7704f893-f01f-4f1d-be97-cb4468e91a4d",
+  "metaData": "{\"gameNum\":2,\"seriesId\":11}",
+  "gameId": 5102573449,
+  "gameName": "bd35f7a4-7daf-40bb-b9c2-b53e691a368a",
+  "gameType": "CUSTOM",
+  "gameMap": 11,
+  "gameMode": "CLASSIC",
+  "region": "NA1"
+}
+```
+
+Test with your favourite http client (curl, Postman, ...)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 

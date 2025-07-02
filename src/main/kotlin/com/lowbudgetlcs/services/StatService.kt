@@ -12,8 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * This service worker consumes [PostMatchCallback]s off of [queue] and saves player
- * and team data into storage.
+ * The StatService saves game-data (such as KDA) for LeagueOfLegendsMatch-es
  */
 class StatService(
     private val gamesRepository: IGameRepository,
@@ -25,9 +24,7 @@ class StatService(
     private val logger: Logger = LoggerFactory.getLogger(StatService::class.java)
 
     /**
-     * Fetches a match from the RiotAPI derived from [callback]. Then, iterates over
-     * each team and saves its game data. Then, iterates over each participant and saves its
-     * game data.
+     * Entrypoint for callback stat-processing.
      */
     suspend fun process(callback: PostMatchCallback) {
         logger.info("🔍 Fetching match details for game ID: ${callback.gameId}")
