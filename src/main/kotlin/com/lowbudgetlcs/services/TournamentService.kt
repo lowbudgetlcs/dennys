@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.routes.riot
+package com.lowbudgetlcs.services
 
 import com.lowbudgetlcs.Dennys
 import com.lowbudgetlcs.models.Game
@@ -12,7 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * This service worker consumes [com.lowbudgetlcs.models.PostMatchCallback]s off of [queue] and saves
+ * This service worker consumes [PostMatchCallback]s off of [queue] and saves
  * the result of the finished [Game]. It also checks if the [Series] owning
  * [Game] is complete. If it is, it saves the result.
  */

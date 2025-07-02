@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.routes.riot
+package com.lowbudgetlcs.services
 
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant

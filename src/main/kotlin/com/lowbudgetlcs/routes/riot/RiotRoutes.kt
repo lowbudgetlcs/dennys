@@ -5,6 +5,8 @@ import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.http.RateLimiter
+import com.lowbudgetlcs.services.StatService
+import com.lowbudgetlcs.services.TournamentService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
