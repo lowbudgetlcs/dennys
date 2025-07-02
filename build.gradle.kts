@@ -23,7 +23,7 @@ repositories {
 
 sqldelight {
     databases {
-        create("Database") {
+        create("Dennys") {
             packageName.set("$group")
             dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
             srcDirs.setFrom("src/main/sqldelight")

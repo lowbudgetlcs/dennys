@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.Dennys
 import com.lowbudgetlcs.models.DivisionId
 import com.lowbudgetlcs.models.Series
 import com.lowbudgetlcs.models.SeriesId
 import com.lowbudgetlcs.models.TeamId
 
-class DatabaseSeriesRepository(private val lblcs: Database) : ISeriesRepository {
+class DatabaseSeriesRepository(private val lblcs: Dennys) : ISeriesRepository {
 
     /**
      * Returns a [Series] derived from [migrations.Series].

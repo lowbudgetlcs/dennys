@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.routes.riot
 
-import com.lowbudgetlcs.LblcsDatabase
-import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.RiotApiClient
 import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.util.RateLimiter
@@ -12,7 +12,6 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,7 +36,7 @@ fun Application.riotRoutes() {
                 val callback = call.receive<PostMatchCallback>()
                 logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
                 // Emit callback onto all registered queues.
-                val database = LblcsDatabase().db
+                val database = Database().db
                 TournamentService(
                     gamesRepository = DatabaseGameRepository(database),
                     seriesRepository = DatabaseSeriesRepository(database),

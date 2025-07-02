@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.repositories.riot
 
-import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.RiotApiClient
 import com.lowbudgetlcs.models.match.LeagueOfLegendsMatch
 import com.lowbudgetlcs.repositories.RiotMatchRepository
 import com.lowbudgetlcs.util.RateLimiter

@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.routes.riot
 
-import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.Dennys
 import com.lowbudgetlcs.models.Game
 import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.models.TeamId
@@ -21,7 +21,7 @@ class TournamentService(
     private val seriesRepository: ISeriesRepository,
     private val playersRepository: IPlayerRepository,
     private val matchRepository: IMatchRepository,
-    private val db: Database
+    private val db: Dennys
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(TournamentService::class.java)

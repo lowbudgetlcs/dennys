@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.Dennys
 import com.lowbudgetlcs.models.*
 import migrations.Team_game_data
 import migrations.Teams
 
-class DatabaseTeamRepository(private val lblcs: Database) : ITeamRepository {
+class DatabaseTeamRepository(private val lblcs: Dennys) : ITeamRepository {
 
     /**
      * Returns a [Team] derived from [Teams]. [Team.teamData] is lazy-loaded.

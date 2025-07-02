@@ -1,13 +1,13 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.Dennys
 import com.lowbudgetlcs.models.*
 import com.lowbudgetlcs.models.match.MatchParticipant
 import migrations.Player_game_data
 import migrations.Players
 
 
-class DatabasePlayerRepository(private val lblcs: Database) : IPlayerRepository {
+class DatabasePlayerRepository(private val lblcs: Dennys) : IPlayerRepository {
 
     /**
      * Returns a [Player] derived from [Players]. [Player.gameData] is lazy-loaded.

@@ -1,16 +1,11 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.models.Game
-import com.lowbudgetlcs.models.GameId
-import com.lowbudgetlcs.models.SeriesId
-import com.lowbudgetlcs.models.TeamId
-import com.lowbudgetlcs.models.PostMatchCallback
-import kotlinx.serialization.encodeToString
+import com.lowbudgetlcs.Dennys
+import com.lowbudgetlcs.models.*
 import kotlinx.serialization.json.Json
 import migrations.Games
 
-class DatabaseGameRepository(private val lblcs: Database) : IGameRepository {
+class DatabaseGameRepository(private val lblcs: Dennys) : IGameRepository {
 
     /**
      * Returns a [Game] derived from [Games].
