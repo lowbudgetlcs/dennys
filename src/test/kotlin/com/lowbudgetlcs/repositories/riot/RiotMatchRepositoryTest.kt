@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.riot
 
-import com.lowbudgetlcs.RiotApiClient
+import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.match.LeagueOfLegendsMatch
 import com.lowbudgetlcs.repositories.RiotMatchRepository
-import com.lowbudgetlcs.util.RateLimiter
+import com.lowbudgetlcs.http.RateLimiter
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.RiotApiClient
+import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.match.LeagueOfLegendsMatch
-import com.lowbudgetlcs.util.RateLimiter
+import com.lowbudgetlcs.http.RateLimiter
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import org.slf4j.Logger

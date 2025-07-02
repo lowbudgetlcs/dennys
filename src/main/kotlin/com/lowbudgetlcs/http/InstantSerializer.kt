@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.util
+package com.lowbudgetlcs.http
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

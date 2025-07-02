@@ -1,5 +1,6 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.http
 
+import com.lowbudgetlcs.Config
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*

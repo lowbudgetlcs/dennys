@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.routes.riot
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.RiotApiClient
+import com.lowbudgetlcs.http.RiotApiClient
 import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.repositories.*
-import com.lowbudgetlcs.util.RateLimiter
+import com.lowbudgetlcs.http.RateLimiter
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
