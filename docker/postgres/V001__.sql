@@ -18,7 +18,7 @@ CREATE TABLE events (
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
   start_date TIMESTAMPTZ NOT NULL,
   end_date TIMESTAMPTZ NOT NULL,
-  status INTEGER NOT NULL
+  status TEXT NOT NULL
 );
 
 CREATE TABLE teams (
