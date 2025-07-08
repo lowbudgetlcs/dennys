@@ -1,11 +1,11 @@
-package com.lowbudgetlcs.models.match
+package com.lowbudgetlcs.dto.lol.match
 
-import com.lowbudgetlcs.http.InstantSerializer
+import com.lowbudgetlcs.InstantSerializer
 import kotlinx.serialization.Serializable
 import java.time.Instant
 
 @Serializable
-data class LeagueOfLegendsMatchInfo(
+data class MatchInfoDto(
     val endOfGameResult: String, // TODO: Make an Enum
     @Serializable(with = InstantSerializer::class) val gameCreation: Instant,
     val gameDuration: Int,
@@ -17,9 +17,9 @@ data class LeagueOfLegendsMatchInfo(
     val gameType: String, // TODO: Make an Enum
     val gameVersion: String,
     val mapId: Int, // TODO: Make an Enum
-    val participants: List<MatchParticipant>,
+    val participants: List<MatchParticipantDto>,
     val platformId: String, // TODO: Make an Enum
     val queueId: Int, // TODO: Make an Enum
-    val teams: List<MatchTeam>,
+    val teams: List<MatchTeamDto>,
     val tournamentCode: String
 )

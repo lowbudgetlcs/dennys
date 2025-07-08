@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models.match.runes
+package com.lowbudgetlcs.dto.lol.match.perks
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

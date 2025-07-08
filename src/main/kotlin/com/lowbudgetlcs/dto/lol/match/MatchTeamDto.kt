@@ -1,13 +1,13 @@
-package com.lowbudgetlcs.models.match
+package com.lowbudgetlcs.dto.lol.match
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MatchTeam(
+data class MatchTeamDto(
     @SerialName("teamId") val teamId: Int,
     @SerialName("win") val win: Boolean,
     @SerialName("bans") val bans: List<MatchTeamBan>,
-    @SerialName("objectives") val objectives: MatchTeamObjectives
+    @SerialName("objectives") val objectives: MatchTeamObjectivesDto
 )
 

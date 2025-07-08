@@ -1,11 +1,11 @@
-package com.lowbudgetlcs.models.match
+package com.lowbudgetlcs.dto.lol.match
 
-import com.lowbudgetlcs.models.match.runes.MatchParticipantPerks
+import com.lowbudgetlcs.dto.lol.match.perks.MatchParticipantPerks
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MatchParticipant(
+data class MatchParticipantDto(
     @SerialName("participantId") val id: Int,
     @SerialName("puuid") val playerUniqueUserId: String,
     @SerialName("profileIcon") val profileIcon: Long,

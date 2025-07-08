@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models.match
+package com.lowbudgetlcs.dto.lol.match
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

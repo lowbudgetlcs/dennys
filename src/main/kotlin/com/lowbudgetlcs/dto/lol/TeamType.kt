@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.models.match
+package com.lowbudgetlcs.dto.lol
 
 enum class TeamType(val code: Int) {
     SUBTEAM(0),

@@ -1,9 +1,9 @@
-package com.lowbudgetlcs.models.match
+package com.lowbudgetlcs.dto.lol.match
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LeagueOfLegendsMatchMetaData(
+data class MatchMetadataDto(
     val dataVersion: Int,
     val matchId: String,
     val participants: List<String>
