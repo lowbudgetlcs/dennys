@@ -1,19 +1,9 @@
 package com.lowbudgetlcs.domain.models
 
-import java.time.OffsetDateTime
-
 data class Player(
-    val id: Int, val name: String, val accounts: List<RiotAccount>, val teamId: Int?, val eventId: Int?
+    val id: Int, val name: String, val accountIds: List<Int>, val teamId: Int?, val eventId: Int?
 )
 
-data class PlayerAuditLog(
-    val id: Int,
-    val playerId: Int,
-    val createdAt: OffsetDateTime,
-    val action: String,
-    val message: String,
-    val origin: String
-)
 
 data class PlayerGameData(
     val kills: Int,

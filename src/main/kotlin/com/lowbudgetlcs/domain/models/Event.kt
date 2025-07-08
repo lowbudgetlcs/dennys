@@ -15,6 +15,4 @@ data class Event(
     val startDate: OffsetDateTime,
     val endDate: OffsetDateTime,
     val status: EventStatus
-) {
-    fun isActive(): Boolean = status == EventStatus.ACTIVE
-}
+)
