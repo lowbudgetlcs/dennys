@@ -1,17 +1,15 @@
-import org.gradle.kotlin.dsl.provideDelegate
-
 val kotlinVersion = "2.2.0"
 val ktorVersion = "3.1.3"
 val logbackVersion = "1.5.18"
-val dbUser: String by project
-val dbPassword: String by project
+val jooqVersion = "3.19.8"
+val junitVersion = ""
+val testcontainerVerison = ""
 
 
 plugins {
     kotlin("jvm") version ("2.2.0")
     id("application")
     id("org.jetbrains.kotlin.plugin.serialization") version ("2.2.0")
-    id("org.jooq.jooq-codegen-gradle") version ("3.19.8")
 }
 
 group = "com.lowbudgetlcs"
@@ -26,29 +24,46 @@ repositories {
     google()
 }
 
-dependencies {
-    // Configuration
-    implementation("com.sksamuel.hoplite:hoplite-core:2.9.0")
+val jooqImplementation by configurations.creating {
+    extendsFrom(configurations.implementation.get())
+}
 
-    // Ktor
-    implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
-    implementation("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
+val itestImplementation by configurations.creating {
+    extendsFrom(configurations.implementation.get())
+}
+
+dependencies {
+    implementation("com.sksamuel.hoplite:hoplite-core:2.9.0")
+    implementation("io.ktor:ktor-server-core-jvm:${ktorVersion}")
+    implementation("io.ktor:ktor-server-netty-jvm:${ktorVersion}")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:${ktorVersion}")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:${ktorVersion}")
+    implementation("io.ktor:ktor-server-request-validation:${ktorVersion}")
+    implementation("io.ktor:ktor-server-config-yaml-jvm:${ktorVersion}")
     implementation("io.ktor:ktor-server-status-pages:${ktorVersion}")
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.ktor:ktor-client-core:${ktorVersion}")
+    implementation("io.ktor:ktor-client-cio:${ktorVersion}")
+    implementation("io.ktor:ktor-client-content-negotiation:${ktorVersion}")
+    implementation("ch.qos.logback:logback-classic:${logbackVersion}")
+    implementation("com.zaxxer:HikariCP:5.1.0")
 
     // Database
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    jooqCodegen("org.postgresql:postgresql:42.7.2")
-    implementation("org.jooq:jooq:3.19.8")
+    implementation("org.postgresql:postgresql:42.7.2")
+    implementation("org.jooq:jooq:$jooqVersion")
 
-    // Testing
+    // Jooq Code Generation
+    jooqImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    jooqImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    jooqImplementation("org.testcontainers:postgresql:1.21.3")
+    jooqImplementation("org.jooq:jooq-meta:${jooqVersion}")
+    jooqImplementation("org.jooq:jooq-codegen:${jooqVersion}")
+
+    // Integration Testing
+    itestImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    itestImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    itestImplementation("org.testcontainers:postgresql:1.21.3")
+
+    // Unit Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
     testImplementation("io.kotest:kotest-assertions-core:5.5.5")
@@ -58,65 +73,19 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.5")
 }
 
-val jooqOutputDir = "build/generated-src/jooq/main"
-jooq {
-    version = "3.19.8"
-   configuration {
-       jdbc {
-           driver = "org.postgresql.Driver"
-           url = "jdbc:postgresql://127.0.0.1:5432/postgres"
-           user = dbUser
-           password = dbPassword
-       }
-       generator {
-           name = "org.jooq.codegen.KotlinGenerator"
-           database {
-               name = "org.jooq.meta.postgres.PostgresDatabase"
-               includes = ".*"
-               inputSchema = "dennys"
-           }
-           generate {}
-           target {
-               packageName = "lblcs"
-               directory = jooqOutputDir
-           }
-       }
-   }
-}
-
-tasks.register<Exec>("dbStart") {
-    workingDir = projectDir
-    commandLine = listOf("docker", "compose", "up", "-d", "postgres")
-    standardOutput = System.out
-    errorOutput = System.err
-}
-
-tasks.register<Exec>("dbStop") {
-    workingDir = projectDir
-    commandLine = listOf("docker", "compose", "down", "postgres")
-    standardOutput = System.out
-    errorOutput = System.err
-}
-
-tasks.register<Copy>("copyJooqCode") {
-    dependsOn("jooqCodegen")
-    from("build/generated-src/jooq/main")
-    into("src/main/jooq")
-}
-
-tasks.named("copyJooqCode") {
-    mustRunAfter("dbStart")
-}
-
-tasks.register("generateJooqFromContainerDb") {
-    dependsOn("dbStart", "copyJooqCode")
-    finalizedBy("dbStop")
+tasks.register<Test>("generateJooq") {
+    group = "jooq"
+    description = "Generates Jooq data classes from Dennys database schema"
+    testClassesDirs = sourceSets["jooq"].output.classesDirs
+    classpath = sourceSets["jooq"].runtimeClasspath
+    useJUnitPlatform()
 }
 
 sourceSets {
-    main {
-        kotlin {
-            srcDir("src/main/jooq")
-        }
-    }
+    main {}
+    test {}
+    create("itest") {
+        compileClasspath += sourceSets["main"].output
+        runtimeClasspath += sourceSets["main"].output    }
+    create("jooq") {}
 }

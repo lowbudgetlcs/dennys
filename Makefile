@@ -3,7 +3,7 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run migrations refresh drop test
+.PHONY: all clean stop build debug-build run refresh jooq test
 
 # Build and run by default
 all: build run
@@ -31,19 +31,14 @@ run:
 
 # Start database container only
 db:
-	docker compose up postgres
+	docker compose up db
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run
 
 # Generate new JOOQ data classes from sql migrations
 jooq:
-	./gradlew generateJooqFromContainerDb 
-
-# Cleans local database
-drop:
-	docker volume rm $(APP_NAME)_pgdata
-	docker volume rm $(APP_NAME)_pgadmin-data
+	./gradlew generateJooq 
 
 # Run tests
 test:
