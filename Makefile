@@ -38,7 +38,7 @@ refresh: clean drop build run
 
 # Generate new JOOQ data classes from sql migrations
 jooq:
-	./gradlew copyJooqCode
+	./gradlew generateJooqFromContainerDb 
 
 # Cleans local database
 drop:

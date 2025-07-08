@@ -46,9 +46,9 @@ open class EventsRecord() : UpdatableRecordImpl<EventsRecord>(Events.EVENTS) {
         set(value): Unit = set(6, value)
         get(): OffsetDateTime? = get(6) as OffsetDateTime?
 
-    open var status: String?
+    open var status: Int?
         set(value): Unit = set(7, value)
-        get(): String? = get(7) as String?
+        get(): Int? = get(7) as Int?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -59,7 +59,7 @@ open class EventsRecord() : UpdatableRecordImpl<EventsRecord>(Events.EVENTS) {
     /**
      * Create a detached, initialised EventsRecord
      */
-    constructor(id: Int? = null, name: String? = null, description: String? = null, riotTournamentId: Int? = null, createdAt: OffsetDateTime? = null, startDate: OffsetDateTime? = null, endDate: OffsetDateTime? = null, status: String? = null): this() {
+    constructor(id: Int? = null, name: String? = null, description: String? = null, riotTournamentId: Int? = null, createdAt: OffsetDateTime? = null, startDate: OffsetDateTime? = null, endDate: OffsetDateTime? = null, status: Int? = null): this() {
         this.id = id
         this.name = name
         this.description = description

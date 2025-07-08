@@ -4,7 +4,6 @@
 package lblcs.tables.records
 
 
-import lblcs.enums.LolSide
 import lblcs.tables.PlayerGameFacts
 
 import org.jooq.Record1
@@ -25,9 +24,9 @@ open class PlayerGameFactsRecord() : UpdatableRecordImpl<PlayerGameFactsRecord>(
         set(value): Unit = set(1, value)
         get(): Int? = get(1) as Int?
 
-    open var side: LolSide?
+    open var side: Int?
         set(value): Unit = set(2, value)
-        get(): LolSide? = get(2) as LolSide?
+        get(): Int? = get(2) as Int?
 
     open var shortcode: String?
         set(value): Unit = set(3, value)
@@ -66,7 +65,7 @@ open class PlayerGameFactsRecord() : UpdatableRecordImpl<PlayerGameFactsRecord>(
     /**
      * Create a detached, initialised PlayerGameFactsRecord
      */
-    constructor(id: Int? = null, riotAccountId: Int? = null, side: LolSide? = null, shortcode: String? = null, playerChampSelectId: Int? = null, playerInventoriesId: Int? = null, playerCombatsId: Int? = null, playerVisionId: Int? = null, playerPingsId: Int? = null, playerFarmingId: Int? = null): this() {
+    constructor(id: Int? = null, riotAccountId: Int? = null, side: Int? = null, shortcode: String? = null, playerChampSelectId: Int? = null, playerInventoriesId: Int? = null, playerCombatsId: Int? = null, playerVisionId: Int? = null, playerPingsId: Int? = null, playerFarmingId: Int? = null): this() {
         this.id = id
         this.riotAccountId = riotAccountId
         this.side = side

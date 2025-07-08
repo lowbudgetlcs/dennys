@@ -8,7 +8,6 @@ import kotlin.collections.Collection
 import kotlin.collections.List
 
 import lblcs.Dennys
-import lblcs.enums.LolSide
 import lblcs.keys.PLAYER_GAME_FACTS_PKEY
 import lblcs.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_CHAMP_SELECT_ID_FKEY
 import lblcs.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_COMBATS_ID_FKEY
@@ -100,7 +99,7 @@ open class PlayerGameFacts(
     /**
      * The column <code>dennys.player_game_facts.side</code>.
      */
-    val SIDE: TableField<PlayerGameFactsRecord, LolSide?> = createField(DSL.name("side"), SQLDataType.VARCHAR.nullable(false).asEnumDataType(LolSide::class.java), this, "")
+    val SIDE: TableField<PlayerGameFactsRecord, Int?> = createField(DSL.name("side"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>dennys.player_game_facts.shortcode</code>.

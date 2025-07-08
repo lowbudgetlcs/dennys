@@ -121,7 +121,7 @@ open class Events(
     /**
      * The column <code>dennys.events.status</code>.
      */
-    val STATUS: TableField<EventsRecord, String?> = createField(DSL.name("status"), SQLDataType.CLOB.nullable(false), this, "")
+    val STATUS: TableField<EventsRecord, Int?> = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false), this, "")
 
     private constructor(alias: Name, aliased: Table<EventsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<EventsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
