@@ -26,15 +26,19 @@ debug-build:
 	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) -f ./docker/Dockerfile . 
 
 # Run all containers
-run: migrations
+run: 
 	docker compose up --attach dennys
 
-migrations:
-	./gradlew generateMainDatabaseMigrations 
-	cp ./build/resources/migrations/* ./docker/postgres
+# Start database container only
+db:
+	docker compose up postgres
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run
+
+# Generate new JOOQ data classes from sql migrations
+jooq:
+	./gradlew copyJooqCode
 
 # Cleans local database
 drop:

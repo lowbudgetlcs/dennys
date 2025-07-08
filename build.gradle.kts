@@ -1,12 +1,17 @@
-val kotlinVersion = "2.1.21"
+import org.gradle.kotlin.dsl.provideDelegate
+
+val kotlinVersion = "2.2.0"
 val ktorVersion = "3.1.3"
 val logbackVersion = "1.5.18"
+val dbUser: String by project
+val dbPassword: String by project
+
 
 plugins {
-    kotlin("jvm") version ("2.1.0")
+    kotlin("jvm") version ("2.2.0")
     id("application")
-    id("org.jetbrains.kotlin.plugin.serialization") version ("2.1.0")
-    id("app.cash.sqldelight") version "2.0.2"
+    id("org.jetbrains.kotlin.plugin.serialization") version ("2.2.0")
+    id("org.jooq.jooq-codegen-gradle") version ("3.19.8")
 }
 
 group = "com.lowbudgetlcs"
@@ -19,18 +24,6 @@ application {
 repositories {
     mavenCentral()
     google()
-}
-
-sqldelight {
-    databases {
-        create("Dennys") {
-            packageName.set("$group")
-            dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
-            srcDirs.setFrom("src/main/sqldelight")
-            deriveSchemaFromMigrations.set(true)
-            migrationOutputDirectory = layout.buildDirectory.dir("resources/migrations")
-        }
-    }
 }
 
 dependencies {
@@ -51,9 +44,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     // Database
-    implementation("app.cash.sqldelight:jdbc-driver:2.0.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("org.postgresql:postgresql:42.7.2")
+    jooqCodegen("org.postgresql:postgresql:42.7.2")
+    implementation("org.jooq:jooq:3.19.8")
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
@@ -63,4 +56,67 @@ dependencies {
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.mockk:mockk:1.13.5")
+}
+
+val jooqOutputDir = "build/generated-src/jooq/main"
+jooq {
+    version = "3.19.8"
+   configuration {
+       jdbc {
+           driver = "org.postgresql.Driver"
+           url = "jdbc:postgresql://127.0.0.1:5432/postgres"
+           user = dbUser
+           password = dbPassword
+       }
+       generator {
+           name = "org.jooq.codegen.KotlinGenerator"
+           database {
+               name = "org.jooq.meta.postgres.PostgresDatabase"
+               includes = ".*"
+               inputSchema = "dennys"
+           }
+           generate {}
+           target {
+               packageName = "lblcs"
+               directory = jooqOutputDir
+           }
+       }
+   }
+}
+
+tasks.register<Exec>("dbStart") {
+    workingDir = projectDir
+    commandLine = listOf("docker", "compose", "up", "-d", "postgres")
+    standardOutput = System.out
+    errorOutput = System.err
+}
+
+tasks.register<Exec>("dbStop") {
+    workingDir = projectDir
+    commandLine = listOf("docker", "compose", "down", "postgres")
+    standardOutput = System.out
+    errorOutput = System.err
+}
+
+tasks.register<Copy>("copyJooqCode") {
+    dependsOn("jooqCodegen")
+    from("build/generated-src/jooq/main")
+    into("src/main/jooq")
+}
+
+tasks.named("copyJooqCode") {
+    mustRunAfter("dbStart")
+}
+
+tasks.register("generateJooqFromContainerDb") {
+    dependsOn("dbStart", "copyJooqCode")
+    finalizedBy("dbStop")
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir("src/main/jooq")
+        }
+    }
 }
