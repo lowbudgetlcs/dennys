@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models
+package com.lowbudgetlcs.domain.models.series
 
 data class Series(
     val id: Int,

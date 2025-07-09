@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models
+package com.lowbudgetlcs.domain.models.game
 
 data class Game(
     val id: Int,

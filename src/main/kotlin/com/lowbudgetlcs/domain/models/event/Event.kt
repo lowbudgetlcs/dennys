@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models
+package com.lowbudgetlcs.domain.models.event
 
 import java.time.OffsetDateTime
 
