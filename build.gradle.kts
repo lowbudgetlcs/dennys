@@ -2,6 +2,7 @@ val kotlinVersion = "2.2.0"
 val ktorVersion = "3.1.3"
 val logbackVersion = "1.5.18"
 val jooqVersion = "3.19.8"
+val kotestVersion = "5.9.0"
 val junitVersion = ""
 val testcontainerVerison = ""
 
@@ -59,8 +60,9 @@ dependencies {
     jooqImplementation("org.jooq:jooq-codegen:${jooqVersion}")
 
     // Integration Testing
-    itestImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    itestImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    itestImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    itestImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
+    itestImplementation("org.testcontainers:testcontainers:1.21.3")
     itestImplementation("org.testcontainers:postgresql:1.21.3")
 
     // Unit Testing
@@ -78,6 +80,16 @@ tasks.register<Test>("generateJooq") {
     description = "Generates Jooq data classes from Dennys database schema"
     testClassesDirs = sourceSets["jooq"].output.classesDirs
     classpath = sourceSets["jooq"].runtimeClasspath
+}
+
+tasks.register<Test>("itests") {
+    group = "test"
+    description = "Run integration source set"
+    testClassesDirs = sourceSets["itest"].output.classesDirs
+    classpath = sourceSets["itest"].runtimeClasspath
+}
+
+tasks.withType<Test>().configureEach(){
     useJUnitPlatform()
 }
 
@@ -86,6 +98,7 @@ sourceSets {
     test {}
     create("itest") {
         compileClasspath += sourceSets["main"].output
-        runtimeClasspath += sourceSets["main"].output    }
+        runtimeClasspath += sourceSets["main"].output
+    }
     create("jooq") {}
 }

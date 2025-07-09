@@ -29,9 +29,9 @@ debug-build:
 run: 
 	docker compose up --attach dennys
 
-# Start database container only
+# Start database tools
 db:
-	docker compose up db
+	docker compose up db pgadmin
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run
