@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.dto.lol.match
+package com.lowbudgetlcs.dto.riot.match
 
 import com.lowbudgetlcs.InstantSerializer
 import kotlinx.serialization.Serializable

@@ -1,15 +1,23 @@
 package com.lowbudgetlcs.dto.events
 
-import org.jooq.storage.tables.Events.Companion.EVENTS
-import org.jooq.Record
+import com.lowbudgetlcs.domain.models.event.Event
+import com.lowbudgetlcs.domain.models.event.NewEvent
 
-fun Record.toEventDto(): EventDto = EventDto(
-    id = this[EVENTS.ID]!!,
-    name = this[EVENTS.NAME]!!,
-    description = this[EVENTS.DESCRIPTION]!!,
-    riotTournamentId = this[EVENTS.RIOT_TOURNAMENT_ID]!!,
-    createdAt = this[EVENTS.CREATED_AT]!!,
-    startDate = this[EVENTS.START_DATE]!!,
-    endDate = this[EVENTS.END_DATE]!!,
-    status = this[EVENTS.STATUS]!!
+fun CreateEventDto.toDomain(): NewEvent = NewEvent(
+    name = name,
+    description = description,
+    startDate = startDate,
+    endDate = endDate,
+    status = status
+)
+
+fun Event.toDto(): EventDto = EventDto(
+    id = id,
+    name = name,
+    startDate = startDate,
+    endDate = endDate,
+    createdAt = createdAt,
+    description = description,
+    riotTournamentId = riotTournamentId,
+    status = status,
 )
