@@ -31,8 +31,8 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.GAMES_RESULTS_PKEY
 import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY
-import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_LOSER_FKEY
-import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_WINNER_FKEY
+import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY
+import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY
 import org.jooq.storage.tables.Games.GamesPath
 import org.jooq.storage.tables.Teams.TeamsPath
 import org.jooq.storage.tables.records.GamesResultsRecord
@@ -81,14 +81,14 @@ open class GamesResults(
     val GAME_ID: TableField<GamesResultsRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
-     * The column <code>dennys.games_results.winner</code>.
+     * The column <code>dennys.games_results.winner_team_id</code>.
      */
-    val WINNER: TableField<GamesResultsRecord, Int?> = createField(DSL.name("winner"), SQLDataType.INTEGER, this, "")
+    val WINNER_TEAM_ID: TableField<GamesResultsRecord, Int?> = createField(DSL.name("winner_team_id"), SQLDataType.INTEGER, this, "")
 
     /**
-     * The column <code>dennys.games_results.loser</code>.
+     * The column <code>dennys.games_results.loser_team_id</code>.
      */
-    val LOSER: TableField<GamesResultsRecord, Int?> = createField(DSL.name("loser"), SQLDataType.INTEGER, this, "")
+    val LOSER_TEAM_ID: TableField<GamesResultsRecord, Int?> = createField(DSL.name("loser_team_id"), SQLDataType.INTEGER, this, "")
 
     private constructor(alias: Name, aliased: Table<GamesResultsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<GamesResultsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
@@ -123,7 +123,7 @@ open class GamesResults(
     }
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getPrimaryKey(): UniqueKey<GamesResultsRecord> = GAMES_RESULTS_PKEY
-    override fun getReferences(): List<ForeignKey<GamesResultsRecord, *>> = listOf(GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY, GAMES_RESULTS__GAMES_RESULTS_WINNER_FKEY, GAMES_RESULTS__GAMES_RESULTS_LOSER_FKEY)
+    override fun getReferences(): List<ForeignKey<GamesResultsRecord, *>> = listOf(GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY)
 
     private lateinit var _games: GamesPath
 
@@ -140,37 +140,37 @@ open class GamesResults(
     val games: GamesPath
         get(): GamesPath = games()
 
-    private lateinit var _gamesResultsWinnerFkey: TeamsPath
+    private lateinit var _gamesResultsWinnerTeamIdFkey: TeamsPath
 
     /**
      * Get the implicit join path to the <code>dennys.teams</code> table, via
-     * the <code>games_results_winner_fkey</code> key.
+     * the <code>games_results_winner_team_id_fkey</code> key.
      */
-    fun gamesResultsWinnerFkey(): TeamsPath {
-        if (!this::_gamesResultsWinnerFkey.isInitialized)
-            _gamesResultsWinnerFkey = TeamsPath(this, GAMES_RESULTS__GAMES_RESULTS_WINNER_FKEY, null)
+    fun gamesResultsWinnerTeamIdFkey(): TeamsPath {
+        if (!this::_gamesResultsWinnerTeamIdFkey.isInitialized)
+            _gamesResultsWinnerTeamIdFkey = TeamsPath(this, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY, null)
 
-        return _gamesResultsWinnerFkey;
+        return _gamesResultsWinnerTeamIdFkey;
     }
 
-    val gamesResultsWinnerFkey: TeamsPath
-        get(): TeamsPath = gamesResultsWinnerFkey()
+    val gamesResultsWinnerTeamIdFkey: TeamsPath
+        get(): TeamsPath = gamesResultsWinnerTeamIdFkey()
 
-    private lateinit var _gamesResultsLoserFkey: TeamsPath
+    private lateinit var _gamesResultsLoserTeamIdFkey: TeamsPath
 
     /**
      * Get the implicit join path to the <code>dennys.teams</code> table, via
-     * the <code>games_results_loser_fkey</code> key.
+     * the <code>games_results_loser_team_id_fkey</code> key.
      */
-    fun gamesResultsLoserFkey(): TeamsPath {
-        if (!this::_gamesResultsLoserFkey.isInitialized)
-            _gamesResultsLoserFkey = TeamsPath(this, GAMES_RESULTS__GAMES_RESULTS_LOSER_FKEY, null)
+    fun gamesResultsLoserTeamIdFkey(): TeamsPath {
+        if (!this::_gamesResultsLoserTeamIdFkey.isInitialized)
+            _gamesResultsLoserTeamIdFkey = TeamsPath(this, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY, null)
 
-        return _gamesResultsLoserFkey;
+        return _gamesResultsLoserTeamIdFkey;
     }
 
-    val gamesResultsLoserFkey: TeamsPath
-        get(): TeamsPath = gamesResultsLoserFkey()
+    val gamesResultsLoserTeamIdFkey: TeamsPath
+        get(): TeamsPath = gamesResultsLoserTeamIdFkey()
     override fun `as`(alias: String): GamesResults = GamesResults(DSL.name(alias), this)
     override fun `as`(alias: Name): GamesResults = GamesResults(alias, this)
     override fun `as`(alias: Table<*>): GamesResults = GamesResults(alias.qualifiedName, this)

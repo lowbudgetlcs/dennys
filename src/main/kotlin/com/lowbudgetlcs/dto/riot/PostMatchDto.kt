@@ -3,7 +3,7 @@ package com.lowbudgetlcs.dto.riot
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PostMatchCallback(
+data class PostMatchDto(
     val startTime: Long,
     val shortCode: String,
     val metaData: String,

@@ -30,15 +30,15 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_LOSER_FKEY
-import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_WINNER_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_FKEY
+import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY
+import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY
+import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
+import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
 import org.jooq.storage.keys.PLAYERS__PLAYERS_TEAM_ID_FKEY
 import org.jooq.storage.keys.PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_TEAM_ID_FKEY
 import org.jooq.storage.keys.SERIES_PARTICIPANTS__SERIES_PARTICIPANTS_TEAM_ID_FKEY
-import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_LOSER_FKEY
-import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_WINNER_FKEY
+import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY
+import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_WINNER_TEAM_ID_FKEY
 import org.jooq.storage.keys.TEAMS_PKEY
 import org.jooq.storage.keys.TEAMS__TEAMS_EVENT_ID_FKEY
 import org.jooq.storage.keys.TEAM_AUDIT_LOGS__TEAM_AUDIT_LOGS_TEAM_ID_FKEY
@@ -162,71 +162,71 @@ open class Teams(
     val events: EventsPath
         get(): EventsPath = events()
 
-    private lateinit var _gamesBlueTeamFkey: GamesPath
+    private lateinit var _gamesBlueTeamIdFkey: GamesPath
 
     /**
      * Get the implicit to-many join path to the <code>dennys.games</code>
-     * table, via the <code>games_blue_team_fkey</code> key
+     * table, via the <code>games_blue_team_id_fkey</code> key
      */
-    fun gamesBlueTeamFkey(): GamesPath {
-        if (!this::_gamesBlueTeamFkey.isInitialized)
-            _gamesBlueTeamFkey = GamesPath(this, null, GAMES__GAMES_BLUE_TEAM_FKEY.inverseKey)
+    fun gamesBlueTeamIdFkey(): GamesPath {
+        if (!this::_gamesBlueTeamIdFkey.isInitialized)
+            _gamesBlueTeamIdFkey = GamesPath(this, null, GAMES__GAMES_BLUE_TEAM_ID_FKEY.inverseKey)
 
-        return _gamesBlueTeamFkey;
+        return _gamesBlueTeamIdFkey;
     }
 
-    val gamesBlueTeamFkey: GamesPath
-        get(): GamesPath = gamesBlueTeamFkey()
+    val gamesBlueTeamIdFkey: GamesPath
+        get(): GamesPath = gamesBlueTeamIdFkey()
 
-    private lateinit var _gamesRedTeamFkey: GamesPath
+    private lateinit var _gamesRedTeamIdFkey: GamesPath
 
     /**
      * Get the implicit to-many join path to the <code>dennys.games</code>
-     * table, via the <code>games_red_team_fkey</code> key
+     * table, via the <code>games_red_team_id_fkey</code> key
      */
-    fun gamesRedTeamFkey(): GamesPath {
-        if (!this::_gamesRedTeamFkey.isInitialized)
-            _gamesRedTeamFkey = GamesPath(this, null, GAMES__GAMES_RED_TEAM_FKEY.inverseKey)
+    fun gamesRedTeamIdFkey(): GamesPath {
+        if (!this::_gamesRedTeamIdFkey.isInitialized)
+            _gamesRedTeamIdFkey = GamesPath(this, null, GAMES__GAMES_RED_TEAM_ID_FKEY.inverseKey)
 
-        return _gamesRedTeamFkey;
+        return _gamesRedTeamIdFkey;
     }
 
-    val gamesRedTeamFkey: GamesPath
-        get(): GamesPath = gamesRedTeamFkey()
+    val gamesRedTeamIdFkey: GamesPath
+        get(): GamesPath = gamesRedTeamIdFkey()
 
-    private lateinit var _gamesResultsLoserFkey: GamesResultsPath
+    private lateinit var _gamesResultsLoserTeamIdFkey: GamesResultsPath
 
     /**
      * Get the implicit to-many join path to the
      * <code>dennys.games_results</code> table, via the
-     * <code>games_results_loser_fkey</code> key
+     * <code>games_results_loser_team_id_fkey</code> key
      */
-    fun gamesResultsLoserFkey(): GamesResultsPath {
-        if (!this::_gamesResultsLoserFkey.isInitialized)
-            _gamesResultsLoserFkey = GamesResultsPath(this, null, GAMES_RESULTS__GAMES_RESULTS_LOSER_FKEY.inverseKey)
+    fun gamesResultsLoserTeamIdFkey(): GamesResultsPath {
+        if (!this::_gamesResultsLoserTeamIdFkey.isInitialized)
+            _gamesResultsLoserTeamIdFkey = GamesResultsPath(this, null, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY.inverseKey)
 
-        return _gamesResultsLoserFkey;
+        return _gamesResultsLoserTeamIdFkey;
     }
 
-    val gamesResultsLoserFkey: GamesResultsPath
-        get(): GamesResultsPath = gamesResultsLoserFkey()
+    val gamesResultsLoserTeamIdFkey: GamesResultsPath
+        get(): GamesResultsPath = gamesResultsLoserTeamIdFkey()
 
-    private lateinit var _gamesResultsWinnerFkey: GamesResultsPath
+    private lateinit var _gamesResultsWinnerTeamIdFkey: GamesResultsPath
 
     /**
      * Get the implicit to-many join path to the
      * <code>dennys.games_results</code> table, via the
-     * <code>games_results_winner_fkey</code> key
+     * <code>games_results_winner_team_id_fkey</code> key
      */
-    fun gamesResultsWinnerFkey(): GamesResultsPath {
-        if (!this::_gamesResultsWinnerFkey.isInitialized)
-            _gamesResultsWinnerFkey = GamesResultsPath(this, null, GAMES_RESULTS__GAMES_RESULTS_WINNER_FKEY.inverseKey)
+    fun gamesResultsWinnerTeamIdFkey(): GamesResultsPath {
+        if (!this::_gamesResultsWinnerTeamIdFkey.isInitialized)
+            _gamesResultsWinnerTeamIdFkey = GamesResultsPath(this, null, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY.inverseKey)
 
-        return _gamesResultsWinnerFkey;
+        return _gamesResultsWinnerTeamIdFkey;
     }
 
-    val gamesResultsWinnerFkey: GamesResultsPath
-        get(): GamesResultsPath = gamesResultsWinnerFkey()
+    val gamesResultsWinnerTeamIdFkey: GamesResultsPath
+        get(): GamesResultsPath = gamesResultsWinnerTeamIdFkey()
 
     private lateinit var _playerToTeams: PlayerToTeamsPath
 
@@ -276,39 +276,39 @@ open class Teams(
     val seriesParticipants: SeriesParticipantsPath
         get(): SeriesParticipantsPath = seriesParticipants()
 
-    private lateinit var _seriesResultsLoserFkey: SeriesResultsPath
+    private lateinit var _seriesResultsLoserTeamIdFkey: SeriesResultsPath
 
     /**
      * Get the implicit to-many join path to the
      * <code>dennys.series_results</code> table, via the
-     * <code>series_results_loser_fkey</code> key
+     * <code>series_results_loser_team_id_fkey</code> key
      */
-    fun seriesResultsLoserFkey(): SeriesResultsPath {
-        if (!this::_seriesResultsLoserFkey.isInitialized)
-            _seriesResultsLoserFkey = SeriesResultsPath(this, null, SERIES_RESULTS__SERIES_RESULTS_LOSER_FKEY.inverseKey)
+    fun seriesResultsLoserTeamIdFkey(): SeriesResultsPath {
+        if (!this::_seriesResultsLoserTeamIdFkey.isInitialized)
+            _seriesResultsLoserTeamIdFkey = SeriesResultsPath(this, null, SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY.inverseKey)
 
-        return _seriesResultsLoserFkey;
+        return _seriesResultsLoserTeamIdFkey;
     }
 
-    val seriesResultsLoserFkey: SeriesResultsPath
-        get(): SeriesResultsPath = seriesResultsLoserFkey()
+    val seriesResultsLoserTeamIdFkey: SeriesResultsPath
+        get(): SeriesResultsPath = seriesResultsLoserTeamIdFkey()
 
-    private lateinit var _seriesResultsWinnerFkey: SeriesResultsPath
+    private lateinit var _seriesResultsWinnerTeamIdFkey: SeriesResultsPath
 
     /**
      * Get the implicit to-many join path to the
      * <code>dennys.series_results</code> table, via the
-     * <code>series_results_winner_fkey</code> key
+     * <code>series_results_winner_team_id_fkey</code> key
      */
-    fun seriesResultsWinnerFkey(): SeriesResultsPath {
-        if (!this::_seriesResultsWinnerFkey.isInitialized)
-            _seriesResultsWinnerFkey = SeriesResultsPath(this, null, SERIES_RESULTS__SERIES_RESULTS_WINNER_FKEY.inverseKey)
+    fun seriesResultsWinnerTeamIdFkey(): SeriesResultsPath {
+        if (!this::_seriesResultsWinnerTeamIdFkey.isInitialized)
+            _seriesResultsWinnerTeamIdFkey = SeriesResultsPath(this, null, SERIES_RESULTS__SERIES_RESULTS_WINNER_TEAM_ID_FKEY.inverseKey)
 
-        return _seriesResultsWinnerFkey;
+        return _seriesResultsWinnerTeamIdFkey;
     }
 
-    val seriesResultsWinnerFkey: SeriesResultsPath
-        get(): SeriesResultsPath = seriesResultsWinnerFkey()
+    val seriesResultsWinnerTeamIdFkey: SeriesResultsPath
+        get(): SeriesResultsPath = seriesResultsWinnerTeamIdFkey()
 
     private lateinit var _teamAuditLogs: TeamAuditLogsPath
 

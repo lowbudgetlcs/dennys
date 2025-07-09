@@ -1,10 +1,14 @@
 package com.lowbudgetlcs.routes.riot
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.http.RiotApiClient
+import com.lowbudgetlcs.RiotApiClient
 import com.lowbudgetlcs.models.PostMatchCallback
 import com.lowbudgetlcs.repositories.*
-import com.lowbudgetlcs.http.RateLimiter
+import com.lowbudgetlcs.RateLimiter
+import com.lowbudgetlcs.repositories.games.DatabaseGameRepository
+import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
+import com.lowbudgetlcs.repositories.jooq.JooqSeriesRepository
+import com.lowbudgetlcs.repositories.teams.DatabaseTeamRepository
 import com.lowbudgetlcs.services.StatService
 import com.lowbudgetlcs.services.TournamentService
 import io.ktor.http.*
@@ -41,14 +45,14 @@ fun Application.riotRoutes() {
                 val database = Database().db
                 TournamentService(
                     gamesRepository = DatabaseGameRepository(database),
-                    seriesRepository = DatabaseSeriesRepository(database),
-                    playersRepository = DatabasePlayerRepository(database),
+                    seriesRepository = JooqSeriesRepository(database),
+                    playersRepository = JooqPlayerRepository(database),
                     matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter()),
                     database
                 ).process(callback)
                 StatService(
                     gamesRepository = DatabaseGameRepository(database),
-                    playersRepository = DatabasePlayerRepository(database),
+                    playersRepository = JooqPlayerRepository(database),
                     teamsRepository = DatabaseTeamRepository(database),
                     matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
                 ).process(callback)

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.event.Event
 import com.lowbudgetlcs.domain.models.event.EventStatus
@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.models.event.NewEvent
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Events.Companion.EVENTS
 
-class EventRepository(private val dsl: DSLContext) {
+class JooqEventRepository(private val dsl: DSLContext) {
 
     fun findById(id: Int): Event? =
         dsl
@@ -22,23 +22,24 @@ class EventRepository(private val dsl: DSLContext) {
             )
             .from(EVENTS)
             .where(EVENTS.ID.eq(id))
-            .fetchOne()?.let { row ->
+            .fetchOne()?.let {
                 Event(
-                    id = row[EVENTS.ID]!!,
-                    name = row[EVENTS.NAME]!!,
-                    description = row[EVENTS.DESCRIPTION]!!,
-                    riotTournamentId = row[EVENTS.RIOT_TOURNAMENT_ID]!!,
-                    createdAt = row[EVENTS.CREATED_AT]!!,
-                    startDate = row[EVENTS.START_DATE]!!,
-                    endDate = row[EVENTS.END_DATE]!!,
-                    status = EventStatus.valueOf(row[EVENTS.STATUS]!!)
+                    id = it[EVENTS.ID]!!,
+                    name = it[EVENTS.NAME]!!,
+                    description = it[EVENTS.DESCRIPTION]!!,
+                    riotTournamentId = it[EVENTS.RIOT_TOURNAMENT_ID]!!,
+                    createdAt = it[EVENTS.CREATED_AT]!!,
+                    startDate = it[EVENTS.START_DATE]!!,
+                    endDate = it[EVENTS.END_DATE]!!,
+                    status = EventStatus.valueOf(it[EVENTS.STATUS]!!)
                 )
             }
+
 
     fun insert(event: NewEvent, riotTournamentId: Int): Event? =
         dsl
             .insertInto(
-                EVENTS,
+                EVENTS
             )
             .set(EVENTS.NAME, event.name)
             .set(EVENTS.DESCRIPTION, event.description)

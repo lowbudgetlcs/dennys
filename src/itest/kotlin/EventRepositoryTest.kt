@@ -1,10 +1,12 @@
-import com.lowbudgetlcs.domain.models.EventStatus
-import com.lowbudgetlcs.dto.events.CreateEventDto
-import com.lowbudgetlcs.repositories.EventRepository
+import com.lowbudgetlcs.domain.models.event.EventStatus
+import com.lowbudgetlcs.domain.models.event.NewEvent
+import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
+import io.kotest.assertions.withClue
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
@@ -18,11 +20,15 @@ class EventRepositoryTest : FunSpec({
     val ds = install(JdbcDatabaseContainerExtension(postgres))
     val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
 
-    test("create EvenDto, insert it, and retrieve it") {
+    test("Insert NewEvent and retrieve by id") {
         val now = OffsetDateTime.now()
-        val event = CreateEventDto("Season 1", "The first season", 1, now, now, EventStatus.ACTIVE.name)
-        EventRepository(dslContext).create(event)
-        val entity = EventRepository(dslContext).getById(1)
-        event shouldBe entity
+        val event = NewEvent("Season 1", "The first season", now, now, EventStatus.ACTIVE)
+        val result = JooqEventRepository(dslContext).insert(event, 1)
+        withClue("result should be present") {
+            result shouldNotBe null
+        }
+        result!!
+        val entity = JooqEventRepository(dslContext).findById(result.id)
+        result shouldBe entity
     }
 })

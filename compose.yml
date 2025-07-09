@@ -43,7 +43,7 @@ services:
     ports: 
       - "127.0.0.1:8888:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin
+      - PGADMIN_DEFAULT_EMAIL=admin@dev.com
       - PGADMIN_DEFAULT_PASSWORD=admin
       - PGADMIN_CONFIG_SERVER_MODE=False
       - PGADMIN_CONFIG_MASTER_PASSWORD=False

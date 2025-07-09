@@ -32,8 +32,8 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.GAMES_PKEY
 import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_FKEY
+import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
+import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAMES__GAMES_SERIES_ID_FKEY
 import org.jooq.storage.tables.GamesResults.GamesResultsPath
 import org.jooq.storage.tables.Series.SeriesPath
@@ -89,14 +89,14 @@ open class Games(
     val SHORTCODE: TableField<GamesRecord, String?> = createField(DSL.name("shortcode"), SQLDataType.CLOB.nullable(false), this, "")
 
     /**
-     * The column <code>dennys.games.blue_team</code>.
+     * The column <code>dennys.games.blue_team_id</code>.
      */
-    val BLUE_TEAM: TableField<GamesRecord, Int?> = createField(DSL.name("blue_team"), SQLDataType.INTEGER, this, "")
+    val BLUE_TEAM_ID: TableField<GamesRecord, Int?> = createField(DSL.name("blue_team_id"), SQLDataType.INTEGER, this, "")
 
     /**
-     * The column <code>dennys.games.red_team</code>.
+     * The column <code>dennys.games.red_team_id</code>.
      */
-    val RED_TEAM: TableField<GamesRecord, Int?> = createField(DSL.name("red_team"), SQLDataType.INTEGER, this, "")
+    val RED_TEAM_ID: TableField<GamesRecord, Int?> = createField(DSL.name("red_team_id"), SQLDataType.INTEGER, this, "")
 
     /**
      * The column <code>dennys.games.series_id</code>.
@@ -137,39 +137,39 @@ open class Games(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<GamesRecord, Int?> = super.getIdentity() as Identity<GamesRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<GamesRecord> = GAMES_PKEY
-    override fun getReferences(): List<ForeignKey<GamesRecord, *>> = listOf(GAMES__GAMES_BLUE_TEAM_FKEY, GAMES__GAMES_RED_TEAM_FKEY, GAMES__GAMES_SERIES_ID_FKEY)
+    override fun getReferences(): List<ForeignKey<GamesRecord, *>> = listOf(GAMES__GAMES_BLUE_TEAM_ID_FKEY, GAMES__GAMES_RED_TEAM_ID_FKEY, GAMES__GAMES_SERIES_ID_FKEY)
 
-    private lateinit var _gamesBlueTeamFkey: TeamsPath
-
-    /**
-     * Get the implicit join path to the <code>dennys.teams</code> table, via
-     * the <code>games_blue_team_fkey</code> key.
-     */
-    fun gamesBlueTeamFkey(): TeamsPath {
-        if (!this::_gamesBlueTeamFkey.isInitialized)
-            _gamesBlueTeamFkey = TeamsPath(this, GAMES__GAMES_BLUE_TEAM_FKEY, null)
-
-        return _gamesBlueTeamFkey;
-    }
-
-    val gamesBlueTeamFkey: TeamsPath
-        get(): TeamsPath = gamesBlueTeamFkey()
-
-    private lateinit var _gamesRedTeamFkey: TeamsPath
+    private lateinit var _gamesBlueTeamIdFkey: TeamsPath
 
     /**
      * Get the implicit join path to the <code>dennys.teams</code> table, via
-     * the <code>games_red_team_fkey</code> key.
+     * the <code>games_blue_team_id_fkey</code> key.
      */
-    fun gamesRedTeamFkey(): TeamsPath {
-        if (!this::_gamesRedTeamFkey.isInitialized)
-            _gamesRedTeamFkey = TeamsPath(this, GAMES__GAMES_RED_TEAM_FKEY, null)
+    fun gamesBlueTeamIdFkey(): TeamsPath {
+        if (!this::_gamesBlueTeamIdFkey.isInitialized)
+            _gamesBlueTeamIdFkey = TeamsPath(this, GAMES__GAMES_BLUE_TEAM_ID_FKEY, null)
 
-        return _gamesRedTeamFkey;
+        return _gamesBlueTeamIdFkey;
     }
 
-    val gamesRedTeamFkey: TeamsPath
-        get(): TeamsPath = gamesRedTeamFkey()
+    val gamesBlueTeamIdFkey: TeamsPath
+        get(): TeamsPath = gamesBlueTeamIdFkey()
+
+    private lateinit var _gamesRedTeamIdFkey: TeamsPath
+
+    /**
+     * Get the implicit join path to the <code>dennys.teams</code> table, via
+     * the <code>games_red_team_id_fkey</code> key.
+     */
+    fun gamesRedTeamIdFkey(): TeamsPath {
+        if (!this::_gamesRedTeamIdFkey.isInitialized)
+            _gamesRedTeamIdFkey = TeamsPath(this, GAMES__GAMES_RED_TEAM_ID_FKEY, null)
+
+        return _gamesRedTeamIdFkey;
+    }
+
+    val gamesRedTeamIdFkey: TeamsPath
+        get(): TeamsPath = gamesRedTeamIdFkey()
 
     private lateinit var _series: SeriesPath
 

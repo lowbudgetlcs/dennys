@@ -19,11 +19,11 @@ open class GamesResultsRecord() : UpdatableRecordImpl<GamesResultsRecord>(GamesR
         set(value): Unit = set(0, value)
         get(): Int? = get(0) as Int?
 
-    open var winner: Int?
+    open var winnerTeamId: Int?
         set(value): Unit = set(1, value)
         get(): Int? = get(1) as Int?
 
-    open var loser: Int?
+    open var loserTeamId: Int?
         set(value): Unit = set(2, value)
         get(): Int? = get(2) as Int?
 
@@ -36,10 +36,10 @@ open class GamesResultsRecord() : UpdatableRecordImpl<GamesResultsRecord>(GamesR
     /**
      * Create a detached, initialised GamesResultsRecord
      */
-    constructor(gameId: Int? = null, winner: Int? = null, loser: Int? = null): this() {
+    constructor(gameId: Int? = null, winnerTeamId: Int? = null, loserTeamId: Int? = null): this() {
         this.gameId = gameId
-        this.winner = winner
-        this.loser = loser
+        this.winnerTeamId = winnerTeamId
+        this.loserTeamId = loserTeamId
         resetChangedOnNotNull()
     }
 }
