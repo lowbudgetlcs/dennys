@@ -4,22 +4,18 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
+
 import kotlin.collections.List
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row2
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -32,8 +28,6 @@ import org.jooq.storage.Dennys
 import org.jooq.storage.keys.RIOT_ACCOUNT_TO_PLAYER_PKEY
 import org.jooq.storage.keys.RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_PLAYER_ID_FKEY
 import org.jooq.storage.keys.RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY
-import org.jooq.storage.tables.Players.PlayersPath
-import org.jooq.storage.tables.RiotAccounts.RiotAccountsPath
 import org.jooq.storage.tables.records.RiotAccountToPlayerRecord
 
 
@@ -43,23 +37,19 @@ import org.jooq.storage.tables.records.RiotAccountToPlayerRecord
 @Suppress("UNCHECKED_CAST")
 open class RiotAccountToPlayer(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, RiotAccountToPlayerRecord>?,
-    parentPath: InverseForeignKey<out Record, RiotAccountToPlayerRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, RiotAccountToPlayerRecord>?,
     aliased: Table<RiotAccountToPlayerRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<RiotAccountToPlayerRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -84,9 +74,8 @@ open class RiotAccountToPlayer(
      */
     val RIOT_ACCOUNT_ID: TableField<RiotAccountToPlayerRecord, Int?> = createField(DSL.name("riot_account_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<RiotAccountToPlayerRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<RiotAccountToPlayerRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<RiotAccountToPlayerRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<RiotAccountToPlayerRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<RiotAccountToPlayerRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.riot_account_to_player</code> table
@@ -105,55 +94,43 @@ open class RiotAccountToPlayer(
      */
     constructor(): this(DSL.name("riot_account_to_player"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, RiotAccountToPlayerRecord>?, parentPath: InverseForeignKey<out Record, RiotAccountToPlayerRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, RIOT_ACCOUNT_TO_PLAYER, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class RiotAccountToPlayerPath : RiotAccountToPlayer, Path<RiotAccountToPlayerRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, RiotAccountToPlayerRecord>?, parentPath: InverseForeignKey<out Record, RiotAccountToPlayerRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<RiotAccountToPlayerRecord>): super(alias, aliased)
-        override fun `as`(alias: String): RiotAccountToPlayerPath = RiotAccountToPlayerPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): RiotAccountToPlayerPath = RiotAccountToPlayerPath(alias, this)
-        override fun `as`(alias: Table<*>): RiotAccountToPlayerPath = RiotAccountToPlayerPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, RiotAccountToPlayerRecord>): this(Internal.createPathAlias(child, key), child, key, RIOT_ACCOUNT_TO_PLAYER, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getPrimaryKey(): UniqueKey<RiotAccountToPlayerRecord> = RIOT_ACCOUNT_TO_PLAYER_PKEY
     override fun getReferences(): List<ForeignKey<RiotAccountToPlayerRecord, *>> = listOf(RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_PLAYER_ID_FKEY, RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY)
 
-    private lateinit var _players: PlayersPath
+    private lateinit var _players: Players
+    private lateinit var _riotAccounts: RiotAccounts
 
     /**
      * Get the implicit join path to the <code>dennys.players</code> table.
      */
-    fun players(): PlayersPath {
+    fun players(): Players {
         if (!this::_players.isInitialized)
-            _players = PlayersPath(this, RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_PLAYER_ID_FKEY, null)
+            _players = Players(this, RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_PLAYER_ID_FKEY)
 
         return _players;
     }
 
-    val players: PlayersPath
-        get(): PlayersPath = players()
-
-    private lateinit var _riotAccounts: RiotAccountsPath
+    val players: Players
+        get(): Players = players()
 
     /**
      * Get the implicit join path to the <code>dennys.riot_accounts</code>
      * table.
      */
-    fun riotAccounts(): RiotAccountsPath {
+    fun riotAccounts(): RiotAccounts {
         if (!this::_riotAccounts.isInitialized)
-            _riotAccounts = RiotAccountsPath(this, RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY, null)
+            _riotAccounts = RiotAccounts(this, RIOT_ACCOUNT_TO_PLAYER__RIOT_ACCOUNT_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY)
 
         return _riotAccounts;
     }
 
-    val riotAccounts: RiotAccountsPath
-        get(): RiotAccountsPath = riotAccounts()
+    val riotAccounts: RiotAccounts
+        get(): RiotAccounts = riotAccounts()
     override fun `as`(alias: String): RiotAccountToPlayer = RiotAccountToPlayer(DSL.name(alias), this)
     override fun `as`(alias: Name): RiotAccountToPlayer = RiotAccountToPlayer(alias, this)
-    override fun `as`(alias: Table<*>): RiotAccountToPlayer = RiotAccountToPlayer(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): RiotAccountToPlayer = RiotAccountToPlayer(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -168,55 +145,21 @@ open class RiotAccountToPlayer(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): RiotAccountToPlayer = RiotAccountToPlayer(name.qualifiedName, null)
+    override fun rename(name: Table<*>): RiotAccountToPlayer = RiotAccountToPlayer(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row2 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row2<Int?, Int?> = super.fieldsRow() as Row2<Int?, Int?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): RiotAccountToPlayer = RiotAccountToPlayer(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): RiotAccountToPlayer = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): RiotAccountToPlayer = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): RiotAccountToPlayer = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): RiotAccountToPlayer = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): RiotAccountToPlayer = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): RiotAccountToPlayer = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): RiotAccountToPlayer = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): RiotAccountToPlayer = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): RiotAccountToPlayer = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

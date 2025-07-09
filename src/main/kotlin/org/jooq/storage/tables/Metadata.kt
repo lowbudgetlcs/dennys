@@ -4,24 +4,21 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row2
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
 import org.jooq.impl.DSL
+import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
@@ -34,23 +31,19 @@ import org.jooq.storage.tables.records.MetadataRecord
 @Suppress("UNCHECKED_CAST")
 open class Metadata(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, MetadataRecord>?,
-    parentPath: InverseForeignKey<out Record, MetadataRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, MetadataRecord>?,
     aliased: Table<MetadataRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<MetadataRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -75,9 +68,8 @@ open class Metadata(
      */
     val LOGO_BUCKET_NAME: TableField<MetadataRecord, String?> = createField(DSL.name("logo_bucket_name"), SQLDataType.CLOB.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<MetadataRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<MetadataRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<MetadataRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<MetadataRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<MetadataRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.metadata</code> table reference
@@ -93,10 +85,12 @@ open class Metadata(
      * Create a <code>dennys.metadata</code> table reference
      */
     constructor(): this(DSL.name("metadata"), null)
+
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, MetadataRecord>): this(Internal.createPathAlias(child, key), child, key, METADATA, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun `as`(alias: String): Metadata = Metadata(DSL.name(alias), this)
     override fun `as`(alias: Name): Metadata = Metadata(alias, this)
-    override fun `as`(alias: Table<*>): Metadata = Metadata(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): Metadata = Metadata(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -111,55 +105,21 @@ open class Metadata(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): Metadata = Metadata(name.qualifiedName, null)
+    override fun rename(name: Table<*>): Metadata = Metadata(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row2 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row2<Int?, String?> = super.fieldsRow() as Row2<Int?, String?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): Metadata = Metadata(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): Metadata = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): Metadata = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): Metadata = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): Metadata = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): Metadata = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): Metadata = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): Metadata = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): Metadata = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): Metadata = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

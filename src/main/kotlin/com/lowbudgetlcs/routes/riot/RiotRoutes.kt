@@ -1,16 +1,6 @@
 package com.lowbudgetlcs.routes.riot
 
-import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.RiotApiClient
-import com.lowbudgetlcs.models.PostMatchCallback
-import com.lowbudgetlcs.repositories.*
-import com.lowbudgetlcs.RateLimiter
-import com.lowbudgetlcs.repositories.games.DatabaseGameRepository
-import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
-import com.lowbudgetlcs.repositories.jooq.JooqSeriesRepository
-import com.lowbudgetlcs.repositories.teams.DatabaseTeamRepository
-import com.lowbudgetlcs.services.StatService
-import com.lowbudgetlcs.services.TournamentService
+import com.lowbudgetlcs.dto.riot.PostMatchDto
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
@@ -39,23 +29,8 @@ fun Application.riotRoutes() {
     routing {
         route("/riot-callback") {
             post {
-                val callback = call.receive<PostMatchCallback>()
+                val callback = call.receive<PostMatchDto>()
                 logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
-                // Emit callback onto all registered queues.
-                val database = Database().db
-                TournamentService(
-                    gamesRepository = DatabaseGameRepository(database),
-                    seriesRepository = JooqSeriesRepository(database),
-                    playersRepository = JooqPlayerRepository(database),
-                    matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter()),
-                    database
-                ).process(callback)
-                StatService(
-                    gamesRepository = DatabaseGameRepository(database),
-                    playersRepository = JooqPlayerRepository(database),
-                    teamsRepository = DatabaseTeamRepository(database),
-                    matchRepository = RiotMatchRepository(RiotApiClient(), RateLimiter())
-                ).process(callback)
                 logger.info("✅ Callback successfully processed!")
                 call.respond(HttpStatusCode.OK)
             }

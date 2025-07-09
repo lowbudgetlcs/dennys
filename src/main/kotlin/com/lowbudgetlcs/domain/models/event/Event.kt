@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.event
 
-import java.time.OffsetDateTime
+import java.time.Instant
 
 enum class EventStatus {
     CANCELED, PAUSED, COMPLETED, ACTIVE, NOT_STARTED
@@ -11,8 +11,8 @@ data class Event(
     val name: String,
     val description: String,
     val riotTournamentId: Int,
-    val createdAt: OffsetDateTime,
-    val startDate: OffsetDateTime,
-    val endDate: OffsetDateTime,
+    val createdAt: Instant,
+    val startDate: Instant,
+    val endDate: Instant,
     val status: EventStatus
 )

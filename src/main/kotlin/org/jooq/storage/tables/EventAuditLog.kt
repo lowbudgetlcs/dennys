@@ -4,25 +4,20 @@
 package org.jooq.storage.tables
 
 
-import java.time.OffsetDateTime
+import java.time.Instant
+import java.util.function.Function
 
-import kotlin.collections.Collection
 import kotlin.collections.List
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row6
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -34,7 +29,6 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.EVENT_AUDIT_LOG_PKEY
 import org.jooq.storage.keys.EVENT_AUDIT_LOG__EVENT_AUDIT_LOG_EVENT_ID_FKEY
-import org.jooq.storage.tables.Events.EventsPath
 import org.jooq.storage.tables.records.EventAuditLogRecord
 
 
@@ -44,23 +38,19 @@ import org.jooq.storage.tables.records.EventAuditLogRecord
 @Suppress("UNCHECKED_CAST")
 open class EventAuditLog(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, EventAuditLogRecord>?,
-    parentPath: InverseForeignKey<out Record, EventAuditLogRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, EventAuditLogRecord>?,
     aliased: Table<EventAuditLogRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<EventAuditLogRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -83,7 +73,7 @@ open class EventAuditLog(
     /**
      * The column <code>dennys.event_audit_log.created_at</code>.
      */
-    val CREATED_AT: TableField<EventAuditLogRecord, OffsetDateTime?> = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
+    val CREATED_AT: TableField<EventAuditLogRecord, Instant?> = createField(DSL.name("created_at"), SQLDataType.INSTANT.defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.INSTANT)), this, "")
 
     /**
      * The column <code>dennys.event_audit_log.event_id</code>.
@@ -105,9 +95,8 @@ open class EventAuditLog(
      */
     val ORIGIN: TableField<EventAuditLogRecord, String?> = createField(DSL.name("origin"), SQLDataType.CLOB.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<EventAuditLogRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<EventAuditLogRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<EventAuditLogRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<EventAuditLogRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<EventAuditLogRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.event_audit_log</code> table reference
@@ -124,40 +113,29 @@ open class EventAuditLog(
      */
     constructor(): this(DSL.name("event_audit_log"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, EventAuditLogRecord>?, parentPath: InverseForeignKey<out Record, EventAuditLogRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, EVENT_AUDIT_LOG, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class EventAuditLogPath : EventAuditLog, Path<EventAuditLogRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, EventAuditLogRecord>?, parentPath: InverseForeignKey<out Record, EventAuditLogRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<EventAuditLogRecord>): super(alias, aliased)
-        override fun `as`(alias: String): EventAuditLogPath = EventAuditLogPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): EventAuditLogPath = EventAuditLogPath(alias, this)
-        override fun `as`(alias: Table<*>): EventAuditLogPath = EventAuditLogPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, EventAuditLogRecord>): this(Internal.createPathAlias(child, key), child, key, EVENT_AUDIT_LOG, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<EventAuditLogRecord, Int?> = super.getIdentity() as Identity<EventAuditLogRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<EventAuditLogRecord> = EVENT_AUDIT_LOG_PKEY
     override fun getReferences(): List<ForeignKey<EventAuditLogRecord, *>> = listOf(EVENT_AUDIT_LOG__EVENT_AUDIT_LOG_EVENT_ID_FKEY)
 
-    private lateinit var _events: EventsPath
+    private lateinit var _events: Events
 
     /**
      * Get the implicit join path to the <code>dennys.events</code> table.
      */
-    fun events(): EventsPath {
+    fun events(): Events {
         if (!this::_events.isInitialized)
-            _events = EventsPath(this, EVENT_AUDIT_LOG__EVENT_AUDIT_LOG_EVENT_ID_FKEY, null)
+            _events = Events(this, EVENT_AUDIT_LOG__EVENT_AUDIT_LOG_EVENT_ID_FKEY)
 
         return _events;
     }
 
-    val events: EventsPath
-        get(): EventsPath = events()
+    val events: Events
+        get(): Events = events()
     override fun `as`(alias: String): EventAuditLog = EventAuditLog(DSL.name(alias), this)
     override fun `as`(alias: Name): EventAuditLog = EventAuditLog(alias, this)
-    override fun `as`(alias: Table<*>): EventAuditLog = EventAuditLog(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): EventAuditLog = EventAuditLog(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -172,55 +150,21 @@ open class EventAuditLog(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): EventAuditLog = EventAuditLog(name.qualifiedName, null)
+    override fun rename(name: Table<*>): EventAuditLog = EventAuditLog(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row6 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row6<Int?, Instant?, Int?, String?, String?, String?> = super.fieldsRow() as Row6<Int?, Instant?, Int?, String?, String?, String?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): EventAuditLog = EventAuditLog(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Instant?, Int?, String?, String?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): EventAuditLog = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): EventAuditLog = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): EventAuditLog = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): EventAuditLog = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): EventAuditLog = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): EventAuditLog = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): EventAuditLog = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): EventAuditLog = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): EventAuditLog = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Instant?, Int?, String?, String?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

@@ -11,17 +11,18 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
-import java.time.OffsetDateTime
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class EventRepositoryTest : FunSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
-        withCopyFileToContainer(MountableFile.forClasspathResource("migrations/"), "/docker-entrypoint-initdb.d/")
+        withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }
     val ds = install(JdbcDatabaseContainerExtension(postgres))
     val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
 
     test("Insert NewEvent and retrieve by id") {
-        val now = OffsetDateTime.now()
+        val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
         val event = NewEvent("Season 1", "The first season", now, now, EventStatus.ACTIVE)
         val result = JooqEventRepository(dslContext).insert(event, 1)
         withClue("result should be present") {
@@ -29,6 +30,7 @@ class EventRepositoryTest : FunSpec({
         }
         result!!
         val entity = JooqEventRepository(dslContext).findById(result.id)
-        result shouldBe entity
+
+        entity shouldBe result
     }
 })

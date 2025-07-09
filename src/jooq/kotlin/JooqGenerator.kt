@@ -6,6 +6,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.MountableFile
+import java.time.Instant
 import java.util.*
 
 @Testcontainers
@@ -14,7 +15,7 @@ class JooqGenerator {
     companion object {
         @Container
         private val postgres = PostgreSQLContainer("postgres:15-alpine").apply {
-            withCopyFileToContainer(MountableFile.forClasspathResource("migrations/"), "/docker-entrypoint-initdb.d/")
+            withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
         }
     }
 
@@ -40,6 +41,10 @@ class JooqGenerator {
                 database = Database().apply {
                     name = "org.jooq.meta.postgres.PostgresDatabase"
                     includes = ".*"
+                    forcedTypes = listOf(ForcedType().apply {
+                        name = "INSTANT"
+                        includeTypes = "TIMESTAMPTZ"
+                    })
                     inputSchema = "dennys"
                 }
                 target = Target().apply {

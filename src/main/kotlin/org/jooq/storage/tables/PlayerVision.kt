@@ -4,22 +4,17 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row6
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -29,9 +24,7 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_VISION_ID_FKEY
 import org.jooq.storage.keys.PLAYER_VISION_PKEY
-import org.jooq.storage.tables.PlayerGameFacts.PlayerGameFactsPath
 import org.jooq.storage.tables.records.PlayerVisionRecord
 
 
@@ -41,23 +34,19 @@ import org.jooq.storage.tables.records.PlayerVisionRecord
 @Suppress("UNCHECKED_CAST")
 open class PlayerVision(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, PlayerVisionRecord>?,
-    parentPath: InverseForeignKey<out Record, PlayerVisionRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, PlayerVisionRecord>?,
     aliased: Table<PlayerVisionRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<PlayerVisionRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -102,9 +91,8 @@ open class PlayerVision(
      */
     val WARDS_DESTROYED: TableField<PlayerVisionRecord, Int?> = createField(DSL.name("wards_destroyed"), SQLDataType.INTEGER.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<PlayerVisionRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<PlayerVisionRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<PlayerVisionRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<PlayerVisionRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<PlayerVisionRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.player_vision</code> table reference
@@ -121,40 +109,13 @@ open class PlayerVision(
      */
     constructor(): this(DSL.name("player_vision"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerVisionRecord>?, parentPath: InverseForeignKey<out Record, PlayerVisionRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, PLAYER_VISION, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class PlayerVisionPath : PlayerVision, Path<PlayerVisionRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerVisionRecord>?, parentPath: InverseForeignKey<out Record, PlayerVisionRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<PlayerVisionRecord>): super(alias, aliased)
-        override fun `as`(alias: String): PlayerVisionPath = PlayerVisionPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): PlayerVisionPath = PlayerVisionPath(alias, this)
-        override fun `as`(alias: Table<*>): PlayerVisionPath = PlayerVisionPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, PlayerVisionRecord>): this(Internal.createPathAlias(child, key), child, key, PLAYER_VISION, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<PlayerVisionRecord, Int?> = super.getIdentity() as Identity<PlayerVisionRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PlayerVisionRecord> = PLAYER_VISION_PKEY
-
-    private lateinit var _playerGameFacts: PlayerGameFactsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.player_game_facts</code> table
-     */
-    fun playerGameFacts(): PlayerGameFactsPath {
-        if (!this::_playerGameFacts.isInitialized)
-            _playerGameFacts = PlayerGameFactsPath(this, null, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_VISION_ID_FKEY.inverseKey)
-
-        return _playerGameFacts;
-    }
-
-    val playerGameFacts: PlayerGameFactsPath
-        get(): PlayerGameFactsPath = playerGameFacts()
     override fun `as`(alias: String): PlayerVision = PlayerVision(DSL.name(alias), this)
     override fun `as`(alias: Name): PlayerVision = PlayerVision(alias, this)
-    override fun `as`(alias: Table<*>): PlayerVision = PlayerVision(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): PlayerVision = PlayerVision(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -169,55 +130,21 @@ open class PlayerVision(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): PlayerVision = PlayerVision(name.qualifiedName, null)
+    override fun rename(name: Table<*>): PlayerVision = PlayerVision(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row6 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row6<Int?, Int?, Int?, Int?, Int?, Int?> = super.fieldsRow() as Row6<Int?, Int?, Int?, Int?, Int?, Int?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): PlayerVision = PlayerVision(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Int?, Int?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): PlayerVision = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): PlayerVision = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): PlayerVision = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): PlayerVision = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): PlayerVision = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): PlayerVision = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): PlayerVision = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): PlayerVision = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): PlayerVision = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Int?, Int?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

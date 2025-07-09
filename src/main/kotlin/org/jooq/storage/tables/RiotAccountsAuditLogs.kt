@@ -4,25 +4,20 @@
 package org.jooq.storage.tables
 
 
-import java.time.OffsetDateTime
+import java.time.Instant
+import java.util.function.Function
 
-import kotlin.collections.Collection
 import kotlin.collections.List
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row6
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -34,7 +29,6 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.RIOT_ACCOUNTS_AUDIT_LOGS_PKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_AUDIT_LOGS__RIOT_ACCOUNTS_AUDIT_LOGS_RIOT_ACCOUNT_ID_FKEY
-import org.jooq.storage.tables.RiotAccounts.RiotAccountsPath
 import org.jooq.storage.tables.records.RiotAccountsAuditLogsRecord
 
 
@@ -44,23 +38,19 @@ import org.jooq.storage.tables.records.RiotAccountsAuditLogsRecord
 @Suppress("UNCHECKED_CAST")
 open class RiotAccountsAuditLogs(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, RiotAccountsAuditLogsRecord>?,
-    parentPath: InverseForeignKey<out Record, RiotAccountsAuditLogsRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, RiotAccountsAuditLogsRecord>?,
     aliased: Table<RiotAccountsAuditLogsRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<RiotAccountsAuditLogsRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -84,7 +74,7 @@ open class RiotAccountsAuditLogs(
     /**
      * The column <code>dennys.riot_accounts_audit_logs.created_at</code>.
      */
-    val CREATED_AT: TableField<RiotAccountsAuditLogsRecord, OffsetDateTime?> = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
+    val CREATED_AT: TableField<RiotAccountsAuditLogsRecord, Instant?> = createField(DSL.name("created_at"), SQLDataType.INSTANT.defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.INSTANT)), this, "")
 
     /**
      * The column <code>dennys.riot_accounts_audit_logs.riot_account_id</code>.
@@ -106,9 +96,8 @@ open class RiotAccountsAuditLogs(
      */
     val ORIGIN: TableField<RiotAccountsAuditLogsRecord, String?> = createField(DSL.name("origin"), SQLDataType.CLOB.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<RiotAccountsAuditLogsRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<RiotAccountsAuditLogsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<RiotAccountsAuditLogsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<RiotAccountsAuditLogsRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<RiotAccountsAuditLogsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.riot_accounts_audit_logs</code> table
@@ -127,41 +116,30 @@ open class RiotAccountsAuditLogs(
      */
     constructor(): this(DSL.name("riot_accounts_audit_logs"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, RiotAccountsAuditLogsRecord>?, parentPath: InverseForeignKey<out Record, RiotAccountsAuditLogsRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, RIOT_ACCOUNTS_AUDIT_LOGS, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class RiotAccountsAuditLogsPath : RiotAccountsAuditLogs, Path<RiotAccountsAuditLogsRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, RiotAccountsAuditLogsRecord>?, parentPath: InverseForeignKey<out Record, RiotAccountsAuditLogsRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<RiotAccountsAuditLogsRecord>): super(alias, aliased)
-        override fun `as`(alias: String): RiotAccountsAuditLogsPath = RiotAccountsAuditLogsPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): RiotAccountsAuditLogsPath = RiotAccountsAuditLogsPath(alias, this)
-        override fun `as`(alias: Table<*>): RiotAccountsAuditLogsPath = RiotAccountsAuditLogsPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, RiotAccountsAuditLogsRecord>): this(Internal.createPathAlias(child, key), child, key, RIOT_ACCOUNTS_AUDIT_LOGS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<RiotAccountsAuditLogsRecord, Int?> = super.getIdentity() as Identity<RiotAccountsAuditLogsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<RiotAccountsAuditLogsRecord> = RIOT_ACCOUNTS_AUDIT_LOGS_PKEY
     override fun getReferences(): List<ForeignKey<RiotAccountsAuditLogsRecord, *>> = listOf(RIOT_ACCOUNTS_AUDIT_LOGS__RIOT_ACCOUNTS_AUDIT_LOGS_RIOT_ACCOUNT_ID_FKEY)
 
-    private lateinit var _riotAccounts: RiotAccountsPath
+    private lateinit var _riotAccounts: RiotAccounts
 
     /**
      * Get the implicit join path to the <code>dennys.riot_accounts</code>
      * table.
      */
-    fun riotAccounts(): RiotAccountsPath {
+    fun riotAccounts(): RiotAccounts {
         if (!this::_riotAccounts.isInitialized)
-            _riotAccounts = RiotAccountsPath(this, RIOT_ACCOUNTS_AUDIT_LOGS__RIOT_ACCOUNTS_AUDIT_LOGS_RIOT_ACCOUNT_ID_FKEY, null)
+            _riotAccounts = RiotAccounts(this, RIOT_ACCOUNTS_AUDIT_LOGS__RIOT_ACCOUNTS_AUDIT_LOGS_RIOT_ACCOUNT_ID_FKEY)
 
         return _riotAccounts;
     }
 
-    val riotAccounts: RiotAccountsPath
-        get(): RiotAccountsPath = riotAccounts()
+    val riotAccounts: RiotAccounts
+        get(): RiotAccounts = riotAccounts()
     override fun `as`(alias: String): RiotAccountsAuditLogs = RiotAccountsAuditLogs(DSL.name(alias), this)
     override fun `as`(alias: Name): RiotAccountsAuditLogs = RiotAccountsAuditLogs(alias, this)
-    override fun `as`(alias: Table<*>): RiotAccountsAuditLogs = RiotAccountsAuditLogs(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): RiotAccountsAuditLogs = RiotAccountsAuditLogs(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -176,55 +154,21 @@ open class RiotAccountsAuditLogs(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): RiotAccountsAuditLogs = RiotAccountsAuditLogs(name.qualifiedName, null)
+    override fun rename(name: Table<*>): RiotAccountsAuditLogs = RiotAccountsAuditLogs(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row6 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row6<Int?, Instant?, Int?, String?, String?, String?> = super.fieldsRow() as Row6<Int?, Instant?, Int?, String?, String?, String?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): RiotAccountsAuditLogs = RiotAccountsAuditLogs(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Instant?, Int?, String?, String?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): RiotAccountsAuditLogs = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): RiotAccountsAuditLogs = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): RiotAccountsAuditLogs = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): RiotAccountsAuditLogs = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): RiotAccountsAuditLogs = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): RiotAccountsAuditLogs = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): RiotAccountsAuditLogs = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): RiotAccountsAuditLogs = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): RiotAccountsAuditLogs = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Instant?, Int?, String?, String?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

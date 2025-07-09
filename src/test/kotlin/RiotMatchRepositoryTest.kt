@@ -1,6 +1,6 @@
 import com.lowbudgetlcs.RateLimiter
 import com.lowbudgetlcs.RiotApiClient
-import com.lowbudgetlcs.models.match.LeagueOfLegendsMatch
+import com.lowbudgetlcs.dto.riot.match.MatchDto
 import com.lowbudgetlcs.repositories.RiotMatchRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -14,16 +14,16 @@ import io.mockk.mockk
 
 class RiotMatchRepositoryTest : StringSpec({
 
-    "getMatch should return LeagueOfLegendsMatch when API call succeeds" {
+    "getMatch should return MatchDto when API call succeeds" {
         // Mock dependencies
         val apiClient = mockk<RiotApiClient>()
         val rateLimiter = mockk<RateLimiter>(relaxed = true)
         val response = mockk<HttpResponse>()
-        val expectedMatch = mockk<LeagueOfLegendsMatch>()
+        val expectedMatch = mockk<MatchDto>()
 
         // Mock API response
         every { response.status } returns HttpStatusCode.Companion.OK
-        coEvery { response.body<LeagueOfLegendsMatch>() } returns expectedMatch
+        coEvery { response.body<MatchDto>() } returns expectedMatch
         coEvery { apiClient.get(any()) } returns response
 
         // Create test instance

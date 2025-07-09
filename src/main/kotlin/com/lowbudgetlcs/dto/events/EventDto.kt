@@ -1,15 +1,15 @@
 package com.lowbudgetlcs.dto.events
 
 import com.lowbudgetlcs.domain.models.event.EventStatus
-import java.time.OffsetDateTime
+import java.time.Instant
 
 data class EventDto(
     val id: Int,
     val name: String,
     val description: String,
     val riotTournamentId: Int,
-    val createdAt: OffsetDateTime,
-    val startDate: OffsetDateTime,
-    val endDate: OffsetDateTime,
+    val createdAt: Instant,
+    val startDate: Instant,
+    val endDate: Instant,
     val status: EventStatus
 )

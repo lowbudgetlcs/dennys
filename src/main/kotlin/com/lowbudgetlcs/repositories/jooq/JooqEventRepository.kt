@@ -46,6 +46,7 @@ class JooqEventRepository(private val dsl: DSLContext) {
             .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId)
             .set(EVENTS.START_DATE, event.startDate)
             .set(EVENTS.END_DATE, event.endDate)
+            .set(EVENTS.STATUS, event.status.name)
             .returning(EVENTS.ID, EVENTS.CREATED_AT)
             .fetchOne()?.let { row ->
                 Event(

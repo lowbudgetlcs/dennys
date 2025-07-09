@@ -4,23 +4,19 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
+
 import kotlin.collections.List
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row4
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -30,27 +26,8 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY
-import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
-import org.jooq.storage.keys.PLAYERS__PLAYERS_TEAM_ID_FKEY
-import org.jooq.storage.keys.PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_TEAM_ID_FKEY
-import org.jooq.storage.keys.SERIES_PARTICIPANTS__SERIES_PARTICIPANTS_TEAM_ID_FKEY
-import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY
-import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_WINNER_TEAM_ID_FKEY
 import org.jooq.storage.keys.TEAMS_PKEY
 import org.jooq.storage.keys.TEAMS__TEAMS_EVENT_ID_FKEY
-import org.jooq.storage.keys.TEAM_AUDIT_LOGS__TEAM_AUDIT_LOGS_TEAM_ID_FKEY
-import org.jooq.storage.tables.Events.EventsPath
-import org.jooq.storage.tables.Games.GamesPath
-import org.jooq.storage.tables.GamesResults.GamesResultsPath
-import org.jooq.storage.tables.PlayerToTeams.PlayerToTeamsPath
-import org.jooq.storage.tables.Players.PlayersPath
-import org.jooq.storage.tables.Series.SeriesPath
-import org.jooq.storage.tables.SeriesParticipants.SeriesParticipantsPath
-import org.jooq.storage.tables.SeriesResults.SeriesResultsPath
-import org.jooq.storage.tables.TeamAuditLogs.TeamAuditLogsPath
 import org.jooq.storage.tables.records.TeamsRecord
 
 
@@ -60,23 +37,19 @@ import org.jooq.storage.tables.records.TeamsRecord
 @Suppress("UNCHECKED_CAST")
 open class Teams(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, TeamsRecord>?,
-    parentPath: InverseForeignKey<out Record, TeamsRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, TeamsRecord>?,
     aliased: Table<TeamsRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<TeamsRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -111,9 +84,8 @@ open class Teams(
      */
     val EVENT_ID: TableField<TeamsRecord, Int?> = createField(DSL.name("event_id"), SQLDataType.INTEGER, this, "")
 
-    private constructor(alias: Name, aliased: Table<TeamsRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<TeamsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<TeamsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<TeamsRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<TeamsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.teams</code> table reference
@@ -130,211 +102,29 @@ open class Teams(
      */
     constructor(): this(DSL.name("teams"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, TeamsRecord>?, parentPath: InverseForeignKey<out Record, TeamsRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, TEAMS, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class TeamsPath : Teams, Path<TeamsRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, TeamsRecord>?, parentPath: InverseForeignKey<out Record, TeamsRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<TeamsRecord>): super(alias, aliased)
-        override fun `as`(alias: String): TeamsPath = TeamsPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): TeamsPath = TeamsPath(alias, this)
-        override fun `as`(alias: Table<*>): TeamsPath = TeamsPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, TeamsRecord>): this(Internal.createPathAlias(child, key), child, key, TEAMS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<TeamsRecord, Int?> = super.getIdentity() as Identity<TeamsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<TeamsRecord> = TEAMS_PKEY
     override fun getReferences(): List<ForeignKey<TeamsRecord, *>> = listOf(TEAMS__TEAMS_EVENT_ID_FKEY)
 
-    private lateinit var _events: EventsPath
+    private lateinit var _events: Events
 
     /**
      * Get the implicit join path to the <code>dennys.events</code> table.
      */
-    fun events(): EventsPath {
+    fun events(): Events {
         if (!this::_events.isInitialized)
-            _events = EventsPath(this, TEAMS__TEAMS_EVENT_ID_FKEY, null)
+            _events = Events(this, TEAMS__TEAMS_EVENT_ID_FKEY)
 
         return _events;
     }
 
-    val events: EventsPath
-        get(): EventsPath = events()
-
-    private lateinit var _gamesBlueTeamIdFkey: GamesPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.games</code>
-     * table, via the <code>games_blue_team_id_fkey</code> key
-     */
-    fun gamesBlueTeamIdFkey(): GamesPath {
-        if (!this::_gamesBlueTeamIdFkey.isInitialized)
-            _gamesBlueTeamIdFkey = GamesPath(this, null, GAMES__GAMES_BLUE_TEAM_ID_FKEY.inverseKey)
-
-        return _gamesBlueTeamIdFkey;
-    }
-
-    val gamesBlueTeamIdFkey: GamesPath
-        get(): GamesPath = gamesBlueTeamIdFkey()
-
-    private lateinit var _gamesRedTeamIdFkey: GamesPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.games</code>
-     * table, via the <code>games_red_team_id_fkey</code> key
-     */
-    fun gamesRedTeamIdFkey(): GamesPath {
-        if (!this::_gamesRedTeamIdFkey.isInitialized)
-            _gamesRedTeamIdFkey = GamesPath(this, null, GAMES__GAMES_RED_TEAM_ID_FKEY.inverseKey)
-
-        return _gamesRedTeamIdFkey;
-    }
-
-    val gamesRedTeamIdFkey: GamesPath
-        get(): GamesPath = gamesRedTeamIdFkey()
-
-    private lateinit var _gamesResultsLoserTeamIdFkey: GamesResultsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.games_results</code> table, via the
-     * <code>games_results_loser_team_id_fkey</code> key
-     */
-    fun gamesResultsLoserTeamIdFkey(): GamesResultsPath {
-        if (!this::_gamesResultsLoserTeamIdFkey.isInitialized)
-            _gamesResultsLoserTeamIdFkey = GamesResultsPath(this, null, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY.inverseKey)
-
-        return _gamesResultsLoserTeamIdFkey;
-    }
-
-    val gamesResultsLoserTeamIdFkey: GamesResultsPath
-        get(): GamesResultsPath = gamesResultsLoserTeamIdFkey()
-
-    private lateinit var _gamesResultsWinnerTeamIdFkey: GamesResultsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.games_results</code> table, via the
-     * <code>games_results_winner_team_id_fkey</code> key
-     */
-    fun gamesResultsWinnerTeamIdFkey(): GamesResultsPath {
-        if (!this::_gamesResultsWinnerTeamIdFkey.isInitialized)
-            _gamesResultsWinnerTeamIdFkey = GamesResultsPath(this, null, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY.inverseKey)
-
-        return _gamesResultsWinnerTeamIdFkey;
-    }
-
-    val gamesResultsWinnerTeamIdFkey: GamesResultsPath
-        get(): GamesResultsPath = gamesResultsWinnerTeamIdFkey()
-
-    private lateinit var _playerToTeams: PlayerToTeamsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.player_to_teams</code> table
-     */
-    fun playerToTeams(): PlayerToTeamsPath {
-        if (!this::_playerToTeams.isInitialized)
-            _playerToTeams = PlayerToTeamsPath(this, null, PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_TEAM_ID_FKEY.inverseKey)
-
-        return _playerToTeams;
-    }
-
-    val playerToTeams: PlayerToTeamsPath
-        get(): PlayerToTeamsPath = playerToTeams()
-
-    private lateinit var _players: PlayersPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.players</code>
-     * table
-     */
-    fun players(): PlayersPath {
-        if (!this::_players.isInitialized)
-            _players = PlayersPath(this, null, PLAYERS__PLAYERS_TEAM_ID_FKEY.inverseKey)
-
-        return _players;
-    }
-
-    val players: PlayersPath
-        get(): PlayersPath = players()
-
-    private lateinit var _seriesParticipants: SeriesParticipantsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.series_participants</code> table
-     */
-    fun seriesParticipants(): SeriesParticipantsPath {
-        if (!this::_seriesParticipants.isInitialized)
-            _seriesParticipants = SeriesParticipantsPath(this, null, SERIES_PARTICIPANTS__SERIES_PARTICIPANTS_TEAM_ID_FKEY.inverseKey)
-
-        return _seriesParticipants;
-    }
-
-    val seriesParticipants: SeriesParticipantsPath
-        get(): SeriesParticipantsPath = seriesParticipants()
-
-    private lateinit var _seriesResultsLoserTeamIdFkey: SeriesResultsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.series_results</code> table, via the
-     * <code>series_results_loser_team_id_fkey</code> key
-     */
-    fun seriesResultsLoserTeamIdFkey(): SeriesResultsPath {
-        if (!this::_seriesResultsLoserTeamIdFkey.isInitialized)
-            _seriesResultsLoserTeamIdFkey = SeriesResultsPath(this, null, SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY.inverseKey)
-
-        return _seriesResultsLoserTeamIdFkey;
-    }
-
-    val seriesResultsLoserTeamIdFkey: SeriesResultsPath
-        get(): SeriesResultsPath = seriesResultsLoserTeamIdFkey()
-
-    private lateinit var _seriesResultsWinnerTeamIdFkey: SeriesResultsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.series_results</code> table, via the
-     * <code>series_results_winner_team_id_fkey</code> key
-     */
-    fun seriesResultsWinnerTeamIdFkey(): SeriesResultsPath {
-        if (!this::_seriesResultsWinnerTeamIdFkey.isInitialized)
-            _seriesResultsWinnerTeamIdFkey = SeriesResultsPath(this, null, SERIES_RESULTS__SERIES_RESULTS_WINNER_TEAM_ID_FKEY.inverseKey)
-
-        return _seriesResultsWinnerTeamIdFkey;
-    }
-
-    val seriesResultsWinnerTeamIdFkey: SeriesResultsPath
-        get(): SeriesResultsPath = seriesResultsWinnerTeamIdFkey()
-
-    private lateinit var _teamAuditLogs: TeamAuditLogsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.team_audit_logs</code> table
-     */
-    fun teamAuditLogs(): TeamAuditLogsPath {
-        if (!this::_teamAuditLogs.isInitialized)
-            _teamAuditLogs = TeamAuditLogsPath(this, null, TEAM_AUDIT_LOGS__TEAM_AUDIT_LOGS_TEAM_ID_FKEY.inverseKey)
-
-        return _teamAuditLogs;
-    }
-
-    val teamAuditLogs: TeamAuditLogsPath
-        get(): TeamAuditLogsPath = teamAuditLogs()
-
-    /**
-     * Get the implicit many-to-many join path to the <code>dennys.series</code>
-     * table
-     */
-    val series: SeriesPath
-        get(): SeriesPath = seriesParticipants().series()
+    val events: Events
+        get(): Events = events()
     override fun `as`(alias: String): Teams = Teams(DSL.name(alias), this)
     override fun `as`(alias: Name): Teams = Teams(alias, this)
-    override fun `as`(alias: Table<*>): Teams = Teams(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): Teams = Teams(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -349,55 +139,21 @@ open class Teams(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): Teams = Teams(name.qualifiedName, null)
+    override fun rename(name: Table<*>): Teams = Teams(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row4 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row4<Int?, String?, String?, Int?> = super.fieldsRow() as Row4<Int?, String?, String?, Int?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): Teams = Teams(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, String?, String?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): Teams = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): Teams = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): Teams = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): Teams = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): Teams = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): Teams = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): Teams = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): Teams = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): Teams = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?, String?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

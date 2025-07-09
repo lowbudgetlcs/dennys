@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.domain.models.event
 
-import java.time.OffsetDateTime
+import java.time.Instant
 
 data class NewEvent(
     val name: String,
     val description: String,
-    val startDate: OffsetDateTime,
-    val endDate: OffsetDateTime,
+    val startDate: Instant,
+    val endDate: Instant,
     val status: EventStatus
 )

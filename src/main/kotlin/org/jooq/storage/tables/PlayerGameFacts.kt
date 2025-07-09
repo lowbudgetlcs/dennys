@@ -4,23 +4,19 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
+
 import kotlin.collections.List
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row10
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -38,13 +34,6 @@ import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_INVENTO
 import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_PINGS_ID_FKEY
 import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_VISION_ID_FKEY
 import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY
-import org.jooq.storage.tables.PlayerChampSelects.PlayerChampSelectsPath
-import org.jooq.storage.tables.PlayerCombats.PlayerCombatsPath
-import org.jooq.storage.tables.PlayerFarming.PlayerFarmingPath
-import org.jooq.storage.tables.PlayerInventories.PlayerInventoriesPath
-import org.jooq.storage.tables.PlayerPings.PlayerPingsPath
-import org.jooq.storage.tables.PlayerVision.PlayerVisionPath
-import org.jooq.storage.tables.RiotAccounts.RiotAccountsPath
 import org.jooq.storage.tables.records.PlayerGameFactsRecord
 
 
@@ -54,23 +43,19 @@ import org.jooq.storage.tables.records.PlayerGameFactsRecord
 @Suppress("UNCHECKED_CAST")
 open class PlayerGameFacts(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, PlayerGameFactsRecord>?,
-    parentPath: InverseForeignKey<out Record, PlayerGameFactsRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, PlayerGameFactsRecord>?,
     aliased: Table<PlayerGameFactsRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<PlayerGameFactsRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -135,9 +120,8 @@ open class PlayerGameFacts(
      */
     val PLAYER_FARMING_ID: TableField<PlayerGameFactsRecord, Int?> = createField(DSL.name("player_farming_id"), SQLDataType.INTEGER, this, "")
 
-    private constructor(alias: Name, aliased: Table<PlayerGameFactsRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<PlayerGameFactsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<PlayerGameFactsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<PlayerGameFactsRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<PlayerGameFactsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.player_game_facts</code> table reference
@@ -154,136 +138,119 @@ open class PlayerGameFacts(
      */
     constructor(): this(DSL.name("player_game_facts"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerGameFactsRecord>?, parentPath: InverseForeignKey<out Record, PlayerGameFactsRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, PLAYER_GAME_FACTS, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class PlayerGameFactsPath : PlayerGameFacts, Path<PlayerGameFactsRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerGameFactsRecord>?, parentPath: InverseForeignKey<out Record, PlayerGameFactsRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<PlayerGameFactsRecord>): super(alias, aliased)
-        override fun `as`(alias: String): PlayerGameFactsPath = PlayerGameFactsPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): PlayerGameFactsPath = PlayerGameFactsPath(alias, this)
-        override fun `as`(alias: Table<*>): PlayerGameFactsPath = PlayerGameFactsPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, PlayerGameFactsRecord>): this(Internal.createPathAlias(child, key), child, key, PLAYER_GAME_FACTS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<PlayerGameFactsRecord, Int?> = super.getIdentity() as Identity<PlayerGameFactsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PlayerGameFactsRecord> = PLAYER_GAME_FACTS_PKEY
     override fun getReferences(): List<ForeignKey<PlayerGameFactsRecord, *>> = listOf(PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_CHAMP_SELECT_ID_FKEY, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_INVENTORIES_ID_FKEY, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_COMBATS_ID_FKEY, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_VISION_ID_FKEY, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_PINGS_ID_FKEY, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_FARMING_ID_FKEY)
 
-    private lateinit var _riotAccounts: RiotAccountsPath
+    private lateinit var _riotAccounts: RiotAccounts
+    private lateinit var _playerChampSelects: PlayerChampSelects
+    private lateinit var _playerInventories: PlayerInventories
+    private lateinit var _playerCombats: PlayerCombats
+    private lateinit var _playerVision: PlayerVision
+    private lateinit var _playerPings: PlayerPings
+    private lateinit var _playerFarming: PlayerFarming
 
     /**
      * Get the implicit join path to the <code>dennys.riot_accounts</code>
      * table.
      */
-    fun riotAccounts(): RiotAccountsPath {
+    fun riotAccounts(): RiotAccounts {
         if (!this::_riotAccounts.isInitialized)
-            _riotAccounts = RiotAccountsPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY, null)
+            _riotAccounts = RiotAccounts(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY)
 
         return _riotAccounts;
     }
 
-    val riotAccounts: RiotAccountsPath
-        get(): RiotAccountsPath = riotAccounts()
-
-    private lateinit var _playerChampSelects: PlayerChampSelectsPath
+    val riotAccounts: RiotAccounts
+        get(): RiotAccounts = riotAccounts()
 
     /**
      * Get the implicit join path to the
      * <code>dennys.player_champ_selects</code> table.
      */
-    fun playerChampSelects(): PlayerChampSelectsPath {
+    fun playerChampSelects(): PlayerChampSelects {
         if (!this::_playerChampSelects.isInitialized)
-            _playerChampSelects = PlayerChampSelectsPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_CHAMP_SELECT_ID_FKEY, null)
+            _playerChampSelects = PlayerChampSelects(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_CHAMP_SELECT_ID_FKEY)
 
         return _playerChampSelects;
     }
 
-    val playerChampSelects: PlayerChampSelectsPath
-        get(): PlayerChampSelectsPath = playerChampSelects()
-
-    private lateinit var _playerInventories: PlayerInventoriesPath
+    val playerChampSelects: PlayerChampSelects
+        get(): PlayerChampSelects = playerChampSelects()
 
     /**
      * Get the implicit join path to the <code>dennys.player_inventories</code>
      * table.
      */
-    fun playerInventories(): PlayerInventoriesPath {
+    fun playerInventories(): PlayerInventories {
         if (!this::_playerInventories.isInitialized)
-            _playerInventories = PlayerInventoriesPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_INVENTORIES_ID_FKEY, null)
+            _playerInventories = PlayerInventories(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_INVENTORIES_ID_FKEY)
 
         return _playerInventories;
     }
 
-    val playerInventories: PlayerInventoriesPath
-        get(): PlayerInventoriesPath = playerInventories()
-
-    private lateinit var _playerCombats: PlayerCombatsPath
+    val playerInventories: PlayerInventories
+        get(): PlayerInventories = playerInventories()
 
     /**
      * Get the implicit join path to the <code>dennys.player_combats</code>
      * table.
      */
-    fun playerCombats(): PlayerCombatsPath {
+    fun playerCombats(): PlayerCombats {
         if (!this::_playerCombats.isInitialized)
-            _playerCombats = PlayerCombatsPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_COMBATS_ID_FKEY, null)
+            _playerCombats = PlayerCombats(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_COMBATS_ID_FKEY)
 
         return _playerCombats;
     }
 
-    val playerCombats: PlayerCombatsPath
-        get(): PlayerCombatsPath = playerCombats()
-
-    private lateinit var _playerVision: PlayerVisionPath
+    val playerCombats: PlayerCombats
+        get(): PlayerCombats = playerCombats()
 
     /**
      * Get the implicit join path to the <code>dennys.player_vision</code>
      * table.
      */
-    fun playerVision(): PlayerVisionPath {
+    fun playerVision(): PlayerVision {
         if (!this::_playerVision.isInitialized)
-            _playerVision = PlayerVisionPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_VISION_ID_FKEY, null)
+            _playerVision = PlayerVision(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_VISION_ID_FKEY)
 
         return _playerVision;
     }
 
-    val playerVision: PlayerVisionPath
-        get(): PlayerVisionPath = playerVision()
-
-    private lateinit var _playerPings: PlayerPingsPath
+    val playerVision: PlayerVision
+        get(): PlayerVision = playerVision()
 
     /**
      * Get the implicit join path to the <code>dennys.player_pings</code> table.
      */
-    fun playerPings(): PlayerPingsPath {
+    fun playerPings(): PlayerPings {
         if (!this::_playerPings.isInitialized)
-            _playerPings = PlayerPingsPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_PINGS_ID_FKEY, null)
+            _playerPings = PlayerPings(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_PINGS_ID_FKEY)
 
         return _playerPings;
     }
 
-    val playerPings: PlayerPingsPath
-        get(): PlayerPingsPath = playerPings()
-
-    private lateinit var _playerFarming: PlayerFarmingPath
+    val playerPings: PlayerPings
+        get(): PlayerPings = playerPings()
 
     /**
      * Get the implicit join path to the <code>dennys.player_farming</code>
      * table.
      */
-    fun playerFarming(): PlayerFarmingPath {
+    fun playerFarming(): PlayerFarming {
         if (!this::_playerFarming.isInitialized)
-            _playerFarming = PlayerFarmingPath(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_FARMING_ID_FKEY, null)
+            _playerFarming = PlayerFarming(this, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_FARMING_ID_FKEY)
 
         return _playerFarming;
     }
 
-    val playerFarming: PlayerFarmingPath
-        get(): PlayerFarmingPath = playerFarming()
+    val playerFarming: PlayerFarming
+        get(): PlayerFarming = playerFarming()
     override fun `as`(alias: String): PlayerGameFacts = PlayerGameFacts(DSL.name(alias), this)
     override fun `as`(alias: Name): PlayerGameFacts = PlayerGameFacts(alias, this)
-    override fun `as`(alias: Table<*>): PlayerGameFacts = PlayerGameFacts(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): PlayerGameFacts = PlayerGameFacts(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -298,55 +265,21 @@ open class PlayerGameFacts(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): PlayerGameFacts = PlayerGameFacts(name.qualifiedName, null)
+    override fun rename(name: Table<*>): PlayerGameFacts = PlayerGameFacts(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row10 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row10<Int?, Int?, Int?, String?, Int?, Int?, Int?, Int?, Int?, Int?> = super.fieldsRow() as Row10<Int?, Int?, Int?, String?, Int?, Int?, Int?, Int?, Int?, Int?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): PlayerGameFacts = PlayerGameFacts(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Int?, Int?, String?, Int?, Int?, Int?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): PlayerGameFacts = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): PlayerGameFacts = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): PlayerGameFacts = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): PlayerGameFacts = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): PlayerGameFacts = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): PlayerGameFacts = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): PlayerGameFacts = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): PlayerGameFacts = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): PlayerGameFacts = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Int?, Int?, String?, Int?, Int?, Int?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

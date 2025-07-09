@@ -4,22 +4,18 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
+
 import kotlin.collections.List
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row3
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -33,8 +29,6 @@ import org.jooq.storage.keys.GAMES_RESULTS_PKEY
 import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY
 import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY
-import org.jooq.storage.tables.Games.GamesPath
-import org.jooq.storage.tables.Teams.TeamsPath
 import org.jooq.storage.tables.records.GamesResultsRecord
 
 
@@ -44,23 +38,19 @@ import org.jooq.storage.tables.records.GamesResultsRecord
 @Suppress("UNCHECKED_CAST")
 open class GamesResults(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, GamesResultsRecord>?,
-    parentPath: InverseForeignKey<out Record, GamesResultsRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, GamesResultsRecord>?,
     aliased: Table<GamesResultsRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<GamesResultsRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -90,9 +80,8 @@ open class GamesResults(
      */
     val LOSER_TEAM_ID: TableField<GamesResultsRecord, Int?> = createField(DSL.name("loser_team_id"), SQLDataType.INTEGER, this, "")
 
-    private constructor(alias: Name, aliased: Table<GamesResultsRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<GamesResultsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<GamesResultsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<GamesResultsRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<GamesResultsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.games_results</code> table reference
@@ -109,71 +98,58 @@ open class GamesResults(
      */
     constructor(): this(DSL.name("games_results"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, GamesResultsRecord>?, parentPath: InverseForeignKey<out Record, GamesResultsRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, GAMES_RESULTS, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class GamesResultsPath : GamesResults, Path<GamesResultsRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, GamesResultsRecord>?, parentPath: InverseForeignKey<out Record, GamesResultsRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<GamesResultsRecord>): super(alias, aliased)
-        override fun `as`(alias: String): GamesResultsPath = GamesResultsPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): GamesResultsPath = GamesResultsPath(alias, this)
-        override fun `as`(alias: Table<*>): GamesResultsPath = GamesResultsPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, GamesResultsRecord>): this(Internal.createPathAlias(child, key), child, key, GAMES_RESULTS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getPrimaryKey(): UniqueKey<GamesResultsRecord> = GAMES_RESULTS_PKEY
     override fun getReferences(): List<ForeignKey<GamesResultsRecord, *>> = listOf(GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY)
 
-    private lateinit var _games: GamesPath
+    private lateinit var _games: Games
+    private lateinit var _gamesResultsWinnerTeamIdFkey: Teams
+    private lateinit var _gamesResultsLoserTeamIdFkey: Teams
 
     /**
      * Get the implicit join path to the <code>dennys.games</code> table.
      */
-    fun games(): GamesPath {
+    fun games(): Games {
         if (!this::_games.isInitialized)
-            _games = GamesPath(this, GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY, null)
+            _games = Games(this, GAMES_RESULTS__GAMES_RESULTS_GAME_ID_FKEY)
 
         return _games;
     }
 
-    val games: GamesPath
-        get(): GamesPath = games()
-
-    private lateinit var _gamesResultsWinnerTeamIdFkey: TeamsPath
+    val games: Games
+        get(): Games = games()
 
     /**
      * Get the implicit join path to the <code>dennys.teams</code> table, via
      * the <code>games_results_winner_team_id_fkey</code> key.
      */
-    fun gamesResultsWinnerTeamIdFkey(): TeamsPath {
+    fun gamesResultsWinnerTeamIdFkey(): Teams {
         if (!this::_gamesResultsWinnerTeamIdFkey.isInitialized)
-            _gamesResultsWinnerTeamIdFkey = TeamsPath(this, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY, null)
+            _gamesResultsWinnerTeamIdFkey = Teams(this, GAMES_RESULTS__GAMES_RESULTS_WINNER_TEAM_ID_FKEY)
 
         return _gamesResultsWinnerTeamIdFkey;
     }
 
-    val gamesResultsWinnerTeamIdFkey: TeamsPath
-        get(): TeamsPath = gamesResultsWinnerTeamIdFkey()
-
-    private lateinit var _gamesResultsLoserTeamIdFkey: TeamsPath
+    val gamesResultsWinnerTeamIdFkey: Teams
+        get(): Teams = gamesResultsWinnerTeamIdFkey()
 
     /**
      * Get the implicit join path to the <code>dennys.teams</code> table, via
      * the <code>games_results_loser_team_id_fkey</code> key.
      */
-    fun gamesResultsLoserTeamIdFkey(): TeamsPath {
+    fun gamesResultsLoserTeamIdFkey(): Teams {
         if (!this::_gamesResultsLoserTeamIdFkey.isInitialized)
-            _gamesResultsLoserTeamIdFkey = TeamsPath(this, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY, null)
+            _gamesResultsLoserTeamIdFkey = Teams(this, GAMES_RESULTS__GAMES_RESULTS_LOSER_TEAM_ID_FKEY)
 
         return _gamesResultsLoserTeamIdFkey;
     }
 
-    val gamesResultsLoserTeamIdFkey: TeamsPath
-        get(): TeamsPath = gamesResultsLoserTeamIdFkey()
+    val gamesResultsLoserTeamIdFkey: Teams
+        get(): Teams = gamesResultsLoserTeamIdFkey()
     override fun `as`(alias: String): GamesResults = GamesResults(DSL.name(alias), this)
     override fun `as`(alias: Name): GamesResults = GamesResults(alias, this)
-    override fun `as`(alias: Table<*>): GamesResults = GamesResults(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): GamesResults = GamesResults(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -188,55 +164,21 @@ open class GamesResults(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): GamesResults = GamesResults(name.qualifiedName, null)
+    override fun rename(name: Table<*>): GamesResults = GamesResults(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row3 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row3<Int?, Int?, Int?> = super.fieldsRow() as Row3<Int?, Int?, Int?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): GamesResults = GamesResults(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): GamesResults = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): GamesResults = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): GamesResults = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): GamesResults = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): GamesResults = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): GamesResults = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): GamesResults = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): GamesResults = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): GamesResults = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

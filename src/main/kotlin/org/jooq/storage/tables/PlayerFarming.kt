@@ -4,22 +4,17 @@
 package org.jooq.storage.tables
 
 
-import kotlin.collections.Collection
+import java.util.function.Function
 
-import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
-import org.jooq.InverseForeignKey
 import org.jooq.Name
-import org.jooq.Path
-import org.jooq.PlainSQL
-import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.SQL
+import org.jooq.Records
+import org.jooq.Row4
 import org.jooq.Schema
-import org.jooq.Select
-import org.jooq.Stringly
+import org.jooq.SelectField
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -30,8 +25,6 @@ import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.PLAYER_FARMING_PKEY
-import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_FARMING_ID_FKEY
-import org.jooq.storage.tables.PlayerGameFacts.PlayerGameFactsPath
 import org.jooq.storage.tables.records.PlayerFarmingRecord
 
 
@@ -41,23 +34,19 @@ import org.jooq.storage.tables.records.PlayerFarmingRecord
 @Suppress("UNCHECKED_CAST")
 open class PlayerFarming(
     alias: Name,
-    path: Table<out Record>?,
-    childPath: ForeignKey<out Record, PlayerFarmingRecord>?,
-    parentPath: InverseForeignKey<out Record, PlayerFarmingRecord>?,
+    child: Table<out Record>?,
+    path: ForeignKey<out Record, PlayerFarmingRecord>?,
     aliased: Table<PlayerFarmingRecord>?,
-    parameters: Array<Field<*>?>?,
-    where: Condition?
+    parameters: Array<Field<*>?>?
 ): TableImpl<PlayerFarmingRecord>(
     alias,
     Dennys.DENNYS,
+    child,
     path,
-    childPath,
-    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table(),
-    where,
+    TableOptions.table()
 ) {
     companion object {
 
@@ -92,9 +81,8 @@ open class PlayerFarming(
      */
     val LEVEL: TableField<PlayerFarmingRecord, Int?> = createField(DSL.name("level"), SQLDataType.INTEGER.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<PlayerFarmingRecord>?): this(alias, null, null, null, aliased, null, null)
-    private constructor(alias: Name, aliased: Table<PlayerFarmingRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
-    private constructor(alias: Name, aliased: Table<PlayerFarmingRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
+    private constructor(alias: Name, aliased: Table<PlayerFarmingRecord>?): this(alias, null, null, aliased, null)
+    private constructor(alias: Name, aliased: Table<PlayerFarmingRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
     /**
      * Create an aliased <code>dennys.player_farming</code> table reference
@@ -111,40 +99,13 @@ open class PlayerFarming(
      */
     constructor(): this(DSL.name("player_farming"), null)
 
-    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerFarmingRecord>?, parentPath: InverseForeignKey<out Record, PlayerFarmingRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, PLAYER_FARMING, null, null)
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    open class PlayerFarmingPath : PlayerFarming, Path<PlayerFarmingRecord> {
-        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerFarmingRecord>?, parentPath: InverseForeignKey<out Record, PlayerFarmingRecord>?): super(path, childPath, parentPath)
-        private constructor(alias: Name, aliased: Table<PlayerFarmingRecord>): super(alias, aliased)
-        override fun `as`(alias: String): PlayerFarmingPath = PlayerFarmingPath(DSL.name(alias), this)
-        override fun `as`(alias: Name): PlayerFarmingPath = PlayerFarmingPath(alias, this)
-        override fun `as`(alias: Table<*>): PlayerFarmingPath = PlayerFarmingPath(alias.qualifiedName, this)
-    }
+    constructor(child: Table<out Record>, key: ForeignKey<out Record, PlayerFarmingRecord>): this(Internal.createPathAlias(child, key), child, key, PLAYER_FARMING, null)
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<PlayerFarmingRecord, Int?> = super.getIdentity() as Identity<PlayerFarmingRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PlayerFarmingRecord> = PLAYER_FARMING_PKEY
-
-    private lateinit var _playerGameFacts: PlayerGameFactsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.player_game_facts</code> table
-     */
-    fun playerGameFacts(): PlayerGameFactsPath {
-        if (!this::_playerGameFacts.isInitialized)
-            _playerGameFacts = PlayerGameFactsPath(this, null, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_FARMING_ID_FKEY.inverseKey)
-
-        return _playerGameFacts;
-    }
-
-    val playerGameFacts: PlayerGameFactsPath
-        get(): PlayerGameFactsPath = playerGameFacts()
     override fun `as`(alias: String): PlayerFarming = PlayerFarming(DSL.name(alias), this)
     override fun `as`(alias: Name): PlayerFarming = PlayerFarming(alias, this)
-    override fun `as`(alias: Table<*>): PlayerFarming = PlayerFarming(alias.qualifiedName, this)
+    override fun `as`(alias: Table<*>): PlayerFarming = PlayerFarming(alias.getQualifiedName(), this)
 
     /**
      * Rename this table
@@ -159,55 +120,21 @@ open class PlayerFarming(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): PlayerFarming = PlayerFarming(name.qualifiedName, null)
+    override fun rename(name: Table<*>): PlayerFarming = PlayerFarming(name.getQualifiedName(), null)
+
+    // -------------------------------------------------------------------------
+    // Row4 type methods
+    // -------------------------------------------------------------------------
+    override fun fieldsRow(): Row4<Int?, Int?, Int?, Int?> = super.fieldsRow() as Row4<Int?, Int?, Int?, Int?>
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    override fun where(condition: Condition?): PlayerFarming = PlayerFarming(qualifiedName, if (aliased()) this else null, condition)
+    fun <U> mapping(from: (Int?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
-     * Create an inline derived table from this table
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
      */
-    override fun where(conditions: Collection<Condition>): PlayerFarming = where(DSL.and(conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(vararg conditions: Condition?): PlayerFarming = where(DSL.and(*conditions))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun where(condition: Field<Boolean?>?): PlayerFarming = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(condition: SQL): PlayerFarming = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String): PlayerFarming = where(DSL.condition(condition))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): PlayerFarming = where(DSL.condition(condition, *binds))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): PlayerFarming = where(DSL.condition(condition, *parts))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereExists(select: Select<*>): PlayerFarming = where(DSL.exists(select))
-
-    /**
-     * Create an inline derived table from this table
-     */
-    override fun whereNotExists(select: Select<*>): PlayerFarming = where(DSL.notExists(select))
+    fun <U> mapping(toType: Class<U>, from: (Int?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }
