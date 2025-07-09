@@ -5,11 +5,9 @@ import com.lowbudgetlcs.models.match.MatchParticipant
 import com.lowbudgetlcs.models.match.MatchTeam
 import com.lowbudgetlcs.models.match.TeamType
 import com.lowbudgetlcs.repositories.games.IGameRepository
-import com.lowbudgetlcs.repositories.IMatchRepository
-import com.lowbudgetlcs.repositories.IPlayerRepository
-import com.lowbudgetlcs.repositories.teams.ITeamRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.collections.get
 
 /**
  * The StatService saves game-data (such as KDA) for LeagueOfLegendsMatch-es
