@@ -14,7 +14,7 @@ FROM gradle:8.9-jdk17 AS test
 WORKDIR /test
 COPY --from=dependencies /cache /home/gradle/.gradle
 COPY . .
-RUN gradle test
+RUN gradle test itest
 
 FROM amazoncorretto:17-alpine AS app
 WORKDIR /app

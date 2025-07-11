@@ -39,6 +39,3 @@ out/
 **/*.local.yaml
 .env*
 !.env.example
-
-### Generated Code ###
-src/main/kotlin/org/jooq

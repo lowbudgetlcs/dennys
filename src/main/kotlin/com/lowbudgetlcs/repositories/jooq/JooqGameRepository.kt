@@ -3,7 +3,7 @@ package com.lowbudgetlcs.repositories.jooq
 import com.lowbudgetlcs.domain.models.game.Game
 import org.jooq.DSLContext
 import org.jooq.storage.tables.references.GAMES
-import org.jooq.storage.tables.references.GAMES_RESULTS
+import org.jooq.storage.tables.references.GAME_RESULTS
 
 class JooqGameRepository(private val dsl: DSLContext) {
 
@@ -11,11 +11,11 @@ class JooqGameRepository(private val dsl: DSLContext) {
         dsl
             .select(
                 GAMES.ID, GAMES.SHORTCODE, GAMES.BLUE_TEAM_ID, GAMES.RED_TEAM_ID, GAMES.SERIES_ID,
-                GAMES_RESULTS.WINNER_TEAM_ID, GAMES_RESULTS.LOSER_TEAM_ID
+                GAME_RESULTS.WINNER_TEAM_ID, GAME_RESULTS.LOSER_TEAM_ID
             )
             .from(GAMES)
-            .leftJoin(GAMES_RESULTS)
-            .on(GAMES_RESULTS.GAME_ID.eq(GAMES.ID))
+            .leftJoin(GAME_RESULTS)
+            .on(GAME_RESULTS.GAME_ID.eq(GAMES.ID))
             .fetch()
             .map { row ->
                 Game(
@@ -24,19 +24,19 @@ class JooqGameRepository(private val dsl: DSLContext) {
                     blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
                     redSideId = row[GAMES.RED_TEAM_ID]!!,
                     seriesId = row[GAMES.SERIES_ID]!!,
-                    winnerId = row[GAMES_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[GAMES_RESULTS.LOSER_TEAM_ID]
+                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
+                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
                 )
             }
 
     fun findById(id: Int): Game? = dsl
         .select(
             GAMES.ID, GAMES.SHORTCODE, GAMES.BLUE_TEAM_ID, GAMES.RED_TEAM_ID, GAMES.SERIES_ID,
-            GAMES_RESULTS.WINNER_TEAM_ID, GAMES_RESULTS.LOSER_TEAM_ID
+            GAME_RESULTS.WINNER_TEAM_ID, GAME_RESULTS.LOSER_TEAM_ID
         )
         .from(GAMES)
-        .leftJoin(GAMES_RESULTS)
-        .on(GAMES.ID.eq(GAMES_RESULTS.GAME_ID))
+        .leftJoin(GAME_RESULTS)
+        .on(GAMES.ID.eq(GAME_RESULTS.GAME_ID))
         .where(GAMES.ID.eq(id))
         .fetchOne()
         ?.let { row ->
@@ -47,8 +47,8 @@ class JooqGameRepository(private val dsl: DSLContext) {
                 blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
                 redSideId = row[GAMES.RED_TEAM_ID]!!,
                 seriesId = row[GAMES.SERIES_ID]!!,
-                winnerId = row[GAMES_RESULTS.WINNER_TEAM_ID],
-                loserId = row[GAMES_RESULTS.LOSER_TEAM_ID]
+                winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
+                loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
             )
         }
 
@@ -56,11 +56,11 @@ class JooqGameRepository(private val dsl: DSLContext) {
         dsl
             .select(
                 GAMES.ID, GAMES.SHORTCODE, GAMES.BLUE_TEAM_ID, GAMES.RED_TEAM_ID, GAMES.SERIES_ID,
-                GAMES_RESULTS.WINNER_TEAM_ID, GAMES_RESULTS.LOSER_TEAM_ID
+                GAME_RESULTS.WINNER_TEAM_ID, GAME_RESULTS.LOSER_TEAM_ID
             )
             .from(GAMES)
-            .leftJoin(GAMES_RESULTS)
-            .on(GAMES.ID.eq(GAMES_RESULTS.GAME_ID))
+            .leftJoin(GAME_RESULTS)
+            .on(GAMES.ID.eq(GAME_RESULTS.GAME_ID))
             .where(GAMES.SHORTCODE.eq(shortcode))
             .fetchOne()
             ?.let { row ->
@@ -70,8 +70,8 @@ class JooqGameRepository(private val dsl: DSLContext) {
                     blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
                     redSideId = row[GAMES.RED_TEAM_ID]!!,
                     seriesId = row[GAMES.SERIES_ID]!!,
-                    winnerId = row[GAMES_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[GAMES_RESULTS.LOSER_TEAM_ID]
+                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
+                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
                 )
             }
 
@@ -82,11 +82,11 @@ class JooqGameRepository(private val dsl: DSLContext) {
         dsl
             .select(
                 GAMES.ID, GAMES.SHORTCODE, GAMES.BLUE_TEAM_ID, GAMES.RED_TEAM_ID, GAMES.SERIES_ID,
-                GAMES_RESULTS.WINNER_TEAM_ID, GAMES_RESULTS.LOSER_TEAM_ID
+                GAME_RESULTS.WINNER_TEAM_ID, GAME_RESULTS.LOSER_TEAM_ID
             )
             .from(GAMES)
-            .leftJoin(GAMES_RESULTS)
-            .on(GAMES.ID.eq(GAMES_RESULTS.GAME_ID))
+            .leftJoin(GAME_RESULTS)
+            .on(GAMES.ID.eq(GAME_RESULTS.GAME_ID))
             .where(GAMES.BLUE_TEAM_ID.eq(teamId).or(GAMES.RED_TEAM_ID.eq(teamId)))
             .and(GAMES.SERIES_ID.eq(seriesId))
             .fetch().map { row ->
@@ -96,8 +96,8 @@ class JooqGameRepository(private val dsl: DSLContext) {
                     blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
                     redSideId = row[GAMES.RED_TEAM_ID]!!,
                     seriesId = row[GAMES.SERIES_ID]!!,
-                    winnerId = row[GAMES_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[GAMES_RESULTS.LOSER_TEAM_ID]
+                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
+                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
                 )
             }
 }

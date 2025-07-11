@@ -1,7 +1,7 @@
 val kotlinVersion = "2.2.0"
 val ktorVersion = "3.1.3"
 val logbackVersion = "1.5.18"
-val jooqVersion = "3.18.6"
+val jooqVersion = "3.19.18"
 val kotestVersion = "5.9.0"
 val testcontainersVersion = "1.21.3"
 val postgresDriverVersion = "42.7.7"
@@ -27,13 +27,13 @@ repositories {
 
 
 tasks.register<Test>("generateJooq") {
-    group = "jooq"
+    group = "codegen"
     description = "Generates Jooq data classes from Dennys database schema"
     testClassesDirs = sourceSets["jooq"].output.classesDirs
     classpath = sourceSets["jooq"].runtimeClasspath
 }
 
-tasks.register<Test>("integrationTests") {
+tasks.register<Test>("itest") {
     group = "test"
     description = "Run integration source set"
     testClassesDirs = sourceSets["itest"].output.classesDirs
@@ -78,8 +78,8 @@ dependencies {
     implementation("org.jooq:jooq:$jooqVersion")
 
     // Jooq Code Generation
-    "jooqImplementation"("org.junit.jupiter:junit-jupiter:5.8.1")
-    "jooqImplementation"("org.testcontainers:junit-jupiter:$testcontainersVersion")
+    "jooqImplementation"("io.kotest:kotest-runner-junit5:$kotestVersion")
+    "jooqImplementation"("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
     "jooqImplementation"("org.testcontainers:postgresql:$testcontainersVersion")
     "jooqImplementation"("org.jooq:jooq-meta:$jooqVersion")
     "jooqImplementation"("org.jooq:jooq-codegen:$jooqVersion")
