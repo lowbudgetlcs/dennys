@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.riot
 
 import com.lowbudgetlcs.RateLimiter
 import com.lowbudgetlcs.RiotApiClient

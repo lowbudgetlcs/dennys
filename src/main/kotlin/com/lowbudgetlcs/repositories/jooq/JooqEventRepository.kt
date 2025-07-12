@@ -3,12 +3,14 @@ package com.lowbudgetlcs.repositories.jooq
 import com.lowbudgetlcs.domain.models.event.Event
 import com.lowbudgetlcs.domain.models.event.EventStatus
 import com.lowbudgetlcs.domain.models.event.NewEvent
+import com.lowbudgetlcs.domain.tournament.Tournament
+import com.lowbudgetlcs.repositories.IEventRepository
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Events.Companion.EVENTS
 
-class JooqEventRepository(private val dsl: DSLContext) {
+class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
 
-    fun findById(id: Int): Event? =
+    override fun getById(id: Int): Event? =
         dsl
             .select(
                 EVENTS.ID,
@@ -36,14 +38,14 @@ class JooqEventRepository(private val dsl: DSLContext) {
             }
 
 
-    fun insert(event: NewEvent, riotTournamentId: Int): Event? =
+    override fun insert(event: NewEvent, tournament: Tournament): Event? =
         dsl
             .insertInto(
                 EVENTS
             )
             .set(EVENTS.NAME, event.name)
             .set(EVENTS.DESCRIPTION, event.description)
-            .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId)
+            .set(EVENTS.RIOT_TOURNAMENT_ID, tournament.id)
             .set(EVENTS.START_DATE, event.startDate)
             .set(EVENTS.END_DATE, event.endDate)
             .set(EVENTS.STATUS, event.status.name)
@@ -53,7 +55,7 @@ class JooqEventRepository(private val dsl: DSLContext) {
                     id = row[EVENTS.ID]!!,
                     name = event.name,
                     description = event.description,
-                    riotTournamentId = riotTournamentId,
+                    riotTournamentId = tournament.id,
                     createdAt = row[EVENTS.CREATED_AT]!!,
                     startDate = event.startDate,
                     endDate = event.endDate,

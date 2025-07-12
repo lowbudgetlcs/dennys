@@ -41,7 +41,7 @@ tasks.register<Test>("itest") {
     shouldRunAfter("test")
 }
 
-tasks.withType<Test>().configureEach(){
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
@@ -96,6 +96,7 @@ dependencies {
     "itestImplementation"("ch.qos.logback:logback-classic:$logbackVersion")
 
     // Unit Testing
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -103,4 +104,6 @@ dependencies {
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation(kotlin("reflect"))
+
 }
