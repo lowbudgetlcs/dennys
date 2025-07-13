@@ -24,7 +24,7 @@ class InMemoryEventRepository : IEventRepository {
             id = id,
             name = event.name,
             description = event.description,
-            riotTournamentId = tournamentId,
+            tournamentId = tournamentId,
             createdAt = now(),
             startDate = event.startDate,
             endDate = event.endDate,

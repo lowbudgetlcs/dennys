@@ -13,7 +13,7 @@ data class Event(
     val id: EventId,
     val name: String,
     val description: String,
-    val riotTournamentId: TournamentId,
+    val tournamentId: TournamentId,
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,

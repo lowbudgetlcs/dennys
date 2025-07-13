@@ -30,7 +30,7 @@ services:
       - POSTGRES_PASSWORD=admin
     volumes:
       # DB Init Scripts
-      - ./docker/postgres/migrations:/docker-entrypoint-initdb.d
+      - ./docker/postgres/sql:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
       interval: 5s 

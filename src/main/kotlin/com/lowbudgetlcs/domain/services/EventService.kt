@@ -10,5 +10,8 @@ class EventService(private val eventRepo: IEventRepository, private val tourname
             eventRepo.insert(event, it.id)
         }
 
+    fun getEvent(id: EventId): Event? = eventRepo.getById(id)
+
+
     fun changeEventStatus(id: EventId, newStatus: EventStatus): Event? = eventRepo.updateStatusById(id, newStatus)
 }
