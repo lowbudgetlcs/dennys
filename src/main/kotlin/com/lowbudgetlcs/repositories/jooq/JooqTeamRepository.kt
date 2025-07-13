@@ -1,6 +1,9 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.EventId
+import com.lowbudgetlcs.domain.models.Team
+import com.lowbudgetlcs.domain.models.TeamId
+import com.lowbudgetlcs.domain.models.TeamName
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Teams
 import org.jooq.storage.tables.references.EVENTS
@@ -26,10 +29,10 @@ class JooqTeamRepository(private val dsl: DSLContext) {
             .fetch()
         return result.map { row ->
             Team(
-                id = row[TEAMS.ID]!!,
-                name = row[TEAMS.NAME]!!,
+                id = TeamId(row[TEAMS.ID]!!),
+                name = TeamName(row[TEAMS.NAME]!!),
                 logoName = row[TEAMS.LOGO_NAME],
-                eventId = row[TEAMS.EVENT_ID]
+                eventId = row[TEAMS.EVENT_ID]?.let { EventId(it) }
             )
         }
     }

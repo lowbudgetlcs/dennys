@@ -1,6 +1,9 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.game.Game
+import com.lowbudgetlcs.domain.models.Game
+import com.lowbudgetlcs.domain.models.GameId
+import com.lowbudgetlcs.domain.models.SeriesId
+import com.lowbudgetlcs.domain.models.TeamId
 import org.jooq.DSLContext
 import org.jooq.storage.tables.references.GAMES
 import org.jooq.storage.tables.references.GAME_RESULTS
@@ -19,13 +22,13 @@ class JooqGameRepository(private val dsl: DSLContext) {
             .fetch()
             .map { row ->
                 Game(
-                    id = row[GAMES.ID]!!,
+                    id = GameId(row[GAMES.ID]!!),
                     shortCode = row[GAMES.SHORTCODE]!!,
-                    blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
-                    redSideId = row[GAMES.RED_TEAM_ID]!!,
-                    seriesId = row[GAMES.SERIES_ID]!!,
-                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
+                    blueSideId = TeamId(row[GAMES.BLUE_TEAM_ID]!!),
+                    redSideId = TeamId(row[GAMES.RED_TEAM_ID]!!),
+                    seriesId = SeriesId(row[GAMES.SERIES_ID]!!),
+                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID]?.let { TeamId(it) },
+                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]?.let { TeamId(it) }
                 )
             }
 
@@ -40,15 +43,14 @@ class JooqGameRepository(private val dsl: DSLContext) {
         .where(GAMES.ID.eq(id))
         .fetchOne()
         ?.let { row ->
-
             Game(
-                id = row[GAMES.ID]!!,
+                id = GameId(row[GAMES.ID]!!),
                 shortCode = row[GAMES.SHORTCODE]!!,
-                blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
-                redSideId = row[GAMES.RED_TEAM_ID]!!,
-                seriesId = row[GAMES.SERIES_ID]!!,
-                winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
-                loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
+                blueSideId = TeamId(row[GAMES.BLUE_TEAM_ID]!!),
+                redSideId = TeamId(row[GAMES.RED_TEAM_ID]!!),
+                seriesId = SeriesId(row[GAMES.SERIES_ID]!!),
+                winnerId = row[GAME_RESULTS.WINNER_TEAM_ID]?.let { TeamId(it) },
+                loserId = row[GAME_RESULTS.LOSER_TEAM_ID]?.let { TeamId(it) }
             )
         }
 
@@ -65,13 +67,13 @@ class JooqGameRepository(private val dsl: DSLContext) {
             .fetchOne()
             ?.let { row ->
                 Game(
-                    id = row[GAMES.ID]!!,
+                    id = GameId(row[GAMES.ID]!!),
                     shortCode = row[GAMES.SHORTCODE]!!,
-                    blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
-                    redSideId = row[GAMES.RED_TEAM_ID]!!,
-                    seriesId = row[GAMES.SERIES_ID]!!,
-                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
+                    blueSideId = TeamId(row[GAMES.BLUE_TEAM_ID]!!),
+                    redSideId = TeamId(row[GAMES.RED_TEAM_ID]!!),
+                    seriesId = SeriesId(row[GAMES.SERIES_ID]!!),
+                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID]?.let { TeamId(it) },
+                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]?.let { TeamId(it) }
                 )
             }
 
@@ -91,13 +93,13 @@ class JooqGameRepository(private val dsl: DSLContext) {
             .and(GAMES.SERIES_ID.eq(seriesId))
             .fetch().map { row ->
                 Game(
-                    id = row[GAMES.ID]!!,
+                    id = GameId(row[GAMES.ID]!!),
                     shortCode = row[GAMES.SHORTCODE]!!,
-                    blueSideId = row[GAMES.BLUE_TEAM_ID]!!,
-                    redSideId = row[GAMES.RED_TEAM_ID]!!,
-                    seriesId = row[GAMES.SERIES_ID]!!,
-                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]
+                    blueSideId = TeamId(row[GAMES.BLUE_TEAM_ID]!!),
+                    redSideId = TeamId(row[GAMES.RED_TEAM_ID]!!),
+                    seriesId = SeriesId(row[GAMES.SERIES_ID]!!),
+                    winnerId = row[GAME_RESULTS.WINNER_TEAM_ID]?.let { TeamId(it) },
+                    loserId = row[GAME_RESULTS.LOSER_TEAM_ID]?.let { TeamId(it) }
                 )
             }
 }

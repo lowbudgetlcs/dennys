@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.riot
 
-import com.lowbudgetlcs.domain.tournament.NewTournament
-import com.lowbudgetlcs.domain.tournament.Tournament
+import com.lowbudgetlcs.domain.models.NewTournament
+import com.lowbudgetlcs.domain.models.Tournament
 import com.lowbudgetlcs.repositories.ITournamentRepository
 
 class RiotTournamentRepository : ITournamentRepository {

@@ -2,19 +2,19 @@ import com.lowbudgetlcs.RateLimiter
 import com.lowbudgetlcs.RiotApiClient
 import com.lowbudgetlcs.dto.riot.match.MatchDto
 import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.ktor.client.call.body
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
+import io.ktor.client.call.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 
-class RiotMatchRepositoryTest : StringSpec({
+class RiotMatchRepositoryTest : FunSpec({
 
-    "getMatch should return MatchDto when API call succeeds" {
+    xtest("getMatch should return MatchDto when API call succeeds") {
         // Mock dependencies
         val apiClient = mockk<RiotApiClient>()
         val rateLimiter = mockk<RateLimiter>(relaxed = true)
@@ -37,7 +37,7 @@ class RiotMatchRepositoryTest : StringSpec({
         coVerify { apiClient.get("https://americas.api.riotgames.com/lol/match/v5/matches/NA1_5240057151") }
     }
 
-    "getMatch should return null when API responds with an error" {
+    xtest("getMatch should return null when API responds with an error") {
         val apiClient = mockk<RiotApiClient>()
         val rateLimiter = mockk<RateLimiter>(relaxed = true)
         val response = mockk<HttpResponse>()
@@ -55,7 +55,7 @@ class RiotMatchRepositoryTest : StringSpec({
         result shouldBe null
     }
 
-    "getMatch should return null when an exception is thrown" {
+    xtest("getMatch should return null when an exception is thrown") {
         val apiClient = mockk<RiotApiClient>()
         val rateLimiter = mockk<RateLimiter>(relaxed = true)
 

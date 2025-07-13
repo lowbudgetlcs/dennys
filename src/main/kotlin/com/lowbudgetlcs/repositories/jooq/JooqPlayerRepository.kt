@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.player.Player
+import com.lowbudgetlcs.domain.models.*
 import org.jooq.DSLContext
 import org.jooq.storage.tables.references.PLAYERS
 
@@ -12,10 +12,10 @@ class JooqPlayerRepository(private val dsl: DSLContext) {
                 PLAYERS.ID, PLAYERS.NAME, PLAYERS.EVENT_ID, PLAYERS.TEAM_ID
             ).from(PLAYERS).fetch().map { row ->
                 Player(
-                    id = row[PLAYERS.ID]!!,
-                    name = row[PLAYERS.NAME]!!,
-                    teamId = row[PLAYERS.TEAM_ID],
-                    eventId = row[PLAYERS.EVENT_ID]
+                    id = PlayerId(row[PLAYERS.ID]!!),
+                    name = PlayerName(row[PLAYERS.NAME]!!),
+                    teamId = row[PLAYERS.TEAM_ID]?.let { TeamId(it) },
+                    eventId = row[PLAYERS.EVENT_ID]?.let { EventId(it) }
                 )
             }
 

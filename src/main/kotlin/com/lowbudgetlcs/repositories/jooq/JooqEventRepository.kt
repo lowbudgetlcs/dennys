@@ -1,16 +1,13 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.event.Event
-import com.lowbudgetlcs.domain.models.event.EventStatus
-import com.lowbudgetlcs.domain.models.event.NewEvent
-import com.lowbudgetlcs.domain.tournament.Tournament
+import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.IEventRepository
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Events.Companion.EVENTS
 
 class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
 
-    override fun getById(id: Int): Event? =
+    override fun getById(id: EventId): Event? =
         dsl
             .select(
                 EVENTS.ID,
@@ -23,13 +20,13 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
                 EVENTS.STATUS
             )
             .from(EVENTS)
-            .where(EVENTS.ID.eq(id))
+            .where(EVENTS.ID.eq(id.value))
             .fetchOne()?.let {
                 Event(
-                    id = it[EVENTS.ID]!!,
+                    id = EventId(it[EVENTS.ID]!!),
                     name = it[EVENTS.NAME]!!,
                     description = it[EVENTS.DESCRIPTION]!!,
-                    riotTournamentId = it[EVENTS.RIOT_TOURNAMENT_ID]!!,
+                    riotTournamentId = TournamentId(it[EVENTS.RIOT_TOURNAMENT_ID]!!),
                     createdAt = it[EVENTS.CREATED_AT]!!,
                     startDate = it[EVENTS.START_DATE]!!,
                     endDate = it[EVENTS.END_DATE]!!,
@@ -38,28 +35,35 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
             }
 
 
-    override fun insert(event: NewEvent, tournament: Tournament): Event? =
+    override fun insert(event: NewEvent, tournamentId: TournamentId): Event? =
         dsl
             .insertInto(
                 EVENTS
             )
             .set(EVENTS.NAME, event.name)
             .set(EVENTS.DESCRIPTION, event.description)
-            .set(EVENTS.RIOT_TOURNAMENT_ID, tournament.id)
+            .set(EVENTS.RIOT_TOURNAMENT_ID, tournamentId.value)
             .set(EVENTS.START_DATE, event.startDate)
             .set(EVENTS.END_DATE, event.endDate)
             .set(EVENTS.STATUS, event.status.name)
             .returning(EVENTS.ID, EVENTS.CREATED_AT)
             .fetchOne()?.let { row ->
                 Event(
-                    id = row[EVENTS.ID]!!,
+                    id = EventId(row[EVENTS.ID]!!),
                     name = event.name,
                     description = event.description,
-                    riotTournamentId = tournament.id,
+                    riotTournamentId = tournamentId,
                     createdAt = row[EVENTS.CREATED_AT]!!,
                     startDate = event.startDate,
                     endDate = event.endDate,
                     status = event.status
                 )
             }
+
+    override fun updateStatusById(
+        id: EventId,
+        status: EventStatus
+    ): Event? {
+        TODO("Not yet implemented")
+    }
 }

@@ -1,5 +1,6 @@
-import com.lowbudgetlcs.domain.models.event.EventStatus
-import com.lowbudgetlcs.domain.models.event.NewEvent
+import com.lowbudgetlcs.domain.models.EventStatus
+import com.lowbudgetlcs.domain.models.NewEvent
+import com.lowbudgetlcs.domain.models.TournamentId
 import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
 import io.kotest.assertions.withClue
 import io.kotest.core.extensions.install
@@ -14,7 +15,7 @@ import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class EventRepositoryTest : FunSpec({
+class JooqEventRepositoryTest : FunSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
         withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }
@@ -23,14 +24,14 @@ class EventRepositoryTest : FunSpec({
 
     test("Insert NewEvent and retrieve by id") {
         val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
-        val event = NewEvent("Season 1", "The first season", now, now, EventStatus.ACTIVE)
-        val result = JooqEventRepository(dslContext).insert(event, 1)
+        val newEvent = NewEvent("Season 1", "The first season", TournamentId(1), now, now, EventStatus.ACTIVE)
+        val event = JooqEventRepository(dslContext).insert(newEvent)
         withClue("result should be present") {
-            result shouldNotBe null
+            event shouldNotBe null
         }
-        result!!
-        val entity = JooqEventRepository(dslContext).findById(result.id)
+        event!!
+        val result = JooqEventRepository(dslContext).getById(event.id)
 
-        entity shouldBe result
+        result shouldBe event
     }
 })

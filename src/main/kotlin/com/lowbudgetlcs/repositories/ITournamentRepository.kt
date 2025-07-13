@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.domain.tournament.NewTournament
-import com.lowbudgetlcs.domain.tournament.Tournament
+import com.lowbudgetlcs.domain.models.NewTournament
+import com.lowbudgetlcs.domain.models.Tournament
 
 interface ITournamentRepository {
     fun create(tournament: NewTournament): Tournament?

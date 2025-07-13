@@ -1,28 +1,35 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.series.Series
+import com.lowbudgetlcs.domain.models.EventId
+import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.SeriesId
+import com.lowbudgetlcs.domain.models.TeamId
 import org.jooq.DSLContext
-import org.jooq.storage.tables.SeriesResults
+import org.jooq.storage.tables.Series.Companion.SERIES
+import org.jooq.storage.tables.SeriesResults.Companion.SERIES_RESULTS
 
 class JooqSeriesRepository(private val dsl: DSLContext) {
 
     fun findById(id: Int): Series? =
         dsl
             .select(
-                org.jooq.storage.tables.Series.Companion.SERIES.ID, org.jooq.storage.tables.Series.Companion.SERIES.EVENT_ID, org.jooq.storage.tables.Series.Companion.SERIES.GAMES_TO_WIN,
-                SeriesResults.Companion.SERIES_RESULTS.WINNER_TEAM_ID, SeriesResults.Companion.SERIES_RESULTS.LOSER_TEAM_ID
+                SERIES.ID,
+                SERIES.EVENT_ID,
+                SERIES.GAMES_TO_WIN,
+                SERIES_RESULTS.WINNER_TEAM_ID,
+                SERIES_RESULTS.LOSER_TEAM_ID
             )
-            .from(org.jooq.storage.tables.Series.Companion.SERIES)
-            .leftJoin(SeriesResults.Companion.SERIES_RESULTS)
-            .on(SeriesResults.Companion.SERIES_RESULTS.SERIES_ID.eq(org.jooq.storage.tables.Series.Companion.SERIES.ID))
-            .where(org.jooq.storage.tables.Series.Companion.SERIES.ID.eq(id))
+            .from(SERIES)
+            .leftJoin(SERIES_RESULTS)
+            .on(SERIES_RESULTS.SERIES_ID.eq(SERIES.ID))
+            .where(SERIES.ID.eq(id))
             .fetchOne()?.let { row ->
                 Series(
-                    id = row[org.jooq.storage.tables.Series.Companion.SERIES.ID]!!,
-                    eventId = row[org.jooq.storage.tables.Series.Companion.SERIES.EVENT_ID]!!,
-                    gamesToWin = row[org.jooq.storage.tables.Series.Companion.SERIES.GAMES_TO_WIN]!!,
-                    winnerId = row[SeriesResults.Companion.SERIES_RESULTS.WINNER_TEAM_ID],
-                    loserId = row[SeriesResults.Companion.SERIES_RESULTS.LOSER_TEAM_ID],
+                    id = SeriesId(row[SERIES.ID]!!),
+                    eventId = EventId(row[SERIES.EVENT_ID]!!),
+                    gamesToWin = row[SERIES.GAMES_TO_WIN]!!,
+                    winnerId = row[SERIES_RESULTS.WINNER_TEAM_ID]?.let { TeamId(it) },
+                    loserId = row[SERIES_RESULTS.LOSER_TEAM_ID]?.let { TeamId(it) },
                 )
             }
 }

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.dto.events
 
-import com.lowbudgetlcs.domain.models.event.Event
-import com.lowbudgetlcs.domain.models.event.NewEvent
+import com.lowbudgetlcs.domain.models.Event
+import com.lowbudgetlcs.domain.models.NewEvent
 
 fun CreateEventDto.toDomain(): NewEvent = NewEvent(
     name = name,
@@ -12,12 +12,12 @@ fun CreateEventDto.toDomain(): NewEvent = NewEvent(
 )
 
 fun Event.toDto(): EventDto = EventDto(
-    id = id,
+    id = id.value,
     name = name,
     startDate = startDate,
     endDate = endDate,
     createdAt = createdAt,
     description = description,
-    riotTournamentId = riotTournamentId,
+    riotTournamentId = riotTournamentId.value,
     status = status,
 )

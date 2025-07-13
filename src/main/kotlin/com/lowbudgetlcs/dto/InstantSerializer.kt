@@ -1,4 +1,4 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.dto
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -10,13 +10,13 @@ import java.time.Instant
 
 object InstantSerializer : KSerializer<Instant> {
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
+        PrimitiveSerialDescriptor("java.time.Instant", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Instant) {
-        encoder.encodeLong(value.toEpochMilli()) // Convert Instant → Long
+        encoder.encodeString(value.toString()) // Convert Instant → String
     }
 
     override fun deserialize(decoder: Decoder): Instant {
-        return Instant.ofEpochMilli(decoder.decodeLong()) // Convert Long → Instant
+        return Instant.parse(decoder.decodeString()) // Convert String → Instant
     }
 }

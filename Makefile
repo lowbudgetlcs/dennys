@@ -3,7 +3,7 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run refresh jooq test
+.PHONY: all clean stop build debug-build run db swagger refresh jooq test
 
 # Build and run by default
 all: build run
@@ -32,6 +32,13 @@ run:
 # Start database tools
 db:
 	docker compose up db pgadmin
+
+swag:
+	docker pull docker.swagger.io/swaggerapi/swagger-editor
+	docker run -d --name swagger -p 80:8080 -e SWAGGER_FILE=docs/openapi.yaml docker.swagger.io/swaggerapi/swagger-editor
+
+kswag:
+	docker stop swagger
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run

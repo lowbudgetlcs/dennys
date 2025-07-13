@@ -1,6 +1,10 @@
+@file:UseSerializers(InstantSerializer::class)
+
 package com.lowbudgetlcs.dto.events
 
-import com.lowbudgetlcs.domain.models.event.EventStatus
+import com.lowbudgetlcs.domain.models.EventStatus
+import com.lowbudgetlcs.dto.InstantSerializer
+import kotlinx.serialization.UseSerializers
 import java.time.Instant
 
 data class EventDto(
