@@ -3,8 +3,10 @@ package com.lowbudgetlcs.routes
 import com.lowbudgetlcs.routes.api.apiRoutes
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.slf4j.Logger
@@ -24,11 +26,19 @@ fun Application.routes() {
                 call.respond(HttpStatusCode.InternalServerError)
             }
         }
+        install(CORS) {
+            anyHost()
+            allowHeader(HttpHeaders.ContentType)
+        }
         route("/") {
             get {
                 call.respondText("WHAT THE FUCK IS UP DENNYS????")
             }
         }
+        swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
+            version = "5.26.1"
+        }
         apiRoutes()
     }
 }
+

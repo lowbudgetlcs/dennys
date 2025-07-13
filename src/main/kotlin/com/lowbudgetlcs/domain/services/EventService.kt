@@ -10,6 +10,8 @@ class EventService(private val eventRepo: IEventRepository, private val tourname
             eventRepo.insert(event, it.id)
         }
 
+    fun getEvents(): List<Event> = eventRepo.getAll()
+
     fun getEvent(id: EventId): Event? = eventRepo.getById(id)
 
 

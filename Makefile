@@ -34,11 +34,10 @@ db:
 	docker compose up db pgadmin
 
 swag:
-	docker pull docker.swagger.io/swaggerapi/swagger-editor
-	docker run -d --name swagger -p 80:8080 -e SWAGGER_FILE=docs/openapi.yaml docker.swagger.io/swaggerapi/swagger-editor
+	docker-compose up swagger-editor
 
 kswag:
-	docker stop swagger
+	docker-compose down
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run

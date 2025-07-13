@@ -1,19 +1,22 @@
-package com.lowbudgetlcs.dto.riot.match
+@file:UseSerializers(InstantSerializer::class)
 
-import com.lowbudgetlcs.dto.InstantSerializer
+package com.lowbudgetlcs.routes.dto.riot.match
+
+import com.lowbudgetlcs.routes.dto.InstantSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.time.Instant
 
 @Serializable
 data class MatchInfoDto(
     val endOfGameResult: String, // TODO: Make an Enum
-    @Serializable(with = InstantSerializer::class) val gameCreation: Instant,
+    val gameCreation: Instant,
     val gameDuration: Int,
-    @Serializable(with = InstantSerializer::class) val gameEndTimestamp: Instant,
+    val gameEndTimestamp: Instant,
     val gameId: Long,
     val gameMode: String, // TODO: Make an Enum
     val gameName: String,
-    @Serializable(with = InstantSerializer::class) val gameStartTimestamp: Instant,
+    val gameStartTimestamp: Instant,
     val gameType: String, // TODO: Make an Enum
     val gameVersion: String,
     val mapId: Int, // TODO: Make an Enum

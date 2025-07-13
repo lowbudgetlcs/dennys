@@ -2,7 +2,7 @@ package com.lowbudgetlcs.repositories.riot
 
 import com.lowbudgetlcs.RateLimiter
 import com.lowbudgetlcs.RiotApiClient
-import com.lowbudgetlcs.dto.riot.match.MatchDto
+import com.lowbudgetlcs.routes.dto.riot.match.MatchDto
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import org.slf4j.Logger

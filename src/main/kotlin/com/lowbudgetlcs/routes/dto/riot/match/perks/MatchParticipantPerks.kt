@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.dto.riot.match.perks
+package com.lowbudgetlcs.routes.dto.riot.match.perks
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

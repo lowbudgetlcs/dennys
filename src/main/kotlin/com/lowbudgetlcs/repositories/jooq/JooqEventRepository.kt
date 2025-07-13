@@ -7,6 +7,30 @@ import org.jooq.storage.tables.Events.Companion.EVENTS
 
 class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
 
+    override fun getAll(): List<Event> = dsl
+        .select(
+            EVENTS.ID,
+            EVENTS.NAME,
+            EVENTS.DESCRIPTION,
+            EVENTS.RIOT_TOURNAMENT_ID,
+            EVENTS.CREATED_AT,
+            EVENTS.START_DATE,
+            EVENTS.END_DATE,
+            EVENTS.STATUS
+        )
+        .from(EVENTS).fetch().map {
+            Event(
+                id = EventId(it[EVENTS.ID]!!),
+                name = it[EVENTS.NAME]!!,
+                description = it[EVENTS.DESCRIPTION]!!,
+                tournamentId = TournamentId(it[EVENTS.RIOT_TOURNAMENT_ID]!!),
+                createdAt = it[EVENTS.CREATED_AT]!!,
+                startDate = it[EVENTS.START_DATE]!!,
+                endDate = it[EVENTS.END_DATE]!!,
+                status = EventStatus.valueOf(it[EVENTS.STATUS]!!)
+            )
+        }
+
     override fun getById(id: EventId): Event? =
         dsl
             .select(

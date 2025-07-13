@@ -1,9 +1,9 @@
 @file:UseSerializers(InstantSerializer::class)
 
-package com.lowbudgetlcs.dto.events
+package com.lowbudgetlcs.routes.dto.events
 
 import com.lowbudgetlcs.domain.models.EventStatus
-import com.lowbudgetlcs.dto.InstantSerializer
+import com.lowbudgetlcs.routes.dto.InstantSerializer
 import kotlinx.serialization.UseSerializers
 import java.time.Instant
 

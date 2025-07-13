@@ -1,10 +1,6 @@
 package com.lowbudgetlcs.repositories.inmemory
 
-import com.lowbudgetlcs.domain.models.Event
-import com.lowbudgetlcs.domain.models.EventId
-import com.lowbudgetlcs.domain.models.EventStatus
-import com.lowbudgetlcs.domain.models.NewEvent
-import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.IEventRepository
 import java.time.Instant.now
 
@@ -13,6 +9,8 @@ class InMemoryEventRepository : IEventRepository {
     fun clear() {
         events.clear()
     }
+
+    override fun getAll(): List<Event> = events
     override fun getById(id: EventId): Event? = events.getOrNull(id.value)
 
     override fun insert(

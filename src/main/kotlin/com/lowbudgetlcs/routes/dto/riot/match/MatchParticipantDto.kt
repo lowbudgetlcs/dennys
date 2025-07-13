@@ -1,6 +1,6 @@
-package com.lowbudgetlcs.dto.riot.match
+package com.lowbudgetlcs.routes.dto.riot.match
 
-import com.lowbudgetlcs.dto.riot.match.perks.MatchParticipantPerks
+import com.lowbudgetlcs.routes.dto.riot.match.perks.MatchParticipantPerks
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

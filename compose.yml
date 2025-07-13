@@ -54,3 +54,14 @@ services:
     volumes:
       # Add default database configuration
       - ./docker/pgAdmin/servers.json:/pgadmin4/servers.json
+
+  swagger-editor:
+    container_name: swagger
+    image: swaggerapi/swagger-editor
+    ports: 
+      - "80:8080"
+    volumes:
+      - ./docker/swaggerEditor/openapi.yaml:/spec/openapi.yaml
+    environment:
+      SWAGGER_FILE: /spec/openapi.yaml
+

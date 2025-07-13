@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.dto.riot
+package com.lowbudgetlcs.routes.dto.riot
 
 enum class TeamType(val code: Int) {
     SUBTEAM(0),

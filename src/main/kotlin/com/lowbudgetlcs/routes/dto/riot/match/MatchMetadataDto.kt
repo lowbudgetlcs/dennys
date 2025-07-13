@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.dto.riot.match
+package com.lowbudgetlcs.routes.dto.riot.match
 
 import kotlinx.serialization.Serializable
 

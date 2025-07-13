@@ -4,11 +4,11 @@ import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.domain.models.EventId
 import com.lowbudgetlcs.domain.models.NewTournament
 import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.dto.events.CreateEventDto
-import com.lowbudgetlcs.dto.events.toDto
-import com.lowbudgetlcs.dto.events.toNewEvent
 import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
 import com.lowbudgetlcs.repositories.riot.RiotTournamentRepository
+import com.lowbudgetlcs.routes.dto.events.CreateEventDto
+import com.lowbudgetlcs.routes.dto.events.toDto
+import com.lowbudgetlcs.routes.dto.events.toNewEvent
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -24,6 +24,12 @@ private val eventService: EventService =
 
 fun Route.eventRoutesV1() {
     route("/event") {
+        get {
+            logger.info("📩 Received get on /v1/event")
+            val events = eventService.getEvents()
+            logger.debug("\uD83D\uDD22 Got ${events.size} events")
+            call.respond(events.map { it.toDto() })
+        }
         post {
             logger.info("📩 Received post on /v1/event")
             val createEvent = call.receive<CreateEventDto>()
@@ -39,7 +45,7 @@ fun Route.eventRoutesV1() {
             }
         }
         get("/{id}") {
-            logger.info("📩 Received get on /v1/event")
+            logger.info("📩 Received get on /v1/event/{id}")
             val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respondText(
                 "Missing or malformed id",
                 status = HttpStatusCode.BadRequest

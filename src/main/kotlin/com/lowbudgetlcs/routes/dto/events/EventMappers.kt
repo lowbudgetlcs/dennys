@@ -1,8 +1,7 @@
-package com.lowbudgetlcs.dto.events
+package com.lowbudgetlcs.routes.dto.events
 
 import com.lowbudgetlcs.domain.models.Event
 import com.lowbudgetlcs.domain.models.NewEvent
-import com.lowbudgetlcs.domain.models.NewTournament
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
     name = name,

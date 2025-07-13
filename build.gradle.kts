@@ -61,21 +61,23 @@ sourceSets {
 }
 
 dependencies {
-    implementation("com.sksamuel.hoplite:hoplite-core:2.9.0")
+    implementation("io.ktor:ktor-server-swagger:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
-    implementation("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-config-yaml-jvm:${ktorVersion}")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("org.jooq:jooq:${jooqVersion}")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.postgresql:postgresql:$postgresDriverVersion")
-    implementation("org.jooq:jooq:$jooqVersion")
+    implementation("ch.qos.logback:logback-classic:${logbackVersion}")
+    implementation("com.sksamuel.hoplite:hoplite-core:2.9.0")
 
     // Jooq Code Generation
     "jooqImplementation"("io.kotest:kotest-runner-junit5:$kotestVersion")

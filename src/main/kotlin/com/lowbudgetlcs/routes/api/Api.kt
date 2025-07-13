@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.routes.api
 
-import com.lowbudgetlcs.dto.riot.PostMatchDto
 import com.lowbudgetlcs.routes.api.v1.eventRoutesV1
+import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

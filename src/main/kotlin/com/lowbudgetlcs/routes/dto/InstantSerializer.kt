@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.dto
+package com.lowbudgetlcs.routes.dto
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

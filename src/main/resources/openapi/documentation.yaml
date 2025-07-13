@@ -1,8 +1,8 @@
-openapi: 3.0.4
+openapi: 3.0.3
 info:
   title: Dennys - OpenAPI 3.0
   description: |-
-    This is the Dennys OpenAPI 3.0 specification.  
+    This is the Dennys OpenAPI 3.0 specification.
   contact:
     email: lblcs.dev@gmail.com
   license:
@@ -14,18 +14,37 @@ externalDocs:
   url: https://github.com/lowbudgetlcs/dennys
 servers:
   - url: http://localhost:9292
-  - url: https://dennys-staging.lowbudgetlcs.com
-  - url: https://dennys.lowbudgetlcs.com
 
 tags:
-  - name: event
+  - name: v1/event
     description: Access to LBLCS events
 paths:
 
   /api/v1/event:
+    get:
+      tags:
+        - v1/event
+      summary: Get all events
+      description: Fetch a list of all events.
+      operationId: getEvents
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDto'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       tags:
-        - event
+        - v1/event
       summary: Create a new event.
       description: Registers an event with Dennys.
       operationId: addEvent
@@ -57,7 +76,7 @@ paths:
   /api/v1/event/{eventId}:
     get:
       tags:
-        - event
+        - v1/event
       summary: Find event by ID.
       description: Returns a single event.
       operationId: getEventById
@@ -561,23 +580,7 @@ components:
             - ACTIVE
             - CANCELED
             - PAUSED
-            - COMPLETED
-        pickType:
-          type: string
-          description: 'The draft format for games.'
-          example: TOURNAMENT_DRAFT
-          enum:
-            - TOURNAMENT_DRAFT
-            - BLIND_PICK
-            - DRAFT_MODE
-            - ALL_RANDOM
-        mapType:
-          type: string
-          description: 'The map for games to take place on.'
-          example: SUMMONERS_RIFT
-          enum:
-            - SUMMONERS_RIFT
-            - HOWLING_ABYSS
+            - COMPLETE
     EventDto:
       type: object
       properties:
