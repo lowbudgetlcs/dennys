@@ -7,7 +7,9 @@
     </appender>
 
     <!-- Root Logger -->
-    <root level="DEBUG">
+    <root level="TRACE">
         <appender-ref ref="CONSOLE"/>
     </root>
+    <logger name="io.netty" level="INFO"/>
+
 </configuration>

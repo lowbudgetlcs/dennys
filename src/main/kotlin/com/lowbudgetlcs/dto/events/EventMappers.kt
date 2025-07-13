@@ -4,12 +4,6 @@ import com.lowbudgetlcs.domain.models.Event
 import com.lowbudgetlcs.domain.models.NewEvent
 import com.lowbudgetlcs.domain.models.NewTournament
 
-fun CreateEventDto.toNewTournament(): NewTournament = NewTournament(
-    metadata = metadata,
-    pickType = pickType,
-    mapType = mapType
-)
-
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
     name = name,
     description = description,

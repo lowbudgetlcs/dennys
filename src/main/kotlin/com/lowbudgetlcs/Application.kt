@@ -16,16 +16,6 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.configureRouting() {
-    install(StatusPages) {
-        exception<RequestValidationException> { call, cause ->
-            logger.warn("⚠️ Request failed validation: ${cause.message}")
-            call.respond(HttpStatusCode.BadRequest)
-        }
-        exception<Throwable> { call, cause ->
-            logger.error("❌ Uncaught exception on call: $call", cause)
-            call.respond(HttpStatusCode.InternalServerError)
-        }
-    }
     install(ContentNegotiation) {
         json()
     }

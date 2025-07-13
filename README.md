@@ -1,12 +1,6 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a id="readme-top"></a>
 <!-- PROJECT SHIELDS -->
 <!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -96,7 +90,7 @@ To get a local copy up and running follow these simple example steps.
 
 * docker 
 * gnumake
-* jdk17
+* jdk21
 
 If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there is a convenient [shell.nix](./shell.nix) file to install all prereqs.
 
@@ -120,7 +114,8 @@ If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there 
    make build
    ```
 You can now run the project with `make run`. This will also create, instantiate,
-and run a a local postgres database. It also starts an instance of [pgadmin](https://www.pgadmin.org/).
+and run a a local postgres database. It also starts an instance of [pgadmin](https://www.pgadmin.org/) 
+for local database inspection.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -129,18 +124,25 @@ and run a a local postgres database. It also starts an instance of [pgadmin](htt
 <!-- USAGE EXAMPLES -->
 ## Development Notes
 
+### EXTREMELY IMPORTANT
+
+To allow for easy API documentation, we have adopted a design-first appraoch to API development. EVERY new API endpoint 
+MUST be created via the Swagger Editor. This way, we have a constantly up-to-date openapi.yaml file that can be
+imported into Postman AND accessed in production for very easy documentation and development.
+
 The `Makefile` contains many useful commands to build/run this application locally- the following are short descriptions of each.
 
-* `make build` - Builds an application image from source.
+* `make build` - Builds the application image from source.
 * `make debug-build` - Runs a build with plaintext output. This is useful to debug build-time failures.
-* `make run` - Runs docker-compose up on the application and its dependencies.
+* `make run` - Starts the application and several dependencies.
 * `make test` - Runs tests in docker container.
+* `make jooq` - Runs Jooq code generation against an ephemeral postgres database. This MUST be run after every schema change.
 * `make stop` - Stops all containers, and removes them. It is a good habit to run this after ctrl-C-ing `make run`.
-* `make drop` - Deletes the volumes used by pgAdmin and postgres.
+* `make db` - Starts the database and pgadmin.
+* `make swag` - Starts the Swagger Editor, accessible within your browser.
 
 
-Below are example post-match callbacks Riot will send- these are compatible with
-the dev database provided:
+Below are example post-match callbacks Riot will send when a tournament game completes:
 
 Game 1:
 
@@ -241,10 +243,11 @@ Project Link: [https://github.com/lowbudgetlcs/dennys](https://github.com/lowbud
 These links were useful when developing.
 
 * [Ktor Documentation](https://ktor.io/docs/welcome.html)
-* [RabbitMQ BASIC Example](https://www.rabbitmq.com/tutorials/tutorial-one-java)
-* [SQLDelight Documentation](https://sqldelight.github.io/sqldelight/2.0.2/jvm_postgresql/)
 * [Riot API Documentation](https://developer.riotgames.com/apis)
 * [Riot Tournament Game Policies](https://developer.riotgames.com/docs/lol#tournament-api)
+* [Jooq documentation](https://www.jooq.org/doc/latest/manual/sql-execution/)
+* [Kotest documentation](https://kotest.io/docs/quickstart)
+* [Swagger documentation](https://swagger.io/docs/specification/v3_0/basic-structure/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
