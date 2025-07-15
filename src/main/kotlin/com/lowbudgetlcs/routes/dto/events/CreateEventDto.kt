@@ -15,4 +15,5 @@ data class CreateEventDto(
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus,
+    val eventGroupId: Int?
 )

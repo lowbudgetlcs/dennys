@@ -12,9 +12,9 @@ value class PlayerName(val name: String) {
 }
 
 data class Player(
-    val id: PlayerId, val name: PlayerName, val teamId: TeamId?, val eventId: EventId?
+    val id: PlayerId, val name: PlayerName
 )
 
 data class NewPlayer(
-    val name: PlayerName, val teamId: TeamId?, val eventId: EventId?
+    val name: PlayerName, val teamId: TeamId?
 )

@@ -4,9 +4,11 @@ package com.lowbudgetlcs.routes.dto.events
 
 import com.lowbudgetlcs.domain.models.EventStatus
 import com.lowbudgetlcs.routes.dto.InstantSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.time.Instant
 
+@Serializable
 data class EventDto(
     val id: Int,
     val name: String,
@@ -15,5 +17,6 @@ data class EventDto(
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,
+    val eventGroup: EventGroupDto?,
     val status: EventStatus
 )

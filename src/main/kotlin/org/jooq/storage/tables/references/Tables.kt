@@ -4,12 +4,11 @@
 package org.jooq.storage.tables.references
 
 
-import org.jooq.storage.tables.EventAuditLogs
+import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
 import org.jooq.storage.tables.Metadata
-import org.jooq.storage.tables.PlayerAuditLogs
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -19,21 +18,19 @@ import org.jooq.storage.tables.PlayerPings
 import org.jooq.storage.tables.PlayerToTeams
 import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
-import org.jooq.storage.tables.RiotAccountAuditLogs
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.RiotAccountsToPlayer
 import org.jooq.storage.tables.Series
-import org.jooq.storage.tables.SeriesParticipants
 import org.jooq.storage.tables.SeriesResults
-import org.jooq.storage.tables.TeamAuditLogs
+import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
 
 
 
 /**
- * The table <code>dennys.event_audit_logs</code>.
+ * The table <code>dennys.event_groups</code>.
  */
-val EVENT_AUDIT_LOGS: EventAuditLogs = EventAuditLogs.EVENT_AUDIT_LOGS
+val EVENT_GROUPS: EventGroups = EventGroups.EVENT_GROUPS
 
 /**
  * The table <code>dennys.events</code>.
@@ -54,11 +51,6 @@ val GAMES: Games = Games.GAMES
  * The table <code>dennys.metadata</code>.
  */
 val METADATA: Metadata = Metadata.METADATA
-
-/**
- * The table <code>dennys.player_audit_logs</code>.
- */
-val PLAYER_AUDIT_LOGS: PlayerAuditLogs = PlayerAuditLogs.PLAYER_AUDIT_LOGS
 
 /**
  * The table <code>dennys.player_champ_selects</code>.
@@ -106,11 +98,6 @@ val PLAYER_VISION: PlayerVision = PlayerVision.PLAYER_VISION
 val PLAYERS: Players = Players.PLAYERS
 
 /**
- * The table <code>dennys.riot_account_audit_logs</code>.
- */
-val RIOT_ACCOUNT_AUDIT_LOGS: RiotAccountAuditLogs = RiotAccountAuditLogs.RIOT_ACCOUNT_AUDIT_LOGS
-
-/**
  * The table <code>dennys.riot_accounts</code>.
  */
 val RIOT_ACCOUNTS: RiotAccounts = RiotAccounts.RIOT_ACCOUNTS
@@ -126,19 +113,14 @@ val RIOT_ACCOUNTS_TO_PLAYER: RiotAccountsToPlayer = RiotAccountsToPlayer.RIOT_AC
 val SERIES: Series = Series.SERIES
 
 /**
- * The table <code>dennys.series_participants</code>.
- */
-val SERIES_PARTICIPANTS: SeriesParticipants = SeriesParticipants.SERIES_PARTICIPANTS
-
-/**
  * The table <code>dennys.series_results</code>.
  */
 val SERIES_RESULTS: SeriesResults = SeriesResults.SERIES_RESULTS
 
 /**
- * The table <code>dennys.team_audit_logs</code>.
+ * The table <code>dennys.team_to_series</code>.
  */
-val TEAM_AUDIT_LOGS: TeamAuditLogs = TeamAuditLogs.TEAM_AUDIT_LOGS
+val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
 
 /**
  * The table <code>dennys.teams</code>.

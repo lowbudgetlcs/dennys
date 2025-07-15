@@ -45,9 +45,13 @@ open class EventsRecord() : UpdatableRecordImpl<EventsRecord>(Events.EVENTS) {
         set(value): Unit = set(6, value)
         get(): Instant? = get(6) as Instant?
 
-    open var status: String?
+    open var eventGroupId: Int?
         set(value): Unit = set(7, value)
-        get(): String? = get(7) as String?
+        get(): Int? = get(7) as Int?
+
+    open var status: String?
+        set(value): Unit = set(8, value)
+        get(): String? = get(8) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -58,7 +62,7 @@ open class EventsRecord() : UpdatableRecordImpl<EventsRecord>(Events.EVENTS) {
     /**
      * Create a detached, initialised EventsRecord
      */
-    constructor(id: Int? = null, name: String? = null, description: String? = null, riotTournamentId: Int? = null, createdAt: Instant? = null, startDate: Instant? = null, endDate: Instant? = null, status: String? = null): this() {
+    constructor(id: Int? = null, name: String? = null, description: String? = null, riotTournamentId: Int? = null, createdAt: Instant? = null, startDate: Instant? = null, endDate: Instant? = null, eventGroupId: Int? = null, status: String? = null): this() {
         this.id = id
         this.name = name
         this.description = description
@@ -66,6 +70,7 @@ open class EventsRecord() : UpdatableRecordImpl<EventsRecord>(Events.EVENTS) {
         this.createdAt = createdAt
         this.startDate = startDate
         this.endDate = endDate
+        this.eventGroupId = eventGroupId
         this.status = status
         resetChangedOnNotNull()
     }

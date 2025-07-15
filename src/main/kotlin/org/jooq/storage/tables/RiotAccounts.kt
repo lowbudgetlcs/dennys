@@ -30,14 +30,13 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
+import org.jooq.storage.keys.PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY
 import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_PKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_RIOT_PUUID_KEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY
-import org.jooq.storage.keys.RIOT_ACCOUNT_AUDIT_LOGS__RIOT_ACCOUNT_AUDIT_LOGS_RIOT_ACCOUNT_ID_FKEY
 import org.jooq.storage.tables.PlayerGameFacts.PlayerGameFactsPath
 import org.jooq.storage.tables.Players.PlayersPath
-import org.jooq.storage.tables.RiotAccountAuditLogs.RiotAccountAuditLogsPath
 import org.jooq.storage.tables.RiotAccountsToPlayer.RiotAccountsToPlayerPath
 import org.jooq.storage.tables.records.RiotAccountsRecord
 
@@ -141,21 +140,21 @@ open class RiotAccounts(
     val playerGameFacts: PlayerGameFactsPath
         get(): PlayerGameFactsPath = playerGameFacts()
 
-    private lateinit var _riotAccountAuditLogs: RiotAccountAuditLogsPath
+    private lateinit var _players: PlayersPath
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.riot_account_audit_logs</code> table
+     * Get the implicit to-many join path to the <code>dennys.players</code>
+     * table
      */
-    fun riotAccountAuditLogs(): RiotAccountAuditLogsPath {
-        if (!this::_riotAccountAuditLogs.isInitialized)
-            _riotAccountAuditLogs = RiotAccountAuditLogsPath(this, null, RIOT_ACCOUNT_AUDIT_LOGS__RIOT_ACCOUNT_AUDIT_LOGS_RIOT_ACCOUNT_ID_FKEY.inverseKey)
+    fun players(): PlayersPath {
+        if (!this::_players.isInitialized)
+            _players = PlayersPath(this, null, PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY.inverseKey)
 
-        return _riotAccountAuditLogs;
+        return _players;
     }
 
-    val riotAccountAuditLogs: RiotAccountAuditLogsPath
-        get(): RiotAccountAuditLogsPath = riotAccountAuditLogs()
+    val players: PlayersPath
+        get(): PlayersPath = players()
 
     private lateinit var _riotAccountsToPlayer: RiotAccountsToPlayerPath
 
@@ -172,13 +171,6 @@ open class RiotAccounts(
 
     val riotAccountsToPlayer: RiotAccountsToPlayerPath
         get(): RiotAccountsToPlayerPath = riotAccountsToPlayer()
-
-    /**
-     * Get the implicit many-to-many join path to the
-     * <code>dennys.players</code> table
-     */
-    val players: PlayersPath
-        get(): PlayersPath = riotAccountsToPlayer().players()
     override fun `as`(alias: String): RiotAccounts = RiotAccounts(DSL.name(alias), this)
     override fun `as`(alias: Name): RiotAccounts = RiotAccounts(alias, this)
     override fun `as`(alias: Table<*>): RiotAccounts = RiotAccounts(alias.qualifiedName, this)

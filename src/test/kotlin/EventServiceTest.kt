@@ -27,15 +27,17 @@ class EventServiceTest : StringSpec({
             description = "This is a test.",
             startDate = start,
             endDate = end,
+            eventGroupId = null,
             status = EventStatus.ACTIVE
         )
-        val event = service.create(newEvent, NewTournament())
+        val event = service.create(newEvent, NewTournament("Test"))
         event.shouldBeInstanceOf<Event>()
         event.shouldBeEqualToIgnoringFields(
             Event(
                 EventId(0),
                 "Test",
                 "This is a test.",
+                eventGroupId = null,
                 TournamentId(0),
                 now(),
                 start,
@@ -51,9 +53,10 @@ class EventServiceTest : StringSpec({
             description = "This is a test.",
             startDate = start,
             endDate = end,
+            eventGroupId = null,
             status = EventStatus.ACTIVE
         )
-        val event = service.create(newEvent, NewTournament())
+        val event = service.create(newEvent, NewTournament("Test"))
         event.shouldBeInstanceOf<Event>()
         val updatedEvent = service.changeEventStatus(
             event.id, EventStatus.CANCELED

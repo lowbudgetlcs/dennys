@@ -29,6 +29,8 @@ fun Application.routes() {
         install(CORS) {
             anyHost()
             allowHeader(HttpHeaders.ContentType)
+            allowHeader(HttpHeaders.Authorization)
+            allowHeader("api_key")
         }
         route("/") {
             get {

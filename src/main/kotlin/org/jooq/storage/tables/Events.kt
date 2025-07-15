@@ -7,6 +7,7 @@ package org.jooq.storage.tables
 import java.time.Instant
 
 import kotlin.collections.Collection
+import kotlin.collections.List
 
 import org.jooq.Condition
 import org.jooq.Field
@@ -32,12 +33,11 @@ import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.EVENTS_PKEY
-import org.jooq.storage.keys.EVENT_AUDIT_LOGS__EVENT_AUDIT_LOGS_EVENT_ID_FKEY
-import org.jooq.storage.keys.PLAYERS__PLAYERS_EVENT_ID_FKEY
+import org.jooq.storage.keys.EVENTS__EVENTS_EVENT_GROUP_ID_FKEY
 import org.jooq.storage.keys.PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_EVENT_ID_FKEY
 import org.jooq.storage.keys.SERIES__SERIES_EVENT_ID_FKEY
 import org.jooq.storage.keys.TEAMS__TEAMS_EVENT_ID_FKEY
-import org.jooq.storage.tables.EventAuditLogs.EventAuditLogsPath
+import org.jooq.storage.tables.EventGroups.EventGroupsPath
 import org.jooq.storage.tables.PlayerToTeams.PlayerToTeamsPath
 import org.jooq.storage.tables.Players.PlayersPath
 import org.jooq.storage.tables.Series.SeriesPath
@@ -118,6 +118,11 @@ open class Events(
     val END_DATE: TableField<EventsRecord, Instant?> = createField(DSL.name("end_date"), SQLDataType.INSTANT.nullable(false), this, "")
 
     /**
+     * The column <code>dennys.events.event_group_id</code>.
+     */
+    val EVENT_GROUP_ID: TableField<EventsRecord, Int?> = createField(DSL.name("event_group_id"), SQLDataType.INTEGER, this, "")
+
+    /**
      * The column <code>dennys.events.status</code>.
      */
     val STATUS: TableField<EventsRecord, String?> = createField(DSL.name("status"), SQLDataType.CLOB.nullable(false), this, "")
@@ -156,22 +161,22 @@ open class Events(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<EventsRecord, Int?> = super.getIdentity() as Identity<EventsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<EventsRecord> = EVENTS_PKEY
+    override fun getReferences(): List<ForeignKey<EventsRecord, *>> = listOf(EVENTS__EVENTS_EVENT_GROUP_ID_FKEY)
 
-    private lateinit var _eventAuditLogs: EventAuditLogsPath
+    private lateinit var _eventGroups: EventGroupsPath
 
     /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.event_audit_logs</code> table
+     * Get the implicit join path to the <code>dennys.event_groups</code> table.
      */
-    fun eventAuditLogs(): EventAuditLogsPath {
-        if (!this::_eventAuditLogs.isInitialized)
-            _eventAuditLogs = EventAuditLogsPath(this, null, EVENT_AUDIT_LOGS__EVENT_AUDIT_LOGS_EVENT_ID_FKEY.inverseKey)
+    fun eventGroups(): EventGroupsPath {
+        if (!this::_eventGroups.isInitialized)
+            _eventGroups = EventGroupsPath(this, EVENTS__EVENTS_EVENT_GROUP_ID_FKEY, null)
 
-        return _eventAuditLogs;
+        return _eventGroups;
     }
 
-    val eventAuditLogs: EventAuditLogsPath
-        get(): EventAuditLogsPath = eventAuditLogs()
+    val eventGroups: EventGroupsPath
+        get(): EventGroupsPath = eventGroups()
 
     private lateinit var _playerToTeams: PlayerToTeamsPath
 
@@ -188,22 +193,6 @@ open class Events(
 
     val playerToTeams: PlayerToTeamsPath
         get(): PlayerToTeamsPath = playerToTeams()
-
-    private lateinit var _players: PlayersPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.players</code>
-     * table
-     */
-    fun players(): PlayersPath {
-        if (!this::_players.isInitialized)
-            _players = PlayersPath(this, null, PLAYERS__PLAYERS_EVENT_ID_FKEY.inverseKey)
-
-        return _players;
-    }
-
-    val players: PlayersPath
-        get(): PlayersPath = players()
 
     private lateinit var _series: SeriesPath
 
@@ -235,6 +224,13 @@ open class Events(
 
     val teams: TeamsPath
         get(): TeamsPath = teams()
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>dennys.players</code> table
+     */
+    val players: PlayersPath
+        get(): PlayersPath = playerToTeams().players()
     override fun `as`(alias: String): Events = Events(DSL.name(alias), this)
     override fun `as`(alias: Name): Events = Events(alias, this)
     override fun `as`(alias: Table<*>): Events = Events(alias.qualifiedName, this)

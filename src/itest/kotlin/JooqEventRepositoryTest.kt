@@ -24,8 +24,8 @@ class JooqEventRepositoryTest : FunSpec({
 
     test("Insert NewEvent and retrieve by id") {
         val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
-        val newEvent = NewEvent("Season 1", "The first season", TournamentId(1), now, now, EventStatus.ACTIVE)
-        val event = JooqEventRepository(dslContext).insert(newEvent)
+        val newEvent = NewEvent("Season 1", "The first season", now, now, EventStatus.ACTIVE)
+        val event = JooqEventRepository(dslContext).insert(newEvent, TournamentId(1))
         withClue("result should be present") {
             event shouldNotBe null
         }

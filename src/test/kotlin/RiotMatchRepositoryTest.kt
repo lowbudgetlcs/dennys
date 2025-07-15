@@ -1,7 +1,7 @@
 import com.lowbudgetlcs.RateLimiter
 import com.lowbudgetlcs.RiotApiClient
-import com.lowbudgetlcs.dto.riot.match.MatchDto
 import com.lowbudgetlcs.repositories.riot.RiotMatchRepository
+import com.lowbudgetlcs.routes.dto.riot.match.MatchDto
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*

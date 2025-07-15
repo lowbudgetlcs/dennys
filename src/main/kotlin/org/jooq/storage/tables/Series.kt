@@ -31,14 +31,14 @@ import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.GAMES__GAMES_SERIES_ID_FKEY
-import org.jooq.storage.keys.SERIES_PARTICIPANTS__SERIES_PARTICIPANTS_SERIES_ID_FKEY
 import org.jooq.storage.keys.SERIES_PKEY
 import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_SERIES_ID_FKEY
 import org.jooq.storage.keys.SERIES__SERIES_EVENT_ID_FKEY
+import org.jooq.storage.keys.TEAM_TO_SERIES__TEAM_TO_SERIES_SERIES_ID_FKEY
 import org.jooq.storage.tables.Events.EventsPath
 import org.jooq.storage.tables.Games.GamesPath
-import org.jooq.storage.tables.SeriesParticipants.SeriesParticipantsPath
 import org.jooq.storage.tables.SeriesResults.SeriesResultsPath
+import org.jooq.storage.tables.TeamToSeries.TeamToSeriesPath
 import org.jooq.storage.tables.Teams.TeamsPath
 import org.jooq.storage.tables.records.SeriesRecord
 
@@ -161,22 +161,6 @@ open class Series(
     val games: GamesPath
         get(): GamesPath = games()
 
-    private lateinit var _seriesParticipants: SeriesParticipantsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.series_participants</code> table
-     */
-    fun seriesParticipants(): SeriesParticipantsPath {
-        if (!this::_seriesParticipants.isInitialized)
-            _seriesParticipants = SeriesParticipantsPath(this, null, SERIES_PARTICIPANTS__SERIES_PARTICIPANTS_SERIES_ID_FKEY.inverseKey)
-
-        return _seriesParticipants;
-    }
-
-    val seriesParticipants: SeriesParticipantsPath
-        get(): SeriesParticipantsPath = seriesParticipants()
-
     private lateinit var _seriesResults: SeriesResultsPath
 
     /**
@@ -193,12 +177,28 @@ open class Series(
     val seriesResults: SeriesResultsPath
         get(): SeriesResultsPath = seriesResults()
 
+    private lateinit var _teamToSeries: TeamToSeriesPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.team_to_series</code> table
+     */
+    fun teamToSeries(): TeamToSeriesPath {
+        if (!this::_teamToSeries.isInitialized)
+            _teamToSeries = TeamToSeriesPath(this, null, TEAM_TO_SERIES__TEAM_TO_SERIES_SERIES_ID_FKEY.inverseKey)
+
+        return _teamToSeries;
+    }
+
+    val teamToSeries: TeamToSeriesPath
+        get(): TeamToSeriesPath = teamToSeries()
+
     /**
      * Get the implicit many-to-many join path to the <code>dennys.teams</code>
      * table
      */
     val teams: TeamsPath
-        get(): TeamsPath = seriesParticipants().teams()
+        get(): TeamsPath = teamToSeries().teams()
     override fun `as`(alias: String): Series = Series(DSL.name(alias), this)
     override fun `as`(alias: Name): Series = Series(alias, this)
     override fun `as`(alias: Table<*>): Series = Series(alias.qualifiedName, this)

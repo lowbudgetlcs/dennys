@@ -9,12 +9,11 @@ import kotlin.collections.List
 import org.jooq.Catalog
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
-import org.jooq.storage.tables.EventAuditLogs
+import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
 import org.jooq.storage.tables.Metadata
-import org.jooq.storage.tables.PlayerAuditLogs
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -24,13 +23,11 @@ import org.jooq.storage.tables.PlayerPings
 import org.jooq.storage.tables.PlayerToTeams
 import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
-import org.jooq.storage.tables.RiotAccountAuditLogs
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.RiotAccountsToPlayer
 import org.jooq.storage.tables.Series
-import org.jooq.storage.tables.SeriesParticipants
 import org.jooq.storage.tables.SeriesResults
-import org.jooq.storage.tables.TeamAuditLogs
+import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
 
 
@@ -48,9 +45,9 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     }
 
     /**
-     * The table <code>dennys.event_audit_logs</code>.
+     * The table <code>dennys.event_groups</code>.
      */
-    val EVENT_AUDIT_LOGS: EventAuditLogs get() = EventAuditLogs.EVENT_AUDIT_LOGS
+    val EVENT_GROUPS: EventGroups get() = EventGroups.EVENT_GROUPS
 
     /**
      * The table <code>dennys.events</code>.
@@ -71,11 +68,6 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      * The table <code>dennys.metadata</code>.
      */
     val METADATA: Metadata get() = Metadata.METADATA
-
-    /**
-     * The table <code>dennys.player_audit_logs</code>.
-     */
-    val PLAYER_AUDIT_LOGS: PlayerAuditLogs get() = PlayerAuditLogs.PLAYER_AUDIT_LOGS
 
     /**
      * The table <code>dennys.player_champ_selects</code>.
@@ -123,11 +115,6 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val PLAYERS: Players get() = Players.PLAYERS
 
     /**
-     * The table <code>dennys.riot_account_audit_logs</code>.
-     */
-    val RIOT_ACCOUNT_AUDIT_LOGS: RiotAccountAuditLogs get() = RiotAccountAuditLogs.RIOT_ACCOUNT_AUDIT_LOGS
-
-    /**
      * The table <code>dennys.riot_accounts</code>.
      */
     val RIOT_ACCOUNTS: RiotAccounts get() = RiotAccounts.RIOT_ACCOUNTS
@@ -143,19 +130,14 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val SERIES: Series get() = Series.SERIES
 
     /**
-     * The table <code>dennys.series_participants</code>.
-     */
-    val SERIES_PARTICIPANTS: SeriesParticipants get() = SeriesParticipants.SERIES_PARTICIPANTS
-
-    /**
      * The table <code>dennys.series_results</code>.
      */
     val SERIES_RESULTS: SeriesResults get() = SeriesResults.SERIES_RESULTS
 
     /**
-     * The table <code>dennys.team_audit_logs</code>.
+     * The table <code>dennys.team_to_series</code>.
      */
-    val TEAM_AUDIT_LOGS: TeamAuditLogs get() = TeamAuditLogs.TEAM_AUDIT_LOGS
+    val TEAM_TO_SERIES: TeamToSeries get() = TeamToSeries.TEAM_TO_SERIES
 
     /**
      * The table <code>dennys.teams</code>.
@@ -165,12 +147,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
-        EventAuditLogs.EVENT_AUDIT_LOGS,
+        EventGroups.EVENT_GROUPS,
         Events.EVENTS,
         GameResults.GAME_RESULTS,
         Games.GAMES,
         Metadata.METADATA,
-        PlayerAuditLogs.PLAYER_AUDIT_LOGS,
         PlayerChampSelects.PLAYER_CHAMP_SELECTS,
         PlayerCombats.PLAYER_COMBATS,
         PlayerFarming.PLAYER_FARMING,
@@ -180,13 +161,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         PlayerToTeams.PLAYER_TO_TEAMS,
         PlayerVision.PLAYER_VISION,
         Players.PLAYERS,
-        RiotAccountAuditLogs.RIOT_ACCOUNT_AUDIT_LOGS,
         RiotAccounts.RIOT_ACCOUNTS,
         RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER,
         Series.SERIES,
-        SeriesParticipants.SERIES_PARTICIPANTS,
         SeriesResults.SERIES_RESULTS,
-        TeamAuditLogs.TEAM_AUDIT_LOGS,
+        TeamToSeries.TEAM_TO_SERIES,
         Teams.TEAMS
     )
 }

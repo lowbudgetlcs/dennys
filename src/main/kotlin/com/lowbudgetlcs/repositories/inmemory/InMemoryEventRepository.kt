@@ -11,11 +11,15 @@ class InMemoryEventRepository : IEventRepository {
     }
 
     override fun getAll(): List<Event> = events
+
+    override fun getAllByGroupId(groupId: EventGroupId): List<Event> = events.filter { event ->
+        event.eventGroupId == groupId
+    }
+
     override fun getById(id: EventId): Event? = events.getOrNull(id.value)
 
     override fun insert(
-        event: NewEvent,
-        tournamentId: TournamentId
+        event: NewEvent, tournamentId: TournamentId
     ): Event? {
         val id = EventId(events.size)
         val e = Event(
@@ -26,6 +30,7 @@ class InMemoryEventRepository : IEventRepository {
             createdAt = now(),
             startDate = event.startDate,
             endDate = event.endDate,
+            eventGroupId = event.eventGroupId,
             status = event.status
         )
         events.add(id.value, e)
@@ -33,8 +38,7 @@ class InMemoryEventRepository : IEventRepository {
     }
 
     override fun updateStatusById(
-        id: EventId,
-        status: EventStatus
+        id: EventId, status: EventStatus
     ): Event? {
         try {
             events[id.value] = events[id.value].copy(status = status)
