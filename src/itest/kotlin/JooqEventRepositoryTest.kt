@@ -1,14 +1,14 @@
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
+import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.toEventGroupId
+import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
-import io.kotest.assertions.withClue
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
@@ -22,17 +22,21 @@ class JooqEventRepositoryTest : FunSpec({
     }
     val ds = install(JdbcDatabaseContainerExtension(postgres))
     val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
+    val repo = JooqEventRepository(dslContext)
+    val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
     test("Insert NewEvent and retrieve by id") {
-        val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
-        val newEvent = NewEvent("Season 1", "The first season", 0.toEventGroupId(), now, now, EventStatus.ACTIVE)
-        val event = JooqEventRepository(dslContext).insert(newEvent, TournamentId(1))
-        withClue("result should be present") {
-            event shouldNotBe null
-        }
-        event!!
-        val result = JooqEventRepository(dslContext).getById(event.id)
-
+        val newEvent = NewEvent(
+            "Season 1",
+            "The first season",
+            0.toEventGroupId(),
+            now,
+            now.plusSeconds(3600L),
+            EventStatus.ACTIVE
+        )
+        val event = repo.insert(newEvent, 1.toTournamentId())
+        event.shouldBeInstanceOf<Event>()
+        val result = repo.getById(event.id)
         result shouldBe event
     }
 })

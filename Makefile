@@ -48,4 +48,4 @@ jooq:
 
 # Run tests
 test:
-	docker build -t dennys:test --progress=plain --no-cache --target test -f ./docker/Dockerfile .
+	./gradlew test itest

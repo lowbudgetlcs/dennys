@@ -1,17 +1,17 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.tournament.NewTournament
+import com.lowbudgetlcs.gateways.ITournamentGateway
 import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
-import com.lowbudgetlcs.repositories.ITournamentRepository
 
 class EventService(
     private val eventRepo: IEventRepository,
     private val eventGroupRepo: IEventGroupRepository,
-    private val tournamentRepo: ITournamentRepository
+    private val tournamentGateway: ITournamentGateway
 ) {
-    fun createEvent(event: NewEvent, tournament: NewTournament): Event? = tournamentRepo.create(tournament)?.let {
+    fun createEvent(event: NewEvent, tournament: NewTournament): Event? = tournamentGateway.create(tournament)?.let {
         eventRepo.insert(event, it.id)
     }
 

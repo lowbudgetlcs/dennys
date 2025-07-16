@@ -1,13 +1,13 @@
 package com.lowbudgetlcs.routes.api.v1
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.toEventGroupId
+import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.services.EventService
+import com.lowbudgetlcs.gateways.TournamentGateway
 import com.lowbudgetlcs.repositories.jooq.JooqEventGroupRepository
 import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
-import com.lowbudgetlcs.repositories.riot.RiotTournamentRepository
 import com.lowbudgetlcs.routes.dto.events.CreateEventDto
 import com.lowbudgetlcs.routes.dto.events.toDto
 import com.lowbudgetlcs.routes.dto.events.toNewEvent
@@ -24,7 +24,7 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 private val eventService: EventService =
     EventService(
         JooqEventRepository(Database.dslContext),
-        JooqEventGroupRepository(Database.dslContext), RiotTournamentRepository()
+        JooqEventGroupRepository(Database.dslContext), TournamentGateway()
     )
 
 fun Route.eventRoutesV1() {
