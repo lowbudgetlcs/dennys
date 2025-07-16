@@ -4,6 +4,9 @@ import com.lowbudgetlcs.domain.models.Team
 import com.lowbudgetlcs.domain.models.TeamId
 import com.lowbudgetlcs.domain.models.TeamName
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.toTeamId
+import com.lowbudgetlcs.domain.models.toTeamName
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Teams
 import org.jooq.storage.tables.references.EVENTS
@@ -29,10 +32,10 @@ class JooqTeamRepository(private val dsl: DSLContext) {
             .fetch()
         return result.map { row ->
             Team(
-                id = TeamId(row[TEAMS.ID]!!),
-                name = TeamName(row[TEAMS.NAME]!!),
+                id = row[TEAMS.ID]!!.toTeamId(),
+                name = row[TEAMS.NAME]!!.toTeamName(),
                 logoName = row[TEAMS.LOGO_NAME],
-                eventId = row[TEAMS.EVENT_ID]?.let { EventId(it) }
+                eventId = row[TEAMS.EVENT_ID]?.toEventId()
             )
         }
     }

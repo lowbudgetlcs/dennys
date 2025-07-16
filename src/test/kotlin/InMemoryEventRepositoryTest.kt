@@ -2,7 +2,7 @@ import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.toTournamentId
+import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.inmemory.InMemoryEventRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models
+package com.lowbudgetlcs.domain.models.tournament
 
 @JvmInline
 value class ShortCode(val value: String)

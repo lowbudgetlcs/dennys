@@ -1,7 +1,12 @@
 package com.lowbudgetlcs.domain.models.events
 
-import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import java.time.Instant
+
+fun NewEventGroup.toEventGroup(id: EventGroupId): EventGroup = EventGroup(
+    id = id,
+    name = name
+)
 
 fun Event.toEventWithGroup(group: EventGroup?): EventWithGroup = EventWithGroup(
     id = id,

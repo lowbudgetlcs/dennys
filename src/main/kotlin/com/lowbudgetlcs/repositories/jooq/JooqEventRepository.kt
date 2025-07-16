@@ -1,7 +1,8 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.IEventRepository
 import org.jooq.DSLContext
 import org.jooq.storage.tables.references.EVENTS
@@ -24,11 +25,11 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
         .from(EVENTS)
         .fetch().map {
             Event(
-                id = EventId(it[EVENTS.ID]!!),
+                id = it[EVENTS.ID]!!.toEventId(),
                 name = it[EVENTS.NAME]!!,
                 description = it[EVENTS.DESCRIPTION]!!,
-                tournamentId = TournamentId(it[EVENTS.RIOT_TOURNAMENT_ID]!!),
-                eventGroupId = it[EVENT_GROUPS.ID]?.let { id -> EventGroupId(id) },
+                tournamentId = it[EVENTS.RIOT_TOURNAMENT_ID]!!.toTournamentId(),
+                eventGroupId = it[EVENT_GROUPS.ID]?.toEventGroupId(),
                 createdAt = it[EVENTS.CREATED_AT]!!,
                 startDate = it[EVENTS.START_DATE]!!,
                 endDate = it[EVENTS.END_DATE]!!,
@@ -52,14 +53,14 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
             .where(EVENTS.EVENT_GROUP_ID.eq(groupId.value))
             .fetch().map {
                 Event(
-                    id = EventId(it[EVENTS.ID]!!),
+                    id = it[EVENTS.ID]!!.toEventId(),
                     name = it[EVENTS.NAME]!!,
                     description = it[EVENTS.DESCRIPTION]!!,
-                    tournamentId = TournamentId(it[EVENTS.RIOT_TOURNAMENT_ID]!!),
+                    tournamentId = it[EVENTS.RIOT_TOURNAMENT_ID]!!.toTournamentId(),
                     createdAt = it[EVENTS.CREATED_AT]!!,
                     startDate = it[EVENTS.START_DATE]!!,
                     endDate = it[EVENTS.END_DATE]!!,
-                    eventGroupId = it[EVENTS.EVENT_GROUP_ID]?.let { id -> EventGroupId(id) },
+                    eventGroupId = it[EVENTS.EVENT_GROUP_ID]?.toEventGroupId(),
                     status = EventStatus.valueOf(it[EVENTS.STATUS]!!)
                 )
             }
@@ -80,14 +81,14 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
             .where(EVENTS.ID.eq(id.value))
             .fetchOne()?.let {
                 Event(
-                    id = EventId(it[EVENTS.ID]!!),
+                    id = it[EVENTS.ID]!!.toEventId(),
                     name = it[EVENTS.NAME]!!,
                     description = it[EVENTS.DESCRIPTION]!!,
-                    tournamentId = TournamentId(it[EVENTS.RIOT_TOURNAMENT_ID]!!),
+                    tournamentId = it[EVENTS.RIOT_TOURNAMENT_ID]!!.toTournamentId(),
                     createdAt = it[EVENTS.CREATED_AT]!!,
                     startDate = it[EVENTS.START_DATE]!!,
                     endDate = it[EVENTS.END_DATE]!!,
-                    eventGroupId = it[EVENTS.EVENT_GROUP_ID]?.let { id -> EventGroupId(id) },
+                    eventGroupId = it[EVENTS.EVENT_GROUP_ID]?.toEventGroupId(),
                     status = EventStatus.valueOf(it[EVENTS.STATUS]!!)
                 )
             }
@@ -106,14 +107,14 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
             .returning(EVENTS.ID, EVENTS.CREATED_AT)
             .fetchOne()?.let { row ->
                 Event(
-                    id = EventId(row[EVENTS.ID]!!),
+                    id = row[EVENTS.ID]!!.toEventId(),
                     name = newEvent.name,
                     description = newEvent.description,
                     tournamentId = tournamentId,
                     createdAt = row[EVENTS.CREATED_AT]!!,
                     startDate = newEvent.startDate,
                     endDate = newEvent.endDate,
-                    eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.let { id -> EventGroupId(id) },
+                    eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.toEventGroupId(),
                     status = newEvent.status
                 )
             }

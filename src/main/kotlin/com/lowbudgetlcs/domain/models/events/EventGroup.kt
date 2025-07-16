@@ -6,3 +6,5 @@ value class EventGroupId(val value: Int)
 fun Int.toEventGroupId(): EventGroupId = EventGroupId(this)
 
 data class EventGroup(val id: EventGroupId, val name: String)
+
+data class NewEventGroup(val name: String)

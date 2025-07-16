@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.events
 
-import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import java.time.Instant
 
 data class EventWithGroup(

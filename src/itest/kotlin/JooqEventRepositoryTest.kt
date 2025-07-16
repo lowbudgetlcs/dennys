@@ -1,4 +1,4 @@
-import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.toEventGroupId

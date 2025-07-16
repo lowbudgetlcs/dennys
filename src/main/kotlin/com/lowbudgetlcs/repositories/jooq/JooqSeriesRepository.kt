@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.Series
-import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.TeamId
-import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.toSeriesId
+import com.lowbudgetlcs.domain.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Series.Companion.SERIES
 import org.jooq.storage.tables.SeriesResults.Companion.SERIES_RESULTS
@@ -25,11 +25,11 @@ class JooqSeriesRepository(private val dsl: DSLContext) {
             .where(SERIES.ID.eq(id))
             .fetchOne()?.let { row ->
                 Series(
-                    id = SeriesId(row[SERIES.ID]!!),
-                    eventId = EventId(row[SERIES.EVENT_ID]!!),
+                    id = row[SERIES.ID]!!.toSeriesId(),
+                    eventId = row[SERIES.EVENT_ID]!!.toEventId(),
                     gamesToWin = row[SERIES.GAMES_TO_WIN]!!,
-                    winnerId = row[SERIES_RESULTS.WINNER_TEAM_ID]?.let { TeamId(it) },
-                    loserId = row[SERIES_RESULTS.LOSER_TEAM_ID]?.let { TeamId(it) },
+                    winnerId = row[SERIES_RESULTS.WINNER_TEAM_ID]?.toTeamId(),
+                    loserId = row[SERIES_RESULTS.LOSER_TEAM_ID]?.toTeamId()
                 )
             }
 }

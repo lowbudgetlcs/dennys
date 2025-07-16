@@ -3,6 +3,8 @@ package com.lowbudgetlcs.domain.models
 @JvmInline
 value class GameId(val value: Int)
 
+fun Int.toGameId(): GameId = GameId(this)
+
 data class Game(
     val id: GameId,
     val shortCode: String,

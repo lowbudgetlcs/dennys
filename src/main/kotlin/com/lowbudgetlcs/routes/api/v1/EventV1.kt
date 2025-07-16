@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.routes.api.v1
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.domain.models.NewTournament
+import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.toEventGroupId
 import com.lowbudgetlcs.domain.services.EventService
@@ -43,7 +43,7 @@ fun Route.eventRoutesV1() {
             val createEvent = call.receive<CreateEventDto>()
             val group = createEvent.eventGroupId?.toEventGroupId()?.let { eventService.getEventGroupById(it) }
             logger.debug("\uD83D\uDCC2 Deserialized body: ${Json.encodeToString(createEvent)}")
-            eventService.create(
+            eventService.createEvent(
                 event = createEvent.toNewEvent(),
                 tournament = NewTournament(createEvent.name)
             )?.let { event ->

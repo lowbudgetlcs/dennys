@@ -1,4 +1,6 @@
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.tournament.NewTournament
+import com.lowbudgetlcs.domain.models.tournament.Tournament
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.repositories.inmemory.InMemoryTournamentRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

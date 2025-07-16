@@ -5,6 +5,8 @@ import com.lowbudgetlcs.domain.models.events.EventId
 @JvmInline
 value class SeriesId(val value: Int)
 
+fun Int.toSeriesId(): SeriesId = SeriesId(this)
+
 data class Series(
     val id: SeriesId,
     val eventId: EventId,

@@ -1,8 +1,9 @@
 package com.lowbudgetlcs.repositories.inmemory
 
-import com.lowbudgetlcs.domain.models.NewTournament
-import com.lowbudgetlcs.domain.models.Tournament
-import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.tournament.NewTournament
+import com.lowbudgetlcs.domain.models.tournament.Tournament
+import com.lowbudgetlcs.domain.models.tournament.toTournament
+import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.ITournamentRepository
 
 class InMemoryTournamentRepository : ITournamentRepository {
@@ -12,11 +13,8 @@ class InMemoryTournamentRepository : ITournamentRepository {
     }
 
     override fun create(tournament: NewTournament): Tournament? {
-        val id = TournamentId(tournaments.size)
-        val t = Tournament(
-            id = id,
-            name = tournament.name
-        )
+        val id = tournaments.size.toTournamentId()
+        val t = tournament.toTournament(id)
         tournaments.add(id.value, t)
         return tournaments[id.value]
     }
