@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.repositories.IEventRepository
 import org.jooq.DSLContext
 import org.jooq.storage.tables.references.EVENTS
@@ -91,36 +92,29 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
                 )
             }
 
-    override fun insert(event: NewEvent, tournamentId: TournamentId): Event? =
+    override fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event? =
         dsl
             .insertInto(
                 EVENTS
             )
-            .set(EVENTS.NAME, event.name)
-            .set(EVENTS.DESCRIPTION, event.description)
+            .set(EVENTS.NAME, newEvent.name)
+            .set(EVENTS.DESCRIPTION, newEvent.description)
             .set(EVENTS.RIOT_TOURNAMENT_ID, tournamentId.value)
-            .set(EVENTS.START_DATE, event.startDate)
-            .set(EVENTS.END_DATE, event.endDate)
-            .set(EVENTS.STATUS, event.status.name)
+            .set(EVENTS.START_DATE, newEvent.startDate)
+            .set(EVENTS.END_DATE, newEvent.endDate)
+            .set(EVENTS.STATUS, newEvent.status.name)
             .returning(EVENTS.ID, EVENTS.CREATED_AT)
             .fetchOne()?.let { row ->
                 Event(
                     id = EventId(row[EVENTS.ID]!!),
-                    name = event.name,
-                    description = event.description,
+                    name = newEvent.name,
+                    description = newEvent.description,
                     tournamentId = tournamentId,
                     createdAt = row[EVENTS.CREATED_AT]!!,
-                    startDate = event.startDate,
-                    endDate = event.endDate,
+                    startDate = newEvent.startDate,
+                    endDate = newEvent.endDate,
                     eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.let { id -> EventGroupId(id) },
-                    status = event.status
+                    status = newEvent.status
                 )
             }
-
-    override fun updateStatusById(
-        id: EventId,
-        status: EventStatus
-    ): Event? {
-        TODO("Not yet implemented")
-    }
 }

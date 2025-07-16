@@ -14,7 +14,6 @@ data class Game(
 )
 
 data class NewGame(
-    val shortCode: String,
     val blueSideId: TeamId,
     val redSideId: TeamId,
     val seriesId: Int,

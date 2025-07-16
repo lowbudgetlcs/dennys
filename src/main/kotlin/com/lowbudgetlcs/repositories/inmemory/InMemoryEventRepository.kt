@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.repositories.inmemory
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.repositories.IEventRepository
 import java.time.Instant.now
 
@@ -19,32 +20,11 @@ class InMemoryEventRepository : IEventRepository {
     override fun getById(id: EventId): Event? = events.getOrNull(id.value)
 
     override fun insert(
-        event: NewEvent, tournamentId: TournamentId
+        newEvent: NewEvent, tournamentId: TournamentId
     ): Event? {
         val id = EventId(events.size)
-        val e = Event(
-            id = id,
-            name = event.name,
-            description = event.description,
-            tournamentId = tournamentId,
-            createdAt = now(),
-            startDate = event.startDate,
-            endDate = event.endDate,
-            eventGroupId = event.eventGroupId,
-            status = event.status
-        )
+        val e = newEvent.toEvent(id, now(), tournamentId)
         events.add(id.value, e)
         return e
-    }
-
-    override fun updateStatusById(
-        id: EventId, status: EventStatus
-    ): Event? {
-        try {
-            events[id.value] = events[id.value].copy(status = status)
-            return events[id.value]
-        } catch (e: IndexOutOfBoundsException) {
-            return null
-        }
     }
 }

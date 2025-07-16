@@ -1,6 +1,7 @@
-import com.lowbudgetlcs.domain.models.EventStatus
-import com.lowbudgetlcs.domain.models.NewEvent
 import com.lowbudgetlcs.domain.models.TournamentId
+import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.toEventGroupId
 import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
 import io.kotest.assertions.withClue
 import io.kotest.core.extensions.install
@@ -24,7 +25,7 @@ class JooqEventRepositoryTest : FunSpec({
 
     test("Insert NewEvent and retrieve by id") {
         val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
-        val newEvent = NewEvent("Season 1", "The first season", now, now, EventStatus.ACTIVE)
+        val newEvent = NewEvent("Season 1", "The first season", 0.toEventGroupId(), now, now, EventStatus.ACTIVE)
         val event = JooqEventRepository(dslContext).insert(newEvent, TournamentId(1))
         withClue("result should be present") {
             event shouldNotBe null

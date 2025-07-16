@@ -1,15 +1,15 @@
 package com.lowbudgetlcs.routes.api.v1
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.domain.models.EventId
 import com.lowbudgetlcs.domain.models.NewTournament
+import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.toEventGroupId
 import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.repositories.jooq.JooqEventGroupRepository
 import com.lowbudgetlcs.repositories.jooq.JooqEventRepository
 import com.lowbudgetlcs.repositories.riot.RiotTournamentRepository
 import com.lowbudgetlcs.routes.dto.events.CreateEventDto
 import com.lowbudgetlcs.routes.dto.events.toDto
-import com.lowbudgetlcs.routes.dto.events.toEventGroupId
 import com.lowbudgetlcs.routes.dto.events.toNewEvent
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -34,14 +34,8 @@ fun Route.eventRoutesV1() {
             val events = call.request.queryParameters["eventGroup"]?.toIntOrNull()?.let { group ->
                 eventService.getEventsByGroupId(group.toEventGroupId())
             } ?: eventService.getEvents()
-            val groups = eventService.getEventGroups()
             logger.debug("\uD83D\uDD22 Got ${events.size} events")
-            val eventsWithGroup = events.map { event ->
-                event.toDto(groups.first { group ->
-                    event.eventGroupId == group.id
-                })
-            }
-            call.respond(eventsWithGroup)
+            call.respond(events)
 
         }
         post {

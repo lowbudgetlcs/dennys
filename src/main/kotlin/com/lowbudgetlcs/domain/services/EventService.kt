@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.NewTournament
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.ITournamentRepository
@@ -14,15 +15,26 @@ class EventService(
         eventRepo.insert(event, it.id)
     }
 
-    fun getEvents(): List<Event> = eventRepo.getAll()
+    fun getEvents(): List<EventWithGroup> {
+        val events = eventRepo.getAll()
+        val groups = eventGroupRepo.getAll()
+        return events.map { e ->
+            val group = groups.first { g ->
+                e.eventGroupId == g.id
+            }
+            e.toEventWithGroup(group)
+        }
+    }
 
-    fun getEventsByGroupId(group: EventGroupId): List<Event> = eventRepo.getAllByGroupId(group)
+    fun getEventsByGroupId(group: EventGroupId): List<EventWithGroup> {
+        val events = eventRepo.getAllByGroupId(group)
+        val group = eventGroupRepo.getById(group)
+        return events.map { it.toEventWithGroup(group) }
+    }
 
     fun getEventGroups(): List<EventGroup> = eventGroupRepo.getAll()
 
-    fun getEventGroupById(id: EventGroupId): EventGroup? = TODO()
+    fun getEventGroupById(id: EventGroupId): EventGroup? = eventGroupRepo.getById(id)
 
     fun getEvent(id: EventId): Event? = eventRepo.getById(id)
-
-    fun changeEventStatus(id: EventId, newStatus: EventStatus): Event? = eventRepo.updateStatusById(id, newStatus)
 }

@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.EventId
 import com.lowbudgetlcs.domain.models.Team
 import com.lowbudgetlcs.domain.models.TeamId
 import com.lowbudgetlcs.domain.models.TeamName
+import com.lowbudgetlcs.domain.models.events.EventId
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Teams
 import org.jooq.storage.tables.references.EVENTS

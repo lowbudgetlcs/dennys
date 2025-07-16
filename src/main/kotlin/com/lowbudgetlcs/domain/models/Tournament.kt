@@ -6,6 +6,8 @@ value class ShortCode(val value: String)
 @JvmInline
 value class TournamentId(val value: Int)
 
+fun Int.toTournamentId(): TournamentId = TournamentId(this)
+
 data class Tournament(val id: TournamentId, val name: String)
 
 data class NewTournament(val name: String)

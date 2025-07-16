@@ -12,7 +12,6 @@ RUN gradle --no-daemon installDist
 
 FROM gradle:8.9-jdk21 AS test
 WORKDIR /test
-COPY --from=dependencies /cache /home/gradle/.gradle
 COPY . .
 RUN gradle test itest
 

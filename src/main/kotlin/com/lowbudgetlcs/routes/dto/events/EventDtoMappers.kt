@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.routes.dto.events
 
-import com.lowbudgetlcs.domain.models.Event
-import com.lowbudgetlcs.domain.models.EventGroup
-import com.lowbudgetlcs.domain.models.EventGroupId
-import com.lowbudgetlcs.domain.models.NewEvent
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventGroup
+import com.lowbudgetlcs.domain.models.events.EventGroupId
+import com.lowbudgetlcs.domain.models.events.NewEvent
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
     name = name,
@@ -13,8 +13,6 @@ fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
     eventGroupId = eventGroupId?.let { EventGroupId(it) },
     status = status
 )
-
-fun Int.toEventGroupId(): EventGroupId = EventGroupId(this)
 
 fun EventGroup.toDto(): EventGroupDto = EventGroupDto(
     id = id.value, name = name
