@@ -18,7 +18,7 @@ updateGame:
     WHERE id = :id
     RETURNING id,shortcode,game_num,winner_id,loser_id,callback_result,created_at,series_id;
 
-countWinsInSeriesByTeam:
-    SELECT COUNT(id)
+winsInSeriesByTeam:
+    SELECT id,shortcode,game_num,winner_id,loser_id,callback_result,created_at,series_id
     FROM games
     WHERE series_id = :series_id AND winner_id = :winner_id;
