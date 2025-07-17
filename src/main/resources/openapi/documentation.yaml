@@ -151,7 +151,7 @@ components:
         - ACTIVE
         - CANCELED
         - PAUSED
-        - COMPLETE
+        - COMPLETED
         
     CreateEventDto:
       type: object
