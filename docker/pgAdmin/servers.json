@@ -2,13 +2,12 @@
     "Servers": {
         "1": {
             "Group": "Dennys",
-            "Name": "Application DB",
-            "Host": "postgres-dennys",
+            "Name": "Db",
+            "Host": "dennys-db",
             "Port": 5432,
             "MaintenanceDB": "postgres",
             "Username": "postgres",
             "Password": "admin",
-            "SSLMode": "prefer",
             "Favorite": true
         }
     }
