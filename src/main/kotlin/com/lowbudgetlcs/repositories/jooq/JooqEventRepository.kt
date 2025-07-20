@@ -23,6 +23,8 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
             EVENT_GROUPS.ID
         )
         .from(EVENTS)
+        .leftJoin(EVENT_GROUPS)
+        .on(EVENTS.EVENT_GROUP_ID.eq(EVENT_GROUPS.ID))
         .fetch().map {
             Event(
                 id = it[EVENTS.ID]!!.toEventId(),
