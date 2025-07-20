@@ -2,7 +2,7 @@
 
 pkgs.mkShell {
     buildInputs = with pkgs; [
-      yq jdk17 gnumake
+      jdk21 gnumake
     ];
     env = {
       TEST="Hello there...";

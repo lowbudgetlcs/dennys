@@ -2,7 +2,7 @@ services:
   dennys:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       target: app
     image: dennys:local
     container_name: dennys-container
@@ -15,12 +15,12 @@ services:
       - RIOT_API_TOKEN=${RIOT_API_TOKEN}
       - RIOT_USE_STUBS=${RIOT_USE_STUBS}
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
 
-  postgres:
+  db:
     image: postgres:15-alpine
-    container_name: postgres-dennys
+    container_name: dennys-db
     ports:
       - "127.0.0.1:5432:5432"
     user: postgres
@@ -29,10 +29,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
     volumes:
-      # DB Data
-      - pgdata:/var/lib/postgresql/data
       # DB Init Scripts
-      - ./docker/postgres:/docker-entrypoint-initdb.d
+      - ./docker/postgres/sql:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
       interval: 5s 
@@ -41,22 +39,29 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:9.4
-    container_name: pgadmin-dennys
+    container_name: pgadmin
     ports: 
       - "127.0.0.1:8888:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=dev@dev.com
+      - PGADMIN_DEFAULT_EMAIL=admin@dev.com
       - PGADMIN_DEFAULT_PASSWORD=admin
       - PGADMIN_CONFIG_SERVER_MODE=False
       - PGADMIN_CONFIG_MASTER_PASSWORD=False
       - PGADMIN_DISABLE_POSTFIX=true
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
     volumes:
-      # Configure DB
+      # Add default database configuration
       - ./docker/pgAdmin/servers.json:/pgadmin4/servers.json
 
-volumes:
-  pgdata:
-  pgadmin-data:
+  swagger-editor:
+    container_name: swagger
+    image: swaggerapi/swagger-editor
+    ports: 
+      - "80:8080"
+    volumes:
+      - ./docker/swaggerEditor/openapi.yaml:/spec/openapi.yaml
+    environment:
+      SWAGGER_FILE: /spec/openapi.yaml
+

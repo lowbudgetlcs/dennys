@@ -1,0 +1,270 @@
+openapi: 3.0.3
+info:
+  title: Dennys - OpenAPI 3.0
+  description: |-
+    This is the Dennys OpenAPI 3.0 specification.
+  contact:
+    email: lblcs.dev@gmail.com
+  license:
+    name: GPL-3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.html#license-text
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Dennys
+  url: https://github.com/lowbudgetlcs/dennys
+servers:
+  - url: http://localhost:9292
+
+tags:
+  - name: v1/event
+    description: Access to LBLCS events
+paths:
+  /api/v1/event:
+    get:
+      tags:
+        - v1/event
+      summary: Get all events
+      description: Fetch a list of all events.
+      operationId: getEvents
+      parameters:
+        - name: eventGroup
+          in: query
+          description: Filter by this event group
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDto'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - v1/event
+      summary: Create a new event.
+      description: Registers an event with Dennys.
+      operationId: addEvent
+      requestBody:
+        description: Event specification
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventDto'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/event/{eventId}:
+    get:
+      tags:
+        - v1/event
+      summary: Find event by ID.
+      description: Returns a single event.
+      operationId: getEventById
+      parameters:
+        - name: eventId
+          in: path
+          description: ID of event to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '400':
+          description: Missing or malformed id
+        '404':
+          description: Event not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      tags:
+        - v1/event
+      summary: Update an event.
+      parameters:
+        - name: eventId
+          in: path
+          description: ID of event to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      operationId: updateEvent
+      requestBody:
+        required: true
+        description: Update existing event.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventDto'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    EventStatus:
+      type: string
+      enum:
+        - NOT_STARTED
+        - ACTIVE
+        - CANCELED
+        - PAUSED
+        - COMPLETED
+
+    CreateEventDto:
+      type: object
+      required:
+        - name
+        - startDate
+        - endDate
+        - status
+      properties:
+        name:
+          type: string
+          example: Season 14 Commercial
+        description:
+          type: string
+          description: Describe the event!
+          example: Season 14's plat-emerald league!
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        eventGroup:
+          type: integer
+          description: An optional event grouping. Invalid IDs will not cause event creation failure.
+        status:
+          allOf:
+            - description: The intended starting status of the event.
+            - example: NOT_STARTED
+            - $ref: '#/components/schemas/EventStatus'
+
+    UpdateEventDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Event name
+          example: Season 14 Commercial
+        description:
+          type: string
+          example: Season 14's plat-emerald league!
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        eventGroupId:
+          type: integer
+        status:
+          allOf:
+            - description: The new event status.
+            - example: CANCELED
+            - $ref: '#/components/schemas/EventStatus'
+
+    EventDto:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - startDate
+        - endDate
+        - status
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          description: Event name
+          example: Season 14 Commercial
+        description:
+          type: string
+          example: Season 14's plat-emerald league!
+        createdAt:
+          type: string
+          format: date-time
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        eventGroup:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        status:
+          allOf:
+            - description: The current event status.
+            - example: NOT_STARTED
+            - $ref: '#/components/schemas/EventStatus'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message

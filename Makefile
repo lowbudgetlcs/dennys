@@ -3,7 +3,7 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run migrations refresh drop test
+.PHONY: all clean stop build debug-build run db swagger refresh jooq test
 
 # Build and run by default
 all: build run
@@ -26,21 +26,26 @@ debug-build:
 	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) -f ./docker/Dockerfile . 
 
 # Run all containers
-run: migrations
+run: 
 	docker compose up --attach dennys
 
-migrations:
-	./gradlew generateMainDatabaseMigrations 
-	cp ./build/resources/migrations/* ./docker/postgres
+# Start database tools
+db:
+	docker compose up db pgadmin
+
+swag:
+	docker-compose up swagger-editor
+
+kswag:
+	docker-compose down
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run
 
-# Cleans local database
-drop:
-	docker volume rm $(APP_NAME)_pgdata
-	docker volume rm $(APP_NAME)_pgadmin-data
+# Generate new JOOQ data classes from sql migrations
+jooq:
+	./gradlew generateJooq 
 
 # Run tests
 test:
-	docker build -t dennys:test --progress=plain --no-cache --target test -f ./docker/Dockerfile .
+	./gradlew test itest

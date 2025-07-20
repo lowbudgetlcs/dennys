@@ -1,0 +1,14 @@
+package com.lowbudgetlcs.repositories
+
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventGroupId
+import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.NewEvent
+
+interface IEventRepository {
+    fun getAll(): List<Event>
+    fun getAllByGroupId(groupId: EventGroupId): List<Event>
+    fun getById(id: EventId): Event?
+    fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event?
+}
