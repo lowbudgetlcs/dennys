@@ -17,14 +17,12 @@ class EventService(
 
     fun createEventGroup(group: NewEventGroup): EventGroup? = eventGroupRepo.insert(group)
 
-    fun getEvents(): List<EventWithGroup> {
+    fun getEventsWithGroups(): List<EventWithGroup> {
         val events = eventRepo.getAll()
         val groups = eventGroupRepo.getAll()
-        return events.map { e ->
-            val group = groups.first { g ->
-                e.eventGroupId == g.id
-            }
-            e.toEventWithGroup(group)
+        return events.mapNotNull { e ->
+            val group = groups.firstOrNull { g -> e.eventGroupId == g.id }
+            group?.let { e.toEventWithGroup(it) }
         }
     }
 

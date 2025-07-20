@@ -33,7 +33,7 @@ fun Route.eventRoutesV1() {
             logger.info("📩 Received get on /v1/event")
             val events = call.request.queryParameters["eventGroup"]?.toIntOrNull()?.let { group ->
                 eventService.getEventsByGroupId(group.toEventGroupId())
-            } ?: eventService.getEvents()
+            } ?: eventService.getEventsWithGroups()
             logger.debug("\uD83D\uDD22 Got ${events.size} events")
             call.respond(events)
 

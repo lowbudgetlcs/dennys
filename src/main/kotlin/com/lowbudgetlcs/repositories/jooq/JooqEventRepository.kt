@@ -75,7 +75,8 @@ class JooqEventRepository(private val dsl: DSLContext) : IEventRepository {
                 EVENTS.CREATED_AT,
                 EVENTS.START_DATE,
                 EVENTS.END_DATE,
-                EVENTS.STATUS
+                EVENTS.STATUS,
+                EVENTS.EVENT_GROUP_ID
             )
             .from(EVENTS)
             .where(EVENTS.ID.eq(id.value))

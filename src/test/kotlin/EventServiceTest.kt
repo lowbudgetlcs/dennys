@@ -75,24 +75,27 @@ class EventServiceTest : StringSpec({
         group.shouldBeInstanceOf<EventGroup>()
         group.shouldBeEqualToIgnoringFields(newGroup1.toEventGroup(0.toEventGroupId()), EventGroup::id)
     }
-    "getEvents() returns all events with their respective groups" {
+    "getEventsWithGroups() returns only events with valid group references" {
         val group1 = service.createEventGroup(NewEventGroup("Group 1"))
         val group2 = service.createEventGroup(NewEventGroup("Group 2"))
         group1.shouldBeInstanceOf<EventGroup>()
         group2.shouldBeInstanceOf<EventGroup>()
+
         val elements = 15
         for (i in 0..elements) {
-            if (i % 3 == 0) {
-                service.createEvent(newEvent.copy(eventGroupId = group1.id), NewTournament("$i"))
-            } else if (i % 4 == 0) {
-                service.createEvent(newEvent.copy(eventGroupId = group2.id), NewTournament("$i"))
-            } else {
-                service.createEvent(newEvent, NewTournament("$i"))
+            val event = when {
+                i % 3 == 0 -> newEvent.copy(eventGroupId = group1.id)
+                i % 4 == 0 -> newEvent.copy(eventGroupId = group2.id)
+                else -> newEvent.copy(eventGroupId = null)
             }
+            service.createEvent(event, NewTournament("$i"))
         }
-        val events = service.getEvents()
+
+        val events = service.getEventsWithGroups()
+        val expectedGrouped = (0..elements).count { it % 3 == 0 || it % 4 == 0 }
+
         events.shouldBeInstanceOf<List<EventWithGroup>>()
-        events.shouldHaveSize(elements + 1)
+        events.shouldHaveSize(expectedGrouped)
         for (e in events) {
             if (e.id.value % 3 == 0) {
                 e.eventGroup shouldBe group1
