@@ -99,7 +99,7 @@ paths:
           description: successful operation
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/EventDto'
         '400':
           description: Missing or malformed id
@@ -111,11 +111,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-      
+
     put:
       tags:
         - v1/event
       summary: Update an event.
+      parameters:
+        - name: eventId
+          in: path
+          description: ID of event to update
+          required: true
+          schema:
+            type: integer
+            format: int64
       operationId: updateEvent
       requestBody:
         required: true
@@ -152,7 +160,7 @@ components:
         - CANCELED
         - PAUSED
         - COMPLETED
-        
+
     CreateEventDto:
       type: object
       required:
@@ -182,7 +190,7 @@ components:
             - description: The intended starting status of the event.
             - example: NOT_STARTED
             - $ref: '#/components/schemas/EventStatus'
-            
+
     UpdateEventDto:
       type: object
       properties:
@@ -206,7 +214,7 @@ components:
             - description: The new event status.
             - example: CANCELED
             - $ref: '#/components/schemas/EventStatus'
-            
+
     EventDto:
       type: object
       required:
@@ -240,16 +248,16 @@ components:
         eventGroup:
           type: object
           properties:
-            id: 
+            id:
               type: integer
-            name: 
+            name:
               type: string
         status:
           allOf:
             - description: The current event status.
             - example: NOT_STARTED
             - $ref: '#/components/schemas/EventStatus'
-            
+
     Error:
       type: object
       properties:
