@@ -18,6 +18,8 @@ servers:
 tags:
   - name: v1/event
     description: Access to LBLCS events
+  - name: v1/players
+    description: Manage Players
 paths:
   /api/v1/event:
     get:
@@ -150,6 +152,125 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/player:
+    get:
+      summary: Get all players (optionally filter by team)
+      operationId: getPlayers
+      tags:
+        - v1/player
+      parameters:
+        - name: teamId
+          in: query
+          description: |
+            Optional team filter:
+              - Not provided: return **all players**
+              - integer value: return players **on that team**
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: List of matching players
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerDto'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new player
+      operationId: addPlayer
+      tags:
+        - v1/player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPlayerDto'
+      responses:
+        '200':
+          description: Player created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+
+  /api/v1/player/{playerId}:
+    get:
+      summary: Get player by ID
+      operationId: getPlayerById
+      tags:
+        - v1/player
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Player found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+        '404':
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Rename a player
+      operationId: renamePlayer
+      tags:
+        - v1/player
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player to rename
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: New name for the player
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenamePlayerDto'
+      responses:
+        '200':
+          description: Player renamed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+        '400':
+          description: Invalid name
+        '404':
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+
 components:
   schemas:
     EventStatus:
@@ -257,6 +378,60 @@ components:
             - description: The current event status.
             - example: NOT_STARTED
             - $ref: '#/components/schemas/EventStatus'
+
+    NewPlayerDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: ruuffian#FUNZ
+        teamId:
+          type: integer
+          nullable: true
+
+
+    RiotAccount:
+      type: object
+      required:
+        - id
+        - riotPuuid
+      properties:
+        id:
+          type: integer
+        riotPuuid:
+          type: string
+          description: Riot's permanent unique user ID (78 chars)
+        playerId:
+          type: integer
+          nullable: true
+
+    PlayerDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiotAccount'
+
+    RenamePlayerDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: New Riot-formatted player name (e.g. ruuffian#FUNZ)
+          example: newname#ABCD
+
 
     Error:
       type: object
