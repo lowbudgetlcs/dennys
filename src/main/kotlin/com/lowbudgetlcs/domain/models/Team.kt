@@ -26,5 +26,14 @@ data class Team(
 data class NewTeam(
     val name: TeamName,
     val logoName: String?,
-    val eventId: EventId?,
+    val eventId: EventId,
 )
+
+data class TeamWithPlayers(
+    val id: TeamId,
+    val name: TeamName,
+    val logoName: String?,
+    val eventId: EventId?,
+    val players: List<Player>
+)
+
