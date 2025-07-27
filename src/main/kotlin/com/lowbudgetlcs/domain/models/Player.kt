@@ -22,3 +22,9 @@ data class Player(
 data class NewPlayer(
     val name: PlayerName, val teamId: TeamId?
 )
+
+data class PlayerWithAccounts(
+    val id:PlayerId,
+    val name: PlayerName,
+    val accounts: List<RiotAccount>
+)
