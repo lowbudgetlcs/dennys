@@ -192,7 +192,10 @@ paths:
         '404':
           description: Event or team not found
         '409':
-          description: Team is already assigned to a different event
+          description: |
+            Conflict:
+            - Team is already assigned to a different event
+            - One or more players on this team are already assigned to a different team in this event
           content:
             application/json:
               schema:
