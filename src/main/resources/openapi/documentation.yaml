@@ -17,11 +17,22 @@ servers:
 
 tags:
   - name: v1/event
-    description: Access to LBLCS events
-  - name: v1/player
-    description: Manage Players
+    description: Top-level event CRUD operations
+
+  - name: v1/event/teams
+    description: Assign/remove teams from events
+
   - name: v1/team
-    description: Manage Teams
+    description: Manage Teams (create/edit/delete)
+
+  - name: v1/team/players
+    description: Add/remove players from teams
+
+  - name: v1/player
+    description: Player basic operations
+
+  - name: v1/player/accounts
+    description: Riot account linking/removal
 
 paths:
   /api/v1/event:
@@ -158,12 +169,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+
   /api/v1/event/{eventId}/teams:
+    get:
+      summary: Get all teams in an event
+      operationId: getTeamsInEvent
+      tags:
+        - v1/event/teams
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID of the event
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of teams in the event
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamWithPlayersDto'
+        '404':
+          description: Event not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       summary: Assign a team to an event
       operationId: addTeamToEvent
       tags:
-        - v1/event
+        - v1/event/teams
       parameters:
         - name: eventId
           in: path
@@ -206,7 +247,7 @@ paths:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
       tags:
-        - v1/event
+        - v1/event/teams
       parameters:
         - name: eventId
           in: path
@@ -227,203 +268,6 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event or team not found
-
-  /api/v1/player:
-    get:
-      summary: Get all players (optionally filter by team)
-      operationId: getPlayers
-      tags:
-        - v1/player
-      parameters:
-        - name: teamId
-          in: query
-          description: |
-            Optional team filter:
-              - Not provided: return **all players**
-              - integer value: return players **on that team**
-          required: false
-          schema:
-            type: integer
-            example: 1
-      responses:
-        '200':
-          description: List of matching players
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PlayerDto'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    post:
-      summary: Create a new player
-      operationId: addPlayer
-      tags:
-        - v1/player
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewPlayerDto'
-      responses:
-        '200':
-          description: Player created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlayerDto'
-
-  /api/v1/player/{playerId}:
-    get:
-      summary: Get player by ID
-      operationId: getPlayerById
-      tags:
-        - v1/player
-      parameters:
-        - name: playerId
-          in: path
-          required: true
-          description: ID of the player to retrieve
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Player found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlayerDto'
-        '404':
-          description: Player not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-    patch:
-      summary: Rename a player
-      operationId: renamePlayer
-      tags:
-        - v1/player
-      parameters:
-        - name: playerId
-          in: path
-          required: true
-          description: ID of the player to rename
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        description: New name for the player
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RenamePlayerDto'
-      responses:
-        '200':
-          description: Player renamed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlayerDto'
-        '400':
-          description: Invalid name
-        '404':
-          description: Player not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/v1/player/{playerId}/accounts:
-    post:
-      summary: Add a Riot account to a player
-      operationId: addAccountToPlayer
-      tags:
-        - v1/player
-      parameters:
-        - name: playerId
-          in: path
-          required: true
-          description: ID of the player
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        description: The Riot account to associate with the player
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - riotPuuid
-              properties:
-                riotPuuid:
-                  type: string
-                  description: Riot’s unique permanent user ID (78 characters)
-                  example: "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefgh"
-      responses:
-        '200':
-          description: Riot account added to player
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlayerDto'
-        '400':
-          description: Invalid Riot PUUID or already assigned
-        '404':
-          description: Player not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/v1/player/{playerId}/accounts/{accountId}:
-    delete:
-      summary: Remove a Riot account from a player
-      operationId: removeAccountFromPlayer
-      tags:
-        - v1/player
-      parameters:
-        - name: playerId
-          in: path
-          required: true
-          description: ID of the player
-          schema:
-            type: integer
-        - name: accountId
-          in: path
-          required: true
-          description: ID of the Riot account to remove
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Riot account removed from player
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlayerDto'
-        '404':
-          description: Player or account not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
   /api/v1/team:
     get:
@@ -547,11 +391,40 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/v1/team/{teamId}/players:
+    get:
+      summary: Get players on a team
+      operationId: getPlayersOnTeam
+      tags:
+        - v1/team/players
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          description: ID of the team
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Players on the team
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerDto'
+        '404':
+          description: Team not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       summary: Add a player to a team
       operationId: addPlayerToTeam
       tags:
-        - v1/team
+        - v1/team/players
       parameters:
         - name: teamId
           in: path
@@ -594,7 +467,7 @@ paths:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
       tags:
-        - v1/team
+        - v1/team/players
       parameters:
         - name: teamId
           in: path
@@ -616,6 +489,232 @@ paths:
         '404':
           description: Team or player not found
 
+  /api/v1/player:
+    get:
+      summary: Get all players (optionally filter by team)
+      operationId: getPlayers
+      tags:
+        - v1/player
+      parameters:
+        - name: teamId
+          in: query
+          description: |
+            Optional team filter:
+              - Not provided: return **all players**
+              - integer value: return players **on that team**
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: List of matching players
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerDto'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new player
+      operationId: addPlayer
+      tags:
+        - v1/player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPlayerDto'
+      responses:
+        '200':
+          description: Player created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+
+  /api/v1/player/{playerId}:
+    get:
+      summary: Get player by ID
+      operationId: getPlayerById
+      tags:
+        - v1/player
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Player found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+        '404':
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Rename a player
+      operationId: renamePlayer
+      tags:
+        - v1/player
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player to rename
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: New name for the player
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenamePlayerDto'
+      responses:
+        '200':
+          description: Player renamed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+        '400':
+          description: Invalid name
+        '404':
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/player/{playerId}/accounts:
+    get:
+      summary: Get Riot accounts for a player
+      operationId: getAccountsForPlayer
+      tags:
+        - v1/player/accounts
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Riot accounts associated with the player
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RiotAccount'
+        '404':
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Add a Riot account to a player
+      operationId: addAccountToPlayer
+      tags:
+        - v1/player/accounts
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: The Riot account to associate with the player
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - riotPuuid
+              properties:
+                riotPuuid:
+                  type: string
+                  description: Riot’s unique permanent user ID (78 characters)
+                  example: "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefgh"
+      responses:
+        '200':
+          description: Riot account added to player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+        '400':
+          description: Invalid Riot PUUID or already assigned
+        '404':
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/player/{playerId}/accounts/{accountId}:
+    delete:
+      summary: Remove a Riot account from a player
+      operationId: removeAccountFromPlayer
+      tags:
+        - v1/player/accounts
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player
+          schema:
+            type: integer
+        - name: accountId
+          in: path
+          required: true
+          description: ID of the Riot account to remove
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Riot account removed from player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDto'
+        '404':
+          description: Player or account not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
