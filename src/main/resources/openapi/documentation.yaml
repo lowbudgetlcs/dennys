@@ -87,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventWithTeamsDto'
+                $ref: '#/components/schemas/EventDto'
         '400':
           description: Invalid input
           content:
@@ -128,7 +128,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventWithTeamsDto'
+                $ref: '#/components/schemas/EventDto'
         '400':
           description: Missing or malformed id
           content:
@@ -193,7 +193,7 @@ paths:
 
   /api/v1/event/{eventId}/teams:
     get:
-      summary: Get all teams in an event
+      summary: Get an event with all teams included
       operationId: getTeamsInEvent
       tags:
         - v1/event/teams
@@ -259,7 +259,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                
+
     delete:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
@@ -421,7 +421,7 @@ paths:
 
   /api/v1/team/{teamId}/players:
     get:
-      summary: Get players on a team
+      summary: Get a team with all the players included
       operationId: getPlayersOnTeam
       tags:
         - v1/team/players
@@ -449,7 +449,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    
+
 
   /api/v1/team/{teamId}/players/{playerId}:
     post:
@@ -886,7 +886,7 @@ components:
         teamId:
           type: integer
           nullable: true
-          
+
 
     RiotAccount:
       type: object
