@@ -17,7 +17,7 @@ servers:
 
 tags:
   - name: v1/event
-    description: Top-level event CRUD operations
+    description: Manage Events (create/edit)
 
   - name: v1/event/teams
     description: Assign/remove teams from events
@@ -43,15 +43,15 @@ paths:
       description: Fetch a list of all events.
       operationId: getEvents
       parameters:
-        - name: eventGroup
+        - name: eventGroupId
           in: query
           description: |
             Optional event group filter:
               - Not provided: return **all events**
-              - integer value: return events **in that event group**
+              - Provided: return events **belonging to the respective event group**
           required: false
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Successful operation
@@ -60,7 +60,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventWithTeamsDto'
+                  $ref: '#/components/schemas/EventDto'
         default:
           description: Unexpected error
           content:
@@ -71,7 +71,8 @@ paths:
       tags:
         - v1/event
       summary: Create a new event.
-      description: Registers an event with Dennys.
+      description: |
+        Registers an event with Dennys, and optionally assign it to an event group
       operationId: addEvent
       requestBody:
         description: Event specification
@@ -89,8 +90,16 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '400':
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         '422':
           description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -103,7 +112,7 @@ paths:
       tags:
         - v1/event
       summary: Find event by ID.
-      description: Returns a single event.
+      description: Returns a single event with the associated teams.
       operationId: getEventById
       parameters:
         - name: eventId
@@ -122,6 +131,10 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '400':
           description: Missing or malformed id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         '404':
           description: Event not found
         default:
@@ -134,7 +147,7 @@ paths:
     patch:
       tags:
         - v1/event
-      summary: Update an event (not including team management).
+      summary: Patch event's data
       parameters:
         - name: eventId
           in: path
@@ -143,25 +156,33 @@ paths:
           schema:
             type: integer
             format: int64
-      operationId: updateEvent
+      operationId: patchEvent
       requestBody:
         required: true
-        description: Update existing event.
+        description: Patch existing event.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEventDto'
+              $ref: '#/components/schemas/PatchEventDto'
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventWithTeamsDto'
+                $ref: '#/components/schemas/EventDto'
         '400':
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
         '422':
           description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
         default:
           description: Unexpected error
           content:
@@ -191,7 +212,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TeamWithPlayersDto'
+                  $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event not found
         default:
@@ -200,6 +221,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /api/v1/event/{eventId}/teams/{teamId}:
     post:
       summary: Assign a team to an event
       operationId: addTeamToEvent
@@ -211,18 +234,11 @@ paths:
           required: true
           schema:
             type: integer
-      requestBody:
-        required: true
-        description: The team to associate with this event
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - teamId
-              properties:
-                teamId:
-                  type: integer
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Team added to event
@@ -234,15 +250,16 @@ paths:
           description: Event or team not found
         '409':
           description: |
-            Conflict:
+            Invalid resource state
+            
+            Possible reasons:
             - Team is already assigned to a different event
             - One or more players on this team are already assigned to a different team in this event
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-  /api/v1/event/{eventId}/teams/{teamId}:
+                
     delete:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
@@ -282,7 +299,7 @@ paths:
           description: |
             Optional event filter:
               - Not provided: return **all teams**
-              - integer value: return teams **in that event**
+              - integer value: return teams **belonging to that event**
           schema:
             type: integer
       responses:
@@ -293,7 +310,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TeamWithPlayersDto'
+                  $ref: '#/components/schemas/TeamDto'
         default:
           description: Unexpected error
           content:
@@ -318,11 +335,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamWithPlayersDto'
+                $ref: '#/components/schemas/TeamDto'
         '400':
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '422':
           description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/v1/team/{teamId}:
     get:
@@ -343,7 +368,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamWithPlayersDto'
+                $ref: '#/components/schemas/TeamDto'
         '404':
           description: Team not found
         default:
@@ -354,8 +379,8 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     patch:
-      summary: Update a team (not including player/event management)
-      operationId: updateTeam
+      summary: Patch a team's data.
+      operationId: patchTeam
       tags:
         - v1/team
       parameters:
@@ -371,7 +396,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateTeamDto'
+              $ref: '#/components/schemas/PatchTeamDto'
       responses:
         '200':
           description: Team updated
@@ -381,6 +406,10 @@ paths:
                 $ref: '#/components/schemas/TeamDto'
         '400':
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Team not found
         default:
@@ -411,7 +440,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PlayerDto'
+                  $ref: '#/components/schemas/TeamWithPlayersDto'
         '404':
           description: Team not found
         default:
@@ -420,6 +449,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    
+
+  /api/v1/team/{teamId}/players/{playerId}:
     post:
       summary: Add a player to a team
       operationId: addPlayerToTeam
@@ -431,17 +463,11 @@ paths:
           required: true
           schema:
             type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - playerId
-              properties:
-                playerId:
-                  type: integer
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Player added
@@ -449,20 +475,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamWithPlayersDto'
-        '403':
-          description: Player already assigned to a team in this event
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '404':
           description: Team or player not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-  /api/v1/team/{teamId}/players/{playerId}:
+        '409':
+          description: |
+            Invalid resource state
+            
+            Possible reasons:
+            - Player is already assigned to a different team in this event
+            - Player is already assigned to this team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
@@ -491,24 +520,13 @@ paths:
 
   /api/v1/player:
     get:
-      summary: Get all players (optionally filter by team)
+      summary: Get all players
       operationId: getPlayers
       tags:
         - v1/player
-      parameters:
-        - name: teamId
-          in: query
-          description: |
-            Optional team filter:
-              - Not provided: return **all players**
-              - integer value: return players **on that team**
-          required: false
-          schema:
-            type: integer
-            example: 1
       responses:
         '200':
-          description: List of matching players
+          description: List of all players
           content:
             application/json:
               schema:
@@ -570,8 +588,8 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     patch:
-      summary: Rename a player
-      operationId: renamePlayer
+      summary: Patch a player's data
+      operationId: patchPlayer
       tags:
         - v1/player
       parameters:
@@ -583,11 +601,11 @@ paths:
             type: integer
       requestBody:
         required: true
-        description: New name for the player
+        description: Updated player data
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RenamePlayerDto'
+              $ref: '#/components/schemas/PatchPlayerDto'
       responses:
         '200':
           description: Player renamed successfully
@@ -596,7 +614,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayerDto'
         '400':
-          description: Invalid name
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Player not found
         default:
@@ -607,36 +629,6 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/v1/player/{playerId}/accounts:
-    get:
-      summary: Get Riot accounts for a player
-      operationId: getAccountsForPlayer
-      tags:
-        - v1/player/accounts
-      parameters:
-        - name: playerId
-          in: path
-          required: true
-          description: ID of the player
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Riot accounts associated with the player
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RiotAccount'
-        '404':
-          description: Player not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
     post:
       summary: Add a Riot account to a player
       operationId: addAccountToPlayer
@@ -671,9 +663,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayerDto'
         '400':
-          description: Invalid Riot PUUID or already assigned
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Player not found
+        '409':
+          description: |
+            Invalid resource state
+            
+            Possible reasons:
+              - Riot account already assigned to a different player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         default:
           description: Unexpected error
           content:
@@ -757,7 +763,7 @@ components:
             - example: NOT_STARTED
             - $ref: '#/components/schemas/EventStatus'
 
-    UpdateEventDto:
+    PatchEventDto:
       type: object
       properties:
         name:
@@ -880,7 +886,7 @@ components:
         teamId:
           type: integer
           nullable: true
-
+          
 
     RiotAccount:
       type: object
@@ -912,15 +918,13 @@ components:
           items:
             $ref: '#/components/schemas/RiotAccount'
 
-    RenamePlayerDto:
+    PatchPlayerDto:
       type: object
-      required:
-        - name
       properties:
         name:
           type: string
-          description: New Riot-formatted player name (e.g. ruuffian#FUNZ)
-          example: newname#ABCD
+          description: New player name (not necessarily a Riot ID)
+          example: newname
 
     NewTeamDto:
       type: object
@@ -940,7 +944,7 @@ components:
           type: integer
           description: ID of the associated event
 
-    UpdateTeamDto:
+    PatchTeamDto:
       type: object
       properties:
         name:
@@ -995,7 +999,7 @@ components:
       type: object
       properties:
         code:
-          type: string
+          type: integer
         message:
           type: string
       required:
