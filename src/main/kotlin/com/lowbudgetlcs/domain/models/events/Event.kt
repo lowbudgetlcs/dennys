@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.models.events
 
+import com.lowbudgetlcs.domain.models.Team
 import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import java.time.Instant
 
@@ -22,4 +23,17 @@ data class Event(
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus
+)
+
+data class EventWithTeams(
+    val id: EventId,
+    val name: String,
+    val description: String,
+    val eventGroupId: EventGroupId?,
+    val tournamentId: TournamentId,
+    val createdAt: Instant,
+    val startDate: Instant,
+    val endDate: Instant,
+    val status: EventStatus,
+    val teams: List<Team>
 )

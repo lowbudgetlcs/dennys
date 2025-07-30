@@ -16,9 +16,17 @@ value class PlayerName(val name: String) {
 fun String.toPlayerName(): PlayerName = PlayerName(this)
 
 data class Player(
-    val id: PlayerId, val name: PlayerName
+    val id: PlayerId,
+    val name: PlayerName
 )
 
 data class NewPlayer(
-    val name: PlayerName, val teamId: TeamId?
+    val name: PlayerName,
+    val teamId: TeamId?
+)
+
+data class PlayerWithAccounts(
+    val id: PlayerId,
+    val name: PlayerName,
+    val accounts: List<RiotAccount>
 )
