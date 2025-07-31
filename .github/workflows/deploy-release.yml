@@ -66,6 +66,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version number
+        shell: bash
+        run: |
+          echo "VERSION=$(cat VERSION)" > $GITHUB_ENV
+
       - name: Deploy release in staging
         uses: appleboy/ssh-action@v1.0.3
         with:
