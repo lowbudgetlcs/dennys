@@ -41,6 +41,7 @@ jobs:
         with:
           platforms: linux/arm64,linux/amd64
           push: true
+          file: docker/Dockerfile
           tags: lblcs/dennys:latest
 
   deploy:
