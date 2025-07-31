@@ -58,6 +58,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/arm64,linux/amd64
+          file: docker/Dockerfile
           push: true
           tags: lblcs/dennys:${{ env.VERSION }}
             
