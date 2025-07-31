@@ -79,4 +79,4 @@ jobs:
             mkdir release-{{ env.VERSION }}
             cd release-{{ env.VERSION }}
             git clone https://github.com/lowbudgetlcs/dennys.git .
-            /lblcs/scripts/dennys/release.sh -v {{ env.VERSION }} {{ secrets.RIOT_API_TOKEN }}
+            /lblcs/scripts/dennys/release.sh -v {{ env.VERSION }} -z {{ secrets.ZONE_ID }} -c {{ secrets.CLOUDFLARE_DNS_TOKEN }} {{ secrets.RIOT_API_TOKEN }}

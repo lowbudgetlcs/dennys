@@ -3,7 +3,6 @@
 pkgs.mkShell {
     buildInputs = with pkgs; [
       jdk21 gnumake
-      go gopls
       yaml-language-server
     ];
     env = {
