@@ -2,6 +2,7 @@ FROM gradle:8.9-jdk21 AS dependencies
 WORKDIR /app
 ENV GRADLE_USER_HOME=/cache
 COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+COPY gradle/ ./
 RUN gradle --no-daemon clean build || true
 
 FROM gradle:8.9-jdk21 AS builder
