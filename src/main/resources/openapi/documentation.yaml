@@ -557,6 +557,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerDto'
+        '400':
+          description: Name field is empty
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '409':
           description: Player name already exists
           content:

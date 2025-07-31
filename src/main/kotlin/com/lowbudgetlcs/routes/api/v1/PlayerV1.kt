@@ -24,6 +24,14 @@ fun Route.playerRoutesV1() {
             val newPlayerDto = call.receive<NewPlayerDto>()
             val newPlayer = newPlayerDto.toNewPlayer()
 
+            if (newPlayerDto.name.isBlank()) {
+                call.respondText(
+                    text = "Player name cannot be blank",
+                    status = HttpStatusCode.BadRequest
+                )
+                return@post
+            }
+
             if (playerService.isNameTaken(newPlayer.name.name)) {
                 call.respondText(text = "Player name already exists", status = HttpStatusCode.Conflict)
                 return@post
