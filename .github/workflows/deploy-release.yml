@@ -19,7 +19,7 @@ on:
       - 'release/*'
 
 jobs:
-  run-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,9 +31,9 @@ jobs:
       - name: Test project
         run: ./gradlew test itest
 
-  build-and-push-image:
+  build:
     runs-on: ubuntu-latest
-    needs: run-tests
+    needs: tests
     steps:
       - uses: actions/checkout@v4
 
@@ -59,8 +59,7 @@ jobs:
         with:
           platforms: linux/arm64,linux/arm64
           push: true
-          tags: 
-            - lblcs/dennys:${{ env.VERSION }}
+          tags: lblcs/dennys:${{ env.VERSION }}
             
   deploy-release:
     needs: build
@@ -73,17 +72,11 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          script: 
+          script: |
             # Create install release
             cd /lblcs/docker/dennys
             rm -rf release-{{ env.VERSION }}
             mkdir release-{{ env.VERSION }}
             cd release-{{ env.VERSION }}
             git clone https://github.com/lowbudgetlcs/dennys.git .
-            # Build go script
-            cd scripts
-            ln -s ../../docker/postgres/sql migrations
-            go build generate-release-scripts.go
-            ./generate-release-scripts {{ env.VERSION }} {{ secrets.RIOT_API_TOKEN }}
-            # Release 
-            ./release.sh 
+            /lblcs/scripts/dennys/release.sh -v {{ env.VERSION }} {{ secrets.RIOT_API_TOKEN }}
