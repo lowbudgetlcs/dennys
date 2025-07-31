@@ -7,6 +7,7 @@ import com.lowbudgetlcs.repositories.IPlayerRepository
 
 class PlayerService(private val playerRepository: IPlayerRepository) {
     fun createPlayer(player: NewPlayer): PlayerWithAccounts? {
+        if (isNameTaken(player.name.name)) return null
         return playerRepository.insert(player)
     }
 
@@ -15,4 +16,8 @@ class PlayerService(private val playerRepository: IPlayerRepository) {
     }
 
     fun getAllPlayers(): List<PlayerWithAccounts> = playerRepository.getAll()
+
+    fun isNameTaken(name: String): Boolean {
+        return playerRepository.getAll().any { it.name.name == name }
+    }
 }

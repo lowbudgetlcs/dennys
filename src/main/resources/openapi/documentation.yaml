@@ -557,6 +557,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerDto'
+        '409':
+          description: Player name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/v1/player/{playerId}:
     get:

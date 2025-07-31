@@ -20,8 +20,15 @@ private val playerService: PlayerService = PlayerService(JooqPlayerRepository(Da
 fun Route.playerRoutesV1() {
     route("/player") {
         post {
+            logger.info("📩 Received post on /v1/player")
             val newPlayerDto = call.receive<NewPlayerDto>()
             val newPlayer = newPlayerDto.toNewPlayer()
+
+            if (playerService.isNameTaken(newPlayer.name.name)) {
+                call.respondText(text = "Player name already exists", status = HttpStatusCode.Conflict)
+                return@post
+            }
+
             val created = playerService.createPlayer(newPlayer)
             if (created != null) {
                 call.respond(created.toDto())
