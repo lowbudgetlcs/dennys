@@ -81,7 +81,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           source: src/migrations/sql
-          target: /lblcs/scripts/dennys/
+          target: /lblcs/scripts/dennys/migrations
           rm: true
 
       - name: Deploy release in staging
