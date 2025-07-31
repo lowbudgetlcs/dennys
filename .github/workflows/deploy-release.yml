@@ -80,8 +80,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: src/migrations/sql/*
-          target: /lblcs/scripts/dennys/migrations
+          source: src/migrations/sql
+          target: /lblcs/scripts/dennys/
           rm: true
 
       - name: Deploy release in staging
