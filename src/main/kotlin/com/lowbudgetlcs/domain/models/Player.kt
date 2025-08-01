@@ -12,7 +12,6 @@ value class PlayerName(val name: String) {
     }
 }
 
-
 fun String.toPlayerName(): PlayerName = PlayerName(this)
 
 data class Player(

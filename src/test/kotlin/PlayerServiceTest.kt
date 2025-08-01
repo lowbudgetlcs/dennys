@@ -1,5 +1,6 @@
 import com.lowbudgetlcs.domain.models.NewPlayer
 import com.lowbudgetlcs.domain.models.PlayerId
+import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.models.toPlayerName
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.inmemory.InMemoryPlayerRepository
@@ -98,5 +99,27 @@ class PlayerServiceTest : StringSpec({
 
         val updated = service.getAllPlayers()
         updated.map { it.id } shouldContainExactly listOf(created!!.id)
+    }
+
+    "getPlayer should return correct player among many" {
+        val one = service.createPlayer(NewPlayer("One#A".toPlayerName(), null))!!
+        val two = service.createPlayer(NewPlayer("Two#B".toPlayerName(), null))!!
+
+        service.getPlayer(one.id) shouldBe one
+        service.getPlayer(two.id) shouldBe two
+    }
+
+    "getPlayer returns null when ID does not exist" {
+        val result = service.getPlayer(PlayerId(999))
+        result.shouldBeNull()
+    }
+
+    "getPlayer returns null when ID was never used, even after inserting others" {
+        val player1 = service.createPlayer(NewPlayer("Alpha#123".toPlayerName(), null))!!
+        val player2 = service.createPlayer(NewPlayer("Bravo#456".toPlayerName(), null))!!
+
+        val unknownId = PlayerId(9999)
+        val result = service.getPlayer(unknownId)
+        result.shouldBeNull()
     }
 })

@@ -2,6 +2,7 @@ package com.lowbudgetlcs.routes.api.v1
 
 import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.domain.models.PlayerWithAccounts
+import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.dto.players.NewPlayerDto
@@ -54,5 +55,21 @@ fun Route.playerRoutesV1() {
             call.respond(playersWithAccountsDto)
         }
 
+        get("{playerId}") {
+            logger.info("📩 Received get on /v1/player/{playerId}")
+            val playerIdField = call.parameters["playerId"]?.toIntOrNull()
+                ?: return@get call.respondText(
+                    text = "Invalid player ID",
+                    status = HttpStatusCode.BadRequest
+                )
+
+            val playerId = playerIdField.toPlayerId()
+            val player = playerService.getPlayer(playerId)
+            if (player != null) {
+                call.respond(player.toDto())
+            } else {
+                call.respondText("Player not found", status = HttpStatusCode.NotFound)
+            }
+        }
     }
 }

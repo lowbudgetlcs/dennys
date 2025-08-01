@@ -44,7 +44,21 @@ class JooqPlayerRepository(
     }
 
     override fun getById(id: PlayerId): PlayerWithAccounts? {
-        TODO("Not yet implemented")
+        val row = dsl
+            .select(PLAYERS.ID, PLAYERS.NAME)
+            .from(PLAYERS)
+            .where(PLAYERS.ID.eq(id.value))
+            .fetchOne() ?: return null
+
+        val playerId = row[PLAYERS.ID]!!.toPlayerId()
+        val name = PlayerName(row[PLAYERS.NAME]!!)
+        val accounts = getAccountsForPlayer(playerId)
+
+        return PlayerWithAccounts(
+            id = playerId,
+            name = name,
+            accounts = accounts
+        )
     }
 
     private fun getAccountsForPlayer(playerId: PlayerId): List<RiotAccount> {
