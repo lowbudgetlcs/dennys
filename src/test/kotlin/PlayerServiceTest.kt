@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.inmemory.InMemoryPlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -68,5 +69,34 @@ class PlayerServiceTest : StringSpec({
             NewPlayer(name = "".toPlayerName(), teamId = null)
         }
         // Add more invalid names here when you can think of any
+    }
+
+    "getAllPlayers() should return empty list when no players exist" {
+        val players = service.getAllPlayers()
+        players.shouldBeEmpty()
+    }
+
+    "getAllPlayers() should return all players with accounts" {
+        val player1 = NewPlayer("PlayerOne#AAA".toPlayerName(), null)
+        val player2 = NewPlayer("PlayerTwo#BBB".toPlayerName(), null)
+
+        val created1 = service.createPlayer(player1)
+        val created2 = service.createPlayer(player2)
+
+        val all = service.getAllPlayers()
+
+        all.map { it.name.name } shouldContainExactly listOf("PlayerOne#AAA", "PlayerTwo#BBB")
+        all.any { it.accounts.isEmpty() } shouldBe true
+    }
+
+    "getAllPlayers() should reflect newly added players" {
+        val initial = service.getAllPlayers()
+        initial.shouldBeEmpty()
+
+        val player = NewPlayer("NewPlayer#XYZ".toPlayerName(), null)
+        val created = service.createPlayer(player)
+
+        val updated = service.getAllPlayers()
+        updated.map { it.id } shouldContainExactly listOf(created!!.id)
     }
 })

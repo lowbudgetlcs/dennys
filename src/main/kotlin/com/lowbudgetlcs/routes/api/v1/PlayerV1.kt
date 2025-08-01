@@ -1,9 +1,11 @@
 package com.lowbudgetlcs.routes.api.v1
 
 import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.domain.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.dto.players.NewPlayerDto
+import com.lowbudgetlcs.routes.dto.players.PlayerDto
 import com.lowbudgetlcs.routes.dto.players.toDto
 import com.lowbudgetlcs.routes.dto.players.toNewPlayer
 import io.ktor.http.*
@@ -43,6 +45,13 @@ fun Route.playerRoutesV1() {
             } else {
                 call.respond(HttpStatusCode.InternalServerError)
             }
+        }
+
+        get {
+            logger.info("📩 Received get on /v1/player")
+            val players = playerService.getAllPlayers()
+            val playersWithAccountsDto : List<PlayerDto> = players.map { it.toDto() }
+            call.respond(playersWithAccountsDto)
         }
 
     }
