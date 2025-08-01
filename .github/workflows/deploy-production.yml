@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
@@ -39,9 +39,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          platforms: linux/arm64,linux/amd64
-          push: true
           file: docker/Dockerfile
+          push: true
           tags: lblcs/dennys:latest
 
   deploy:
