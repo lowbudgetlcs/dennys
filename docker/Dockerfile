@@ -6,7 +6,7 @@ RUN gradle build --no-daemon || return 0
 COPY . .
 RUN gradle --no-daemon installDist
 
-FROM amazoncorretto:21-alpine AS local_app
+FROM amazoncorretto:21-alpine AS app
 WORKDIR /app
 COPY --from=builder /builder/build/install/dennys/ ./
 ENTRYPOINT ["./bin/dennys"]

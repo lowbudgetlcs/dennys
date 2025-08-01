@@ -7,8 +7,6 @@ build/
 .env*
 gradlew.bat
 gradlew
-logs/
-gradle/
 
 *.iml
 Makefile
