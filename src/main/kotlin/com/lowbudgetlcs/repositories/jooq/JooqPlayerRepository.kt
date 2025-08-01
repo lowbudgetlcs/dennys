@@ -61,6 +61,15 @@ class JooqPlayerRepository(
         )
     }
 
+    override fun renamePlayer(id: PlayerId, newName: PlayerName): PlayerWithAccounts? {
+        val updatedRows = dsl.update(PLAYERS)
+            .set(PLAYERS.NAME, newName.name)
+            .where(PLAYERS.ID.eq(id.value))
+            .execute()
+
+        return if (updatedRows > 0) getById(id) else null
+    }
+
     private fun getAccountsForPlayer(playerId: PlayerId): List<RiotAccount> {
         return dsl.select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID)
             .from(RIOT_ACCOUNTS)

@@ -5,10 +5,7 @@ import com.lowbudgetlcs.domain.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
-import com.lowbudgetlcs.routes.dto.players.NewPlayerDto
-import com.lowbudgetlcs.routes.dto.players.PlayerDto
-import com.lowbudgetlcs.routes.dto.players.toDto
-import com.lowbudgetlcs.routes.dto.players.toNewPlayer
+import com.lowbudgetlcs.routes.dto.players.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -71,5 +68,26 @@ fun Route.playerRoutesV1() {
                 call.respondText("Player not found", status = HttpStatusCode.NotFound)
             }
         }
+
+        patch("{playerId}") {
+            logger.info("📩 Received patch on /v1/player/{playerId}")
+            val playerIdField = call.parameters["playerId"]?.toIntOrNull()
+                ?: return@patch call.respond(HttpStatusCode.BadRequest, "Invalid player ID")
+
+            val dto = call.receive<PatchPlayerDto>()
+            if (dto.name.isBlank()) {
+                return@patch call.respond(HttpStatusCode.BadRequest, "Player name cannot be blank")
+            }
+
+            if (playerService.isNameTaken(dto.name)) {
+                return@patch call.respond(HttpStatusCode.Conflict, "Player name already exists")
+            }
+
+            val updated = playerService.renamePlayer(playerIdField.toPlayerId(), dto.name)
+                ?: return@patch call.respond(HttpStatusCode.NotFound, "Player not found")
+
+            call.respond(updated.toDto())
+        }
+
     }
 }

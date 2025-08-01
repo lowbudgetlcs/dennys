@@ -115,11 +115,48 @@ class PlayerServiceTest : StringSpec({
     }
 
     "getPlayer returns null when ID was never used, even after inserting others" {
-        val player1 = service.createPlayer(NewPlayer("Alpha#123".toPlayerName(), null))!!
-        val player2 = service.createPlayer(NewPlayer("Bravo#456".toPlayerName(), null))!!
+        service.createPlayer(NewPlayer("Alpha#123".toPlayerName(), null))!!
+        service.createPlayer(NewPlayer("Bravo#456".toPlayerName(), null))!!
 
         val unknownId = PlayerId(9999)
         val result = service.getPlayer(unknownId)
         result.shouldBeNull()
+    }
+
+    "renamePlayer should succeed for valid input" {
+        val original = service.createPlayer(NewPlayer("OldName#XYZ".toPlayerName(), null))!!
+        val renamed = service.renamePlayer(original.id, "NewName#XYZ")
+
+        renamed.shouldNotBeNull()
+        renamed.id shouldBe original.id
+        renamed.name.name shouldBe "NewName#XYZ"
+    }
+
+    "renamePlayer should return null for blank name" {
+        val player = service.createPlayer(NewPlayer("Player#1".toPlayerName(), null))!!
+        val result = service.renamePlayer(player.id, "")
+        result.shouldBeNull()
+    }
+
+    "renamePlayer should return null if new name already exists" {
+        val p1 = service.createPlayer(NewPlayer("Unique#1".toPlayerName(), null))!!
+        val p2 = service.createPlayer(NewPlayer("Unique#2".toPlayerName(), null))!!
+
+        val conflict = service.renamePlayer(p2.id, "Unique#1")
+        conflict.shouldBeNull()
+    }
+
+    "renamePlayer should return null for nonexistent ID" {
+        val result = service.renamePlayer(PlayerId(9999), "SomeName#123")
+        result.shouldBeNull()
+    }
+
+    "renamePlayer should update the stored value" {
+        val created = service.createPlayer(NewPlayer("Initial#Name".toPlayerName(), null))!!
+        service.renamePlayer(created.id, "Updated#Name")
+
+        val fetched = service.getPlayer(created.id)
+        fetched.shouldNotBeNull()
+        fetched.name.name shouldBe "Updated#Name"
     }
 })
