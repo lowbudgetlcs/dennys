@@ -11,7 +11,6 @@ all: build run
 # Clean up the Docker image
 clean: stop
 	docker rmi $(APP_NAME):$(TAG) || true
-	docker rmi $(APP_NAME):test || true
 
 # Stop the Docker container
 stop:
@@ -23,7 +22,7 @@ build:
 
 # Build without caching and readable output
 debug-build:
-	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) -f ./docker/Dockerfile . 
+	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile . 
 
 # Run all containers
 run: 
@@ -35,9 +34,6 @@ db:
 
 swag:
 	docker-compose up swagger-editor
-
-kswag:
-	docker-compose down
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run
