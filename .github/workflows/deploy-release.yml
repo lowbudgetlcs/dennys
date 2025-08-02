@@ -48,16 +48,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
-     # - name: Set up QEMU
-     #   uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-     #     platforms: linux/arm64,linux/amd64
           file: docker/Dockerfile
           push: true
           tags: lblcs/dennys:${{ env.VERSION }}
@@ -73,16 +69,17 @@ jobs:
         run: |
           echo "VERSION=$(cat VERSION)" > $GITHUB_ENV
 
-      - name: Copy to Remote Server
+      - name: Copy db migrations to Remote Server
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SSH_HOST}}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: src/migrations/sql
-          target: /lblcs/scripts/dennys/migrations
-          rm: true
+          source: src/migrations/sql/*
+          target: /lblcs/scripts/dennys/${{ env.VERSION }}/migrations
+          overwrite: true
+          strip_components: true
 
       - name: Deploy release in staging
         uses: appleboy/ssh-action@v1.0.3
