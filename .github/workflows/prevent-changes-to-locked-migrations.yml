@@ -1,7 +1,7 @@
 name: Prevents changes to locked migrations.
 
 on:
-  push:
+  pull_request:
     branches:
       - main
       - release/*
