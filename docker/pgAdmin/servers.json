@@ -2,7 +2,7 @@
     "Servers": {
         "1": {
             "Group": "Dennys",
-            "Name": "Db",
+            "Name": "dennys",
             "Host": "dennys-db",
             "Port": 5432,
             "MaintenanceDB": "postgres",
