@@ -10,6 +10,7 @@ jobs:
   check-migrations:
     runs-on: ubuntu-latest
     steps:
+    - name: Prevent changes to LOCKED migrations.
       uses: xalvarez/prevent-file-change-action@v2
       with:
         githubToken: ${{ secrets.GITHUB_TOKEN }}
