@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.routes.api
 
+import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.routes.api.v1.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.playerRoutesV1
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.apiRoutes() {
+fun Route.apiRoutes(riotGateway: IRiotAccountGateway) {
     route("/api/v1") {
         route("/riot-callback") {
             post {
@@ -25,6 +26,6 @@ fun Route.apiRoutes() {
             }
         }
         eventRoutesV1()
-        playerRoutesV1()
+        playerRoutesV1(riotGateway = riotGateway)
     }
 }

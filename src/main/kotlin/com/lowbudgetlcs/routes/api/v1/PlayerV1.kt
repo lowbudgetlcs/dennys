@@ -4,6 +4,7 @@ import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.domain.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.services.PlayerService
+import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.dto.players.*
 import io.ktor.http.*
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 private val playerService: PlayerService = PlayerService(JooqPlayerRepository(Database.dslContext))
 
-fun Route.playerRoutesV1() {
+fun Route.playerRoutesV1(riotGateway: IRiotAccountGateway) {
     route("/player") {
         post {
             logger.info("📩 Received post on /v1/player")

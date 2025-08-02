@@ -1,5 +1,6 @@
 package com.lowbudgetlcs
 
+import com.lowbudgetlcs.config.RiotConfig
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -8,11 +9,9 @@ import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-data class RiotConfig(val key: String, val useStubs: Boolean)
-
 class RiotApiClient(
     private val client: HttpClient = defaultClient(),
-    private val apiKey: String = Config.binder.bindOrThrow<RiotConfig>("riot").key
+    private val apiKey: String = appConfig.riot.key
 ) {
     companion object {
         fun defaultClient(): HttpClient = HttpClient(CIO) {

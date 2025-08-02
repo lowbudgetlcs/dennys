@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.routes
 
+import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.routes.api.apiRoutes
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Application.routes() {
+fun Application.routes(riotGateway: IRiotAccountGateway) {
     routing {
         install(StatusPages) {
             exception<RequestValidationException> { call, cause ->
@@ -40,7 +41,7 @@ fun Application.routes() {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
             version = "5.26.1"
         }
-        apiRoutes()
+        apiRoutes(riotGateway = riotGateway)
     }
 }
 
