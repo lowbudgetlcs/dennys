@@ -1,0 +1,17 @@
+name: Prevents changes to locked migrations.
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+
+jobs:
+  check-migrations:
+  runs-on: ubuntu-latest
+  steps:
+    uses: xalvarez/prevent-file-change-action@v2
+    with:
+      githubToken: ${{ secrets.GITHUB_TOKEN }}
+      pattern: src/migrations/sql/*__LOCKED\.sql
+      allowNewFiles: true
