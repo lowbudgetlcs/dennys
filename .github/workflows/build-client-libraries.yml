@@ -31,4 +31,5 @@ jobs:
         run: |
           echo '//${{ secrets.NEXUS_URL }}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}' > ~/.npmrc
           cd ts-sdk
+          npm i
           npm publish .
