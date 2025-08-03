@@ -26,8 +26,7 @@ jobs:
 
       - name: Login to remote
         run: |
-          echo "registry=//${{ secrets.NEXUS_URL }}/repository/npm-internal/" > .npmrc
-          echo "//${{ secrets.NEXUS_URL}}/repository/npm-internal/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}" >> .npmrc
+          echo '//${{ secrets.NEXUS_URL }}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}' >> .npmrc
           npm login
 
       - name: Publish package to npm repo 
