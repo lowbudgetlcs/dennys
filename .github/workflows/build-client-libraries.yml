@@ -1,0 +1,34 @@
+name: Build supported client libraries.
+
+on:
+  push:
+    paths:
+      - 'src/main'
+  branches:
+    - 'main'
+    - 'release/*'
+
+jobs:
+  build-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate typescript package
+        run: |
+          docker run --rm \
+            -v ./src/main/resources/openapi:/local openapitools/openapi-generator-cli generate \
+            -i /local/documentation.yaml \
+            -g typescript \
+            -o /local/sdk-ts \
+            --additional-properties=npmName=@lblcs/dennys-sdk-typescript,npmRepository=${{ secrets.NEXUS_URL }}/repository/npm-lblcs,platform=node
+
+      - name: Login to remote
+        run: |
+          echo "registry=//${{ secrets.NEXUS_URL }}/repository/npm-internal" > .npmrc
+          echo "//${{ secrets.NEXUS_URL}}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}" >> .npmrc
+          npm login
+
+      - name: Publish package to npm repo 
+        run: |
+          npm publish sdk-ts
