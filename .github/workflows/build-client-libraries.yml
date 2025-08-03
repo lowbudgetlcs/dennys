@@ -3,11 +3,10 @@ name: Build supported client libraries.
 on:
   push:
     paths:
-      - 'src/main/kotlin'
+      - 'src/main/kotlin/**'
 
     branches:
       - 'main'
-      - 'release/*'
 
 jobs:
   build-typescript:
@@ -17,19 +16,19 @@ jobs:
 
       - name: Generate typescript package
         run: |
+          mkdir ts-sdk
           docker run --rm \
-            -v ./src/main/resources/openapi:/local openapitools/openapi-generator-cli generate \
+            -v ./:/out \
+            -v ./src/main/resources/openapi:/local \
+            openapitools/openapi-generator-cli generate \
             -i /local/documentation.yaml \
             -g typescript \
-            -o /local/sdk-ts \
-            --additional-properties=npmName=@lblcs/dennys-sdk-typescript,npmRepository=${{ secrets.NEXUS_URL }}/repository/npm-lblcs,platform=node
-
-      - name: Login to remote
-        run: |
-          echo "registry=//${{ secrets.NEXUS_URL }}/repository/npm-internal" > .npmrc
-          echo "//${{ secrets.NEXUS_URL}}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}" >> .npmrc
-          npm login
+            -o /out/ts-sdk \
+            --additional-properties=npmName=@lblcs/dennys-sdk-typescript,npmRepository=https://${{ secrets.NEXUS_URL }}/repository/npm-lblcs,platform=node
 
       - name: Publish package to npm repo 
         run: |
-          npm publish sdk-ts
+          echo '//${{ secrets.NEXUS_URL }}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}' > ~/.npmrc
+          cd ts-sdk
+          npm i
+          npm publish .

@@ -44,4 +44,3 @@ fun Application.routes() {
         apiRoutes()
     }
 }
-
