@@ -16,7 +16,7 @@ class RiotAccountGateway(
     override suspend fun getAccountByPuuid(puuid: String): AccountDto? {
         val response: HttpResponse = client.get("$baseUrl/riot/account/v1/accounts/by-puuid/$puuid") {
             headers {
-                append(HttpHeaders.Authorization, "Bearer $apiKey")
+                append("X-Riot-Token", apiKey)
             }
         }
 

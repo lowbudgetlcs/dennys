@@ -16,28 +16,16 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
 
-fun Application.configureRouting(riotGateway: IRiotAccountGateway) {
+fun Application.configureRouting() {
     install(ContentNegotiation) {
         json()
     }
-    routes(riotGateway = riotGateway)
+    routes()
 }
 
 fun Application.module() {
     logger.info("🔧 Performing opening duties...")
-
-    val riotHttpClient = HttpClient(CIO) {
-        install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
-        }
-    }
-    val riotGateway = RiotAccountGateway(
-        client = riotHttpClient,
-        apiKey = appConfig.riot.key
-    )
-
-    configureRouting(riotGateway = riotGateway)
-
+    configureRouting()
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
 }
 

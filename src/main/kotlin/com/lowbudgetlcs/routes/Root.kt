@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Application.routes(riotGateway: IRiotAccountGateway) {
+fun Application.routes() {
     routing {
         install(StatusPages) {
             exception<RequestValidationException> { call, cause ->
@@ -41,7 +41,7 @@ fun Application.routes(riotGateway: IRiotAccountGateway) {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
             version = "5.26.1"
         }
-        apiRoutes(riotGateway = riotGateway)
+        apiRoutes()
     }
 }
 

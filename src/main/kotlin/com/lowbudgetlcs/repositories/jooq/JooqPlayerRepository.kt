@@ -83,4 +83,35 @@ class JooqPlayerRepository(
                 )
             }
     }
+
+    override fun createAccountRecord(riotPuuid: RiotPuuid): RiotAccount {
+        val inserted = dsl.insertInto(RIOT_ACCOUNTS)
+            .set(RIOT_ACCOUNTS.RIOT_PUUID, riotPuuid.value)
+            .returning(RIOT_ACCOUNTS.ID)
+            .fetchOne() ?: throw IllegalStateException("Failed to insert Riot account")
+
+        return RiotAccount(
+            id = RiotAccountId(inserted[RIOT_ACCOUNTS.ID]!!),
+            riotPuuid = riotPuuid,
+            playerId = null
+        )
+    }
+
+    override fun insertAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val updated = dsl.update(RIOT_ACCOUNTS)
+            .set(RIOT_ACCOUNTS.PLAYER_ID, playerId.value)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .execute()
+
+        return if (updated > 0) getById(playerId) else null
+    }
+
+    override fun removeAccount(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        dsl.deleteFrom(RIOT_ACCOUNTS)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .and(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
+            .execute()
+
+        return getById(playerId)
+    }
 }

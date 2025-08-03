@@ -1,5 +1,6 @@
 package com.lowbudgetlcs
 
+import com.lowbudgetlcs.config.DatabaseConfig
 import com.sksamuel.hoplite.Masked
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -7,10 +8,8 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import javax.sql.DataSource
 
-data class DatabaseConfig(val url: Masked, val password: Masked)
-
 object Database {
-    private val dbConfig: DatabaseConfig = Config.binder.bindOrThrow<DatabaseConfig>("database")
+    private val dbConfig: DatabaseConfig = appConfig.database
     private val dataSource: DataSource by lazy {
         val config = HikariConfig().apply {
             jdbcUrl = dbConfig.url.value
