@@ -2,12 +2,14 @@ package com.lowbudgetlcs.routes.api
 
 import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.appConfig
-import com.lowbudgetlcs.domain.services.PlayerAccountService
+import com.lowbudgetlcs.domain.services.AccountService
 import com.lowbudgetlcs.domain.services.PlayerService
-import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.gateways.RiotAccountGateway
+import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.jooq.JooqAccountRepository
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
+import com.lowbudgetlcs.routes.api.v1.accountRoutesV1
 import com.lowbudgetlcs.routes.api.v1.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.playerRoutesV1
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
@@ -32,13 +34,16 @@ fun Route.apiRoutes() {
             json(Json { ignoreUnknownKeys = true })
         }
     }
-    val riotGateway = RiotAccountGateway(
+    val riotAccountGateway = RiotAccountGateway(
         client = riotHttpClient,
         apiKey = appConfig.riot.key
     )
+
+    val accountRepository: IAccountRepository = JooqAccountRepository(Database.dslContext)
+    val accountService = AccountService(accountRepository, riotAccountGateway)
+
     val playerRepository : IPlayerRepository = JooqPlayerRepository(Database.dslContext)
     val playerService = PlayerService(playerRepository)
-    val playerAccountService = PlayerAccountService(playerRepository, riotGateway)
 
     route("/api/v1") {
         route("/riot-callback") {
@@ -51,9 +56,10 @@ fun Route.apiRoutes() {
         }
         eventRoutesV1()
         playerRoutesV1(
-            playerService = playerService,
-            playerAccountService = playerAccountService,
-            riotGateway = riotGateway
+            playerService = playerService
+        )
+        accountRoutesV1(
+            accountService = accountService
         )
     }
 }

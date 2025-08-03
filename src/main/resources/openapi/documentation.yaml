@@ -34,6 +34,9 @@ tags:
   - name: v1/player/accounts
     description: Riot account linking/removal
 
+  - name: v1/account
+    description: Create and inspect Riot accounts
+
 paths:
   /api/v1/event:
     get:
@@ -642,8 +645,8 @@ paths:
 
   /api/v1/player/{playerId}/accounts:
     post:
-      summary: Add a Riot account to a player
-      operationId: addAccountToPlayer
+      summary: Link a Riot account to a player
+      operationId: linkAccountToPlayer
       tags:
         - v1/player/accounts
       parameters:
@@ -655,49 +658,32 @@ paths:
             type: integer
       requestBody:
         required: true
-        description: The Riot account to associate with the player
         content:
           application/json:
             schema:
               type: object
               required:
-                - riotPuuid
+                - accountId
               properties:
-                riotPuuid:
-                  type: string
-                  description: Riot’s unique permanent user ID (78 characters)
-                  example: "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefgh"
+                accountId:
+                  type: integer
+                  description: Internal database ID of the Riot account to link
       responses:
         '200':
-          description: Riot account added to player
+          description: Riot account linked to player
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerDto'
         '400':
           description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '404':
-          description: Player not found
+          description: Player or Riot account not found
         '409':
-          description: |
-            Invalid resource state
-            
-            Possible reasons:
-              - Riot account already assigned to a different player
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Riot account already assigned to another player
         default:
           description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+
 
   /api/v1/player/{playerId}/accounts/{accountId}:
     delete:
@@ -733,6 +719,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+
+  /api/v1/account:
+    get:
+      summary: Get all Riot accounts
+      operationId: getAllRiotAccounts
+      tags:
+        - v1/account
+      responses:
+        '200':
+          description: List of all Riot accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RiotAccountDto'
+        default:
+          description: Unexpected error
+
+    post:
+      summary: Create a new Riot account
+      operationId: createRiotAccountDto
+      tags:
+        - v1/account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRiotAccountDto'
+      responses:
+        '201':
+          description: Riot account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiotAccountDto'
+        '400':
+          description: Invalid PUUID format
+        '404':
+          description: Riot account not found from Riot API
+        '409':
+          description: Riot account already exists
+        default:
+          description: Unexpected error
+
+  /api/v1/account/{accountId}:
+    get:
+      summary: Get Riot account by ID
+      operationId: getRiotAccountDtoById
+      tags:
+        - v1/account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Internal database ID of the Riot account
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Riot account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiotAccountDto'
+        '404':
+          description: Riot account not found
+        default:
+          description: Unexpected error
+
 
 components:
   schemas:
@@ -899,8 +957,19 @@ components:
           type: integer
           nullable: true
 
+    NewRiotAccountDto:
+      type: object
+      required:
+        - riotPuuid
+      properties:
+        riotPuuid:
+          type: string
+          description: Riot's permanent unique user ID (78 chars)
+        playerId:
+          type: integer
+          nullable: true
 
-    RiotAccount:
+    RiotAccountDto:
       type: object
       required:
         - id
@@ -928,7 +997,7 @@ components:
         accounts:
           type: array
           items:
-            $ref: '#/components/schemas/RiotAccount'
+            $ref: '#/components/schemas/RiotAccountDto'
 
     PatchPlayerDto:
       type: object

@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.routes.dto.players
 
+import com.lowbudgetlcs.routes.dto.accounts.RiotAccountDto
 import kotlinx.serialization.Serializable
 
 @Serializable

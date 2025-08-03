@@ -22,6 +22,7 @@ class RiotAccountGateway(
 
         return when (response.status) {
             HttpStatusCode.OK -> response.body()
+            HttpStatusCode.BadRequest -> null
             HttpStatusCode.NotFound -> null
             else -> throw RuntimeException("Riot API error: ${response.status}")
         }

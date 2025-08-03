@@ -3,6 +3,8 @@ package com.lowbudgetlcs.domain.models
 @JvmInline
 value class RiotAccountId(val value: Int)
 
+fun Int.toRiotAccountId(): RiotAccountId = RiotAccountId(this)
+
 @JvmInline
 value class RiotPuuid(val value: String) {
     init {
@@ -17,5 +19,6 @@ data class RiotAccount(
 )
 
 data class NewRiotAccount(
-    val riotPuuid: RiotPuuid
+    val riotPuuid: RiotPuuid,
+    val playerId: PlayerId?
 )

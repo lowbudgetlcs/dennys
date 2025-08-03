@@ -1,6 +1,10 @@
 package com.lowbudgetlcs.routes.dto.players
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.NewPlayer
+import com.lowbudgetlcs.domain.models.PlayerName
+import com.lowbudgetlcs.domain.models.PlayerWithAccounts
+import com.lowbudgetlcs.domain.models.toTeamId
+import com.lowbudgetlcs.routes.dto.accounts.toDto
 
 fun NewPlayerDto.toNewPlayer(): NewPlayer =
     NewPlayer(
@@ -13,11 +17,4 @@ fun PlayerWithAccounts.toDto(): PlayerDto =
         id = id.value,
         name = name.name,
         accounts = accounts.map { it.toDto() }
-    )
-
-fun RiotAccount.toDto(): RiotAccountDto =
-    RiotAccountDto(
-        id = id.value,
-        riotPuuid = riotPuuid.value,
-        playerId = playerId?.value
     )

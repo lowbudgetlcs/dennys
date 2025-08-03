@@ -1,12 +1,7 @@
 package com.lowbudgetlcs.routes.api.v1
 
-import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.domain.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.models.toPlayerId
-import com.lowbudgetlcs.domain.services.PlayerAccountService
 import com.lowbudgetlcs.domain.services.PlayerService
-import com.lowbudgetlcs.gateways.IRiotAccountGateway
-import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.dto.players.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -19,9 +14,7 @@ import org.slf4j.LoggerFactory
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.playerRoutesV1(
-    playerService: PlayerService,
-    playerAccountService: PlayerAccountService,
-    riotGateway: IRiotAccountGateway
+    playerService: PlayerService
 ) {
     route("/player") {
         post {
@@ -95,29 +88,7 @@ fun Route.playerRoutesV1(
         }
 
         post("{playerId}/accounts") {
-            logger.info("📩 Received post on /v1/player/{playerId}/accounts")
-            val playerIdField = call.parameters["playerId"]?.toIntOrNull()
-                ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid player ID")
 
-            val playerId = playerIdField.toPlayerId()
-            val request = call.receive<AddAccountToPlayerDto>()
-
-            if (request.riotPuuid.isBlank()) {
-                return@post call.respond(HttpStatusCode.BadRequest, "PUUID cannot be blank")
-            }
-
-            try {
-                val updated = playerAccountService.addAccountToPlayer(playerId, request.riotPuuid)
-                    ?: return@post call.respond(HttpStatusCode.NotFound, "Player not found")
-                call.respond(updated.toDto())
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.BadRequest, e.message ?: "Invalid input")
-            } catch (e: IllegalStateException) {
-                call.respond(HttpStatusCode.Conflict, e.message ?: "Conflict")
-            } catch (e: Exception) {
-                logger.error("❌ Unexpected error", e)
-                call.respond(HttpStatusCode.InternalServerError)
-            }
         }
 
     }
