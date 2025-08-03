@@ -26,7 +26,7 @@ class PlayerService(private val playerRepository: IPlayerRepository) {
     }
 
     fun linkAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
-        val player = playerRepository.getById(playerId) ?: return null
+        playerRepository.getById(playerId) ?: return null
 
         // Account cannot be re-linked without being removed first
         val allPlayers = playerRepository.getAll()

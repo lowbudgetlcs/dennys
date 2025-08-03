@@ -1,7 +1,4 @@
-import com.lowbudgetlcs.domain.models.NewPlayer
-import com.lowbudgetlcs.domain.models.PlayerId
-import com.lowbudgetlcs.domain.models.toPlayerId
-import com.lowbudgetlcs.domain.models.toPlayerName
+import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.inmemory.InMemoryPlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -158,5 +155,57 @@ class PlayerServiceTest : StringSpec({
         val fetched = service.getPlayer(created.id)
         fetched.shouldNotBeNull()
         fetched.name.name shouldBe "Updated#Name"
+    }
+
+    "linkAccountToPlayer should successfully link an unlinked account" {
+        val player = service.createPlayer(NewPlayer("LinkTest#A".toPlayerName(), null))!!
+        val account = repo.createAccountRecord(RiotPuuid("a".repeat(78)))
+
+        val linked = service.linkAccountToPlayer(player.id, account.id)
+
+        linked.shouldNotBeNull()
+        linked.id shouldBe player.id
+        linked.accounts.map { it.id } shouldContainExactly listOf(account.id)
+
+        // Confirm it's stored
+        val stored = service.getPlayer(player.id)
+        stored.shouldNotBeNull()
+        stored.accounts.map { it.id } shouldContainExactly listOf(account.id)
+    }
+
+    "linkAccountToPlayer should throw if account is already linked to another player" {
+        val p1 = service.createPlayer(NewPlayer("One#A".toPlayerName(), null))!!
+        val p2 = service.createPlayer(NewPlayer("Two#B".toPlayerName(), null))!!
+        val account = repo.createAccountRecord(RiotPuuid("b".repeat(78)))
+
+        service.linkAccountToPlayer(p1.id, account.id)
+
+        val exception = shouldThrow<IllegalStateException> {
+            service.linkAccountToPlayer(p2.id, account.id)
+        }
+        exception.message shouldBe "Account already linked to another player"
+    }
+
+    "unlinkAccountFromPlayer should remove the link between player and account" {
+        val player = service.createPlayer(NewPlayer("UnlinkTest#Z".toPlayerName(), null))!!
+        val account = repo.createAccountRecord(RiotPuuid("z".repeat(78)))
+
+        service.linkAccountToPlayer(player.id, account.id)
+
+        val afterUnlink = service.unlinkAccountFromPlayer(player.id, account.id)
+        afterUnlink.shouldNotBeNull()
+        afterUnlink.accounts.shouldBeEmpty()
+
+        val fetched = service.getPlayer(player.id)
+        fetched.shouldNotBeNull()
+        fetched.accounts.shouldBeEmpty()
+    }
+
+    "unlinkAccountFromPlayer should return null if account is not already linked to player" {
+        val player = service.createPlayer(NewPlayer("UnlinkFail#Y".toPlayerName(), null))!!
+        val account = repo.createAccountRecord(RiotPuuid("y".repeat(78)))
+
+        val result = service.unlinkAccountFromPlayer(player.id, account.id)
+        result.shouldBeNull()
     }
 })
