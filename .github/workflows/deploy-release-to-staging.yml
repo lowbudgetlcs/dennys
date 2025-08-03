@@ -1,4 +1,4 @@
-name: Build and deploy release
+name: Build and deploy release to staging environment.
 
 on:
   push:
