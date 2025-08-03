@@ -6,4 +6,3 @@ import com.sksamuel.hoplite.addResourceSource
 object Config {
     val binder = ConfigLoaderBuilder.default().addResourceSource("/config.properties").build().configBinder()
 }
-
