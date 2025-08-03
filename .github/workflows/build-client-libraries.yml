@@ -3,7 +3,7 @@ name: Build supported client libraries.
 on:
   push:
     paths:
-      - 'src/main'
+      - 'src/main/kotlin'
 
     branches:
       - 'main'
