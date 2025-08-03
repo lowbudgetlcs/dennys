@@ -31,4 +31,5 @@ jobs:
 
       - name: Publish package to npm repo 
         run: |
-          npm publish sdk-ts --registry https://${{ secrets.NEXUS_URL }}/repository/npm-lblcs
+          cd sdk-ts
+          npm publish .
