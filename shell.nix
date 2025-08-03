@@ -3,6 +3,8 @@
 pkgs.mkShell {
     buildInputs = with pkgs; [
       jdk21 gnumake
+      yaml-language-server
+      docker
     ];
     env = {
       TEST="Hello there...";

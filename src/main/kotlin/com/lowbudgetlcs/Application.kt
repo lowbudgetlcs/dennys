@@ -28,4 +28,3 @@ fun Application.module() {
     configureRouting()
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
 }
-
