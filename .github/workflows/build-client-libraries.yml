@@ -4,9 +4,10 @@ on:
   push:
     paths:
       - 'src/main'
-  branches:
-    - 'main'
-    - 'release/*'
+
+    branches:
+      - 'main'
+      - 'release/*'
 
 jobs:
   build-typescript:
