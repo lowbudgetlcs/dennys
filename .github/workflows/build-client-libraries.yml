@@ -17,6 +17,7 @@ jobs:
 
       - name: Generate typescript package
         run: |
+          mkdir sdk-ts
           docker run --rm \
             -v ./src/main/resources/openapi:/local openapitools/openapi-generator-cli generate \
             -i /local/documentation.yaml \
@@ -27,7 +28,7 @@ jobs:
       - name: Login to remote
         run: |
           echo '//${{ secrets.NEXUS_URL }}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}' >> .npmrc
-          npm login
+          npm login --registry https://${{ secrets.NEXUS_URL }}/repository/npm-lblcs
 
       - name: Publish package to npm repo 
         run: |
