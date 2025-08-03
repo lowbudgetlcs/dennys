@@ -7,6 +7,9 @@ class InMemoryPlayerRepository : IPlayerRepository {
     private val players = mutableListOf<PlayerWithAccounts>()
     private var currentPlayerId = 0
 
+    private val accounts = mutableMapOf<RiotAccountId, RiotAccount>()
+    private var currentAccountId = 0
+
     override fun insert(newPlayer: NewPlayer): PlayerWithAccounts? {
         val id = PlayerId(currentPlayerId++)
         val player = PlayerWithAccounts(
@@ -29,6 +32,52 @@ class InMemoryPlayerRepository : IPlayerRepository {
         val updated = players[index].copy(name = newName)
         players[index] = updated
         return updated
+    }
+
+    override fun insertAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val playerIndex = players.indexOfFirst { it.id == playerId }
+        if (playerIndex == -1) return null
+
+        val account = accounts[accountId] ?: return null
+
+        if (account.playerId != null && account.playerId != playerId) return null
+
+        val updatedAccount = account.copy(playerId = playerId)
+        accounts[accountId] = updatedAccount
+
+        val player = players[playerIndex]
+        val updatedPlayer = player.copy(accounts = player.accounts + updatedAccount)
+        players[playerIndex] = updatedPlayer
+
+        return updatedPlayer
+    }
+
+    override fun removeAccount(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val playerIndex = players.indexOfFirst { it.id == playerId }
+        if (playerIndex == -1) return null
+
+        val account = accounts[accountId] ?: return null
+
+        if (account.playerId != playerId) return null
+
+        // Unlink account from player
+        val updatedAccount = account.copy(playerId = null)
+        accounts[accountId] = updatedAccount
+
+        val player = players[playerIndex]
+        val updatedPlayer = player.copy(
+            accounts = player.accounts.filterNot { it.id == accountId }
+        )
+        players[playerIndex] = updatedPlayer
+
+        return updatedPlayer
+    }
+
+    fun createAccountRecord(riotPuuid: RiotPuuid): RiotAccount {
+        val id = RiotAccountId(currentAccountId++)
+        val account = RiotAccount(id = id, riotPuuid = riotPuuid, playerId = null)
+        accounts[id] = account
+        return account
     }
 
     fun clear() {

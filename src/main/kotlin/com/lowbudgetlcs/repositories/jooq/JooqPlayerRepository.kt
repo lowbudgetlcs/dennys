@@ -83,4 +83,24 @@ class JooqPlayerRepository(
                 )
             }
     }
+
+    override fun insertAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val updatedRows = dsl.update(RIOT_ACCOUNTS)
+            .set(RIOT_ACCOUNTS.PLAYER_ID, playerId.value)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .execute()
+
+        return if (updatedRows > 0) getById(playerId) else null
+    }
+
+    override fun removeAccount(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val updatedRows = dsl.update(RIOT_ACCOUNTS)
+            .set(RIOT_ACCOUNTS.PLAYER_ID, null as Int?)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .and(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
+            .execute()
+
+        return if (updatedRows > 0) getById(playerId) else null
+    }
+
 }

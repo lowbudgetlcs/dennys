@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.routes.api.v1
 
 import com.lowbudgetlcs.domain.models.toPlayerId
+import com.lowbudgetlcs.domain.models.toRiotAccountId
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.routes.dto.players.*
 import io.ktor.http.*
@@ -88,7 +89,34 @@ fun Route.playerRoutesV1(
         }
 
         post("{playerId}/accounts") {
+            val playerId = call.parameters["playerId"]?.toIntOrNull()?.toPlayerId()
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid player ID")
 
+            val body = call.receive<Map<String, Int>>()
+            val accountId = body["accountId"]?.toRiotAccountId()
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing accountId")
+
+            try {
+                val updated = playerService.linkAccountToPlayer(playerId, accountId)
+                    ?: return@post call.respond(HttpStatusCode.NotFound, "Player or account not found")
+
+                call.respond(updated.toDto())
+            } catch (e: IllegalStateException) {
+                call.respond(HttpStatusCode.Conflict, e.message ?: "Conflict linking account")
+            }
+        }
+
+        delete("{playerId}/accounts/{accountId}") {
+            val playerId = call.parameters["playerId"]?.toIntOrNull()?.toPlayerId()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid player ID")
+
+            val accountId = call.parameters["accountId"]?.toIntOrNull()?.toRiotAccountId()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid account ID")
+
+            val updated = playerService.unlinkAccountFromPlayer(playerId, accountId)
+                ?: return@delete call.respond(HttpStatusCode.NotFound, "Player or account not found")
+
+            call.respond(updated.toDto())
         }
 
     }
