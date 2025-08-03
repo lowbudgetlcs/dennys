@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NewPlayerDto(
-    val name: String,
-    val teamId: Int? = null
+    val name: String
 )

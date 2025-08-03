@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NewRiotAccountDto(
-    val riotPuuid: String,
-    val playerId: Int? = null
+    val riotPuuid: String
 )

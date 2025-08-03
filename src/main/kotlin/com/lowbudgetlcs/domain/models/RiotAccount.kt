@@ -19,6 +19,5 @@ data class RiotAccount(
 )
 
 data class NewRiotAccount(
-    val riotPuuid: RiotPuuid,
-    val playerId: PlayerId?
+    val riotPuuid: RiotPuuid
 )

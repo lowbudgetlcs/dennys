@@ -13,7 +13,7 @@ externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
 servers:
-  - url: /api
+  - url: http://localhost:9292
 
 tags:
   - name: v1/event
@@ -38,7 +38,7 @@ tags:
     description: Create and inspect Riot accounts
 
 paths:
-  /v1/event:
+  /api/v1/event:
     get:
       tags:
         - v1/event
@@ -110,7 +110,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /v1/event/{eventId}:
+  /api/v1/event/{eventId}:
     get:
       tags:
         - v1/event
@@ -194,7 +194,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
 
-  /v1/event/{eventId}/teams:
+  /api/v1/event/{eventId}/teams:
     get:
       summary: Get an event with all teams included
       operationId: getTeamsInEvent
@@ -225,7 +225,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/event/{eventId}/teams/{teamId}:
+  /api/v1/event/{eventId}/teams/{teamId}:
     post:
       summary: Assign a team to an event
       operationId: addTeamToEvent
@@ -289,7 +289,7 @@ paths:
         '404':
           description: Event or team not found
 
-  /v1/team:
+  /api/v1/team:
     get:
       summary: Get all teams (optionally filter by event)
       operationId: getTeams
@@ -352,7 +352,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/team/{teamId}:
+  /api/v1/team/{teamId}:
     get:
       summary: Get a team by ID
       operationId: getTeamById
@@ -422,7 +422,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/team/{teamId}/players:
+  /api/v1/team/{teamId}/players:
     get:
       summary: Get a team with all the players included
       operationId: getPlayersOnTeam
@@ -454,7 +454,7 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 
-  /v1/team/{teamId}/players/{playerId}:
+  /api/v1/team/{teamId}/players/{playerId}:
     post:
       summary: Add a player to a team
       operationId: addPlayerToTeam
@@ -521,7 +521,7 @@ paths:
         '404':
           description: Team or player not found
 
-  /v1/player:
+  /api/v1/player:
     get:
       summary: Get all players
       operationId: getPlayers
@@ -573,7 +573,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/player/{playerId}:
+  /api/v1/player/{playerId}:
     get:
       summary: Get player by ID
       operationId: getPlayerById
@@ -643,7 +643,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /v1/player/{playerId}/accounts:
+  /api/v1/player/{playerId}/accounts:
     post:
       summary: Link a Riot account to a player
       operationId: linkAccountToPlayer
@@ -685,7 +685,7 @@ paths:
           description: Unexpected error
 
 
-  /v1/player/{playerId}/accounts/{accountId}:
+  /api/v1/player/{playerId}/accounts/{accountId}:
     delete:
       summary: Remove a Riot account from a player
       operationId: removeAccountFromPlayer
@@ -953,9 +953,6 @@ components:
         name:
           type: string
           example: ruuffian#FUNZ
-        teamId:
-          type: integer
-          nullable: true
 
     NewRiotAccountDto:
       type: object
@@ -965,9 +962,6 @@ components:
         riotPuuid:
           type: string
           description: Riot's permanent unique user ID (78 chars)
-        playerId:
-          type: integer
-          nullable: true
 
     RiotAccountDto:
       type: object

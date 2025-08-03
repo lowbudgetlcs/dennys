@@ -20,8 +20,7 @@ data class Player(
 )
 
 data class NewPlayer(
-    val name: PlayerName,
-    val teamId: TeamId?
+    val name: PlayerName
 )
 
 data class PlayerWithAccounts(

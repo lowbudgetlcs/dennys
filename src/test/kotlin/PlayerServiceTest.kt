@@ -19,8 +19,7 @@ class PlayerServiceTest : StringSpec({
     }
 
     val newPlayer = NewPlayer(
-        name = "player#123".toPlayerName(),
-        teamId = null
+        name = "player#123".toPlayerName()
     )
 
     "Successfully create player" {
@@ -64,7 +63,7 @@ class PlayerServiceTest : StringSpec({
 
     "Blank or invalid Riot names should throw" {
         shouldThrow<IllegalArgumentException> {
-            NewPlayer(name = "".toPlayerName(), teamId = null)
+            NewPlayer(name = "".toPlayerName())
         }
         // Add more invalid names here when you can think of any
     }
@@ -75,8 +74,8 @@ class PlayerServiceTest : StringSpec({
     }
 
     "getAllPlayers() should return all players with accounts" {
-        val player1 = NewPlayer("PlayerOne#AAA".toPlayerName(), null)
-        val player2 = NewPlayer("PlayerTwo#BBB".toPlayerName(), null)
+        val player1 = NewPlayer("PlayerOne#AAA".toPlayerName())
+        val player2 = NewPlayer("PlayerTwo#BBB".toPlayerName())
 
         val created1 = service.createPlayer(player1)
         val created2 = service.createPlayer(player2)
@@ -91,7 +90,7 @@ class PlayerServiceTest : StringSpec({
         val initial = service.getAllPlayers()
         initial.shouldBeEmpty()
 
-        val player = NewPlayer("NewPlayer#XYZ".toPlayerName(), null)
+        val player = NewPlayer("NewPlayer#XYZ".toPlayerName())
         val created = service.createPlayer(player)
 
         val updated = service.getAllPlayers()
@@ -99,8 +98,8 @@ class PlayerServiceTest : StringSpec({
     }
 
     "getPlayer should return correct player among many" {
-        val one = service.createPlayer(NewPlayer("One#A".toPlayerName(), null))!!
-        val two = service.createPlayer(NewPlayer("Two#B".toPlayerName(), null))!!
+        val one = service.createPlayer(NewPlayer("One#A".toPlayerName()))!!
+        val two = service.createPlayer(NewPlayer("Two#B".toPlayerName()))!!
 
         service.getPlayer(one.id) shouldBe one
         service.getPlayer(two.id) shouldBe two
@@ -112,8 +111,8 @@ class PlayerServiceTest : StringSpec({
     }
 
     "getPlayer returns null when ID was never used, even after inserting others" {
-        service.createPlayer(NewPlayer("Alpha#123".toPlayerName(), null))!!
-        service.createPlayer(NewPlayer("Bravo#456".toPlayerName(), null))!!
+        service.createPlayer(NewPlayer("Alpha#123".toPlayerName()))!!
+        service.createPlayer(NewPlayer("Bravo#456".toPlayerName()))!!
 
         val unknownId = PlayerId(9999)
         val result = service.getPlayer(unknownId)
@@ -121,7 +120,7 @@ class PlayerServiceTest : StringSpec({
     }
 
     "renamePlayer should succeed for valid input" {
-        val original = service.createPlayer(NewPlayer("OldName#XYZ".toPlayerName(), null))!!
+        val original = service.createPlayer(NewPlayer("OldName#XYZ".toPlayerName()))!!
         val renamed = service.renamePlayer(original.id, "NewName#XYZ")
 
         renamed.shouldNotBeNull()
@@ -130,14 +129,14 @@ class PlayerServiceTest : StringSpec({
     }
 
     "renamePlayer should return null for blank name" {
-        val player = service.createPlayer(NewPlayer("Player#1".toPlayerName(), null))!!
+        val player = service.createPlayer(NewPlayer("Player#1".toPlayerName()))!!
         val result = service.renamePlayer(player.id, "")
         result.shouldBeNull()
     }
 
     "renamePlayer should return null if new name already exists" {
-        val p1 = service.createPlayer(NewPlayer("Unique#1".toPlayerName(), null))!!
-        val p2 = service.createPlayer(NewPlayer("Unique#2".toPlayerName(), null))!!
+        val p1 = service.createPlayer(NewPlayer("Unique#1".toPlayerName()))!!
+        val p2 = service.createPlayer(NewPlayer("Unique#2".toPlayerName()))!!
 
         val conflict = service.renamePlayer(p2.id, "Unique#1")
         conflict.shouldBeNull()
@@ -149,7 +148,7 @@ class PlayerServiceTest : StringSpec({
     }
 
     "renamePlayer should update the stored value" {
-        val created = service.createPlayer(NewPlayer("Initial#Name".toPlayerName(), null))!!
+        val created = service.createPlayer(NewPlayer("Initial#Name".toPlayerName()))!!
         service.renamePlayer(created.id, "Updated#Name")
 
         val fetched = service.getPlayer(created.id)
@@ -158,7 +157,7 @@ class PlayerServiceTest : StringSpec({
     }
 
     "linkAccountToPlayer should successfully link an unlinked account" {
-        val player = service.createPlayer(NewPlayer("LinkTest#A".toPlayerName(), null))!!
+        val player = service.createPlayer(NewPlayer("LinkTest#A".toPlayerName()))!!
         val account = repo.createAccountRecord(RiotPuuid("a".repeat(78)))
 
         val linked = service.linkAccountToPlayer(player.id, account.id)
@@ -174,8 +173,8 @@ class PlayerServiceTest : StringSpec({
     }
 
     "linkAccountToPlayer should throw if account is already linked to another player" {
-        val p1 = service.createPlayer(NewPlayer("One#A".toPlayerName(), null))!!
-        val p2 = service.createPlayer(NewPlayer("Two#B".toPlayerName(), null))!!
+        val p1 = service.createPlayer(NewPlayer("One#A".toPlayerName()))!!
+        val p2 = service.createPlayer(NewPlayer("Two#B".toPlayerName()))!!
         val account = repo.createAccountRecord(RiotPuuid("b".repeat(78)))
 
         service.linkAccountToPlayer(p1.id, account.id)
@@ -187,7 +186,7 @@ class PlayerServiceTest : StringSpec({
     }
 
     "unlinkAccountFromPlayer should remove the link between player and account" {
-        val player = service.createPlayer(NewPlayer("UnlinkTest#Z".toPlayerName(), null))!!
+        val player = service.createPlayer(NewPlayer("UnlinkTest#Z".toPlayerName()))!!
         val account = repo.createAccountRecord(RiotPuuid("z".repeat(78)))
 
         service.linkAccountToPlayer(player.id, account.id)
@@ -202,7 +201,7 @@ class PlayerServiceTest : StringSpec({
     }
 
     "unlinkAccountFromPlayer should return null if account is not already linked to player" {
-        val player = service.createPlayer(NewPlayer("UnlinkFail#Y".toPlayerName(), null))!!
+        val player = service.createPlayer(NewPlayer("UnlinkFail#Y".toPlayerName()))!!
         val account = repo.createAccountRecord(RiotPuuid("y".repeat(78)))
 
         val result = service.unlinkAccountFromPlayer(player.id, account.id)
