@@ -22,7 +22,7 @@ jobs:
             -i /local/documentation.yaml \
             -g typescript \
             -o /local/sdk-ts \
-            --additional-properties=npmName=@lblcs/dennys-sdk-typescript,npmRepository=${{ secrets.NEXUS_URL }}/repository/npm-lblcs,platform=node
+            --additional-properties=npmName=@lblcs/dennys-sdk-typescript,npmRepository=https://${{ secrets.NEXUS_URL }}/repository/npm-lblcs,platform=node
 
       - name: Login to remote
         run: |
@@ -31,4 +31,4 @@ jobs:
 
       - name: Publish package to npm repo 
         run: |
-          npm publish sdk-ts
+          npm publish sdk-ts --registry https://${{ secrets.NEXUS_URL }}/repository/npm-lblcs
