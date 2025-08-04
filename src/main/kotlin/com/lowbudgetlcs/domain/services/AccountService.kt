@@ -4,12 +4,13 @@ import com.lowbudgetlcs.domain.models.NewRiotAccount
 import com.lowbudgetlcs.domain.models.RiotAccount
 import com.lowbudgetlcs.domain.models.RiotAccountId
 import com.lowbudgetlcs.domain.models.RiotPuuid
+import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.repositories.IAccountRepository
 
 class AccountService(
     private val accountRepository: IAccountRepository,
-    private val riotAccountGateway: RiotAccountGateway
+    private val riotAccountGateway: IRiotAccountGateway
 ) {
 
     suspend fun createAccount(account: NewRiotAccount): RiotAccount? {

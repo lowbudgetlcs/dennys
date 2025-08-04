@@ -2,6 +2,7 @@ import com.lowbudgetlcs.domain.models.NewRiotAccount
 import com.lowbudgetlcs.domain.models.RiotAccountId
 import com.lowbudgetlcs.domain.models.RiotPuuid
 import com.lowbudgetlcs.domain.services.AccountService
+import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
 import com.lowbudgetlcs.routes.dto.riot.account.AccountDto
@@ -17,7 +18,7 @@ import io.mockk.mockk
 class AccountServiceTest : StringSpec({
 
     val repo = InMemoryAccountRepository()
-    val gateway = mockk<RiotAccountGateway>()
+    val gateway = mockk<IRiotAccountGateway>()
     val service = AccountService(repo, gateway)
 
     val validPuuid = "a".repeat(78)
