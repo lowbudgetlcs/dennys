@@ -33,7 +33,7 @@ db:
 	docker compose up db pgadmin
 
 swag:
-	docker-compose up swagger-editor
+	docker compose up swagger-editor
 
 # A full refresh. WARNING: Deletes all data stored in the postgres data volume
 refresh: clean drop build run

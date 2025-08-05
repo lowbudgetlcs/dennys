@@ -1,9 +1,13 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
 
-class PlayerService(private val playerRepository: IPlayerRepository) {
+class PlayerService(
+    private val playerRepository: IPlayerRepository,
+    private val accountRepository: IAccountRepository
+) {
     fun createPlayer(player: NewPlayer): PlayerWithAccounts? {
         if (isNameTaken(player.name.name)) return null
         return playerRepository.insert(player)
@@ -26,13 +30,15 @@ class PlayerService(private val playerRepository: IPlayerRepository) {
     }
 
     fun linkAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
-        playerRepository.getById(playerId) ?: return null
+        if (playerRepository.getById(playerId) == null) throw NoSuchElementException("Player does not exist")
 
         // Account cannot be re-linked without being removed first
-        val allPlayers = playerRepository.getAll()
-        if (allPlayers.any { it.accounts.any { acc -> acc.id == accountId && it.id != playerId } }) {
-            throw IllegalStateException("Account already linked to another player")
+        val account = accountRepository.getById(accountId)
+        if (account == null) {
+            throw NoSuchElementException("Account does not exist")
         }
+        if (account.playerId != null)
+            throw IllegalStateException("Account already linked to another player")
 
         return playerRepository.insertAccountToPlayer(playerId, accountId)
     }

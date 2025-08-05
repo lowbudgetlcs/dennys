@@ -43,7 +43,7 @@ fun Route.apiRoutes() {
     val accountService = AccountService(accountRepository, riotAccountGateway)
 
     val playerRepository : IPlayerRepository = JooqPlayerRepository(Database.dslContext)
-    val playerService = PlayerService(playerRepository)
+    val playerService = PlayerService(playerRepository, accountRepository)
 
     route("/api/v1") {
         route("/riot-callback") {

@@ -16,7 +16,7 @@ class JooqAccountRepository(
             .fetchOne()
             ?.let { record ->
                 RiotAccount(
-                    id = RiotAccountId(record[RIOT_ACCOUNTS.ID]!!),
+                    id = record[RIOT_ACCOUNTS.ID]!!.toRiotAccountId(),
                     riotPuuid = newAccount.riotPuuid,
                     playerId = null
                 )
@@ -29,17 +29,17 @@ class JooqAccountRepository(
             .from(RIOT_ACCOUNTS)
             .fetch()
 
-            return accounts.map { row ->
-                val accountId = row[RIOT_ACCOUNTS.ID]!!.toRiotAccountId()
-                val riotPuuid = RiotPuuid(row[RIOT_ACCOUNTS.RIOT_PUUID]!!)
-                val playerId = row[RIOT_ACCOUNTS.PLAYER_ID]?.let { PlayerId(it) }
+        return accounts.map { row ->
+            val accountId = row[RIOT_ACCOUNTS.ID]!!.toRiotAccountId()
+            val riotPuuid = RiotPuuid(row[RIOT_ACCOUNTS.RIOT_PUUID]!!)
+            val playerId = row[RIOT_ACCOUNTS.PLAYER_ID]?.let { PlayerId(it) }
 
-                RiotAccount(
-                    id = accountId,
-                    riotPuuid = riotPuuid,
-                    playerId = playerId
-                )
-            }
+            RiotAccount(
+                id = accountId,
+                riotPuuid = riotPuuid,
+                playerId = playerId
+            )
+        }
     }
 
     override fun getById(accountId: RiotAccountId): RiotAccount? {
@@ -50,7 +50,7 @@ class JooqAccountRepository(
             .fetchOne()
             ?.let { row ->
                 RiotAccount(
-                    id = RiotAccountId(row[RIOT_ACCOUNTS.ID]!!),
+                    id = row[RIOT_ACCOUNTS.ID]!!.toRiotAccountId(),
                     riotPuuid = RiotPuuid(row[RIOT_ACCOUNTS.RIOT_PUUID]!!),
                     playerId = row[RIOT_ACCOUNTS.PLAYER_ID]?.let { PlayerId(it) }
                 )
