@@ -18,29 +18,18 @@ fun Route.playerRoutesV1(
     playerService: PlayerService
 ) {
     route("/player") {
+
         post {
             logger.info("📩 Received post on /v1/player")
-            val newPlayerDto = call.receive<NewPlayerDto>()
-            val newPlayer = newPlayerDto.toNewPlayer()
+            val dto = call.receive<NewPlayerDto>()
 
-            if (newPlayerDto.name.isBlank()) {
-                call.respondText(
-                    text = "Player name cannot be blank",
-                    status = HttpStatusCode.BadRequest
-                )
-                return@post
-            }
-
-            if (playerService.isNameTaken(newPlayer.name.name)) {
-                call.respondText(text = "Player name already exists", status = HttpStatusCode.Conflict)
-                return@post
-            }
-
-            val created = playerService.createPlayer(newPlayer)
-            if (created != null) {
+            try {
+                val created = playerService.createPlayer(dto.toNewPlayer())
                 call.respond(created.toDto())
-            } else {
-                call.respond(HttpStatusCode.InternalServerError)
+            } catch (e: IllegalArgumentException) {
+                call.respond(HttpStatusCode.BadRequest, e.message ?: "Invalid input")
+            } catch (e: IllegalStateException) {
+                call.respond(HttpStatusCode.Conflict, e.message ?: "Conflict")
             }
         }
 
@@ -60,32 +49,31 @@ fun Route.playerRoutesV1(
                 )
 
             val playerId = playerIdField.toPlayerId()
-            val player = playerService.getPlayer(playerId)
-            if (player != null) {
+            try {
+                val player = playerService.getPlayer(playerId)
                 call.respond(player.toDto())
-            } else {
-                call.respondText("Player not found", status = HttpStatusCode.NotFound)
+            } catch(e: NoSuchElementException) {
+                call.respond(HttpStatusCode.NotFound, e.message ?: "Not Found")
             }
         }
 
         patch("{playerId}") {
             logger.info("📩 Received patch on /v1/player/{playerId}")
-            val playerIdField = call.parameters["playerId"]?.toIntOrNull()
+            val playerId = call.parameters["playerId"]?.toIntOrNull()?.toPlayerId()
                 ?: return@patch call.respond(HttpStatusCode.BadRequest, "Invalid player ID")
 
             val dto = call.receive<PatchPlayerDto>()
-            if (dto.name.isBlank()) {
-                return@patch call.respond(HttpStatusCode.BadRequest, "Player name cannot be blank")
+
+            try {
+                val updated = playerService.renamePlayer(playerId, dto.name)
+                call.respond(updated.toDto())
+            } catch (e: IllegalArgumentException) {
+                call.respond(HttpStatusCode.BadRequest, e.message ?: "Invalid input")
+            } catch (e: IllegalStateException) {
+                call.respond(HttpStatusCode.Conflict, e.message ?: "Conflict")
+            } catch (e: NoSuchElementException) {
+                call.respond(HttpStatusCode.NotFound, e.message ?: "Not found")
             }
-
-            if (playerService.isNameTaken(dto.name)) {
-                return@patch call.respond(HttpStatusCode.Conflict, "Player name already exists")
-            }
-
-            val updated = playerService.renamePlayer(playerIdField.toPlayerId(), dto.name)
-                ?: return@patch call.respond(HttpStatusCode.NotFound, "Player not found")
-
-            call.respond(updated.toDto())
         }
 
         post("{playerId}/accounts") {
@@ -98,8 +86,6 @@ fun Route.playerRoutesV1(
 
             try {
                 val updated = playerService.linkAccountToPlayer(playerId, accountId)
-                    ?: return@post call.respond(HttpStatusCode.NotFound, "Player or account not found")
-
                 call.respond(updated.toDto())
             } catch (e: IllegalStateException) {
                 call.respond(HttpStatusCode.Conflict, e.message ?: "Conflict linking account")
@@ -113,10 +99,12 @@ fun Route.playerRoutesV1(
             val accountId = call.parameters["accountId"]?.toIntOrNull()?.toRiotAccountId()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid account ID")
 
-            val updated = playerService.unlinkAccountFromPlayer(playerId, accountId)
-                ?: return@delete call.respond(HttpStatusCode.NotFound, "Player or account not found")
-
-            call.respond(updated.toDto())
+            try {
+                val updated = playerService.unlinkAccountFromPlayer(playerId, accountId)
+                call.respond(updated.toDto())
+            } catch(e: NoSuchElementException) {
+                call.respond(HttpStatusCode.NotFound, e.message ?: "Not found")
+            }
         }
 
     }

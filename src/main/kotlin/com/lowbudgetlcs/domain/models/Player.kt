@@ -8,7 +8,7 @@ fun Int.toPlayerId(): PlayerId = PlayerId(this)
 @JvmInline
 value class PlayerName(val name: String) {
     init {
-        require(name.isNotBlank()) { "Player name must not be blank" }
+        require(name.isNotBlank()) { "Player name cannot be blank" }
     }
 }
 

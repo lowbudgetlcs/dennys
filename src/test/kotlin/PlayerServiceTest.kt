@@ -24,11 +24,8 @@ class PlayerServiceTest : StringSpec({
         accountRepo.clear()
     }
 
-    val newPlayer = NewPlayer(
-        name = "player#123".toPlayerName()
-    )
-
     "Successfully create player" {
+        val newPlayer = NewPlayer("player#123".toPlayerName())
         val created = service.createPlayer(newPlayer)
 
         created.shouldNotBeNull()
@@ -41,14 +38,27 @@ class PlayerServiceTest : StringSpec({
     }
 
     "Creating duplicate player names fails" {
+        val newPlayer = NewPlayer("player#123".toPlayerName())
         val created = service.createPlayer(newPlayer)
         created.shouldNotBeNull()
 
-        val duplicate = service.createPlayer(newPlayer)
-        duplicate.shouldBeNull()
+        val exception = shouldThrow<IllegalStateException> {
+            service.createPlayer(newPlayer)
+        }
+        exception.message shouldBe "Player name already exists"
+    }
+
+    "Creating a blank player name throws" {
+        val exception = shouldThrow<IllegalArgumentException> {
+            val blankPlayer = NewPlayer("".toPlayerName())
+            service.createPlayer(blankPlayer)
+        }
+
+        exception.message shouldBe "Player name cannot be blank"
     }
 
     "getAllPlayers returns created players" {
+        val newPlayer = NewPlayer("player#123".toPlayerName())
         val p1 = service.createPlayer(newPlayer.copy(name = "one#AAA".toPlayerName()))
         val p2 = service.createPlayer(newPlayer.copy(name = "two#BBB".toPlayerName()))
 
@@ -56,12 +66,15 @@ class PlayerServiceTest : StringSpec({
         all.shouldContainExactly(p1, p2)
     }
 
-    "getPlayer returns null for invalid ID" {
-        val result = service.getPlayer(PlayerId(999))
-        result.shouldBeNull()
+    "getPlayer throws for unknown ID" {
+        val exception = shouldThrow<NoSuchElementException> {
+            service.getPlayer(PlayerId(999))
+        }
+        exception.message shouldBe "Player not found"
     }
 
     "isNameTaken returns true for existing names" {
+        val newPlayer = NewPlayer("player#123".toPlayerName())
         service.createPlayer(newPlayer)
         service.isNameTaken("player#123") shouldBe true
         service.isNameTaken("unknown#123") shouldBe false
@@ -100,7 +113,7 @@ class PlayerServiceTest : StringSpec({
         val created = service.createPlayer(player)
 
         val updated = service.getAllPlayers()
-        updated.map { it.id } shouldContainExactly listOf(created!!.id)
+        updated.map { it.id } shouldContainExactly listOf(created.id)
     }
 
     "getPlayer should return correct player among many" {
@@ -111,46 +124,38 @@ class PlayerServiceTest : StringSpec({
         service.getPlayer(two.id) shouldBe two
     }
 
-    "getPlayer returns null when ID does not exist" {
-        val result = service.getPlayer(PlayerId(999))
-        result.shouldBeNull()
-    }
-
-    "getPlayer returns null when ID was never used, even after inserting others" {
-        service.createPlayer(NewPlayer("Alpha#123".toPlayerName()))!!
-        service.createPlayer(NewPlayer("Bravo#456".toPlayerName()))!!
-
-        val unknownId = PlayerId(9999)
-        val result = service.getPlayer(unknownId)
-        result.shouldBeNull()
-    }
-
     "renamePlayer should succeed for valid input" {
-        val original = service.createPlayer(NewPlayer("OldName#XYZ".toPlayerName()))!!
-        val renamed = service.renamePlayer(original.id, "NewName#XYZ")
+        val player = service.createPlayer(NewPlayer("OldName#123".toPlayerName()))
+        val updated = service.renamePlayer(player.id, "NewName#123")
 
-        renamed.shouldNotBeNull()
-        renamed.id shouldBe original.id
-        renamed.name.name shouldBe "NewName#XYZ"
+        updated.id shouldBe player.id
+        updated.name.name shouldBe "NewName#123"
     }
 
-    "renamePlayer should return null for blank name" {
-        val player = service.createPlayer(NewPlayer("Player#1".toPlayerName()))!!
-        val result = service.renamePlayer(player.id, "")
-        result.shouldBeNull()
+    "renamePlayer should throw if name is blank" {
+        val player = service.createPlayer(NewPlayer("Player#1".toPlayerName()))
+
+        val exception = shouldThrow<IllegalArgumentException> {
+            service.renamePlayer(player.id, "")
+        }
+        exception.message shouldBe "Player name cannot be blank"
     }
 
-    "renamePlayer should return null if new name already exists" {
-        val p1 = service.createPlayer(NewPlayer("Unique#1".toPlayerName()))!!
-        val p2 = service.createPlayer(NewPlayer("Unique#2".toPlayerName()))!!
+    "renamePlayer should throw if name already taken" {
+        service.createPlayer(NewPlayer("Taken#1".toPlayerName()))
+        val player = service.createPlayer(NewPlayer("Free#1".toPlayerName()))
 
-        val conflict = service.renamePlayer(p2.id, "Unique#1")
-        conflict.shouldBeNull()
+        val exception = shouldThrow<IllegalStateException> {
+            service.renamePlayer(player.id, "Taken#1")
+        }
+        exception.message shouldBe "Player name already exists"
     }
 
-    "renamePlayer should return null for nonexistent ID" {
-        val result = service.renamePlayer(PlayerId(9999), "SomeName#123")
-        result.shouldBeNull()
+    "renamePlayer should throw for nonexistent player ID" {
+        val exception = shouldThrow<NoSuchElementException> {
+            service.renamePlayer(PlayerId(9999), "AnyName#123")
+        }
+        exception.message shouldBe "Player not found"
     }
 
     "renamePlayer should update the stored value" {
@@ -160,5 +165,14 @@ class PlayerServiceTest : StringSpec({
         val fetched = service.getPlayer(created.id)
         fetched.shouldNotBeNull()
         fetched.name.name shouldBe "Updated#Name"
+    }
+
+    "getAllPlayers should reflect additions" {
+        service.getAllPlayers().shouldBeEmpty()
+
+        val p1 = service.createPlayer(NewPlayer("One#1".toPlayerName()))
+        val p2 = service.createPlayer(NewPlayer("Two#2".toPlayerName()))
+
+        service.getAllPlayers().map { it.id } shouldContainExactly listOf(p1.id, p2.id)
     }
 })
