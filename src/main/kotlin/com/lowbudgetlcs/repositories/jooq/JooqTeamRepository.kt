@@ -1,9 +1,6 @@
 package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.Team
-import com.lowbudgetlcs.domain.models.TeamId
-import com.lowbudgetlcs.domain.models.TeamName
-import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.toTeamId
 import com.lowbudgetlcs.domain.models.toTeamName

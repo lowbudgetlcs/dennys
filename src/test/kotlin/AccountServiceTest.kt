@@ -3,7 +3,6 @@ import com.lowbudgetlcs.domain.models.RiotAccountId
 import com.lowbudgetlcs.domain.models.RiotPuuid
 import com.lowbudgetlcs.domain.services.AccountService
 import com.lowbudgetlcs.gateways.IRiotAccountGateway
-import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
 import com.lowbudgetlcs.routes.dto.riot.account.AccountDto
 import io.kotest.assertions.throwables.shouldThrow

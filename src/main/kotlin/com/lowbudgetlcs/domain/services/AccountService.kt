@@ -5,7 +5,6 @@ import com.lowbudgetlcs.domain.models.RiotAccount
 import com.lowbudgetlcs.domain.models.RiotAccountId
 import com.lowbudgetlcs.domain.models.RiotPuuid
 import com.lowbudgetlcs.gateways.IRiotAccountGateway
-import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.repositories.IAccountRepository
 
 class AccountService(

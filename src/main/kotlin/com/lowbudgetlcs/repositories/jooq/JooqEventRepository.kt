@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.jooq
 
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.IEventRepository
 import org.jooq.DSLContext

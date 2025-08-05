@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.inmemory
 
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.repositories.IEventRepository
 import java.time.Instant.now
 

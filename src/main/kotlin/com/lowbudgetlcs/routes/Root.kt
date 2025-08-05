@@ -1,6 +1,5 @@
 package com.lowbudgetlcs.routes
 
-import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.routes.api.apiRoutes
 import io.ktor.http.*
 import io.ktor.server.application.*

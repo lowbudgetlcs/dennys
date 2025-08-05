@@ -1,7 +1,6 @@
 package com.lowbudgetlcs
 
 import com.lowbudgetlcs.config.DatabaseConfig
-import com.sksamuel.hoplite.Masked
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jooq.SQLDialect
