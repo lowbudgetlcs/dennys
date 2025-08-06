@@ -12,7 +12,7 @@ class AccountService(
     private val riotAccountGateway: IRiotAccountGateway
 ) {
 
-    suspend fun createAccount(account: NewRiotAccount): RiotAccount? {
+    suspend fun createAccount(account: NewRiotAccount): RiotAccount {
         val puuid = account.riotPuuid
 
         if (isPuuidTaken(puuid)) {
@@ -20,13 +20,14 @@ class AccountService(
         }
 
         // Call Riot API to verify PUUID
-        riotAccountGateway.getAccountByPuuid(puuid.value)
-            ?: throw NoSuchElementException("Riot account not found from Riot API")
+        riotAccountGateway.getAccountByPuuid(puuid.value) // throws if anything fails
 
-        return accountRepository.insert(account)
+        return accountRepository.insert(account) ?: throw IllegalStateException("Failed to insert account")
     }
 
-    fun getAccount(accountId: RiotAccountId): RiotAccount? = accountRepository.getById(accountId)
+    fun getAccount(accountId: RiotAccountId): RiotAccount {
+        return accountRepository.getById(accountId) ?: throw NoSuchElementException("Account not found")
+    }
 
     fun getAllAccounts(): List<RiotAccount> = accountRepository.getAll()
 

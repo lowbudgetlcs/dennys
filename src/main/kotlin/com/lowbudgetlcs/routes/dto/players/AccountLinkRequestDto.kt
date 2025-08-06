@@ -3,6 +3,4 @@ package com.lowbudgetlcs.routes.dto.players
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AddAccountToPlayerDto(
-    val riotPuuid: String
-)
+data class AccountLinkRequestDto(val accountId: Int)
