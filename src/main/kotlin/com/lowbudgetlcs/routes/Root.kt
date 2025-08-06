@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.routes
 
 import com.lowbudgetlcs.routes.api.apiRoutes
+import com.lowbudgetlcs.routes.dto.Error
 import com.lowbudgetlcs.routes.dto.accounts.NewRiotAccountDto
 import com.lowbudgetlcs.routes.dto.players.AccountLinkRequestDto
 import com.lowbudgetlcs.routes.dto.players.NewPlayerDto
@@ -26,31 +27,45 @@ fun Application.routes() {
         install(StatusPages) {
             exception<RequestValidationException> { call, cause ->
                 logger.warn("⚠️ Request failed validation: ${cause.reasons.joinToString()}")
-                call.respond(HttpStatusCode.UnprocessableEntity, cause.reasons.joinToString())
+                val code = HttpStatusCode.UnprocessableEntity
+                val e = Error(code = code.value, message = cause.reasons.joinToString())
+                call.respond(code, e)
             }
             exception<BadRequestException> { call, cause ->
                 logger.warn("⚠️ Bad request: ${cause.message}")
-                call.respond(HttpStatusCode.BadRequest, "Malformed request body")
+                val code = HttpStatusCode.BadRequest
+                val e = Error(code = code.value, message = "Malformed request body")
+                call.respond(code, e)
             }
             exception<JsonConvertException> { call, cause ->
                 logger.warn("⚠️ JSON deserialization failed", cause)
-                call.respond(HttpStatusCode.BadRequest, "Invalid JSON format: ${cause.message}")
+                val code = HttpStatusCode.BadRequest
+                val e = Error(code = code.value, message = "Invalid JSON format: ${cause.message}")
+                call.respond(code, e)
             }
             exception<IllegalArgumentException> { call, cause ->
                 logger.warn("⚠️ Invalid input: ${cause.message}")
-                call.respond(HttpStatusCode.UnprocessableEntity, cause.message ?: "Invalid input")
+                val code = HttpStatusCode.UnprocessableEntity
+                val e = Error(code = code.value, message = cause.message ?: "Invalid input")
+                call.respond(code, e)
             }
             exception<IllegalStateException> { call, cause ->
                 logger.warn("⚠️ Conflict: ${cause.message}")
-                call.respond(HttpStatusCode.Conflict, cause.message ?: "Conflict occurred")
+                val code = HttpStatusCode.Conflict
+                val e = Error(code = code.value, message = cause.message ?: "Conflict occurred")
+                call.respond(code, e)
             }
             exception<NoSuchElementException> { call, cause ->
                 logger.warn("⚠️ Not found: ${cause.message}")
-                call.respond(HttpStatusCode.NotFound, cause.message ?: "Not found")
+                val code = HttpStatusCode.NotFound
+                val e = Error(code = code.value, message = cause.message ?: "Not found")
+                call.respond(code, e)
             }
             exception<Throwable> { call, cause ->
-                logger.error("❌ Uncaught exception on call: $call", cause)
-                call.respond(HttpStatusCode.InternalServerError, "Internal server error")
+                logger.error("⚠️ Internal server error: $call", cause)
+                val code = HttpStatusCode.InternalServerError
+                val e = Error(code = code.value, message = cause.message ?: "Internal server error")
+                call.respond(code, e)
             }
         }
         install(RequestValidation) {

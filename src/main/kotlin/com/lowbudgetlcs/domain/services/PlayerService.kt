@@ -32,14 +32,14 @@ class PlayerService(
         if (newName.isBlank()) throw IllegalArgumentException("Player name cannot be blank")
         if (isNameTaken(newName)) throw IllegalStateException("Player name already exists")
 
-        getPlayer(playerId) // throws if not found
+        this.getPlayer(playerId) // throws if not found
 
         return playerRepository.renamePlayer(playerId, PlayerName(newName))
             ?: throw IllegalStateException("Failed to rename player")
     }
 
     fun linkAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
-        getPlayer(playerId) // throws if not found
+        this.getPlayer(playerId) // throws if not found
 
         val account = accountRepository.getById(accountId)
             ?: throw NoSuchElementException("Account does not exist")
@@ -52,8 +52,13 @@ class PlayerService(
     }
 
     fun unlinkAccountFromPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
+        val player = this.getPlayer(playerId) // throws if not found
+        val account = accountRepository.getById(accountId)
+            ?: throw NoSuchElementException("Account does not exist")
+        if (player.accounts.none { it.id == account.id })
+            throw IllegalStateException("Account does not belong to player")
         return playerRepository.removeAccount(playerId, accountId)
-            ?: throw NoSuchElementException("Player or account not found")
+            ?: throw Throwable("Failed to unlink account from player")
     }
 
 }
