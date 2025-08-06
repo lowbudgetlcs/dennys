@@ -1,9 +1,6 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.NewRiotAccount
-import com.lowbudgetlcs.domain.models.RiotAccount
-import com.lowbudgetlcs.domain.models.RiotAccountId
-import com.lowbudgetlcs.domain.models.RiotPuuid
+import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.IAccountRepository
 
@@ -22,7 +19,7 @@ class AccountService(
         // Call Riot API to verify PUUID
         riotAccountGateway.getAccountByPuuid(puuid.value) // throws if anything fails
 
-        return accountRepository.insert(account) ?: throw IllegalStateException("Failed to insert account")
+        return accountRepository.insert(account) ?: throw RepositoryException("Failed to insert account")
     }
 
     fun getAccount(accountId: RiotAccountId): RiotAccount {

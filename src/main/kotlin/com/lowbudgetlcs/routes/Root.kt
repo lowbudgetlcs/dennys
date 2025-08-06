@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.routes
 
+import com.lowbudgetlcs.domain.models.RepositoryException
 import com.lowbudgetlcs.routes.api.apiRoutes
 import com.lowbudgetlcs.routes.dto.Error
 import com.lowbudgetlcs.routes.dto.accounts.NewRiotAccountDto
@@ -59,6 +60,12 @@ fun Application.routes() {
                 logger.warn("⚠️ Not found: ${cause.message}")
                 val code = HttpStatusCode.NotFound
                 val e = Error(code = code.value, message = cause.message ?: "Not found")
+                call.respond(code, e)
+            }
+            exception<RepositoryException> { call, cause ->
+                logger.error("⚠️ Repository Exception: $call", cause)
+                val code = HttpStatusCode.InternalServerError
+                val e = Error(code = code.value, message = cause.message ?: "Internal server error")
                 call.respond(code, e)
             }
             exception<Throwable> { call, cause ->

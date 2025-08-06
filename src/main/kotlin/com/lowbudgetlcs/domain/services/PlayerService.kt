@@ -14,7 +14,7 @@ class PlayerService(
         if (isNameTaken(player.name.value)) throw IllegalStateException("Player name already exists")
 
         return playerRepository.insert(player)
-            ?: throw IllegalStateException("Failed to create player")
+            ?: throw RepositoryException("Failed to create player")
     }
 
     fun getPlayer(id: PlayerId): PlayerWithAccounts {
@@ -35,7 +35,7 @@ class PlayerService(
         this.getPlayer(playerId) // throws if not found
 
         return playerRepository.renamePlayer(playerId, PlayerName(newName))
-            ?: throw IllegalStateException("Failed to rename player")
+            ?: throw RepositoryException("Failed to rename player")
     }
 
     fun linkAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
@@ -48,17 +48,20 @@ class PlayerService(
             throw IllegalStateException("Account already linked to another player")
 
         return playerRepository.insertAccountToPlayer(playerId, accountId)
-            ?: throw IllegalStateException("Failed to link account to player")
+            ?: throw RepositoryException("Failed to link account to player")
     }
 
     fun unlinkAccountFromPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
         val player = this.getPlayer(playerId) // throws if not found
+
         val account = accountRepository.getById(accountId)
             ?: throw NoSuchElementException("Account does not exist")
+
         if (player.accounts.none { it.id == account.id })
             throw IllegalStateException("Account does not belong to player")
+
         return playerRepository.removeAccount(playerId, accountId)
-            ?: throw Throwable("Failed to unlink account from player")
+            ?: throw RepositoryException("Failed to unlink account from player")
     }
 
 }
