@@ -25,6 +25,10 @@ class InMemoryAccountRepository : IAccountRepository {
         return accounts.find { it.id == accountId }
     }
 
+    override fun getAccountByPuuid(puuid: String): RiotAccount? {
+        return accounts.find { it.riotPuuid.value == puuid }
+    }
+
     fun clear() {
         accounts.clear()
         nextId = 0
