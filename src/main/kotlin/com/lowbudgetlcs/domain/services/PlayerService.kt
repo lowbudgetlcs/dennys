@@ -10,8 +10,8 @@ class PlayerService(
 ) {
 
     fun createPlayer(player: NewPlayer): PlayerWithAccounts {
-        if (player.name.name.isBlank()) throw IllegalArgumentException("Player name cannot be blank")
-        if (isNameTaken(player.name.name)) throw IllegalStateException("Player name already exists")
+        if (player.name.value.isBlank()) throw IllegalArgumentException("Player name cannot be blank")
+        if (isNameTaken(player.name.value)) throw IllegalStateException("Player name already exists")
 
         return playerRepository.insert(player)
             ?: throw IllegalStateException("Failed to create player")
@@ -25,7 +25,7 @@ class PlayerService(
     fun getAllPlayers(): List<PlayerWithAccounts> = playerRepository.getAll()
 
     fun isNameTaken(name: String): Boolean {
-        return playerRepository.getAll().any { it.name.name == name }
+        return playerRepository.getAll().any { it.name.value == name }
     }
 
     fun renamePlayer(playerId: PlayerId, newName: String): PlayerWithAccounts {

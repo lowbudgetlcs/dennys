@@ -13,6 +13,6 @@ fun NewPlayerDto.toNewPlayer(): NewPlayer =
 fun PlayerWithAccounts.toDto(): PlayerDto =
     PlayerDto(
         id = id.value,
-        name = name.name,
+        name = name.value,
         accounts = accounts.map { it.toDto() }
     )

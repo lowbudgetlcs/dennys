@@ -37,6 +37,6 @@ class JooqPlayerRepositoryTest : FunSpec({
 
         renamed.shouldNotBeNull()
         renamed.id shouldBe created.id
-        renamed.name.name shouldBe "NewName#XYZ"
+        renamed.name.value shouldBe "NewName#XYZ"
     }
 })

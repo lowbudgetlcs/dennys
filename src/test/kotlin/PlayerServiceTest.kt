@@ -1,6 +1,5 @@
 import com.lowbudgetlcs.domain.models.NewPlayer
 import com.lowbudgetlcs.domain.models.PlayerId
-import com.lowbudgetlcs.domain.models.RiotPuuid
 import com.lowbudgetlcs.domain.models.toPlayerName
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
@@ -9,7 +8,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
@@ -101,7 +99,7 @@ class PlayerServiceTest : StringSpec({
 
         val all = service.getAllPlayers()
 
-        all.map { it.name.name } shouldContainExactly listOf("PlayerOne#AAA", "PlayerTwo#BBB")
+        all.map { it.name.value } shouldContainExactly listOf("PlayerOne#AAA", "PlayerTwo#BBB")
         all.any { it.accounts.isEmpty() } shouldBe true
     }
 
@@ -129,7 +127,7 @@ class PlayerServiceTest : StringSpec({
         val updated = service.renamePlayer(player.id, "NewName#123")
 
         updated.id shouldBe player.id
-        updated.name.name shouldBe "NewName#123"
+        updated.name.value shouldBe "NewName#123"
     }
 
     "renamePlayer should throw if name is blank" {
@@ -164,7 +162,7 @@ class PlayerServiceTest : StringSpec({
 
         val fetched = service.getPlayer(created.id)
         fetched.shouldNotBeNull()
-        fetched.name.name shouldBe "Updated#Name"
+        fetched.name.value shouldBe "Updated#Name"
     }
 
     "getAllPlayers should reflect additions" {

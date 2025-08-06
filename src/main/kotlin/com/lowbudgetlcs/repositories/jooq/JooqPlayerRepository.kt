@@ -12,7 +12,7 @@ class JooqPlayerRepository(
 
     override fun insert(newPlayer: NewPlayer): PlayerWithAccounts? {
         val insertedId = dsl.insertInto(PLAYERS)
-            .set(PLAYERS.NAME, newPlayer.name.name)
+            .set(PLAYERS.NAME, newPlayer.name.value)
             .returning(PLAYERS.ID)
             .fetchOne()
             ?.get(PLAYERS.ID)
@@ -30,7 +30,7 @@ class JooqPlayerRepository(
 
     override fun renamePlayer(id: PlayerId, newName: PlayerName): PlayerWithAccounts? {
         val updated = dsl.update(PLAYERS)
-            .set(PLAYERS.NAME, newName.name)
+            .set(PLAYERS.NAME, newName.value)
             .where(PLAYERS.ID.eq(id.value))
             .execute()
 
