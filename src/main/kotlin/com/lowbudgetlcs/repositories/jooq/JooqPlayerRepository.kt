@@ -11,47 +11,67 @@ class JooqPlayerRepository(
 ) : IPlayerRepository {
 
     override fun insert(newPlayer: NewPlayer): PlayerWithAccounts? {
-        return dsl.insertInto(PLAYERS)
+        val insertedId = dsl.insertInto(PLAYERS)
             .set(PLAYERS.NAME, newPlayer.name.name)
             .returning(PLAYERS.ID)
             .fetchOne()
-            ?.let { row ->
-                PlayerWithAccounts(
-                    id = row[PLAYERS.ID]!!.toPlayerId(),
-                    name = newPlayer.name,
-                    accounts = emptyList()
-                )
-            }
+            ?.get(PLAYERS.ID)
+
+        return insertedId?.toPlayerId()?.let { getById(it) }
     }
 
     override fun getAll(): List<PlayerWithAccounts> {
-        val players = dsl
-            .select(PLAYERS.ID, PLAYERS.NAME)
-            .from(PLAYERS)
-            .fetch()
-
-        return players.map { row ->
-            val playerId = row[PLAYERS.ID]!!.toPlayerId()
-            val name = PlayerName(row[PLAYERS.NAME]!!)
-            val accounts = getAccountsForPlayer(playerId)
-
-            PlayerWithAccounts(
-                id = playerId,
-                name = name,
-                accounts = accounts
-            )
-        }
+        return fetchPlayerRows().mapNotNull { rowToPlayerWithAccounts(it) }
     }
 
     override fun getById(id: PlayerId): PlayerWithAccounts? {
-        val row = dsl
-            .select(PLAYERS.ID, PLAYERS.NAME)
-            .from(PLAYERS)
-            .where(PLAYERS.ID.eq(id.value))
-            .fetchOne() ?: return null
+        return getPlayerRowById(id)?.let { rowToPlayerWithAccounts(it) }
+    }
 
-        val playerId = row[PLAYERS.ID]!!.toPlayerId()
-        val name = PlayerName(row[PLAYERS.NAME]!!)
+    override fun renamePlayer(id: PlayerId, newName: PlayerName): PlayerWithAccounts? {
+        val updated = dsl.update(PLAYERS)
+            .set(PLAYERS.NAME, newName.name)
+            .where(PLAYERS.ID.eq(id.value))
+            .execute()
+
+        return if (updated > 0) getById(id) else null
+    }
+
+    override fun insertAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val updated = dsl.update(RIOT_ACCOUNTS)
+            .set(RIOT_ACCOUNTS.PLAYER_ID, playerId.value)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .execute()
+
+        return if (updated > 0) getById(playerId) else null
+    }
+
+    override fun removeAccount(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
+        val updated = dsl.update(RIOT_ACCOUNTS)
+            .set(RIOT_ACCOUNTS.PLAYER_ID, null as Int?)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .and(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
+            .execute()
+
+        return if (updated > 0) getById(playerId) else null
+    }
+
+    // Helper functions
+
+    private fun fetchPlayerRows() = dsl
+        .select(PLAYERS.ID, PLAYERS.NAME)
+        .from(PLAYERS)
+        .fetch()
+
+    private fun getPlayerRowById(id: PlayerId) = dsl
+        .select(PLAYERS.ID, PLAYERS.NAME)
+        .from(PLAYERS)
+        .where(PLAYERS.ID.eq(id.value))
+        .fetchOne()
+
+    private fun rowToPlayerWithAccounts(row: org.jooq.Record): PlayerWithAccounts? {
+        val playerId = row[PLAYERS.ID]?.toPlayerId() ?: return null
+        val name = row[PLAYERS.NAME]?.let { PlayerName(it) } ?: return null
         val accounts = getAccountsForPlayer(playerId)
 
         return PlayerWithAccounts(
@@ -59,15 +79,6 @@ class JooqPlayerRepository(
             name = name,
             accounts = accounts
         )
-    }
-
-    override fun renamePlayer(id: PlayerId, newName: PlayerName): PlayerWithAccounts? {
-        val updatedRows = dsl.update(PLAYERS)
-            .set(PLAYERS.NAME, newName.name)
-            .where(PLAYERS.ID.eq(id.value))
-            .execute()
-
-        return if (updatedRows > 0) getById(id) else null
     }
 
     private fun getAccountsForPlayer(playerId: PlayerId): List<RiotAccount> {
@@ -83,24 +94,4 @@ class JooqPlayerRepository(
                 )
             }
     }
-
-    override fun insertAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
-        val updatedRows = dsl.update(RIOT_ACCOUNTS)
-            .set(RIOT_ACCOUNTS.PLAYER_ID, playerId.value)
-            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
-            .execute()
-
-        return if (updatedRows > 0) getById(playerId) else null
-    }
-
-    override fun removeAccount(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts? {
-        val updatedRows = dsl.update(RIOT_ACCOUNTS)
-            .set(RIOT_ACCOUNTS.PLAYER_ID, null as Int?)
-            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
-            .and(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
-            .execute()
-
-        return if (updatedRows > 0) getById(playerId) else null
-    }
-
 }
