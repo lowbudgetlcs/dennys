@@ -38,4 +38,15 @@ class JooqAccountRepositoryTest : FunSpec({
         val all = repo.getAll()
         all.any { it.riotPuuid == puuid } shouldBe true
     }
+
+    test("getAccountByPuuid returns correct account") {
+        val puuid = RiotPuuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC793")
+        val inserted = repo.insert(NewRiotAccount(puuid))
+
+        inserted.shouldNotBeNull()
+        val fetched = repo.getAccountByPuuid(puuid.value)
+
+        fetched.shouldNotBeNull()
+        fetched shouldBe inserted
+    }
 })

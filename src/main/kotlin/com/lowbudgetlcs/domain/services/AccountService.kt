@@ -32,7 +32,7 @@ class AccountService(
     fun getAllAccounts(): List<RiotAccount> = accountRepository.getAll()
 
     fun isPuuidTaken(puuid: RiotPuuid): Boolean {
-        return accountRepository.getAll().any { it.riotPuuid.value == puuid.value }
+        return accountRepository.getAccountByPuuid(puuid.value) != null
     }
 
 }
