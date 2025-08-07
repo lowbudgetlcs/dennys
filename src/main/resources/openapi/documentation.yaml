@@ -13,11 +13,17 @@ externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
 servers:
-  - url: /api
+  - url: http://localhost:9292
 
 tags:
+  - name: v1/eventGroup
+    description: Manage event groups
+
+  - name: v1/eventGroup/events
+    description: Add/remove events to event groups
+
   - name: v1/event
-    description: Manage Events (create/edit)
+    description: Manage Event
 
   - name: v1/event/teams
     description: Assign/remove teams from events
@@ -38,23 +44,243 @@ tags:
     description: Create and inspect Riot accounts
 
 paths:
+  /api/v1/eventGroup:
+    get:
+      summary: Get all event groups
+      operationId: getEventGroups
+      tags:
+        - v1/eventGroup
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventGroupDto'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a new event group
+      operationId: createEventGroup
+      tags:
+        - v1/eventGroup
+      requestBody:
+        description: Event group specification
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventGroupDto'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGroupDto'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/eventGroup/{eventGroupId}:
+    get:
+      summary: Get an event group by ID
+      operationId: getEventGroupById
+      tags:
+        - v1/eventGroup
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          description: ID of the event group to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Event group found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGroupDto'
+        '404':
+          description: Event group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      summary: Patch an event group's data
+      operationId: patchEventGroup
+      tags:
+        - v1/eventGroup
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          description: ID of the event group to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Fields to update on the event group
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchEventGroupDto'
+      responses:
+        '200':
+          description: Event group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGroupDto'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/eventGroup/{eventGroupId}/events:
+    get:
+      summary: Get an event group with all events included
+      operationId: getEventsInEventGroup
+      tags:
+        - v1/eventGroup/events
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          description: ID of the event group
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of events in the event group
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventGroupWithEventsDto'
+        '404':
+          description: Event group not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Assign an event to an event group
+      operationId: addEventToEventGroup
+      tags:
+        - v1/eventGroup/events
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGroupLinkRequestDto'
+      responses:
+        '200':
+          description: Event added to event group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGroupWithEventsDto'
+        '404':
+          description: Event group or event not found
+        '409':
+          description: |
+            Invalid resource state
+            
+            Possible reasons:
+            - Event is already assigned to another event group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/eventGroup/{eventGroupId}/events/{eventId}:
+    delete:
+      summary: Remove an event from an event group
+      operationId: removeEventFromEventGroup
+      tags:
+        - v1/eventGroup/events
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Event removed from event groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGroupWithEventsDto'
+        '404':
+          description: Event or team not found
+
   /api/v1/event:
     get:
       tags:
         - v1/event
-      summary: Get all events (optionally filter by event group)
+      summary: Get all events
       description: Fetch a list of all events.
       operationId: getEvents
-      parameters:
-        - name: eventGroupId
-          in: query
-          description: |
-            Optional event group filter:
-              - Not provided: return **all events**
-              - Provided: return events **belonging to the respective event group**
-          required: false
-          schema:
-            type: integer
       responses:
         '200':
           description: Successful operation
@@ -70,6 +296,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
     post:
       tags:
         - v1/event
@@ -179,20 +406,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventDto'
+                $ref: '#/components/schemas/Error'
         '422':
           description: Validation exception
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventDto'
+                $ref: '#/components/schemas/Error'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
 
   /api/v1/event/{eventId}/teams:
     get:
@@ -224,8 +450,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-  /api/v1/event/{eventId}/teams/{teamId}:
     post:
       summary: Assign a team to an event
       operationId: addTeamToEvent
@@ -237,11 +461,12 @@ paths:
           required: true
           schema:
             type: integer
-        - name: teamId
-          in: path
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTeamLinkRequestDto'
       responses:
         '200':
           description: Team added to event
@@ -263,6 +488,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/v1/event/{eventId}/teams/{teamId}:
     delete:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
@@ -452,9 +678,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-
-  /api/v1/team/{teamId}/players/{playerId}:
     post:
       summary: Add a player to a team
       operationId: addPlayerToTeam
@@ -466,11 +689,12 @@ paths:
           required: true
           schema:
             type: integer
-        - name: playerId
-          in: path
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamPlayerLinkRequestDto'
       responses:
         '200':
           description: Player added
@@ -480,10 +704,6 @@ paths:
                 $ref: '#/components/schemas/TeamWithPlayersDto'
         '404':
           description: Team or player not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '409':
           description: |
             Invalid resource state
@@ -495,6 +715,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+
+  /api/v1/team/{teamId}/players/{playerId}:
     delete:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
@@ -788,6 +1011,61 @@ paths:
 
 components:
   schemas:
+    CreateEventGroupDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Season 14
+
+    EventGroupDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 0
+        name:
+          type: string
+          example: Season 14
+
+    PatchEventGroupDto:
+      type: object
+      description: Fields to update on an event group
+      properties:
+        name:
+          type: string
+          example: Updated Group Name
+
+    EventGroupWithEventsDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 0
+        name:
+          type: string
+          example: Season 14
+        evemts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDto'
+
+    EventGroupLinkRequestDto:
+      type: object
+      required:
+        - eventId
+      properties:
+        eventId:
+          type: integer
+
     EventStatus:
       type: string
       enum:
@@ -938,6 +1216,14 @@ components:
           items:
             $ref: '#/components/schemas/TeamDto'
 
+    EventTeamLinkRequestDto:
+      type: object
+      required:
+        - teamId
+      properties:
+        teamId:
+          type: integer
+
 
     NewPlayerDto:
       type: object
@@ -1071,6 +1357,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PlayerDto'
+
+    TeamPlayerLinkRequestDto:
+      type: object
+      required:
+        - playerId
+      properties:
+        playerId:
+          type: integer
 
     Error:
       type: object
