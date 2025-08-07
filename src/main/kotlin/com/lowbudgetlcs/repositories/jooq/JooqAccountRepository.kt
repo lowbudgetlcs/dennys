@@ -17,9 +17,7 @@ class JooqAccountRepository(
             .fetchOne()
             ?.get(RIOT_ACCOUNTS.ID)
 
-        return insertedId?.toRiotAccountId()?.let {
-            getById(it)
-        }
+        return insertedId?.toRiotAccountId()?.let(::getById)
     }
 
     override fun getAll(): List<RiotAccount> {

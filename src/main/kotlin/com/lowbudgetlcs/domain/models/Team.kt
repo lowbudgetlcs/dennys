@@ -23,7 +23,7 @@ fun String.toTeamLogoName(): TeamLogoName = TeamLogoName(this)
 data class Team(
     val id: TeamId,
     val name: TeamName,
-    val logoName: String?,
+    val logoName: TeamLogoName?,
     val eventId: EventId?
 )
 
@@ -35,7 +35,7 @@ data class NewTeam(
 data class TeamWithPlayers(
     val id: TeamId,
     val name: TeamName,
-    val logoName: String?,
+    val logoName: TeamLogoName?,
     val eventId: EventId?,
     val players: List<Player>
 )
