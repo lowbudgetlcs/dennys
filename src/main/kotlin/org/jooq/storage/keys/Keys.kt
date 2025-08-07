@@ -22,7 +22,6 @@ import org.jooq.storage.tables.PlayerToTeams
 import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
 import org.jooq.storage.tables.RiotAccounts
-import org.jooq.storage.tables.RiotAccountsToPlayer
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.TeamToSeries
@@ -41,7 +40,6 @@ import org.jooq.storage.tables.records.PlayerToTeamsRecord
 import org.jooq.storage.tables.records.PlayerVisionRecord
 import org.jooq.storage.tables.records.PlayersRecord
 import org.jooq.storage.tables.records.RiotAccountsRecord
-import org.jooq.storage.tables.records.RiotAccountsToPlayerRecord
 import org.jooq.storage.tables.records.SeriesRecord
 import org.jooq.storage.tables.records.SeriesResultsRecord
 import org.jooq.storage.tables.records.TeamToSeriesRecord
@@ -69,7 +67,6 @@ val PLAYERS_NAME_KEY: UniqueKey<PlayersRecord> = Internal.createUniqueKey(Player
 val PLAYERS_PKEY: UniqueKey<PlayersRecord> = Internal.createUniqueKey(Players.PLAYERS, DSL.name("players_pkey"), arrayOf(Players.PLAYERS.ID), true)
 val RIOT_ACCOUNTS_PKEY: UniqueKey<RiotAccountsRecord> = Internal.createUniqueKey(RiotAccounts.RIOT_ACCOUNTS, DSL.name("riot_accounts_pkey"), arrayOf(RiotAccounts.RIOT_ACCOUNTS.ID), true)
 val RIOT_ACCOUNTS_RIOT_PUUID_KEY: UniqueKey<RiotAccountsRecord> = Internal.createUniqueKey(RiotAccounts.RIOT_ACCOUNTS, DSL.name("riot_accounts_riot_puuid_key"), arrayOf(RiotAccounts.RIOT_ACCOUNTS.RIOT_PUUID), true)
-val RIOT_ACCOUNTS_TO_PLAYER_PKEY: UniqueKey<RiotAccountsToPlayerRecord> = Internal.createUniqueKey(RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER, DSL.name("riot_accounts_to_player_pkey"), arrayOf(RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER.PLAYER_ID, RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER.RIOT_ACCOUNT_ID), true)
 val SERIES_PKEY: UniqueKey<SeriesRecord> = Internal.createUniqueKey(Series.SERIES, DSL.name("series_pkey"), arrayOf(Series.SERIES.ID), true)
 val SERIES_RESULTS_PKEY: UniqueKey<SeriesResultsRecord> = Internal.createUniqueKey(SeriesResults.SERIES_RESULTS, DSL.name("series_results_pkey"), arrayOf(SeriesResults.SERIES_RESULTS.SERIES_ID), true)
 val TEAM_TO_SERIES_PKEY: UniqueKey<TeamToSeriesRecord> = Internal.createUniqueKey(TeamToSeries.TEAM_TO_SERIES, DSL.name("team_to_series_pkey"), arrayOf(TeamToSeries.TEAM_TO_SERIES.TEAM_ID, TeamToSeries.TEAM_TO_SERIES.SERIES_ID), true)
@@ -96,9 +93,7 @@ val PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY: ForeignKey<Player
 val PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_EVENT_ID_FKEY: ForeignKey<PlayerToTeamsRecord, EventsRecord> = Internal.createForeignKey(PlayerToTeams.PLAYER_TO_TEAMS, DSL.name("player_to_teams_event_id_fkey"), arrayOf(PlayerToTeams.PLAYER_TO_TEAMS.EVENT_ID), org.jooq.storage.keys.EVENTS_PKEY, arrayOf(Events.EVENTS.ID), true)
 val PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_PLAYER_ID_FKEY: ForeignKey<PlayerToTeamsRecord, PlayersRecord> = Internal.createForeignKey(PlayerToTeams.PLAYER_TO_TEAMS, DSL.name("player_to_teams_player_id_fkey"), arrayOf(PlayerToTeams.PLAYER_TO_TEAMS.PLAYER_ID), org.jooq.storage.keys.PLAYERS_PKEY, arrayOf(Players.PLAYERS.ID), true)
 val PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_TEAM_ID_FKEY: ForeignKey<PlayerToTeamsRecord, TeamsRecord> = Internal.createForeignKey(PlayerToTeams.PLAYER_TO_TEAMS, DSL.name("player_to_teams_team_id_fkey"), arrayOf(PlayerToTeams.PLAYER_TO_TEAMS.TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
-val PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY: ForeignKey<PlayersRecord, RiotAccountsRecord> = Internal.createForeignKey(Players.PLAYERS, DSL.name("players_main_account_id_fkey"), arrayOf(Players.PLAYERS.MAIN_ACCOUNT_ID), org.jooq.storage.keys.RIOT_ACCOUNTS_PKEY, arrayOf(RiotAccounts.RIOT_ACCOUNTS.ID), true)
-val RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_PLAYER_ID_FKEY: ForeignKey<RiotAccountsToPlayerRecord, PlayersRecord> = Internal.createForeignKey(RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER, DSL.name("riot_accounts_to_player_player_id_fkey"), arrayOf(RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER.PLAYER_ID), org.jooq.storage.keys.PLAYERS_PKEY, arrayOf(Players.PLAYERS.ID), true)
-val RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY: ForeignKey<RiotAccountsToPlayerRecord, RiotAccountsRecord> = Internal.createForeignKey(RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER, DSL.name("riot_accounts_to_player_riot_account_id_fkey"), arrayOf(RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER.RIOT_ACCOUNT_ID), org.jooq.storage.keys.RIOT_ACCOUNTS_PKEY, arrayOf(RiotAccounts.RIOT_ACCOUNTS.ID), true)
+val RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY: ForeignKey<RiotAccountsRecord, PlayersRecord> = Internal.createForeignKey(RiotAccounts.RIOT_ACCOUNTS, DSL.name("riot_accounts_player_id_fkey"), arrayOf(RiotAccounts.RIOT_ACCOUNTS.PLAYER_ID), org.jooq.storage.keys.PLAYERS_PKEY, arrayOf(Players.PLAYERS.ID), true)
 val SERIES__SERIES_EVENT_ID_FKEY: ForeignKey<SeriesRecord, EventsRecord> = Internal.createForeignKey(Series.SERIES, DSL.name("series_event_id_fkey"), arrayOf(Series.SERIES.EVENT_ID), org.jooq.storage.keys.EVENTS_PKEY, arrayOf(Events.EVENTS.ID), true)
 val SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY: ForeignKey<SeriesResultsRecord, TeamsRecord> = Internal.createForeignKey(SeriesResults.SERIES_RESULTS, DSL.name("series_results_loser_team_id_fkey"), arrayOf(SeriesResults.SERIES_RESULTS.LOSER_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
 val SERIES_RESULTS__SERIES_RESULTS_SERIES_ID_FKEY: ForeignKey<SeriesResultsRecord, SeriesRecord> = Internal.createForeignKey(SeriesResults.SERIES_RESULTS, DSL.name("series_results_series_id_fkey"), arrayOf(SeriesResults.SERIES_RESULTS.SERIES_ID), org.jooq.storage.keys.SERIES_PKEY, arrayOf(Series.SERIES.ID), true)

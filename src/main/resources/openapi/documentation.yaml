@@ -343,7 +343,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
         
-
   /api/v1/event/{eventId}/teams:
     get:
       summary: Get an event with all teams included
@@ -811,13 +810,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - accountId
-              properties:
-                accountId:
-                  type: integer
-                  description: Internal database ID of the Riot account to link
+              $ref: '#/components/schemas/AccountLinkRequestDto'
       responses:
         '200':
           description: Riot account linked to player
@@ -1164,6 +1157,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RiotAccountDto'
+            
+    AccountLinkRequestDto:
+      type: object
+      required:
+        - accountId
+      properties:
+        accountId:
+          type: integer
 
     PatchPlayerDto:
       type: object

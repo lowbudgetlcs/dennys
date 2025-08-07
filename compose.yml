@@ -59,7 +59,7 @@ services:
     container_name: swagger
     image: swaggerapi/swagger-editor
     ports: 
-      - "80:8080"
+      - "127.0.0.1:80:8080"
     volumes:
       - ./docker/swaggerEditor/openapi.yaml:/spec/openapi.yaml
     environment:

@@ -23,6 +23,10 @@ open class RiotAccountsRecord() : UpdatableRecordImpl<RiotAccountsRecord>(RiotAc
         set(value): Unit = set(1, value)
         get(): String? = get(1) as String?
 
+    open var playerId: Int?
+        set(value): Unit = set(2, value)
+        get(): Int? = get(2) as Int?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -32,9 +36,10 @@ open class RiotAccountsRecord() : UpdatableRecordImpl<RiotAccountsRecord>(RiotAc
     /**
      * Create a detached, initialised RiotAccountsRecord
      */
-    constructor(id: Int? = null, riotPuuid: String? = null): this() {
+    constructor(id: Int? = null, riotPuuid: String? = null, playerId: Int? = null): this() {
         this.id = id
         this.riotPuuid = riotPuuid
+        this.playerId = playerId
         resetChangedOnNotNull()
     }
 }
