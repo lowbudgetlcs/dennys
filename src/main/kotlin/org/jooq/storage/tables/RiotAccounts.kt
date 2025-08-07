@@ -30,14 +30,12 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY
 import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_PKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_RIOT_PUUID_KEY
-import org.jooq.storage.keys.RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY
+import org.jooq.storage.keys.RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY
 import org.jooq.storage.tables.PlayerGameFacts.PlayerGameFactsPath
 import org.jooq.storage.tables.Players.PlayersPath
-import org.jooq.storage.tables.RiotAccountsToPlayer.RiotAccountsToPlayerPath
 import org.jooq.storage.tables.records.RiotAccountsRecord
 
 
@@ -88,6 +86,11 @@ open class RiotAccounts(
      */
     val RIOT_PUUID: TableField<RiotAccountsRecord, String?> = createField(DSL.name("riot_puuid"), SQLDataType.CLOB.nullable(false), this, "")
 
+    /**
+     * The column <code>dennys.riot_accounts.player_id</code>.
+     */
+    val PLAYER_ID: TableField<RiotAccountsRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER, this, "")
+
     private constructor(alias: Name, aliased: Table<RiotAccountsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<RiotAccountsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<RiotAccountsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -123,6 +126,22 @@ open class RiotAccounts(
     override fun getIdentity(): Identity<RiotAccountsRecord, Int?> = super.getIdentity() as Identity<RiotAccountsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<RiotAccountsRecord> = RIOT_ACCOUNTS_PKEY
     override fun getUniqueKeys(): List<UniqueKey<RiotAccountsRecord>> = listOf(RIOT_ACCOUNTS_RIOT_PUUID_KEY)
+    override fun getReferences(): List<ForeignKey<RiotAccountsRecord, *>> = listOf(RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY)
+
+    private lateinit var _players: PlayersPath
+
+    /**
+     * Get the implicit join path to the <code>dennys.players</code> table.
+     */
+    fun players(): PlayersPath {
+        if (!this::_players.isInitialized)
+            _players = PlayersPath(this, RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY, null)
+
+        return _players;
+    }
+
+    val players: PlayersPath
+        get(): PlayersPath = players()
 
     private lateinit var _playerGameFacts: PlayerGameFactsPath
 
@@ -139,38 +158,6 @@ open class RiotAccounts(
 
     val playerGameFacts: PlayerGameFactsPath
         get(): PlayerGameFactsPath = playerGameFacts()
-
-    private lateinit var _players: PlayersPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.players</code>
-     * table
-     */
-    fun players(): PlayersPath {
-        if (!this::_players.isInitialized)
-            _players = PlayersPath(this, null, PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY.inverseKey)
-
-        return _players;
-    }
-
-    val players: PlayersPath
-        get(): PlayersPath = players()
-
-    private lateinit var _riotAccountsToPlayer: RiotAccountsToPlayerPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.riot_accounts_to_player</code> table
-     */
-    fun riotAccountsToPlayer(): RiotAccountsToPlayerPath {
-        if (!this::_riotAccountsToPlayer.isInitialized)
-            _riotAccountsToPlayer = RiotAccountsToPlayerPath(this, null, RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_RIOT_ACCOUNT_ID_FKEY.inverseKey)
-
-        return _riotAccountsToPlayer;
-    }
-
-    val riotAccountsToPlayer: RiotAccountsToPlayerPath
-        get(): RiotAccountsToPlayerPath = riotAccountsToPlayer()
     override fun `as`(alias: String): RiotAccounts = RiotAccounts(DSL.name(alias), this)
     override fun `as`(alias: Name): RiotAccounts = RiotAccounts(alias, this)
     override fun `as`(alias: Table<*>): RiotAccounts = RiotAccounts(alias.qualifiedName, this)

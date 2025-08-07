@@ -23,10 +23,6 @@ open class PlayersRecord() : UpdatableRecordImpl<PlayersRecord>(Players.PLAYERS)
         set(value): Unit = set(1, value)
         get(): String? = get(1) as String?
 
-    open var mainAccountId: Int?
-        set(value): Unit = set(2, value)
-        get(): Int? = get(2) as Int?
-
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -36,10 +32,9 @@ open class PlayersRecord() : UpdatableRecordImpl<PlayersRecord>(Players.PLAYERS)
     /**
      * Create a detached, initialised PlayersRecord
      */
-    constructor(id: Int? = null, name: String? = null, mainAccountId: Int? = null): this() {
+    constructor(id: Int? = null, name: String? = null): this() {
         this.id = id
         this.name = name
-        this.mainAccountId = mainAccountId
         resetChangedOnNotNull()
     }
 }
