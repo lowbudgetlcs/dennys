@@ -14,13 +14,17 @@ value class TeamName(val value: String) {
     }
 }
 
+@JvmInline
+value class TeamLogoName(val value: String)
+
 fun String.toTeamName(): TeamName = TeamName(this)
+fun String.toTeamLogoName(): TeamLogoName = TeamLogoName(this)
 
 data class Team(
     val id: TeamId,
     val name: TeamName,
     val logoName: String?,
-    val eventId: EventId?,
+    val eventId: EventId?
 )
 
 data class NewTeam(
