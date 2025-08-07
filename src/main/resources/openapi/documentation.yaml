@@ -18,10 +18,10 @@ servers:
 tags:
   - name: v1/eventGroup
     description: Manage event groups
-    
-  - name: v1/eventGroup/event
+
+  - name: v1/eventGroup/events
     description: Add/remove events to event groups
-    
+
   - name: v1/event
     description: Manage Event
 
@@ -64,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'        
+                $ref: '#/components/schemas/Error'
     post:
       summary: Create a new event group
       operationId: createEventGroup
@@ -102,13 +102,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  
-  /api/v1/eventGroup/{eventGroupId}/event:
+
+  /api/v1/eventGroup/{eventGroupId}/events:
     get:
       summary: Get an event group with all events included
       operationId: getEventsInEventGroup
       tags:
-        - v1/eventGroup/event
+        - v1/eventGroup/events
       parameters:
         - name: eventGroupId
           in: path
@@ -124,7 +124,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventGroupWithEvents'
+                  $ref: '#/components/schemas/EventGroupWithEventsDto'
         '404':
           description: Event group not found
         default:
@@ -134,12 +134,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/eventGroup/{eventGroupId}/event/{eventId}:
+  /api/v1/eventGroup/{eventGroupId}/events/{eventId}:
     post:
       summary: Assign an event to an event group
       operationId: addEventToEventGroup
       tags:
-        - v1/eventGroup/event
+        - v1/eventGroup/events
       parameters:
         - name: eventGroupId
           in: path
@@ -175,7 +175,7 @@ paths:
       summary: Remove an event from an event group
       operationId: removeEventFromEventGroup
       tags:
-        - v1/eventGroup/event
+        - v1/eventGroup/events
       parameters:
         - name: eventGroupId
           in: path
@@ -196,7 +196,7 @@ paths:
                 $ref: '#/components/schemas/EventGroupWithEventsDto'
         '404':
           description: Event or team not found
-  
+
   /api/v1/event:
     get:
       tags:
@@ -219,7 +219,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                
+
     post:
       tags:
         - v1/event
@@ -342,7 +342,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        
+
   /api/v1/event/{eventId}/teams:
     get:
       summary: Get an event with all teams included
@@ -942,10 +942,10 @@ components:
       required:
         - name
       properties:
-        name: 
+        name:
           type: string
           example: Season 14
-    
+
     EventGroupDto:
       type: object
       required:
@@ -955,9 +955,26 @@ components:
         id:
           type: integer
           example: 0
-        name: 
+        name:
           type: string
           example: Season 14
+
+    EventGroupWithEventsDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 0
+        name:
+          type: string
+          example: Season 14
+        evemts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDto'
 
     EventStatus:
       type: string
@@ -1157,7 +1174,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RiotAccountDto'
-            
+
     AccountLinkRequestDto:
       type: object
       required:
