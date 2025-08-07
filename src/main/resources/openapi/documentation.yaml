@@ -517,20 +517,10 @@ paths:
 
   /api/v1/team:
     get:
-      summary: Get all teams (optionally filter by event)
+      summary: Get all teams
       operationId: getTeams
       tags:
         - v1/team
-      parameters:
-        - name: eventId
-          in: query
-          required: false
-          description: |
-            Optional event filter:
-              - Not provided: return **all teams**
-              - integer value: return teams **belonging to that event**
-          schema:
-            type: integer
       responses:
         '200':
           description: List of teams
