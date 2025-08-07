@@ -3,10 +3,13 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run db swagger refresh jooq test
+.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev
 
 # Build and run by default
 all: build run
+
+dev: build
+	docker compose up --attach dennys
 
 # Clean up the Docker image
 clean: stop
@@ -26,7 +29,7 @@ debug-build:
 
 # Run all containers
 run: 
-	docker compose up --attach dennys
+	docker compose up dennys db --attach dennys
 
 # Start database tools
 db:
