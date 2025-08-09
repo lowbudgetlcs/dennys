@@ -29,20 +29,46 @@ class JooqTeamRepository(
     }
 
     override fun getById(id: TeamId): Team? {
-        TODO("Not yet implemented")
+        return getTeamRowById(id)?.let(::rowToTeam)
     }
 
-    override fun updateTeam(id: TeamId, newName: TeamName?, newLogoName: TeamLogoName?): Team? {
-        TODO("Not yet implemented")
+    override fun updateTeamName(id: TeamId, newName: TeamName): Team? {
+        val updated = dsl.update(TEAMS)
+            .set(TEAMS.NAME, newName.value)
+            .where(TEAMS.ID.eq(id.value))
+            .execute()
+
+        return if (updated > 0) getById(id) else null
+    }
+
+    override fun updateTeamLogoName(id: TeamId, newLogoName: TeamLogoName): Team? {
+        val updated = dsl.update(TEAMS)
+            .set(TEAMS.LOGO_NAME, newLogoName.value)
+            .where(TEAMS.ID.eq(id.value))
+            .execute()
+
+        return if (updated > 0) getById(id) else null
     }
 
     override fun insertPlayerToTeam(teamId: TeamId, playerId: PlayerId): TeamWithPlayers? {
-        TODO("Not yet implemented")
+        val updated = dsl.update(PLAYERS.playerToTeams)
+            .set(PLAYERS.playerToTeams.TEAM_ID, teamId.value)
+            .where(PLAYERS.playerToTeams.PLAYER_ID.eq(playerId.value))
+            .execute()
+
+        return if (updated > 0) getByTeamWithPlayersId(teamId) else null
     }
 
     override fun removePlayer(teamId: TeamId, playerId: PlayerId): TeamWithPlayers? {
-        TODO("Not yet implemented")
+        val updated = dsl.update(PLAYERS.playerToTeams)
+            .set(PLAYERS.playerToTeams.TEAM_ID, null as Int?)
+            .where(PLAYERS.playerToTeams.PLAYER_ID.eq(playerId.value))
+            .and(PLAYERS.playerToTeams.TEAM_ID.eq(teamId.value))
+            .execute()
+
+        return if (updated > 0) getByTeamWithPlayersId(teamId) else null
     }
+
 
     // Helper functions
 
@@ -50,6 +76,16 @@ class JooqTeamRepository(
         .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_NAME)
         .from(TEAMS)
         .fetch()
+
+    private fun getTeamRowById(id: TeamId) = dsl
+        .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_NAME, TEAMS.EVENT_ID)
+        .from(TEAMS)
+        .where(TEAMS.ID.eq(id.value))
+        .fetchOne()
+
+    private fun getByTeamWithPlayersId(id: TeamId): TeamWithPlayers? {
+        return getTeamRowById(id)?.let(::rowToTeamWithPlayers)
+    }
 
     private fun rowToTeam(row: Record): Team? {
         val teamId = row[TEAMS.ID]?.toTeamId() ?: return null

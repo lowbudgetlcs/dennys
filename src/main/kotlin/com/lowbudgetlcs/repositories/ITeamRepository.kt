@@ -6,7 +6,8 @@ interface ITeamRepository {
     fun insert(newTeam: NewTeam): Team?
     fun getAll(): List<Team>
     fun getById(id: TeamId): Team?
-    fun updateTeam(id: TeamId, newName: TeamName? = null, newLogoName: TeamLogoName? = null): Team?
+    fun updateTeamName(id: TeamId, newName: TeamName): Team?
+    fun updateTeamLogoName(id: TeamId, newLogoName: TeamLogoName): Team?
 
     fun insertPlayerToTeam(teamId: TeamId, playerId: PlayerId): TeamWithPlayers?
     fun removePlayer(teamId: TeamId, playerId: PlayerId): TeamWithPlayers?
