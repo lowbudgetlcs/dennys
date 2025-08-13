@@ -13,10 +13,9 @@ data class EventDto(
     val id: Int,
     val name: String,
     val description: String,
-    val tournamentId: Int,
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,
-    val eventGroup: EventGroupDto?,
-    val status: EventStatus
+    val status: EventStatus,
+    val tournamentId: Int
 )

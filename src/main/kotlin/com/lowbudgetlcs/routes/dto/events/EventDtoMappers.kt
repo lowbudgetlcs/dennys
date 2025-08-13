@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventGroup
 import com.lowbudgetlcs.domain.models.events.EventGroupId
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.routes.dto.eventgroup.EventGroupDto
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
     name = name,
