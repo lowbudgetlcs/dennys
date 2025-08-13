@@ -19,14 +19,13 @@ fun EventGroup.toDto(): EventGroupDto = EventGroupDto(
     id = id.value, name = name
 )
 
-fun Event.toDto(group: EventGroup?): EventDto = EventDto(
+fun Event.toDto(): EventDto = EventDto(
     id = id.value,
     name = name,
     startDate = startDate,
     endDate = endDate,
     createdAt = createdAt,
     description = description,
-    tournamentId = tournamentId.value,
-    eventGroup = group?.toDto(),
     status = status,
+    tournamentId = tournamentId.value
 )

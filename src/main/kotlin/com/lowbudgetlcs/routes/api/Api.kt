@@ -10,7 +10,7 @@ import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.jooq.JooqAccountRepository
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.api.v1.account.accountRoutesV1
-import com.lowbudgetlcs.routes.api.v1.eventRoutesV1
+import com.lowbudgetlcs.routes.api.v1.event.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.player.playerRoutesV1
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
 import io.ktor.client.*

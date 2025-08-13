@@ -11,6 +11,8 @@ class EventService(
     private val eventGroupRepo: IEventGroupRepository,
     private val tournamentGateway: ITournamentGateway
 ) {
+    fun getAllEvents(): List<Event> = eventRepo.getAll()
+
     fun createEvent(event: NewEvent, tournament: NewTournament): Event? = tournamentGateway.create(tournament)?.let {
         eventRepo.insert(event, it.id)
     }
