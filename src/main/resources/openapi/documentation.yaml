@@ -341,7 +341,7 @@ paths:
     get:
       tags:
         - v1/event
-      summary: Find event by ID.
+      summary: Get an event by ID.
       description: Returns a single event with the associated teams.
       operationId: getEventById
       parameters:
@@ -377,7 +377,7 @@ paths:
     patch:
       tags:
         - v1/event
-      summary: Patch event's data
+      summary: Patch an event's data
       parameters:
         - name: eventId
           in: path
@@ -451,7 +451,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Assign a team to an event
+      summary: Link a team to an event
       operationId: addTeamToEvent
       tags:
         - v1/event/teams

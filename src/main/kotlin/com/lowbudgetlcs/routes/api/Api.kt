@@ -34,9 +34,10 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.apiRoutes() {
 
+    // Manual dependency wiring. Could be extracted to a DI framework.
     val riotHttpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
+            json()
         }
     }
     val riotAccountGateway = RiotAccountGateway(

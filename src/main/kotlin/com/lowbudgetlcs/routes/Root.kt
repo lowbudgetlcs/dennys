@@ -75,35 +75,6 @@ fun Application.routes() {
                 call.respond(code, e)
             }
         }
-        install(RequestValidation) {
-            validate<NewRiotAccountDto> { dto ->
-                when {
-                    dto.riotPuuid.isBlank() -> ValidationResult.Invalid("PUUID cannot be blank")
-                    else -> ValidationResult.Valid
-                }
-            }
-
-            validate<NewPlayerDto> { dto ->
-                when {
-                    dto.name.isBlank() -> ValidationResult.Invalid("Player name cannot be blank")
-                    else -> ValidationResult.Valid
-                }
-            }
-
-            validate<PatchPlayerDto> { dto ->
-                when {
-                    dto.name.isBlank() -> ValidationResult.Invalid("New name cannot be blank")
-                    else -> ValidationResult.Valid
-                }
-            }
-
-            validate<AccountLinkRequestDto> { dto ->
-                when {
-                    dto.accountId <= 0 -> ValidationResult.Invalid("Account ID must be greater than 0")
-                    else -> ValidationResult.Valid
-                }
-            }
-        }
         install(CORS) {
             anyHost()
             allowHeader(HttpHeaders.ContentType)

@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
 import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
+import io.ktor.server.plugins.NotFoundException
 
 class EventService(
     private val eventRepo: IEventRepository,
@@ -43,6 +44,8 @@ class EventService(
 
     fun getEventGroupById(id: EventGroupId): EventGroup? = eventGroupRepo.getById(id)
 
-    fun getEvent(id: EventId): Event? = eventRepo.getById(id)
+    fun getEvent(id: EventId): Event =
+        eventRepo.getById(id) ?: throw NoSuchElementException("Player with ${id.value} not found.")
+
     private fun isNameTaken(name: String): Boolean = eventRepo.getAll().any { it.name == name }
 }
