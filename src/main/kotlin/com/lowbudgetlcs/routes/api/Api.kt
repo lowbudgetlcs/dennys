@@ -16,6 +16,7 @@ import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.api.v1.account.accountRoutesV1
 import com.lowbudgetlcs.routes.api.v1.event.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.player.playerRoutesV1
+import com.lowbudgetlcs.routes.dto.InstantSerializer
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -27,8 +28,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Instant
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
@@ -37,7 +40,11 @@ fun Route.apiRoutes() {
     // Manual dependency wiring. Could be extracted to a DI framework.
     val riotHttpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json()
+            json(Json {
+                serializersModule = SerializersModule {
+                    contextual(Instant::class, InstantSerializer)
+                }
+            })
         }
     }
     val riotAccountGateway = RiotAccountGateway(
