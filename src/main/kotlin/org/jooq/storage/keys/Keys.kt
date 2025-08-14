@@ -51,7 +51,9 @@ import org.jooq.storage.tables.records.TeamsRecord
 // UNIQUE and PRIMARY KEY definitions
 // -------------------------------------------------------------------------
 
+val EVENT_GROUPS_NAME_KEY: UniqueKey<EventGroupsRecord> = Internal.createUniqueKey(EventGroups.EVENT_GROUPS, DSL.name("event_groups_name_key"), arrayOf(EventGroups.EVENT_GROUPS.NAME), true)
 val EVENT_GROUPS_PKEY: UniqueKey<EventGroupsRecord> = Internal.createUniqueKey(EventGroups.EVENT_GROUPS, DSL.name("event_groups_pkey"), arrayOf(EventGroups.EVENT_GROUPS.ID), true)
+val EVENTS_NAME_KEY: UniqueKey<EventsRecord> = Internal.createUniqueKey(Events.EVENTS, DSL.name("events_name_key"), arrayOf(Events.EVENTS.NAME), true)
 val EVENTS_PKEY: UniqueKey<EventsRecord> = Internal.createUniqueKey(Events.EVENTS, DSL.name("events_pkey"), arrayOf(Events.EVENTS.ID), true)
 val GAME_RESULTS_PKEY: UniqueKey<GameResultsRecord> = Internal.createUniqueKey(GameResults.GAME_RESULTS, DSL.name("game_results_pkey"), arrayOf(GameResults.GAME_RESULTS.GAME_ID), true)
 val GAMES_PKEY: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_pkey"), arrayOf(Games.GAMES.ID), true)

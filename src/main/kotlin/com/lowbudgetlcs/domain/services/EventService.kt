@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.services
 
+import com.lowbudgetlcs.domain.models.RepositoryException
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
@@ -11,8 +12,14 @@ class EventService(
     private val eventGroupRepo: IEventGroupRepository,
     private val tournamentGateway: ITournamentGateway
 ) {
-    fun createEvent(event: NewEvent, tournament: NewTournament): Event? = tournamentGateway.create(tournament)?.let {
-        eventRepo.insert(event, it.id)
+    fun getAllEvents(): List<Event> = eventRepo.getAll()
+
+    fun createEvent(event: NewEvent, tournament: NewTournament): Event {
+        if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
+        if (isNameTaken(event.name)) throw IllegalArgumentException("Event '${event.name}' already exists.")
+        val t = tournamentGateway.create(tournament)
+            ?: throw RepositoryException("Failed to register tournament with Riot Games.")
+        return eventRepo.insert(event, t.id) ?: throw RepositoryException("Failed to create event.")
     }
 
     fun createEventGroup(group: NewEventGroup): EventGroup? = eventGroupRepo.insert(group)
@@ -36,5 +43,8 @@ class EventService(
 
     fun getEventGroupById(id: EventGroupId): EventGroup? = eventGroupRepo.getById(id)
 
-    fun getEvent(id: EventId): Event? = eventRepo.getById(id)
+    fun getEvent(id: EventId): Event =
+        eventRepo.getById(id) ?: throw NoSuchElementException("Player with ${id.value} not found.")
+
+    private fun isNameTaken(name: String): Boolean = eventRepo.getAll().any { it.name == name }
 }

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.gateways
 
-import com.lowbudgetlcs.routes.dto.riot.account.AccountDto
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
+import com.lowbudgetlcs.routes.dto.riot.account.AccountDto
 
 interface IRiotAccountGateway {
 

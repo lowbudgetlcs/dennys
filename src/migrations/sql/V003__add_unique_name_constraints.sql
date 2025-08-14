@@ -1,0 +1,7 @@
+START TRANSACTION;
+SET SEARCH_PATH = dennys;
+
+ALTER TABLE event_groups ADD UNIQUE (name);
+ALTER TABLE events ADD UNIQUE (name);
+
+COMMIT;

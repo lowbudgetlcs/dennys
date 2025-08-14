@@ -28,6 +28,6 @@ fun NewEvent.toEvent(id: EventId, createdAt: Instant, tournamentId: TournamentId
     createdAt = createdAt,
     startDate = startDate,
     endDate = endDate,
-    eventGroupId = eventGroupId,
+    eventGroupId = null,
     status = status
 )

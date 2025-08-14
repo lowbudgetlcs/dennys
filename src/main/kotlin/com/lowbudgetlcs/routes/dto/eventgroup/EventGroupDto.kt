@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.routes.dto.events
+package com.lowbudgetlcs.routes.dto.eventgroup
 
 import kotlinx.serialization.Serializable
 

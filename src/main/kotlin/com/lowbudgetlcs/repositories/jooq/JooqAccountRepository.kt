@@ -3,8 +3,8 @@ package com.lowbudgetlcs.repositories.jooq
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.IAccountRepository
 import org.jooq.DSLContext
-import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 import org.jooq.Record
+import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
 class JooqAccountRepository(
     private val dsl: DSLContext
@@ -17,9 +17,7 @@ class JooqAccountRepository(
             .fetchOne()
             ?.get(RIOT_ACCOUNTS.ID)
 
-        return insertedId?.toRiotAccountId()?.let {
-            getById(it)
-        }
+        return insertedId?.toRiotAccountId()?.let(::getById)
     }
 
     override fun getAll(): List<RiotAccount> {
