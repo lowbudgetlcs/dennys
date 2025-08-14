@@ -47,6 +47,7 @@ hoplite-core = { group = "com.sksamuel.hoplite", name = "hoplite-core", version.
 # kotest
 kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
 # kotest extensions
 kotest-testcontainers = { group = "io.kotest.extensions", name = "kotest-extensions-testcontainers", version = "2.0.2" }
 # testcontainers
@@ -64,4 +65,4 @@ ktor-client-plugins = ["ktor-client-content-negotiation"]
 jooq-codegen = ["jooq-meta", "jooq-codegen"]
 database = ["jooq-core", "postgresql-core"]
 kotest-unit = ["junit-core", "kotest-runner", "kotest-assertions", "mockk-core"]
-kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]
+kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]

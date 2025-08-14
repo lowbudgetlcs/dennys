@@ -5,5 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Resource("/event")
-class EventRoutes {
-}
+class EventRoutes {}
