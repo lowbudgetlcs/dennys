@@ -6,7 +6,6 @@ import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
 import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
-import io.ktor.server.plugins.NotFoundException
 
 class EventService(
     private val eventRepo: IEventRepository,

@@ -3,10 +3,6 @@ package com.lowbudgetlcs.routes
 import com.lowbudgetlcs.domain.models.RepositoryException
 import com.lowbudgetlcs.routes.api.apiRoutes
 import com.lowbudgetlcs.routes.dto.Error
-import com.lowbudgetlcs.routes.dto.accounts.NewRiotAccountDto
-import com.lowbudgetlcs.routes.dto.players.AccountLinkRequestDto
-import com.lowbudgetlcs.routes.dto.players.NewPlayerDto
-import com.lowbudgetlcs.routes.dto.players.PatchPlayerDto
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.application.*

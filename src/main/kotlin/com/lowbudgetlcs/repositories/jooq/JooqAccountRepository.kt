@@ -3,8 +3,8 @@ package com.lowbudgetlcs.repositories.jooq
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.IAccountRepository
 import org.jooq.DSLContext
-import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 import org.jooq.Record
+import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
 class JooqAccountRepository(
     private val dsl: DSLContext

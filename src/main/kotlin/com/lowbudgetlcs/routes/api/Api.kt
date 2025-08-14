@@ -20,7 +20,7 @@ import com.lowbudgetlcs.routes.dto.InstantSerializer
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

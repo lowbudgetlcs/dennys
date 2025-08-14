@@ -1,11 +1,9 @@
 package com.lowbudgetlcs.routes.dto.events
 
 import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.routes.dto.InstantSerializer
 import com.lowbudgetlcs.routes.dto.teams.TeamDto
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import java.time.Instant
 
 @Serializable

@@ -2,7 +2,6 @@ package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.repositories.ITeamRepository
 import org.jooq.DSLContext
 import org.jooq.Record
