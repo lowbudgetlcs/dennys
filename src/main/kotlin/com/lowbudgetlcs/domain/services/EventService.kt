@@ -29,10 +29,11 @@ class EventService(
 
     fun patchEvent(id: EventId, update: EventUpdate): Event {
         val event = getEvent(id)
+        update.name?.let { if (isNameTaken(it)) throw IllegalArgumentException("Event '${event.name}' already exists.") }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
-        return eventRepo.update(event) ?: throw RepositoryException("Failed to update event.")
+        return eventRepo.update(event.patch(update)) ?: throw RepositoryException("Failed to update event.")
     }
 
     fun createEventGroup(group: NewEventGroup): EventGroup? = eventGroupRepo.insert(group)

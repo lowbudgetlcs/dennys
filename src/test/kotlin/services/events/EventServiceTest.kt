@@ -1,15 +1,6 @@
 package services.events
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventGroup
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.NewEventGroup
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventGroup
-import com.lowbudgetlcs.domain.models.events.toEventGroupId
-import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.tournament.Tournament
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
@@ -22,7 +13,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
 import io.mockk.mockk
 import java.time.Instant
@@ -77,34 +67,12 @@ class EventServiceTest : FunSpec({
         fetched shouldBe e
     }
 
-    test("Fetching event that doesn't exist returns null") {
-        every {
-            tournamentGate.create(newTournament)
-        } returns Tournament(
-            id = 9999.toTournamentId(), name = "Test"
-        )
-        every { eventRepo.insert(newEvent, 9999.toTournamentId()) } returns expectedEvent
-        every { eventRepo.getAll() } returns listOf()
-        val e = service.createEvent(newEvent, newTournament)
-        e.shouldNotBeNull()
-        val fetched = service.getEvent((expectedEvent.id.value + 1).toEventId())
-        fetched shouldBe null
+    test("Fetching event that doesn't exist throws NoSuchElementException") {
+        every { eventRepo.getById(expectedEvent.id) } returns null
+        shouldThrow<NoSuchElementException> {
+            service.getEvent(expectedEvent.id)
+        }
     }
-
-    test("Fetching negative returns null") {
-        every {
-            tournamentGate.create(newTournament)
-        } returns Tournament(
-            id = 9999.toTournamentId(), name = "Test"
-        )
-        every { eventRepo.insert(newEvent, 9999.toTournamentId()) } returns expectedEvent
-        every { eventRepo.getAll() } returns listOf(expectedEvent)
-        val e = service.createEvent(newEvent, newTournament)
-        e.shouldNotBeNull()
-        val fetched = service.getEvent((-1).toEventId())
-        fetched shouldBe null
-    }
-
 
     xtest("createEventGroup() returns valid group") {
         every { eventGroupRepo.insert(newGroup1) } returns newGroup1.toEventGroup(1.toEventGroupId())

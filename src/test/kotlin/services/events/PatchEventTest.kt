@@ -3,6 +3,7 @@ package services.events
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.patch
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.domain.services.EventService
@@ -20,7 +21,8 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class PatchEventTest : FunSpec({
-    val service = EventService(mockk<IEventRepository>(), mockk<IEventGroupRepository>(), mockk<ITournamentGateway>())
+    val eventRepo = mockk<IEventRepository>()
+    val service = EventService(eventRepo, mockk<IEventGroupRepository>(), mockk<ITournamentGateway>())
     val start = Instant.now()
     val end = start.plusSeconds(40_000L)
     val expectedEvent = Event(
@@ -36,24 +38,32 @@ class PatchEventTest : FunSpec({
     )
 
     beforeTest {
-        every { service.getEvent(expectedEvent.id) } returns expectedEvent
+        every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
     }
 
     /* service.patchEvent() */
     test("patchEvent() throws exception when event id not found") {
-        every { service.getEvent(expectedEvent.id) } throws NoSuchElementException("Event not found.")
+        every { eventRepo.getById(expectedEvent.id) } returns null
         shouldThrow<NoSuchElementException> {
             service.patchEvent(expectedEvent.id, EventUpdate())
         }
     }
+
     test("patchEvent() does nothing when update is empty") {
+        every { eventRepo.update(expectedEvent) } returns expectedEvent
+
         val event = service.patchEvent(expectedEvent.id, EventUpdate())
         event shouldBe expectedEvent
     }
 
     test("patchEvent() updates name field") {
         val name = "ABCDEFG"
-        val event = service.patchEvent(expectedEvent.id, EventUpdate(name = name))
+        val update = EventUpdate(name = name)
+        val patched = expectedEvent.patch(update)
+        every { eventRepo.getAll() } returns listOf(expectedEvent)
+        every { eventRepo.update(patched) } returns patched
+
+        val event = service.patchEvent(expectedEvent.id, update)
         event.name shouldBe name
         event.shouldBeEqualToIgnoringFields(expectedEvent, Event::name)
         event.name shouldNotBe expectedEvent.name
@@ -61,6 +71,10 @@ class PatchEventTest : FunSpec({
 
     test("patchEvent() updates description field") {
         val description = "ABCDEFG"
+        val update = EventUpdate(description = description)
+        val patched = expectedEvent.patch(update)
+        every { eventRepo.update(patched) } returns patched
+
         val event = service.patchEvent(expectedEvent.id, EventUpdate(description = description))
         event.description shouldBe description
         event.shouldBeEqualToIgnoringFields(expectedEvent, Event::description)
@@ -69,6 +83,10 @@ class PatchEventTest : FunSpec({
 
     test("patchEvent() updates startDate field") {
         val startDate = Instant.now()
+        val update = EventUpdate(startDate = startDate)
+        val patched = expectedEvent.patch(update)
+        every { eventRepo.update(patched) } returns patched
+
         val event = service.patchEvent(expectedEvent.id, EventUpdate(startDate = startDate))
         event.startDate shouldBe startDate
         event.shouldBeEqualToIgnoringFields(expectedEvent, Event::startDate)
@@ -77,6 +95,10 @@ class PatchEventTest : FunSpec({
 
     test("patchEvent() updates endDate field") {
         val endDate = Instant.now()
+        val update = EventUpdate(endDate = endDate)
+        val patched = expectedEvent.patch(update)
+        every { eventRepo.update(patched) } returns patched
+
         val event = service.patchEvent(expectedEvent.id, EventUpdate(endDate = endDate))
         event.endDate shouldBe endDate
         event.shouldBeEqualToIgnoringFields(expectedEvent, Event::endDate)
@@ -85,6 +107,10 @@ class PatchEventTest : FunSpec({
 
     test("patchEvent() updates status field") {
         val status = EventStatus.CANCELED
+        val update = EventUpdate(status = status)
+        val patched = expectedEvent.patch(update)
+        every { eventRepo.update(patched) } returns patched
+
         val event = service.patchEvent(expectedEvent.id, EventUpdate(status = status))
         event.status shouldBe status
         event.shouldBeEqualToIgnoringFields(expectedEvent, Event::status)
@@ -96,6 +122,12 @@ class PatchEventTest : FunSpec({
             service.patchEvent(
                 expectedEvent.id, EventUpdate(endDate = expectedEvent.startDate, startDate = expectedEvent.endDate)
             )
+        }
+    }
+    test("patchEvent() throws exception when name is taken") {
+        every { eventRepo.getAll() } returns listOf(expectedEvent)
+        shouldThrow<IllegalArgumentException> {
+            service.patchEvent(expectedEvent.id, EventUpdate(name = expectedEvent.name))
         }
     }
 })
