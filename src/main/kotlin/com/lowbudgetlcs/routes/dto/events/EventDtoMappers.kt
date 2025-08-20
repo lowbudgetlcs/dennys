@@ -2,15 +2,16 @@ package com.lowbudgetlcs.routes.dto.events
 
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventGroup
+import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.routes.dto.eventgroup.EventGroupDto
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
-    name = name,
-    description = description,
-    startDate = startDate,
-    endDate = endDate,
-    status = status
+    name = name, description = description, startDate = startDate, endDate = endDate, status = status
+)
+
+fun PatchEventDto.toEventUpdate(): EventUpdate = EventUpdate(
+    name = name, description = description, startDate = startDate, endDate = endDate, status = status
 )
 
 fun EventGroup.toDto(): EventGroupDto = EventGroupDto(

@@ -25,6 +25,14 @@ data class Event(
     val status: EventStatus
 )
 
+data class EventUpdate (
+    val name: String?,
+    val description: String?,
+    val startDate: Instant?,
+    val endDate: Instant?,
+    val status: EventStatus?
+)
+
 data class EventWithTeams(
     val id: EventId,
     val name: String,

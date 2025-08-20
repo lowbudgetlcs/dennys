@@ -22,6 +22,10 @@ class EventService(
         return eventRepo.insert(event, t.id) ?: throw RepositoryException("Failed to create event.")
     }
 
+    fun patchEvent(id: EventId, event: EventUpdate): Event {
+
+    }
+
     fun createEventGroup(group: NewEventGroup): EventGroup? = eventGroupRepo.insert(group)
 
     fun getEventsWithGroups(): List<EventWithGroup> {
