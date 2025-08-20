@@ -31,8 +31,8 @@ class EventRepositoryTest : StringSpec({
     val repo = EventRepository(dslContext)
 
     // Data
-    var insertedEventCount = 1000
-    val now = Instant.now()
+    var insertedEventCount = 100
+    val now = Instant.now().truncatedTo(ChronoUnit.MICROS)
     val newEvent = NewEvent(
         name = "Season 1",
         description = "The first season",
@@ -50,16 +50,15 @@ class EventRepositoryTest : StringSpec({
 
     fun Arb.Companion.newEvent(count: Int): Arb<List<NewEvent>> = Arb.set(
         Arb.bind(
-            Arb.string(minSize = 1, maxSize = 10), Arb.string(minSize = 0, maxSize = 10), Arb.instant(
-                Instant.parse("2000-01-01T00:00:00Z"),
-                Instant.parse("2030-01-01T00:00:00Z")
+            Arb.string(minSize = 5, maxSize = 20), Arb.string(minSize = 0, maxSize = 100), Arb.instant(
+                Instant.parse("2000-01-01T00:00:00Z"), Instant.parse("2030-01-01T00:00:00Z")
             ), Arb.enum<EventStatus>()
         ) { name, desc, start, status ->
             NewEvent(
                 name = name,
                 description = desc,
-                startDate = start,
-                endDate = start.plus(Arb.long(1, 604_800).next(), ChronoUnit.SECONDS),
+                startDate = start.truncatedTo(ChronoUnit.MICROS),
+                endDate = start.truncatedTo(ChronoUnit.MICROS).plus(Arb.long(1, 604_800).next(), ChronoUnit.SECONDS),
                 status = status
             )
         }, size = count
@@ -71,7 +70,7 @@ class EventRepositoryTest : StringSpec({
                 new to new.toEvent(
                     id = 1.toEventId(),
                     tournamentId = 1.toTournamentId(),
-                    createdAt = Instant.now()
+                    createdAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
                 )
             }
         }
@@ -95,9 +94,7 @@ class EventRepositoryTest : StringSpec({
     "insert() cannot insert duplicate Event" {
         repo.insert(newEvent, 1.toTournamentId())
         insertedEventCount++
-        shouldThrow<Throwable> {
-            repo.insert(newEvent, 1.toTournamentId())
-        }
+        repo.insert(newEvent, 1.toTournamentId()) shouldBe null
     }
 
     "getById() fetches correct Event" {

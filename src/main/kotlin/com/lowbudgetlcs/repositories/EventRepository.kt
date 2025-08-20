@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import org.jooq.DSLContext
 import org.jooq.Record
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.storage.tables.references.EVENTS
 
 class EventRepository(private val dsl: DSLContext) : IEventRepository {
@@ -17,14 +18,17 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
     override fun getById(id: EventId): Event? =
         selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne()?.let(::rowToEvent)
 
-    override fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event? {
+    override fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event? = try {
         val insertedId = dsl.insertInto(
             EVENTS
         ).set(EVENTS.NAME, newEvent.name).set(EVENTS.DESCRIPTION, newEvent.description)
             .set(EVENTS.RIOT_TOURNAMENT_ID, tournamentId.value).set(EVENTS.START_DATE, newEvent.startDate)
             .set(EVENTS.END_DATE, newEvent.endDate).set(EVENTS.STATUS, newEvent.status.name).returning(EVENTS.ID)
             .fetchOne()?.get(EVENTS.ID)
-        return insertedId?.toEventId()?.let(::getById)
+        insertedId?.toEventId()?.let(::getById)
+    } catch (e: IntegrityConstraintViolationException) {
+        println(e.message)
+        null
     }
 
     override fun update(event: Event): Event? {
