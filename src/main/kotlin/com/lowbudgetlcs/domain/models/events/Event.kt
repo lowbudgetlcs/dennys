@@ -25,12 +25,20 @@ data class Event(
     val status: EventStatus
 )
 
-data class EventUpdate (
-    val name: String?,
-    val description: String?,
-    val startDate: Instant?,
-    val endDate: Instant?,
-    val status: EventStatus?
+data class EventUpdate(
+    val name: String? = null,
+    val description: String? = null,
+    val startDate: Instant? = null,
+    val endDate: Instant? = null,
+    val status: EventStatus? = null
+)
+
+fun Event.patch(update: EventUpdate): Event = copy(
+    name = update.name ?: this.name,
+    description = update.description ?: this.description,
+    startDate = update.startDate ?: this.startDate,
+    endDate = update.endDate ?: this.endDate,
+    status = update.status ?: this.status,
 )
 
 data class EventWithTeams(

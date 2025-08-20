@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
 import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
+import java.time.Instant
 
 class EventService(
     private val eventRepo: IEventRepository,
@@ -14,16 +15,24 @@ class EventService(
 ) {
     fun getAllEvents(): List<Event> = eventRepo.getAll()
 
+    fun getEvent(id: EventId): Event =
+        eventRepo.getById(id) ?: throw NoSuchElementException("Player with ${id.value} not found.")
+
     fun createEvent(event: NewEvent, tournament: NewTournament): Event {
         if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
         if (isNameTaken(event.name)) throw IllegalArgumentException("Event '${event.name}' already exists.")
+        if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
         val t = tournamentGateway.create(tournament)
             ?: throw RepositoryException("Failed to register tournament with Riot Games.")
         return eventRepo.insert(event, t.id) ?: throw RepositoryException("Failed to create event.")
     }
 
-    fun patchEvent(id: EventId, event: EventUpdate): Event {
-
+    fun patchEvent(id: EventId, update: EventUpdate): Event {
+        val event = getEvent(id)
+        val start = update.startDate ?: event.startDate
+        val end = update.endDate ?: event.endDate
+        if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
+        return eventRepo.update(event) ?: throw RepositoryException("Failed to update event.")
     }
 
     fun createEventGroup(group: NewEventGroup): EventGroup? = eventGroupRepo.insert(group)
@@ -46,9 +55,6 @@ class EventService(
     fun getEventGroups(): List<EventGroup> = eventGroupRepo.getAll()
 
     fun getEventGroupById(id: EventGroupId): EventGroup? = eventGroupRepo.getById(id)
-
-    fun getEvent(id: EventId): Event =
-        eventRepo.getById(id) ?: throw NoSuchElementException("Player with ${id.value} not found.")
 
     private fun isNameTaken(name: String): Boolean = eventRepo.getAll().any { it.name == name }
 }

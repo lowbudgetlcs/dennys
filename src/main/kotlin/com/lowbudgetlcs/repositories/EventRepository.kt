@@ -27,6 +27,13 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
         return insertedId?.toEventId()?.let(::getById)
     }
 
+    override fun update(event: Event): Event? {
+        val insertedId = dsl.update(EVENTS).set(EVENTS.NAME, event.name).set(EVENTS.DESCRIPTION, event.description)
+            .set(EVENTS.START_DATE, event.startDate).set(EVENTS.END_DATE, event.endDate)
+            .set(EVENTS.STATUS, event.status.name).returning(EVENTS.ID).fetchOne()?.get(EVENTS.ID)
+        return insertedId?.toEventId()?.let(::getById)
+    }
+
 
     private fun selectEvents() = dsl.select(
         EVENTS.ID,
