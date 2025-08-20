@@ -25,7 +25,7 @@ class PatchEventTest : FunSpec({
     val service = EventService(eventRepo, mockk<IEventGroupRepository>(), mockk<ITournamentGateway>())
     val start = Instant.now()
     val end = start.plusSeconds(40_000L)
-    val expectedEvent = Event(
+    val testEvent = Event(
         id = 0.toEventId(),
         createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
         tournamentId = 9999.toTournamentId(),
@@ -38,96 +38,96 @@ class PatchEventTest : FunSpec({
     )
 
     beforeTest {
-        every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
+        every { eventRepo.getById(testEvent.id) } returns testEvent
     }
 
     /* service.patchEvent() */
     test("patchEvent() throws exception when event id not found") {
-        every { eventRepo.getById(expectedEvent.id) } returns null
+        every { eventRepo.getById(testEvent.id) } returns null
         shouldThrow<NoSuchElementException> {
-            service.patchEvent(expectedEvent.id, EventUpdate())
+            service.patchEvent(testEvent.id, EventUpdate())
         }
     }
 
     test("patchEvent() does nothing when update is empty") {
-        every { eventRepo.update(expectedEvent) } returns expectedEvent
+        every { eventRepo.update(testEvent) } returns testEvent
 
-        val event = service.patchEvent(expectedEvent.id, EventUpdate())
-        event shouldBe expectedEvent
+        val event = service.patchEvent(testEvent.id, EventUpdate())
+        event shouldBe testEvent
     }
 
     test("patchEvent() updates name field") {
         val name = "ABCDEFG"
         val update = EventUpdate(name = name)
-        val patched = expectedEvent.patch(update)
-        every { eventRepo.getAll() } returns listOf(expectedEvent)
+        val patched = testEvent.patch(update)
+        every { eventRepo.getAll() } returns listOf(testEvent)
         every { eventRepo.update(patched) } returns patched
 
-        val event = service.patchEvent(expectedEvent.id, update)
+        val event = service.patchEvent(testEvent.id, update)
         event.name shouldBe name
-        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::name)
-        event.name shouldNotBe expectedEvent.name
+        event.shouldBeEqualToIgnoringFields(testEvent, Event::name)
+        event.name shouldNotBe testEvent.name
     }
 
     test("patchEvent() updates description field") {
         val description = "ABCDEFG"
         val update = EventUpdate(description = description)
-        val patched = expectedEvent.patch(update)
+        val patched = testEvent.patch(update)
         every { eventRepo.update(patched) } returns patched
 
-        val event = service.patchEvent(expectedEvent.id, EventUpdate(description = description))
+        val event = service.patchEvent(testEvent.id, EventUpdate(description = description))
         event.description shouldBe description
-        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::description)
-        event.description shouldNotBe expectedEvent.description
+        event.shouldBeEqualToIgnoringFields(testEvent, Event::description)
+        event.description shouldNotBe testEvent.description
     }
 
     test("patchEvent() updates startDate field") {
         val startDate = Instant.now()
         val update = EventUpdate(startDate = startDate)
-        val patched = expectedEvent.patch(update)
+        val patched = testEvent.patch(update)
         every { eventRepo.update(patched) } returns patched
 
-        val event = service.patchEvent(expectedEvent.id, EventUpdate(startDate = startDate))
+        val event = service.patchEvent(testEvent.id, EventUpdate(startDate = startDate))
         event.startDate shouldBe startDate
-        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::startDate)
-        event.startDate shouldNotBe expectedEvent.startDate
+        event.shouldBeEqualToIgnoringFields(testEvent, Event::startDate)
+        event.startDate shouldNotBe testEvent.startDate
     }
 
     test("patchEvent() updates endDate field") {
         val endDate = Instant.now()
         val update = EventUpdate(endDate = endDate)
-        val patched = expectedEvent.patch(update)
+        val patched = testEvent.patch(update)
         every { eventRepo.update(patched) } returns patched
 
-        val event = service.patchEvent(expectedEvent.id, EventUpdate(endDate = endDate))
+        val event = service.patchEvent(testEvent.id, EventUpdate(endDate = endDate))
         event.endDate shouldBe endDate
-        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::endDate)
-        event.endDate shouldNotBe expectedEvent.endDate
+        event.shouldBeEqualToIgnoringFields(testEvent, Event::endDate)
+        event.endDate shouldNotBe testEvent.endDate
     }
 
     test("patchEvent() updates status field") {
         val status = EventStatus.CANCELED
         val update = EventUpdate(status = status)
-        val patched = expectedEvent.patch(update)
+        val patched = testEvent.patch(update)
         every { eventRepo.update(patched) } returns patched
 
-        val event = service.patchEvent(expectedEvent.id, EventUpdate(status = status))
+        val event = service.patchEvent(testEvent.id, EventUpdate(status = status))
         event.status shouldBe status
-        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::status)
-        event.status shouldNotBe expectedEvent.status
+        event.shouldBeEqualToIgnoringFields(testEvent, Event::status)
+        event.status shouldNotBe testEvent.status
     }
 
     test("patchEvent() cannot invalidate start and end dates.") {
         shouldThrow<IllegalArgumentException> {
             service.patchEvent(
-                expectedEvent.id, EventUpdate(endDate = expectedEvent.startDate, startDate = expectedEvent.endDate)
+                testEvent.id, EventUpdate(endDate = testEvent.startDate, startDate = testEvent.endDate)
             )
         }
     }
     test("patchEvent() throws exception when name is taken") {
-        every { eventRepo.getAll() } returns listOf(expectedEvent)
+        every { eventRepo.getAll() } returns listOf(testEvent)
         shouldThrow<IllegalArgumentException> {
-            service.patchEvent(expectedEvent.id, EventUpdate(name = expectedEvent.name))
+            service.patchEvent(testEvent.id, EventUpdate(name = testEvent.name))
         }
     }
 })
