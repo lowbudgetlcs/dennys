@@ -367,6 +367,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         '404':
           description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -444,6 +448,10 @@ paths:
                   $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -476,6 +484,10 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         '409':
           description: |
             Invalid resource state
@@ -514,6 +526,10 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/v1/team:
     get:
