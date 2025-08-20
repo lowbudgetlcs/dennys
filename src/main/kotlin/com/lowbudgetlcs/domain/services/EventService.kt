@@ -16,7 +16,7 @@ class EventService(
     fun getAllEvents(): List<Event> = eventRepo.getAll()
 
     fun getEvent(id: EventId): Event =
-        eventRepo.getById(id) ?: throw NoSuchElementException("Player with ${id.value} not found.")
+        eventRepo.getById(id) ?: throw NoSuchElementException("Event with ${id.value} not found.")
 
     fun createEvent(event: NewEvent, tournament: NewTournament): Event {
         if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
@@ -29,7 +29,7 @@ class EventService(
 
     fun patchEvent(id: EventId, update: EventUpdate): Event {
         val event = getEvent(id)
-        update.name?.let { if (isNameTaken(it)) throw IllegalArgumentException("Event '${event.name}' already exists.") }
+        update.name?.let { if (isNameTaken(it)) throw IllegalArgumentException("Event '${update.name}' already exists.") }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
