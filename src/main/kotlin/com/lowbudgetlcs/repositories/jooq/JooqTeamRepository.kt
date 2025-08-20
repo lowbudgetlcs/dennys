@@ -51,19 +51,19 @@ class JooqTeamRepository(
     }
 
     override fun insertPlayerToTeam(teamId: TeamId, playerId: PlayerId): TeamWithPlayers? {
-        val updated = dsl.update(PLAYERS.playerToTeams)
-            .set(PLAYERS.playerToTeams.TEAM_ID, teamId.value)
-            .where(PLAYERS.playerToTeams.PLAYER_ID.eq(playerId.value))
+        val updated = dsl.update(PLAYERS.playersToTeam)
+            .set(PLAYERS.playersToTeam.TEAM_ID, teamId.value)
+            .where(PLAYERS.playersToTeam.PLAYER_ID.eq(playerId.value))
             .execute()
 
         return if (updated > 0) getByTeamWithPlayersId(teamId) else null
     }
 
     override fun removePlayer(teamId: TeamId, playerId: PlayerId): TeamWithPlayers? {
-        val updated = dsl.update(PLAYERS.playerToTeams)
-            .set(PLAYERS.playerToTeams.TEAM_ID, null as Int?)
-            .where(PLAYERS.playerToTeams.PLAYER_ID.eq(playerId.value))
-            .and(PLAYERS.playerToTeams.TEAM_ID.eq(teamId.value))
+        val updated = dsl.update(PLAYERS.playersToTeam)
+            .set(PLAYERS.playersToTeam.TEAM_ID, null as Int?)
+            .where(PLAYERS.playersToTeam.PLAYER_ID.eq(playerId.value))
+            .and(PLAYERS.playersToTeam.TEAM_ID.eq(teamId.value))
             .execute()
 
         return if (updated > 0) getByTeamWithPlayersId(teamId) else null
@@ -120,7 +120,7 @@ class JooqTeamRepository(
     private fun getPlayersForTeam(teamId: TeamId): List<Player> {
         return dsl.select(PLAYERS.ID, PLAYERS.NAME)
             .from(PLAYERS)
-            .where(PLAYERS.playerToTeams.TEAM_ID.eq(teamId.value))
+            .where(PLAYERS.playersToTeam.TEAM_ID.eq(teamId.value))
             .fetch()
             .map {
                 Player(

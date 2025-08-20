@@ -20,9 +20,10 @@ import org.jooq.storage.tables.PlayerFarming
 import org.jooq.storage.tables.PlayerGameFacts
 import org.jooq.storage.tables.PlayerInventories
 import org.jooq.storage.tables.PlayerPings
-import org.jooq.storage.tables.PlayerToTeams
 import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
+import org.jooq.storage.tables.PlayersToEvent
+import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
@@ -99,11 +100,6 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val PLAYER_PINGS: PlayerPings get() = PlayerPings.PLAYER_PINGS
 
     /**
-     * The table <code>dennys.player_to_teams</code>.
-     */
-    val PLAYER_TO_TEAMS: PlayerToTeams get() = PlayerToTeams.PLAYER_TO_TEAMS
-
-    /**
      * The table <code>dennys.player_vision</code>.
      */
     val PLAYER_VISION: PlayerVision get() = PlayerVision.PLAYER_VISION
@@ -112,6 +108,16 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      * The table <code>dennys.players</code>.
      */
     val PLAYERS: Players get() = Players.PLAYERS
+
+    /**
+     * The table <code>dennys.players_to_event</code>.
+     */
+    val PLAYERS_TO_EVENT: PlayersToEvent get() = PlayersToEvent.PLAYERS_TO_EVENT
+
+    /**
+     * The table <code>dennys.players_to_team</code>.
+     */
+    val PLAYERS_TO_TEAM: PlayersToTeam get() = PlayersToTeam.PLAYERS_TO_TEAM
 
     /**
      * The table <code>dennys.riot_accounts</code>.
@@ -152,9 +158,10 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         PlayerGameFacts.PLAYER_GAME_FACTS,
         PlayerInventories.PLAYER_INVENTORIES,
         PlayerPings.PLAYER_PINGS,
-        PlayerToTeams.PLAYER_TO_TEAMS,
         PlayerVision.PLAYER_VISION,
         Players.PLAYERS,
+        PlayersToEvent.PLAYERS_TO_EVENT,
+        PlayersToTeam.PLAYERS_TO_TEAM,
         RiotAccounts.RIOT_ACCOUNTS,
         Series.SERIES,
         SeriesResults.SERIES_RESULTS,

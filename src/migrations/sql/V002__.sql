@@ -42,5 +42,6 @@ CREATE TABLE IF NOT EXISTS players_to_event (
   CONSTRAINT players_to_event_unique UNIQUE (player_id, event_id)
 );
 
+DROP TABLE IF EXISTS player_to_teams;
 
 COMMIT;

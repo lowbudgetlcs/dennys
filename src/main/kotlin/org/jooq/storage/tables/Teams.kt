@@ -34,7 +34,7 @@ import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_LOSER_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_WINNER_TEAM_ID_FKEY
-import org.jooq.storage.keys.PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_TEAM_ID_FKEY
+import org.jooq.storage.keys.PLAYERS_TO_TEAM__PLAYERS_TO_TEAM_TEAM_FKEY
 import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY
 import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_WINNER_TEAM_ID_FKEY
 import org.jooq.storage.keys.TEAMS_PKEY
@@ -43,7 +43,8 @@ import org.jooq.storage.keys.TEAM_TO_SERIES__TEAM_TO_SERIES_TEAM_ID_FKEY
 import org.jooq.storage.tables.Events.EventsPath
 import org.jooq.storage.tables.GameResults.GameResultsPath
 import org.jooq.storage.tables.Games.GamesPath
-import org.jooq.storage.tables.PlayerToTeams.PlayerToTeamsPath
+import org.jooq.storage.tables.Players.PlayersPath
+import org.jooq.storage.tables.PlayersToTeam.PlayersToTeamPath
 import org.jooq.storage.tables.Series.SeriesPath
 import org.jooq.storage.tables.SeriesResults.SeriesResultsPath
 import org.jooq.storage.tables.TeamToSeries.TeamToSeriesPath
@@ -224,21 +225,21 @@ open class Teams(
     val gamesRedTeamIdFkey: GamesPath
         get(): GamesPath = gamesRedTeamIdFkey()
 
-    private lateinit var _playerToTeams: PlayerToTeamsPath
+    private lateinit var _playersToTeam: PlayersToTeamPath
 
     /**
      * Get the implicit to-many join path to the
-     * <code>dennys.player_to_teams</code> table
+     * <code>dennys.players_to_team</code> table
      */
-    fun playerToTeams(): PlayerToTeamsPath {
-        if (!this::_playerToTeams.isInitialized)
-            _playerToTeams = PlayerToTeamsPath(this, null, PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_TEAM_ID_FKEY.inverseKey)
+    fun playersToTeam(): PlayersToTeamPath {
+        if (!this::_playersToTeam.isInitialized)
+            _playersToTeam = PlayersToTeamPath(this, null, PLAYERS_TO_TEAM__PLAYERS_TO_TEAM_TEAM_FKEY.inverseKey)
 
-        return _playerToTeams;
+        return _playersToTeam;
     }
 
-    val playerToTeams: PlayerToTeamsPath
-        get(): PlayerToTeamsPath = playerToTeams()
+    val playersToTeam: PlayersToTeamPath
+        get(): PlayersToTeamPath = playersToTeam()
 
     private lateinit var _seriesResultsLoserTeamIdFkey: SeriesResultsPath
 
@@ -289,6 +290,13 @@ open class Teams(
 
     val teamToSeries: TeamToSeriesPath
         get(): TeamToSeriesPath = teamToSeries()
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>dennys.players</code> table
+     */
+    val players: PlayersPath
+        get(): PlayersPath = playersToTeam().players()
 
     /**
      * Get the implicit many-to-many join path to the <code>dennys.series</code>
