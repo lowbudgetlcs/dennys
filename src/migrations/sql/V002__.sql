@@ -16,10 +16,12 @@ CREATE TABLE IF NOT EXISTS players_to_team (
   team_id    INTEGER NOT NULL,
 
   CONSTRAINT players_to_team_player_fkey
-    FOREIGN KEY (player_id) REFERENCES players(id),
+    FOREIGN KEY (player_id) REFERENCES players(id)
+    ON UPDATE NO ACTION ON DELETE CASCADE,
 
   CONSTRAINT players_to_team_team_fkey
-    FOREIGN KEY (team_id) REFERENCES teams(id),
+    FOREIGN KEY (team_id) REFERENCES teams(id)
+    ON UPDATE NO ACTION ON DELETE CASCADE,
 
   CONSTRAINT players_to_team_unique UNIQUE (player_id, team_id)
 );
@@ -30,10 +32,12 @@ CREATE TABLE IF NOT EXISTS players_to_event (
   event_id   INTEGER NOT NULL,
 
   CONSTRAINT players_to_event_player_fkey
-    FOREIGN KEY (player_id) REFERENCES players(id),
+    FOREIGN KEY (player_id) REFERENCES players(id)
+    ON UPDATE NO ACTION ON DELETE CASCADE,
 
   CONSTRAINT players_to_event_event_fkey
-    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (event_id) REFERENCES events(id)
+    ON UPDATE NO ACTION ON DELETE CASCADE,
 
   CONSTRAINT players_to_event_unique UNIQUE (player_id, event_id)
 );
