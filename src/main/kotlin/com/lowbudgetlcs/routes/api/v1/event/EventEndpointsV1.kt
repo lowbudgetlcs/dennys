@@ -3,17 +3,13 @@ package com.lowbudgetlcs.routes.api.v1.event
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.routes.dto.events.CreateEventDto
-import com.lowbudgetlcs.routes.dto.events.PatchEventDto
-import com.lowbudgetlcs.routes.dto.events.toDto
-import com.lowbudgetlcs.routes.dto.events.toEventUpdate
-import com.lowbudgetlcs.routes.dto.events.toNewEvent
+import com.lowbudgetlcs.routes.dto.events.*
 import io.ktor.http.*
 import io.ktor.server.application.Application
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
-import io.ktor.server.resources.post
 import io.ktor.server.resources.patch
+import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.slf4j.Logger
@@ -45,5 +41,11 @@ fun Route.eventEndpointsV1(
         val dto = call.receive<PatchEventDto>()
         val updated = eventService.patchEvent(route.eventId.toEventId(), dto.toEventUpdate())
         call.respond(updated.toDto())
+    }
+
+    get<EventResourcesV1.ByIdTeams> { route ->
+        logger.info("📩 Received GET on /v1/event/{id}/teams")
+        val events = eventService.getEventWithTeams(route.eventId.toEventId())
+        call.respond(events.map { it.toDto() })
     }
 }

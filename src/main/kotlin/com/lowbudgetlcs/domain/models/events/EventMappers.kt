@@ -8,18 +8,6 @@ fun NewEventGroup.toEventGroup(id: EventGroupId): EventGroup = EventGroup(
     name = name
 )
 
-fun Event.toEventWithGroup(group: EventGroup?): EventWithGroup = EventWithGroup(
-    id = id,
-    name = name,
-    description = description,
-    eventGroup = group,
-    tournamentId = tournamentId,
-    createdAt = createdAt,
-    startDate = startDate,
-    endDate = endDate,
-    status = status
-)
-
 fun NewEvent.toEvent(id: EventId, createdAt: Instant, tournamentId: TournamentId): Event = Event(
     id = id,
     name = name,

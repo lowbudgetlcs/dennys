@@ -2,7 +2,6 @@ package com.lowbudgetlcs.gateways
 
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.tournament.Tournament
-import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 
 class TournamentGateway : ITournamentGateway {
     override fun create(tournament: NewTournament): Tournament {

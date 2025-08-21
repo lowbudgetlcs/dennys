@@ -11,7 +11,7 @@ import io.ktor.server.routing.*
 fun Route.playerRoutesV1(
     playerService: PlayerService
 ) {
-    route ("/player") {
+    route("/player") {
         install(RequestValidation) {
             validate<NewPlayerDto> { dto ->
                 when {

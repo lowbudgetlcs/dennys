@@ -9,7 +9,7 @@ import io.ktor.server.routing.*
 fun Route.eventRoutesV1(
     eventService: EventService
 ) {
-    route ("/event") {
+    route("/event") {
         install(RequestValidation) {
             validate<CreateEventDto> { dto ->
                 when {
