@@ -1,7 +1,7 @@
 import com.lowbudgetlcs.domain.models.NewTeam
 import com.lowbudgetlcs.domain.models.TeamLogoName
 import com.lowbudgetlcs.domain.models.TeamName
-import com.lowbudgetlcs.repositories.jooq.JooqTeamRepository
+import com.lowbudgetlcs.repositories.jooq.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
@@ -18,7 +18,7 @@ class JooqTeamRepositoryTest : FunSpec({
     }
     val ds = install(JdbcDatabaseContainerExtension(postgres))
     val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-    val repo = JooqTeamRepository(dsl)
+    val repo = TeamRepository(dsl)
 
     test("insert and fetch team by id") {
         val newTeam = NewTeam(

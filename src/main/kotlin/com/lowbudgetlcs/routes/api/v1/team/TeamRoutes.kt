@@ -6,4 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Resource("/team")
 class TeamRoutes {
+
+    @Serializable
+    @Resource("{teamId}")
+    data class ById(val parent: TeamRoutes = TeamRoutes(), val teamId: Int)
+
 }

@@ -6,7 +6,7 @@ import org.jooq.DSLContext
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 import org.jooq.Record
 
-class JooqAccountRepository(
+class AccountRepository(
     private val dsl: DSLContext
 ) : IAccountRepository {
 

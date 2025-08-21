@@ -9,9 +9,9 @@ import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
 import com.lowbudgetlcs.repositories.ITeamRepository
-import com.lowbudgetlcs.repositories.jooq.JooqAccountRepository
-import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
-import com.lowbudgetlcs.repositories.jooq.JooqTeamRepository
+import com.lowbudgetlcs.repositories.jooq.AccountRepository
+import com.lowbudgetlcs.repositories.jooq.PlayerRepository
+import com.lowbudgetlcs.repositories.jooq.TeamRepository
 import com.lowbudgetlcs.routes.api.v1.account.accountRoutesV1
 import com.lowbudgetlcs.routes.api.v1.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.player.playerRoutesV1
@@ -43,13 +43,13 @@ fun Route.apiRoutes() {
         apiKey = appConfig.riot.key
     )
 
-    val accountRepository: IAccountRepository = JooqAccountRepository(Database.dslContext)
+    val accountRepository: IAccountRepository = AccountRepository(Database.dslContext)
     val accountService = AccountService(accountRepository, riotAccountGateway)
 
-    val playerRepository : IPlayerRepository = JooqPlayerRepository(Database.dslContext)
+    val playerRepository : IPlayerRepository = PlayerRepository(Database.dslContext)
     val playerService = PlayerService(playerRepository, accountRepository)
 
-    val teamRepository : ITeamRepository = JooqTeamRepository(Database.dslContext)
+    val teamRepository : ITeamRepository = TeamRepository(Database.dslContext)
     val teamService = TeamService(teamRepository)
 
     route("/api/v1") {

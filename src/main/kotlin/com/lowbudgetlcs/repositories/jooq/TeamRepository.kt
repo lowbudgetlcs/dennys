@@ -8,7 +8,7 @@ import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.TEAMS
 
-class JooqTeamRepository(
+class TeamRepository(
     private val dsl: DSLContext
 ) : ITeamRepository {
 

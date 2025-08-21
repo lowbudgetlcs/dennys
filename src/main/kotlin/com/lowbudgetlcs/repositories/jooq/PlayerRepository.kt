@@ -7,7 +7,7 @@ import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
-class JooqPlayerRepository(
+class PlayerRepository(
     private val dsl: DSLContext
 ) : IPlayerRepository {
 

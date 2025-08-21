@@ -1,6 +1,6 @@
 import com.lowbudgetlcs.domain.models.NewRiotAccount
 import com.lowbudgetlcs.domain.models.RiotPuuid
-import com.lowbudgetlcs.repositories.jooq.JooqAccountRepository
+import com.lowbudgetlcs.repositories.jooq.AccountRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
@@ -17,7 +17,7 @@ class JooqAccountRepositoryTest : FunSpec({
     }
     val ds = install(JdbcDatabaseContainerExtension(postgres))
     val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-    val repo = JooqAccountRepository(dsl)
+    val repo = AccountRepository(dsl)
 
     test("insert and retrieve RiotAccount") {
         val puuid = RiotPuuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC791")
