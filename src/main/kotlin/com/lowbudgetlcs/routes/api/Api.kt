@@ -4,14 +4,18 @@ import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.appConfig
 import com.lowbudgetlcs.domain.services.AccountService
 import com.lowbudgetlcs.domain.services.PlayerService
+import com.lowbudgetlcs.domain.services.TeamService
 import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 import com.lowbudgetlcs.repositories.jooq.JooqAccountRepository
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
+import com.lowbudgetlcs.repositories.jooq.JooqTeamRepository
 import com.lowbudgetlcs.routes.api.v1.account.accountRoutesV1
 import com.lowbudgetlcs.routes.api.v1.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.player.playerRoutesV1
+import com.lowbudgetlcs.routes.api.v1.team.teamRoutesV1
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -45,6 +49,9 @@ fun Route.apiRoutes() {
     val playerRepository : IPlayerRepository = JooqPlayerRepository(Database.dslContext)
     val playerService = PlayerService(playerRepository, accountRepository)
 
+    val teamRepository : ITeamRepository = JooqTeamRepository(Database.dslContext)
+    val teamService = TeamService(teamRepository)
+
     route("/api/v1") {
         route("/riot-callback") {
             post {
@@ -60,6 +67,9 @@ fun Route.apiRoutes() {
         )
         accountRoutesV1(
             accountService = accountService
+        )
+        teamRoutesV1(
+            teamService = teamService
         )
     }
 }

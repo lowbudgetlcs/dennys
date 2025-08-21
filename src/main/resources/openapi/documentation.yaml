@@ -1283,7 +1283,6 @@ components:
       type: object
       required:
         - name
-        - eventId
       properties:
         name:
           type: string
@@ -1293,8 +1292,6 @@ components:
           type: string
           nullable: true
           example: ggs.png
-        eventId:
-          type: integer
           description: ID of the associated event
 
     PatchTeamDto:

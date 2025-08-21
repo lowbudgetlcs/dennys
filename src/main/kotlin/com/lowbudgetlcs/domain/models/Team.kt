@@ -29,7 +29,7 @@ data class Team(
 
 data class NewTeam(
     val name: TeamName,
-    val logoName: String?
+    val logoName: TeamLogoName?
 )
 
 data class TeamWithPlayers(

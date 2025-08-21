@@ -2,7 +2,6 @@ package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.repositories.ITeamRepository
 import org.jooq.DSLContext
 import org.jooq.Record
@@ -16,7 +15,7 @@ class JooqTeamRepository(
     override fun insert(newTeam: NewTeam): Team? {
         val insertedId = dsl.insertInto(TEAMS)
             .set(TEAMS.NAME, newTeam.name.value)
-            .set(TEAMS.LOGO_NAME, newTeam.logoName)
+            .set(TEAMS.LOGO_NAME, newTeam.logoName?.value)
             .returning(TEAMS.ID)
             .fetchOne()
             ?.get(TEAMS.ID)
@@ -73,7 +72,7 @@ class JooqTeamRepository(
     // Helper functions
 
     private fun fetchTeamRows() = dsl
-        .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_NAME)
+        .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_NAME, TEAMS.EVENT_ID)
         .from(TEAMS)
         .fetch()
 
