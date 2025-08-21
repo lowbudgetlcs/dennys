@@ -1099,9 +1099,11 @@ components:
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
             - description: The intended starting status of the event.
@@ -1133,12 +1135,15 @@ components:
         createdAt:
           type: string
           format: date-time
+          example: "2025-08-21T15:34:23.105Z"
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
             - $ref: '#/components/schemas/EventStatus'
@@ -1163,30 +1168,29 @@ components:
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: Season 15 Audit
         description:
           type: string
+          example: The Season 15 plat-emerald league!
         createdAt:
           type: string
           format: date-time
+          example: "2025-08-21T15:34:23.105Z"
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
-        eventGroup:
-          type: object
-          nullable: true
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
+          example: "2025-08-27T15:34:23.105Z"
         tournamentId:
           type: integer
           format: int64
+          example: 54142
         status:
           allOf:
             - $ref: '#/components/schemas/EventStatus'
@@ -1209,9 +1213,11 @@ components:
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
             - description: The new event status.
@@ -1224,6 +1230,7 @@ components:
       properties:
         teamId:
           type: integer
+          example: 3
 
 
     NewPlayerDto:
