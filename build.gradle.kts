@@ -69,8 +69,12 @@ dependencies {
 
     // Integration Testing
     "itestImplementation"(libs.bundles.kotest.integration)
+    "itestImplementation"(libs.bundles.ktor.client)
+    "itestImplementation"(libs.bundles.ktor.client.plugins)
+    "itestImplementation"(libs.ktor.serialization.json)
     "itestImplementation"(libs.bundles.database)
     "itestImplementation"(libs.logback.core)
+    "itestImplementation"(libs.hoplite.core)
 
     // Unit Testing
     testImplementation(libs.bundles.kotest.unit)

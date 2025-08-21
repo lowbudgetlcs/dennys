@@ -9,11 +9,6 @@ services:
     ports:
       - "127.0.0.1:9292:9292"
     env_file: .env
-    environment:
-      - LBLCS_JDBC_URL=${LBLCS_JDBC_URL}
-      - LBLCS_JDBC_PW=${LBLCS_JDBC_PW}
-      - RIOT_API_TOKEN=${RIOT_API_TOKEN}
-      - RIOT_USE_STUBS=${RIOT_USE_STUBS}
     depends_on:
       db:
         condition: service_healthy

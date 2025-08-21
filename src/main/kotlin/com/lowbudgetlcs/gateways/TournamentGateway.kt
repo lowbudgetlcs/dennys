@@ -4,13 +4,11 @@ import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.tournament.Tournament
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.IMetadataRepository
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,11 +21,11 @@ class TournamentGateway(
     private val stub: Boolean,
     private val baseUrl: String = "https://americas.api.riotgames.com"
 ) : ITournamentGateway {
-    override suspend fun create(tournament: NewTournament): Tournament {
+    override fun create(tournament: NewTournament): Tournament = runBlocking {
         val name = tournament.name
         val providerId = metadataRepo.getProviderId() ?: throw NoSuchElementException("Cannot find riot provider id.")
         // TODO: This is ugly.
-        val url = if (!stub) "$baseUrl/lol/tournament/v5/tournament" else "$baseUrl/lol/tournament-stub/v5/tournament"
+        val url = if (!stub) "$baseUrl/lol/tournament/v5/tournaments" else "$baseUrl/lol/tournament-stub/v5/tournaments"
         val res = client.post(url) {
             headers {
                 append("X-Riot-Token", apiKey)
@@ -36,11 +34,11 @@ class TournamentGateway(
             setBody(CreateTournamentRequest(name, providerId))
         }
         if (res.status.value in 200..299) {
-            return Tournament(
+            return@runBlocking Tournament(
                 id = res.body<Int>().toTournamentId(), name = name
             )
         } else {
-            throw Exception("Faield to create Riot tournament.")
+            throw Exception("Failed to create Riot tournament.")
         }
     }
 }

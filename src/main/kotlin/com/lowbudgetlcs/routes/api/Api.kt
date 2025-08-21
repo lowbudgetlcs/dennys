@@ -7,7 +7,6 @@ import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.gateways.RiotAccountGateway
 import com.lowbudgetlcs.gateways.TournamentGateway
-import com.lowbudgetlcs.repositories.EventGroupRepository
 import com.lowbudgetlcs.repositories.EventRepository
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository

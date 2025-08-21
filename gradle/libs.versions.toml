@@ -8,7 +8,7 @@ testcontainers = "1.21.3"
 hikaricp = "5.1.0"
 postgres = "42.7.7"
 hoplite = "2.9.0"
-mockk = "1.13.5"
+mockk = "1.14.5"
 
 [libraries]
 # kotlin
@@ -65,4 +65,4 @@ ktor-client-plugins = ["ktor-client-content-negotiation"]
 jooq-codegen = ["jooq-meta", "jooq-codegen"]
 database = ["jooq-core", "postgresql-core"]
 kotest-unit = ["junit-core", "kotest-runner", "kotest-assertions", "mockk-core"]
-kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]
+kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "mockk-core", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]

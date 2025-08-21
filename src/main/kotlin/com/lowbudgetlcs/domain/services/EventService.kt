@@ -5,10 +5,13 @@ import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class EventService(
-    private val eventRepo: IEventRepository,
-    private val tournamentGateway: ITournamentGateway
+    private val eventRepo: IEventRepository, private val tournamentGateway: ITournamentGateway
 ) : IEventService {
     override fun getAllEvents(): List<Event> = eventRepo.getAll()
 
@@ -21,6 +24,7 @@ class EventService(
         if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
         if (isNameTaken(event.name)) throw IllegalArgumentException("Event '${event.name}' already exists.")
         if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
+        // TODO: Services may need to be refactored to support suspend functions.
         val t = tournamentGateway.create(tournament)
             ?: throw RepositoryException("Failed to register tournament with Riot Games.")
         return eventRepo.insert(event, t.id) ?: throw RepositoryException("Failed to create event.")
