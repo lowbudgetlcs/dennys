@@ -11,6 +11,7 @@ import com.lowbudgetlcs.repositories.EventGroupRepository
 import com.lowbudgetlcs.repositories.EventRepository
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.MetadataRepository
 import com.lowbudgetlcs.repositories.jooq.JooqAccountRepository
 import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
 import com.lowbudgetlcs.routes.api.v1.account.accountRoutesV1
@@ -57,8 +58,14 @@ fun Route.apiRoutes() {
     val playerRepository: IPlayerRepository = JooqPlayerRepository(Database.dslContext)
     val playerService = PlayerService(playerRepository, accountRepository)
 
+    val metadataRepo = MetadataRepository(Database.dslContext)
+    val tournamentGateway = TournamentGateway(
+        metadataRepo = metadataRepo,
+        client = riotHttpClient,
+        apiKey = appConfig.riot.key,
+        stub = appConfig.riot.useStubs,
+    )
     val eventRepo = EventRepository(Database.dslContext)
-    val tournamentGateway = TournamentGateway()
     val eventService = EventService(eventRepo, tournamentGateway)
 
     route("/api/v1") {
