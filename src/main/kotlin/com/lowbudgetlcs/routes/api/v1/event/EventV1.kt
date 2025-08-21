@@ -1,13 +1,13 @@
 package com.lowbudgetlcs.routes.api.v1.event
 
-import com.lowbudgetlcs.domain.services.EventService
+import com.lowbudgetlcs.domain.services.IEventService
 import com.lowbudgetlcs.routes.dto.events.CreateEventDto
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*
 
 
 fun Route.eventRoutesV1(
-    eventService: EventService
+    eventService: IEventService
 ) {
     route("/event") {
         install(RequestValidation) {

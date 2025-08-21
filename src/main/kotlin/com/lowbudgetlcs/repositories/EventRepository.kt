@@ -38,7 +38,6 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
         return insertedId?.toEventId()?.let(::getById)
     }
 
-
     private fun selectEvents() = dsl.select(
         EVENTS.ID,
         EVENTS.NAME,

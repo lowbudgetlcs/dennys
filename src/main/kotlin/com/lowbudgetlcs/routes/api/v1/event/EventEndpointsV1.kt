@@ -2,7 +2,7 @@ package com.lowbudgetlcs.routes.api.v1.event
 
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
-import com.lowbudgetlcs.domain.services.EventService
+import com.lowbudgetlcs.domain.services.IEventService
 import com.lowbudgetlcs.routes.dto.events.*
 import io.ktor.http.*
 import io.ktor.server.application.Application
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.eventEndpointsV1(
-    eventService: EventService
+    eventService: IEventService
 ) {
     get<EventResourcesV1> {
         logger.info("📩 Received GET on /v1/event")

@@ -58,9 +58,8 @@ fun Route.apiRoutes() {
     val playerService = PlayerService(playerRepository, accountRepository)
 
     val eventRepo = EventRepository(Database.dslContext)
-    val eventGroupRepo = EventGroupRepository(Database.dslContext)
     val tournamentGateway = TournamentGateway()
-    val eventService = EventService(eventRepo, eventGroupRepo, tournamentGateway)
+    val eventService = EventService(eventRepo, tournamentGateway)
 
     route("/api/v1") {
         route("/riot-callback") {

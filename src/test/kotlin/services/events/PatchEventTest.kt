@@ -22,7 +22,7 @@ import java.time.temporal.ChronoUnit
 
 class PatchEventTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
-    val service = EventService(eventRepo, mockk<IEventGroupRepository>(), mockk<ITournamentGateway>())
+    val service = EventService(eventRepo, mockk<ITournamentGateway>())
     val start = Instant.now()
     val end = start.plusSeconds(40_000L)
     val testEvent = Event(

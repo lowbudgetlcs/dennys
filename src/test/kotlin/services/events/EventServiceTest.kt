@@ -21,8 +21,7 @@ import java.time.temporal.ChronoUnit
 class EventServiceTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
     val tournamentGate = mockk<ITournamentGateway>()
-    val eventGroupRepo = mockk<IEventGroupRepository>()
-    val service = EventService(eventRepo, eventGroupRepo, tournamentGate)
+    val service = EventService(eventRepo, tournamentGate)
     val start = Instant.now()
     val end = Instant.now().plusSeconds(3600L)
     val newEvent = NewEvent(
@@ -72,12 +71,5 @@ class EventServiceTest : FunSpec({
         shouldThrow<NoSuchElementException> {
             service.getEvent(expectedEvent.id)
         }
-    }
-
-    xtest("createEventGroup() returns valid group") {
-        every { eventGroupRepo.insert(newGroup1) } returns newGroup1.toEventGroup(1.toEventGroupId())
-        val group = service.createEventGroup(newGroup1)
-        group.shouldNotBeNull()
-        group.shouldBeEqualToIgnoringFields(newGroup1.toEventGroup(0.toEventGroupId()), EventGroup::id)
     }
 })
