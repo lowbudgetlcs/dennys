@@ -75,6 +75,7 @@ val RIOT_ACCOUNTS_RIOT_PUUID_KEY: UniqueKey<RiotAccountsRecord> = Internal.creat
 val SERIES_PKEY: UniqueKey<SeriesRecord> = Internal.createUniqueKey(Series.SERIES, DSL.name("series_pkey"), arrayOf(Series.SERIES.ID), true)
 val SERIES_RESULTS_PKEY: UniqueKey<SeriesResultsRecord> = Internal.createUniqueKey(SeriesResults.SERIES_RESULTS, DSL.name("series_results_pkey"), arrayOf(SeriesResults.SERIES_RESULTS.SERIES_ID), true)
 val TEAM_TO_SERIES_PKEY: UniqueKey<TeamToSeriesRecord> = Internal.createUniqueKey(TeamToSeries.TEAM_TO_SERIES, DSL.name("team_to_series_pkey"), arrayOf(TeamToSeries.TEAM_TO_SERIES.TEAM_ID, TeamToSeries.TEAM_TO_SERIES.SERIES_ID), true)
+val TEAMS_NAME_EVENT_ID_KEY: UniqueKey<TeamsRecord> = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_name_event_id_key"), arrayOf(Teams.TEAMS.NAME, Teams.TEAMS.EVENT_ID), true)
 val TEAMS_PKEY: UniqueKey<TeamsRecord> = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_pkey"), arrayOf(Teams.TEAMS.ID), true)
 
 // -------------------------------------------------------------------------

@@ -44,4 +44,6 @@ CREATE TABLE IF NOT EXISTS players_to_event (
 
 DROP TABLE IF EXISTS player_to_teams;
 
+ALTER TABLE teams ADD UNIQUE (name, event_id);
+
 COMMIT;

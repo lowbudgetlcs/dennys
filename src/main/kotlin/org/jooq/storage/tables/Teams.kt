@@ -37,6 +37,7 @@ import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_WINNER_TEAM_ID_FKEY
 import org.jooq.storage.keys.PLAYERS_TO_TEAM__PLAYERS_TO_TEAM_TEAM_FKEY
 import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_LOSER_TEAM_ID_FKEY
 import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_WINNER_TEAM_ID_FKEY
+import org.jooq.storage.keys.TEAMS_NAME_EVENT_ID_KEY
 import org.jooq.storage.keys.TEAMS_PKEY
 import org.jooq.storage.keys.TEAMS__TEAMS_EVENT_ID_FKEY
 import org.jooq.storage.keys.TEAM_TO_SERIES__TEAM_TO_SERIES_TEAM_ID_FKEY
@@ -142,6 +143,7 @@ open class Teams(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<TeamsRecord, Int?> = super.getIdentity() as Identity<TeamsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<TeamsRecord> = TEAMS_PKEY
+    override fun getUniqueKeys(): List<UniqueKey<TeamsRecord>> = listOf(TEAMS_NAME_EVENT_ID_KEY)
     override fun getReferences(): List<ForeignKey<TeamsRecord, *>> = listOf(TEAMS__TEAMS_EVENT_ID_FKEY)
 
     private lateinit var _events: EventsPath
