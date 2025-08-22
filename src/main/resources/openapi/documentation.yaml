@@ -6,8 +6,8 @@ info:
   contact:
     email: lblcs.dev@gmail.com
   license:
-    name: GPL-3.0
-    url: https://www.gnu.org/licenses/gpl-3.0.html#license-text
+    name: MIT
+    url: https://github.com/lowbudgetlcs/dennys/blob/main/LICENSE.txt
   version: 1.0.0
 externalDocs:
   description: Find out more about Dennys
