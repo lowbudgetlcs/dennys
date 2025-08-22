@@ -37,24 +37,6 @@ services:
       timeout: 10s
       retries: 3
 
-  pgadmin:
-    image: dpage/pgadmin4:9.4
-    container_name: pgadmin
-    ports: 
-      - "127.0.0.1:8888:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@dev.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-      - PGADMIN_CONFIG_SERVER_MODE=False
-      - PGADMIN_CONFIG_MASTER_PASSWORD=False
-      - PGADMIN_DISABLE_POSTFIX=true
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      # Add default database configuration
-      - ./docker/pgAdmin/servers.json:/pgadmin4/servers.json
-
   swagger-editor:
     container_name: swagger
     image: swaggerapi/swagger-editor
