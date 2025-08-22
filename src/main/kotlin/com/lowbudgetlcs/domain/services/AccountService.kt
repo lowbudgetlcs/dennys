@@ -3,6 +3,7 @@ package com.lowbudgetlcs.domain.services
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.IAccountRepository
+import com.lowbudgetlcs.repositories.DatabaseException
 
 class AccountService(
     private val accountRepository: IAccountRepository,
@@ -19,7 +20,7 @@ class AccountService(
         // Call Riot API to verify PUUID
         riotAccountGateway.getAccountByPuuid(puuid.value) // throws if anything fails
 
-        return accountRepository.insert(account) ?: throw RepositoryException("Failed to insert account")
+        return accountRepository.insert(account) ?: throw DatabaseException("Failed to insert account")
     }
 
     fun getAccount(accountId: RiotAccountId): RiotAccount {

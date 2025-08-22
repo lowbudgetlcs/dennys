@@ -3,6 +3,7 @@ package com.lowbudgetlcs.domain.services
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.DatabaseException
 
 class PlayerService(
     private val playerRepository: IPlayerRepository,
@@ -14,7 +15,7 @@ class PlayerService(
         if (isNameTaken(player.name.value)) throw IllegalStateException("Player name already exists")
 
         return playerRepository.insert(player)
-            ?: throw RepositoryException("Failed to create player")
+            ?: throw DatabaseException("Failed to create player")
     }
 
     fun getPlayer(id: PlayerId): PlayerWithAccounts {
@@ -35,7 +36,7 @@ class PlayerService(
         this.getPlayer(playerId) // throws if not found
 
         return playerRepository.renamePlayer(playerId, PlayerName(newName))
-            ?: throw RepositoryException("Failed to rename player")
+            ?: throw DatabaseException("Failed to rename player")
     }
 
     fun linkAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
@@ -48,7 +49,7 @@ class PlayerService(
             throw IllegalStateException("Account already linked to another player")
 
         return playerRepository.insertAccountToPlayer(playerId, accountId)
-            ?: throw RepositoryException("Failed to link account to player")
+            ?: throw DatabaseException("Failed to link account to player")
     }
 
     fun unlinkAccountFromPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
@@ -61,7 +62,7 @@ class PlayerService(
             throw IllegalStateException("Account does not belong to player")
 
         return playerRepository.removeAccount(playerId, accountId)
-            ?: throw RepositoryException("Failed to unlink account from player")
+            ?: throw DatabaseException("Failed to unlink account from player")
     }
 
 }

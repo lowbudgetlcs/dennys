@@ -2,6 +2,7 @@ package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.repositories.DatabaseException
 
 class TeamService(
     private val teamRepository: ITeamRepository
@@ -12,7 +13,7 @@ class TeamService(
         if (name.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
 
         return teamRepository.insert(team)
-            ?: throw RepositoryException("Failed to create team")
+            ?: throw DatabaseException("Failed to create team")
     }
 
     fun getAllTeams(): List<Team> = teamRepository.getAll()
@@ -24,12 +25,12 @@ class TeamService(
         if (newName.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
 
         return teamRepository.updateTeamName(id, TeamName(newName))
-            ?: throw RepositoryException("Failed to rename team")
+            ?: throw DatabaseException("Failed to rename team")
     }
 
     fun updateLogoName(id: TeamId, newLogoName: String?): Team {
         val value = newLogoName ?: throw IllegalArgumentException("Logo name cannot be null")
         return teamRepository.updateTeamLogoName(id, TeamLogoName(value))
-            ?: throw RepositoryException("Failed to update team logo")
+            ?: throw DatabaseException("Failed to update team logo")
     }
 }

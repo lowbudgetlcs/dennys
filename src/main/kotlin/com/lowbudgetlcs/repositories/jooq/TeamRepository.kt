@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.repositories.ITeamRepository
 import org.jooq.DSLContext
 import org.jooq.Record
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.TEAMS
 
