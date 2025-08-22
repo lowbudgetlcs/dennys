@@ -1,14 +1,11 @@
 package com.lowbudgetlcs.routes.dto.teams
 
-import com.lowbudgetlcs.domain.models.NewTeam
-import com.lowbudgetlcs.domain.models.Team
-import com.lowbudgetlcs.domain.models.TeamLogoName
-import com.lowbudgetlcs.domain.models.TeamName
+import com.lowbudgetlcs.domain.models.*
 
 fun NewTeamDto.toNewTeam(): NewTeam =
     NewTeam(
-        name = TeamName(name),
-        logoName = logoName?.let { TeamLogoName(it) }
+        name = name.toTeamName(),
+        logoName = logoName?.toTeamLogoName()
     )
 
 fun Team.toDto(): TeamDto =

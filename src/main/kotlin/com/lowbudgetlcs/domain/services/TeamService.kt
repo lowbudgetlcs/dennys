@@ -10,7 +10,6 @@ class TeamService(
     fun createTeam(team: NewTeam): Team {
         val name = team.name.value
         if (name.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
-        if (name.length > 80) throw IllegalArgumentException("Team name must be <= 80 characters")
 
         return teamRepository.insert(team)
             ?: throw RepositoryException("Failed to create team")
@@ -23,7 +22,6 @@ class TeamService(
 
     fun renameTeam(id: TeamId, newName: String): Team {
         if (newName.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
-        if (newName.length > 80) throw IllegalArgumentException("Team name must be <= 80 characters")
 
         return teamRepository.updateTeamName(id, TeamName(newName))
             ?: throw RepositoryException("Failed to rename team")
