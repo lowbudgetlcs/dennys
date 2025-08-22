@@ -1,6 +1,6 @@
 import com.lowbudgetlcs.domain.models.NewPlayer
 import com.lowbudgetlcs.domain.models.PlayerName
-import com.lowbudgetlcs.repositories.jooq.JooqPlayerRepository
+import com.lowbudgetlcs.repositories.jooq.PlayerRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
@@ -17,7 +17,7 @@ class JooqPlayerRepositoryTest : FunSpec({
     }
     val ds = install(JdbcDatabaseContainerExtension(postgres))
     val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-    val repo = JooqPlayerRepository(dsl)
+    val repo = PlayerRepository(dsl)
 
     test("insert and fetch player by id") {
         val newPlayer = NewPlayer(PlayerName("TestPlayer#123"))

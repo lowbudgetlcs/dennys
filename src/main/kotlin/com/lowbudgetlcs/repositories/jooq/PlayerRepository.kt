@@ -3,10 +3,11 @@ package com.lowbudgetlcs.repositories.jooq
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.repositories.IPlayerRepository
 import org.jooq.DSLContext
+import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
-class JooqPlayerRepository(
+class PlayerRepository(
     private val dsl: DSLContext
 ) : IPlayerRepository {
 
@@ -17,15 +18,15 @@ class JooqPlayerRepository(
             .fetchOne()
             ?.get(PLAYERS.ID)
 
-        return insertedId?.toPlayerId()?.let { getById(it) }
+        return insertedId?.toPlayerId()?.let(::getById)
     }
 
     override fun getAll(): List<PlayerWithAccounts> {
-        return fetchPlayerRows().mapNotNull { rowToPlayerWithAccounts(it) }
+        return fetchPlayerRows().mapNotNull(::rowToPlayerWithAccounts)
     }
 
     override fun getById(id: PlayerId): PlayerWithAccounts? {
-        return getPlayerRowById(id)?.let { rowToPlayerWithAccounts(it) }
+        return getPlayerRowById(id)?.let(::rowToPlayerWithAccounts)
     }
 
     override fun renamePlayer(id: PlayerId, newName: PlayerName): PlayerWithAccounts? {
@@ -69,7 +70,7 @@ class JooqPlayerRepository(
         .where(PLAYERS.ID.eq(id.value))
         .fetchOne()
 
-    private fun rowToPlayerWithAccounts(row: org.jooq.Record): PlayerWithAccounts? {
+    private fun rowToPlayerWithAccounts(row: Record): PlayerWithAccounts? {
         val playerId = row[PLAYERS.ID]?.toPlayerId() ?: return null
         val name = row[PLAYERS.NAME]?.let { PlayerName(it) } ?: return null
         val accounts = getAccountsForPlayer(playerId)

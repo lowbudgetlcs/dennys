@@ -34,12 +34,12 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.EVENTS_PKEY
 import org.jooq.storage.keys.EVENTS__EVENTS_EVENT_GROUP_ID_FKEY
-import org.jooq.storage.keys.PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_EVENT_ID_FKEY
+import org.jooq.storage.keys.PLAYERS_TO_EVENT__PLAYERS_TO_EVENT_EVENT_FKEY
 import org.jooq.storage.keys.SERIES__SERIES_EVENT_ID_FKEY
 import org.jooq.storage.keys.TEAMS__TEAMS_EVENT_ID_FKEY
 import org.jooq.storage.tables.EventGroups.EventGroupsPath
-import org.jooq.storage.tables.PlayerToTeams.PlayerToTeamsPath
 import org.jooq.storage.tables.Players.PlayersPath
+import org.jooq.storage.tables.PlayersToEvent.PlayersToEventPath
 import org.jooq.storage.tables.Series.SeriesPath
 import org.jooq.storage.tables.Teams.TeamsPath
 import org.jooq.storage.tables.records.EventsRecord
@@ -178,21 +178,21 @@ open class Events(
     val eventGroups: EventGroupsPath
         get(): EventGroupsPath = eventGroups()
 
-    private lateinit var _playerToTeams: PlayerToTeamsPath
+    private lateinit var _playersToEvent: PlayersToEventPath
 
     /**
      * Get the implicit to-many join path to the
-     * <code>dennys.player_to_teams</code> table
+     * <code>dennys.players_to_event</code> table
      */
-    fun playerToTeams(): PlayerToTeamsPath {
-        if (!this::_playerToTeams.isInitialized)
-            _playerToTeams = PlayerToTeamsPath(this, null, PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_EVENT_ID_FKEY.inverseKey)
+    fun playersToEvent(): PlayersToEventPath {
+        if (!this::_playersToEvent.isInitialized)
+            _playersToEvent = PlayersToEventPath(this, null, PLAYERS_TO_EVENT__PLAYERS_TO_EVENT_EVENT_FKEY.inverseKey)
 
-        return _playerToTeams;
+        return _playersToEvent;
     }
 
-    val playerToTeams: PlayerToTeamsPath
-        get(): PlayerToTeamsPath = playerToTeams()
+    val playersToEvent: PlayersToEventPath
+        get(): PlayersToEventPath = playersToEvent()
 
     private lateinit var _series: SeriesPath
 
@@ -230,7 +230,7 @@ open class Events(
      * <code>dennys.players</code> table
      */
     val players: PlayersPath
-        get(): PlayersPath = playerToTeams().players()
+        get(): PlayersPath = playersToEvent().players()
     override fun `as`(alias: String): Events = Events(DSL.name(alias), this)
     override fun `as`(alias: Name): Events = Events(alias, this)
     override fun `as`(alias: Table<*>): Events = Events(alias.qualifiedName, this)
