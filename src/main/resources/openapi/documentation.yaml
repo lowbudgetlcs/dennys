@@ -44,7 +44,7 @@ tags:
     description: Create and inspect Riot accounts
 
 paths:
-  /api/v1/eventGroup:
+  /v1/eventGroup:
     get:
       summary: Get all event groups
       operationId: getEventGroups
@@ -103,7 +103,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/eventGroup/{eventGroupId}:
+  /v1/eventGroup/{eventGroupId}:
     get:
       summary: Get an event group by ID
       operationId: getEventGroupById
@@ -180,7 +180,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/eventGroup/{eventGroupId}/events:
+  /v1/eventGroup/{eventGroupId}/events:
     get:
       summary: Get an event group with all events included
       operationId: getEventsInEventGroup
@@ -247,7 +247,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/eventGroup/{eventGroupId}/events/{eventId}:
+  /v1/eventGroup/{eventGroupId}/events/{eventId}:
     delete:
       summary: Remove an event from an event group
       operationId: removeEventFromEventGroup
@@ -274,7 +274,7 @@ paths:
         '404':
           description: Event or team not found
 
-  /api/v1/event:
+  /v1/event:
     get:
       tags:
         - v1/event
@@ -337,7 +337,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/event/{eventId}:
+  /v1/event/{eventId}:
     get:
       tags:
         - v1/event
@@ -424,7 +424,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/event/{eventId}/teams:
+  /v1/event/{eventId}/teams:
     get:
       summary: Get an event with all teams included
       operationId: getTeamsInEvent
@@ -500,7 +500,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/event/{eventId}/teams/{teamId}:
+  /v1/event/{eventId}/teams/{teamId}:
     delete:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
@@ -531,7 +531,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/team:
+  /v1/team:
     get:
       summary: Get all teams
       operationId: getTeams
@@ -584,7 +584,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/team/{teamId}:
+  /v1/team/{teamId}:
     get:
       summary: Get a team by ID
       operationId: getTeamById
@@ -654,7 +654,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/team/{teamId}/players:
+  /v1/team/{teamId}/players:
     get:
       summary: Get a team with all the players included
       operationId: getPlayersOnTeam
@@ -723,7 +723,7 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 
-  /api/v1/team/{teamId}/players/{playerId}:
+  /v1/team/{teamId}/players/{playerId}:
     delete:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
@@ -750,7 +750,7 @@ paths:
         '404':
           description: Team or player not found
 
-  /api/v1/player:
+  /v1/player:
     get:
       summary: Get all players
       operationId: getPlayers
@@ -802,7 +802,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/player/{playerId}:
+  /v1/player/{playerId}:
     get:
       summary: Get player by ID
       operationId: getPlayerById
@@ -872,7 +872,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/v1/player/{playerId}/accounts:
+  /v1/player/{playerId}/accounts:
     post:
       summary: Link a Riot account to a player
       operationId: linkAccountToPlayer
@@ -908,7 +908,7 @@ paths:
           description: Unexpected error
 
 
-  /api/v1/player/{playerId}/accounts/{accountId}:
+  /v1/player/{playerId}/accounts/{accountId}:
     delete:
       summary: Remove a Riot account from a player
       operationId: removeAccountFromPlayer
@@ -944,7 +944,7 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 
-  /api/v1/account:
+  /v1/account:
     get:
       summary: Get all Riot accounts
       operationId: getAllRiotAccounts
@@ -989,7 +989,7 @@ paths:
         default:
           description: Unexpected error
 
-  /api/v1/account/{accountId}:
+  /v1/account/{accountId}:
     get:
       summary: Get Riot account by ID
       operationId: getRiotAccountDtoById
