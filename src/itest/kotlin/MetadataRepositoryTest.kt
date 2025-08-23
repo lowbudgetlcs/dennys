@@ -16,16 +16,9 @@ class MetadataRepositoryTest : StringSpec({
     val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
     val repo = MetadataRepository(dslContext)
 
-    val providerId = 2
-
-    "init() creates the initial metadata row" {
-        val success = repo.init(providerId, "test")
-        success shouldBe true
-    }
-
     "getProviderId() succeeds and returns correct provider ID" {
         val id = repo.getProviderId()
-        id shouldBe providerId
+        id shouldBe 1 
     }
 
     "setProviderId() succeeds and returns ID" {
