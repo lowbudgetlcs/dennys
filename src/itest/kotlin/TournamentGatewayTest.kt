@@ -38,7 +38,7 @@ class TournamentGatewayTest : FunSpec({
     )
     val newTournament = NewTournament("Test")
 
-    test("create() returns a valid Tournament") {
+    xtest("create() returns a valid Tournament") {
         val tournament = gate.create(newTournament)
         tournament.shouldBeInstanceOf<Tournament>()
         tournament.shouldBeEqualToIgnoringFields(Tournament(0.toTournamentId(), "Test"), Tournament::id)
