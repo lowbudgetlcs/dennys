@@ -1,0 +1,6 @@
+START TRANSACTION;
+SET SEARCH_PATH = dennys;
+
+INSERT INTO metadata VALUES (1, '');
+
+COMMIT;
