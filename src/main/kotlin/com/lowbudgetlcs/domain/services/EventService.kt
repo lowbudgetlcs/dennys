@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.services
 
+import com.lowbudgetlcs.domain.models.TeamId
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
@@ -10,8 +11,6 @@ class EventService(
     private val eventRepo: IEventRepository, private val tournamentGateway: ITournamentGateway
 ) : IEventService {
     override fun getAllEvents(): List<Event> = eventRepo.getAll()
-
-    override fun getEventWithTeams(id: EventId): List<EventWithTeams> = TODO("Not yet implemented")
 
     override fun getEvent(id: EventId): Event =
         eventRepo.getById(id) ?: throw NoSuchElementException("Event with ${id.value} not found.")
@@ -34,6 +33,22 @@ class EventService(
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
         return eventRepo.update(event.patch(update)) ?: throw DatabaseException("Failed to update event.")
     }
+
+    override fun getEventWithTeams(id: EventId): EventWithTeams =
+        eventRepo.getByIdWithTeams(id) ?: throw NoSuchElementException("Event with ${id.value} not found.")
+
+    override fun addTeam(
+        eventId: EventId, teamId: TeamId
+    ): EventWithTeams {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeTeam(
+        eventId: EventId, teamId: TeamId
+    ): EventWithTeams {
+        TODO("Not yet implemented")
+    }
+
 
     private fun isNameTaken(name: String): Boolean = eventRepo.getAll().any { it.name == name }
 }

@@ -1,7 +1,11 @@
 package com.lowbudgetlcs.routes.dto.events
 
-import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.routes.dto.eventgroup.EventGroupDto
+import com.lowbudgetlcs.domain.models.TeamId
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.EventWithTeams
+import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.toTeamId
 import com.lowbudgetlcs.routes.dto.teams.toDto
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
@@ -12,9 +16,7 @@ fun PatchEventDto.toEventUpdate(): EventUpdate = EventUpdate(
     name = name, description = description, startDate = startDate, endDate = endDate, status = status
 )
 
-fun EventGroup.toDto(): EventGroupDto = EventGroupDto(
-    id = id.value, name = name
-)
+fun EventTeamLinkDto.toTeamId(): TeamId = teamId.toTeamId()
 
 fun Event.toDto(): EventDto = EventDto(
     id = id.value,
