@@ -53,11 +53,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /lblcs/docker/dennys
-            echo database.url="${{ secrets.LBLCS_JDBC_URL }}" > .env
-            echo database.password="${{ secrets.LBLCS_JDBC_PW }}" >> .env
-            echo riot.key="${{ secrets.RIOT_API_TOKEN }}" >> .env
-            echo riot.useStubs=False >> .env
             docker compose down
             docker compose pull
             docker compose up -d
-            rm -f ./.env
