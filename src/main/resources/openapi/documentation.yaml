@@ -13,7 +13,7 @@ externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
 servers:
-  - url: http://localhost:9292
+  - url: /api
 
 tags:
   - name: v1/eventGroup
