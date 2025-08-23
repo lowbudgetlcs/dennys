@@ -1,6 +1,8 @@
 package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import org.jooq.DSLContext
@@ -18,6 +20,10 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
     override fun getById(id: EventId): Event? =
         selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne()?.let(::rowToEvent)
 
+    override fun getByIdWithTeams(id: EventId): EventWithTeams? {
+        TODO("Not yet implemented")
+    }
+
     override fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event? = try {
         val insertedId = dsl.insertInto(
             EVENTS
@@ -33,10 +39,23 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
     override fun update(event: Event): Event? {
         val insertedId = dsl.update(EVENTS).set(EVENTS.NAME, event.name).set(EVENTS.DESCRIPTION, event.description)
             .set(EVENTS.START_DATE, event.startDate).set(EVENTS.END_DATE, event.endDate)
-            .set(EVENTS.STATUS, event.status.name)
-            .where(EVENTS.ID.eq(event.id.value))
-            .returning(EVENTS.ID).fetchOne()?.get(EVENTS.ID)
+            .set(EVENTS.STATUS, event.status.name).where(EVENTS.ID.eq(event.id.value)).returning(EVENTS.ID).fetchOne()
+            ?.get(EVENTS.ID)
         return insertedId?.toEventId()?.let(::getById)
+    }
+
+    override fun associateTeam(
+        eventId: EventId,
+        teamId: TeamId
+    ): EventWithTeams? {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteTeam(
+        eventId: EventId,
+        teamId: TeamId
+    ): EventWithTeams? {
+        TODO("Not yet implemented")
     }
 
     private fun selectEvents() = dsl.select(

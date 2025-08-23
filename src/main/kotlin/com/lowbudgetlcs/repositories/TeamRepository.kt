@@ -1,18 +1,18 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.domain.models.NewTeam
+import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.Player
 import com.lowbudgetlcs.domain.models.PlayerId
 import com.lowbudgetlcs.domain.models.PlayerName
-import com.lowbudgetlcs.domain.models.Team
-import com.lowbudgetlcs.domain.models.TeamId
-import com.lowbudgetlcs.domain.models.TeamLogoName
-import com.lowbudgetlcs.domain.models.TeamName
-import com.lowbudgetlcs.domain.models.TeamWithPlayers
+import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.models.team.TeamLogoName
+import com.lowbudgetlcs.domain.models.team.TeamName
+import com.lowbudgetlcs.domain.models.team.TeamWithPlayers
 import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.toTeamId
-import com.lowbudgetlcs.domain.models.toTeamLogoName
-import com.lowbudgetlcs.domain.models.toTeamName
+import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.models.team.toTeamLogoName
+import com.lowbudgetlcs.domain.models.team.toTeamName
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS

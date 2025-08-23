@@ -1,7 +1,6 @@
 package com.lowbudgetlcs.routes.api.v1.event
 
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.toTeamId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.services.IEventService
 import com.lowbudgetlcs.routes.dto.events.*

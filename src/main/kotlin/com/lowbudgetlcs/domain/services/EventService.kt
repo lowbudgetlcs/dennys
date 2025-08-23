@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.TeamId
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
