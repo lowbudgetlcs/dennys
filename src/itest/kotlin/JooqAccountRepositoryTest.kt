@@ -1,6 +1,6 @@
 import com.lowbudgetlcs.domain.models.NewRiotAccount
 import com.lowbudgetlcs.domain.models.RiotPuuid
-import com.lowbudgetlcs.repositories.jooq.AccountRepository
+import com.lowbudgetlcs.repositories.AccountRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension

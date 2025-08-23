@@ -1,7 +1,7 @@
 import com.lowbudgetlcs.domain.models.NewTeam
 import com.lowbudgetlcs.domain.models.TeamLogoName
 import com.lowbudgetlcs.domain.models.TeamName
-import com.lowbudgetlcs.repositories.jooq.TeamRepository
+import com.lowbudgetlcs.repositories.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension

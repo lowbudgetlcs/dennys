@@ -226,7 +226,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventGroupLinkRequestDto'
+              $ref: '#/components/schemas/EventGroupAddEventDto'
       responses:
         '200':
           description: Event added to event group
@@ -341,7 +341,7 @@ paths:
     get:
       tags:
         - v1/event
-      summary: Find event by ID.
+      summary: Get an event by ID.
       description: Returns a single event with the associated teams.
       operationId: getEventById
       parameters:
@@ -367,6 +367,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         '404':
           description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -377,7 +381,7 @@ paths:
     patch:
       tags:
         - v1/event
-      summary: Patch event's data
+      summary: Patch an event's data
       parameters:
         - name: eventId
           in: path
@@ -444,6 +448,10 @@ paths:
                   $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -451,7 +459,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Assign a team to an event
+      summary: Link a team to an event
       operationId: addTeamToEvent
       tags:
         - v1/event/teams
@@ -466,7 +474,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventTeamLinkRequestDto'
+              $ref: '#/components/schemas/EventAddTeamDto'
       responses:
         '200':
           description: Team added to event
@@ -476,6 +484,10 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         '409':
           description: |
             Invalid resource state
@@ -514,6 +526,10 @@ paths:
                 $ref: '#/components/schemas/EventWithTeamsDto'
         '404':
           description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/v1/team:
     get:
@@ -1001,6 +1017,16 @@ paths:
 
 components:
   schemas:
+    EventStatus:
+      type: string
+      enum:
+        - NOT_STARTED
+        - ACTIVE
+        - CANCELED
+        - PAUSED
+        - COMPLETED
+        
+  # Event Group Schemas
     CreateEventGroupDto:
       type: object
       required:
@@ -1009,7 +1035,6 @@ components:
         name:
           type: string
           example: Season 14
-
     EventGroupDto:
       type: object
       required:
@@ -1022,15 +1047,6 @@ components:
         name:
           type: string
           example: Season 14
-
-    PatchEventGroupDto:
-      type: object
-      description: Fields to update on an event group
-      properties:
-        name:
-          type: string
-          example: Updated Group Name
-
     EventGroupWithEventsDto:
       type: object
       required:
@@ -1039,32 +1055,32 @@ components:
       properties:
         id:
           type: integer
-          example: 0
+          example: 1
         name:
           type: string
           example: Season 14
-        evemts:
+        events:
           type: array
           items:
             $ref: '#/components/schemas/EventDto'
-
-    EventGroupLinkRequestDto:
+    PatchEventGroupDto:
+      type: object
+      description: Fields to update on an event group
+      properties:
+        name:
+          type: string
+          example: Season 14 But New
+    EventGroupAddEventDto:
       type: object
       required:
         - eventId
       properties:
         eventId:
           type: integer
+          format: int64
+          example: 1
 
-    EventStatus:
-      type: string
-      enum:
-        - NOT_STARTED
-        - ACTIVE
-        - CANCELED
-        - PAUSED
-        - COMPLETED
-
+    # Event Schemas
     CreateEventDto:
       type: object
       required:
@@ -1083,18 +1099,107 @@ components:
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
-        eventGroup:
-          type: integer
-          description: An optional event grouping. Invalid IDs will not cause event creation failure.
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
             - description: The intended starting status of the event.
             - example: NOT_STARTED
             - $ref: '#/components/schemas/EventStatus'
-
+    EventDto:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - startDate
+        - endDate
+        - status
+        - tournamentId
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          description: Event name
+          example: Season 14 Commercial
+        description:
+          type: string
+          example: Season 14's plat-emerald league!
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-08-21T15:34:23.105Z"
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-08-22T15:34:23.105Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-08-27T15:34:23.105Z"
+        status:
+          allOf:
+            - $ref: '#/components/schemas/EventStatus'
+            - description: The current event status.
+            - example: NOT_STARTED
+        tournamentId:
+          type: integer
+          format: int64
+          example: 1234
+    EventWithTeamsDto:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - startDate
+        - endDate
+        - status
+        - tournamentId
+        - teams
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Season 15 Audit
+        description:
+          type: string
+          example: The Season 15 plat-emerald league!
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-08-21T15:34:23.105Z"
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-08-22T15:34:23.105Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-08-27T15:34:23.105Z"
+        tournamentId:
+          type: integer
+          format: int64
+          example: 54142
+        status:
+          allOf:
+            - $ref: '#/components/schemas/EventStatus'
+            - description: The current event status.
+            - example: NOT_STARTED
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamDto'
     PatchEventDto:
       type: object
       properties:
@@ -1108,111 +1213,24 @@ components:
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
-        eventGroupId:
-          type: integer
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
             - description: The new event status.
             - example: CANCELED
             - $ref: '#/components/schemas/EventStatus'
-
-    EventDto:
-      type: object
-      required:
-        - id
-        - name
-        - description
-        - createdAt
-        - startDate
-        - endDate
-        - status
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-          description: Event name
-          example: Season 14 Commercial
-        description:
-          type: string
-          example: Season 14's plat-emerald league!
-        createdAt:
-          type: string
-          format: date-time
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-        eventGroup:
-          type: object
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-        status:
-          allOf:
-            - description: The current event status.
-            - example: NOT_STARTED
-            - $ref: '#/components/schemas/EventStatus'
-
-    EventWithTeamsDto:
-      type: object
-      required:
-        - id
-        - name
-        - description
-        - createdAt
-        - startDate
-        - endDate
-        - status
-        - teams
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        description:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-        eventGroup:
-          type: object
-          nullable: true
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-        tournamentId:
-          type: integer
-        status:
-          $ref: '#/components/schemas/EventStatus'
-        teams:
-          type: array
-          items:
-            $ref: '#/components/schemas/TeamDto'
-
-    EventTeamLinkRequestDto:
+    EventAddTeamDto:
       type: object
       required:
         - teamId
       properties:
         teamId:
           type: integer
+          example: 3
 
 
     NewPlayerDto:

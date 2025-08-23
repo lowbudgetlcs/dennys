@@ -32,6 +32,7 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
+import org.jooq.storage.keys.EVENTS_NAME_KEY
 import org.jooq.storage.keys.EVENTS_PKEY
 import org.jooq.storage.keys.EVENTS__EVENTS_EVENT_GROUP_ID_FKEY
 import org.jooq.storage.keys.PLAYERS_TO_EVENT__PLAYERS_TO_EVENT_EVENT_FKEY
@@ -161,6 +162,7 @@ open class Events(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<EventsRecord, Int?> = super.getIdentity() as Identity<EventsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<EventsRecord> = EVENTS_PKEY
+    override fun getUniqueKeys(): List<UniqueKey<EventsRecord>> = listOf(EVENTS_NAME_KEY)
     override fun getReferences(): List<ForeignKey<EventsRecord, *>> = listOf(EVENTS__EVENTS_EVENT_GROUP_ID_FKEY)
 
     private lateinit var _eventGroups: EventGroupsPath

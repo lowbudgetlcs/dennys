@@ -3,10 +3,6 @@ package com.lowbudgetlcs.routes
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.routes.api.apiRoutes
 import com.lowbudgetlcs.routes.dto.Error
-import com.lowbudgetlcs.routes.dto.accounts.NewRiotAccountDto
-import com.lowbudgetlcs.routes.dto.players.AccountLinkRequestDto
-import com.lowbudgetlcs.routes.dto.players.NewPlayerDto
-import com.lowbudgetlcs.routes.dto.players.PatchPlayerDto
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.application.*
@@ -63,7 +59,7 @@ fun Application.routes() {
                 call.respond(code, e)
             }
             exception<DatabaseException> { call, cause ->
-                logger.error("⚠️ Repository Exception: $call", cause)
+                logger.error("⚠️ Database Exception: $call", cause)
                 val code = HttpStatusCode.InternalServerError
                 val e = Error(code = code.value, message = cause.message ?: "Internal server error")
                 call.respond(code, e)
@@ -73,35 +69,6 @@ fun Application.routes() {
                 val code = HttpStatusCode.InternalServerError
                 val e = Error(code = code.value, message = cause.message ?: "Internal server error")
                 call.respond(code, e)
-            }
-        }
-        install(RequestValidation) {
-            validate<NewRiotAccountDto> { dto ->
-                when {
-                    dto.riotPuuid.isBlank() -> ValidationResult.Invalid("PUUID cannot be blank")
-                    else -> ValidationResult.Valid
-                }
-            }
-
-            validate<NewPlayerDto> { dto ->
-                when {
-                    dto.name.isBlank() -> ValidationResult.Invalid("Player name cannot be blank")
-                    else -> ValidationResult.Valid
-                }
-            }
-
-            validate<PatchPlayerDto> { dto ->
-                when {
-                    dto.name.isBlank() -> ValidationResult.Invalid("New name cannot be blank")
-                    else -> ValidationResult.Valid
-                }
-            }
-
-            validate<AccountLinkRequestDto> { dto ->
-                when {
-                    dto.accountId <= 0 -> ValidationResult.Invalid("Account ID must be greater than 0")
-                    else -> ValidationResult.Valid
-                }
             }
         }
         install(CORS) {

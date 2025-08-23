@@ -8,7 +8,8 @@ import com.lowbudgetlcs.domain.models.tournament.TournamentId
 
 interface IEventRepository {
     fun getAll(): List<Event>
-    fun getAllByGroupId(groupId: EventGroupId): List<Event>
     fun getById(id: EventId): Event?
+    fun getAllByGroupId(groupId: EventGroupId): List<Event>
     fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event?
+    fun update(event: Event): Event?
 }
