@@ -19,7 +19,7 @@ on:
       - 'release/*'
 
 jobs:
-  tests:
+  unit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,11 +29,25 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Test project
-        run: ./gradlew test itest
+        run: ./gradlew test
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Utilizes Gradle cache
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test project
+        run: ./gradlew itest
 
   build:
     runs-on: ubuntu-24.04-arm
-    needs: tests
+    needs: 
+      - unit
+      - integration
     steps:
       - uses: actions/checkout@v4
 
