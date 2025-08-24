@@ -1,15 +1,18 @@
 <configuration>
-    <!-- Console Appender for INFO level logs -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+  <!-- Console Appender for INFO level logs -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+          <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+  </appender>
 
-    <!-- Root Logger -->
-    <root level="TRACE">
-        <appender-ref ref="CONSOLE"/>
-    </root>
-    <logger name="io.netty" level="INFO"/>
-
+  <!-- Root Logger -->
+  <root level="${ROOT_LOG_LEVEL:INFO}">
+      <appender-ref ref="CONSOLE"/>
+  </root>
+  <logger name="io.netty" level="${NETTY_LOG_LEVEL:-INFO}"/>
+  <logger name="org.jooq.tools" level="${JOOQ_LOG_LEVEL:-INFO}"/>
+  <logger name="org.jooq.impl" level="${JOOQ_LOG_LEVEL:-INFO}"/>
+  <logger name="com.zaxxer.hikari" level="${HIKARI_LOG_LEVEL:-INFO}"/>
+  <logger name="io.ktor.server" level="${KTOR_LOG_LEVEL:-INFO}"/>
 </configuration>

@@ -1,5 +1,6 @@
-package com.lowbudgetlcs.domain.models
+package com.lowbudgetlcs.domain.models.team
 
+import com.lowbudgetlcs.domain.models.Player
 import com.lowbudgetlcs.domain.models.events.EventId
 
 @JvmInline
@@ -14,10 +15,11 @@ value class TeamName(val value: String) {
     }
 }
 
+fun String.toTeamName(): TeamName = TeamName(this)
+
 @JvmInline
 value class TeamLogoName(val value: String)
 
-fun String.toTeamName(): TeamName = TeamName(this)
 fun String.toTeamLogoName(): TeamLogoName = TeamLogoName(this)
 
 data class Team(
@@ -29,7 +31,7 @@ data class Team(
 
 data class NewTeam(
     val name: TeamName,
-    val logoName: TeamLogoName?
+    val logoName: TeamLogoName? = null
 )
 
 data class TeamWithPlayers(

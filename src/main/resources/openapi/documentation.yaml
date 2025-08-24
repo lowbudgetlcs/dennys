@@ -16,12 +16,6 @@ servers:
   - url: /api
 
 tags:
-  - name: v1/eventGroup
-    description: Manage event groups
-
-  - name: v1/eventGroup/events
-    description: Add/remove events to event groups
-
   - name: v1/event
     description: Manage Event
 
@@ -34,9 +28,6 @@ tags:
   - name: v1/team
     description: Manage Teams (create/edit/delete)
 
-  - name: v1/team/players
-    description: Add/remove players from teams
-
   - name: v1/player
     description: Player basic operations
 
@@ -46,13 +37,16 @@ tags:
   - name: v1/account
     description: Create and inspect Riot accounts
 
+  - name: Not Implemented
+    description: These endpoints are planned or WIP, but do not currently have functionality.
+
 paths:
   /v1/eventGroup:
     get:
       summary: Get all event groups
       operationId: getEventGroups
       tags:
-        - v1/eventGroup
+        - Not Implemented
       responses:
         "200":
           description: Successful operation
@@ -72,7 +66,7 @@ paths:
       summary: Create a new event group
       operationId: createEventGroup
       tags:
-        - v1/eventGroup
+        - Not Implemented
       requestBody:
         description: Event group specification
         content:
@@ -111,7 +105,7 @@ paths:
       summary: Get an event group by ID
       operationId: getEventGroupById
       tags:
-        - v1/eventGroup
+        - Not Implemented
       parameters:
         - name: eventGroupId
           in: path
@@ -142,7 +136,7 @@ paths:
       summary: Patch an event group's data
       operationId: patchEventGroup
       tags:
-        - v1/eventGroup
+        - Not Implemented
       parameters:
         - name: eventGroupId
           in: path
@@ -188,7 +182,7 @@ paths:
       summary: Get an event group with all events included
       operationId: getEventsInEventGroup
       tags:
-        - v1/eventGroup/events
+        - Not Implemented
       parameters:
         - name: eventGroupId
           in: path
@@ -217,7 +211,7 @@ paths:
       summary: Assign an event to an event group
       operationId: addEventToEventGroup
       tags:
-        - v1/eventGroup/events
+        - Not Implemented
       parameters:
         - name: eventGroupId
           in: path
@@ -255,7 +249,7 @@ paths:
       summary: Remove an event from an event group
       operationId: removeEventFromEventGroup
       tags:
-        - v1/eventGroup/events
+        - Not Implemented
       parameters:
         - name: eventGroupId
           in: path
@@ -515,11 +509,12 @@ paths:
           required: true
           schema:
             type: integer
-        - name: teamId
-          in: path
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventTeamLinkDto"
       responses:
         "200":
           description: Team removed from event
@@ -731,7 +726,7 @@ paths:
       summary: Patch a team's data.
       operationId: patchTeam
       tags:
-        - v1/team
+        - Not Implemented
       parameters:
         - name: teamId
           in: path
@@ -773,7 +768,7 @@ paths:
       summary: Get a team with all the players included
       operationId: getPlayersOnTeam
       tags:
-        - v1/team/players
+        - Not Implemented
       parameters:
         - name: teamId
           in: path
@@ -802,7 +797,7 @@ paths:
       summary: Add a player to a team
       operationId: addPlayerToTeam
       tags:
-        - v1/team/players
+        - Not Implemented
       parameters:
         - name: teamId
           in: path
@@ -841,7 +836,7 @@ paths:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
       tags:
-        - v1/team/players
+        - Not Implemented
       parameters:
         - name: teamId
           in: path
@@ -1388,6 +1383,7 @@ components:
         teamId:
           type: integer
           example: 3
+          description: The team to operate on
 
     EventCreateSeriesDto:
       type: object
