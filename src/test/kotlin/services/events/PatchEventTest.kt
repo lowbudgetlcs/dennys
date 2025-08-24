@@ -1,15 +1,11 @@
 package services.events
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.patch
-import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.gateways.ITournamentGateway
-import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -22,7 +18,7 @@ import java.time.temporal.ChronoUnit
 
 class PatchEventTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
-    val service = EventService(eventRepo, mockk<ITournamentGateway>())
+    val service = EventService(eventRepo, mockk<ITournamentGateway>(), mockk<ITeamRepository>())
     val start = Instant.now()
     val end = start.plusSeconds(40_000L)
     val testEvent = Event(

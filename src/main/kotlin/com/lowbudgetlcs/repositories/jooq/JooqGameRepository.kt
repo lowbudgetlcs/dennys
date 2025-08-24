@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.Game
+import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toGameId
 import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.storage.tables.references.GAMES
 import org.jooq.storage.tables.references.GAME_RESULTS

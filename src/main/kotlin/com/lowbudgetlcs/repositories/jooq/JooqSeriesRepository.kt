@@ -2,8 +2,8 @@ package com.lowbudgetlcs.repositories.jooq
 
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.storage.tables.Series.Companion.SERIES
 import org.jooq.storage.tables.SeriesResults.Companion.SERIES_RESULTS

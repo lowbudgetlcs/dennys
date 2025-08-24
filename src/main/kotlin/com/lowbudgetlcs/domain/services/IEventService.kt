@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 
 interface IEventService {
@@ -39,13 +40,40 @@ interface IEventService {
      * @param EventUpdate the new event information.
      * @return the updated event.
      *
-     * @throws java.lang.IllegalArgumentException if the new details are invalid
+     * @throws IllegalArgumentException if the new details are invalid
      * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories fail.
      */
     fun patchEvent(id: EventId, update: EventUpdate): Event
 
     /**
      * Fetches all events and includes teams that are registered to the event
+     *
+     * @param EventId the event to fetch.
+     * @return the specified event with all child teams.
+     *
+     * @throws NoSuchElementException if the specified event cannot be found
      */
-    fun getEventWithTeams(id: EventId): List<EventWithTeams>
+    fun getEventWithTeams(id: EventId): EventWithTeams
+
+    /**
+     * Associate a team with an event
+     *
+     * @param EventId the target event.
+     * @param TeamId the team to add.
+     * @return the event with all registered teams.
+     *
+     * @throws NoSuchElementException if the specified event or team doesn't exist
+     */
+    fun addTeam(eventId: EventId, teamId: TeamId): EventWithTeams
+
+    /**
+     * Unassociate a team with an event
+     *
+     * @param EventId the target event.
+     * @param TeamId the team to add.
+     * @return the event with all registered teams.
+     *
+     * @throws NoSuchElementException if the specified event or team doesn't exist
+     */
+    fun removeTeam(eventId: EventId, teamId: TeamId): EventWithTeams
 }

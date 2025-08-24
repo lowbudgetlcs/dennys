@@ -42,10 +42,21 @@ fun Route.eventEndpointsV1(
         val updated = eventService.patchEvent(route.eventId.toEventId(), dto.toEventUpdate())
         call.respond(updated.toDto())
     }
-
     get<EventResourcesV1.ByIdTeams> { route ->
         logger.info("📩 Received GET on /v1/event/{id}/teams")
         val events = eventService.getEventWithTeams(route.eventId.toEventId())
-        call.respond(events.map { it.toDto() })
+        call.respond(events.toDto())
+    }
+    post<EventResourcesV1.ByIdTeams> { route ->
+        logger.info("📩 Received POST on /v1/event/{eventId}/teams/{teamId}")
+        val team = call.receive<EventTeamLinkDto>()
+        val event = eventService.addTeam(route.eventId.toEventId(), team.toTeamId())
+        call.respond(event.toDto())
+    }
+    delete<EventResourcesV1.ByIdTeams> { route ->
+        logger.info("📩 Received DELETE on /v1/event/{eventId}/teams/{teamId}")
+        val team = call.receive<EventTeamLinkDto>()
+        val event = eventService.removeTeam(route.eventId.toEventId(), team.toTeamId())
+        call.respond(event.toDto())
     }
 }

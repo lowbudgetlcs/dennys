@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
-import com.lowbudgetlcs.repositories.DatabaseException
 
 class PlayerService(
     private val playerRepository: IPlayerRepository,

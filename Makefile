@@ -33,7 +33,7 @@ run:
 
 # Start database tools
 db:
-	docker compose up db pgadmin
+	docker compose up db 
 
 swag:
 	docker compose up swagger-editor

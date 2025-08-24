@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.events
 
-import com.lowbudgetlcs.domain.models.Team
+import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import java.time.Instant
 

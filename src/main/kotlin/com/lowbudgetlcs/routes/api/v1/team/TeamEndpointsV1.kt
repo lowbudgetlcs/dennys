@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.routes.api.v1.team
 
-import com.lowbudgetlcs.domain.models.toTeamId
+import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.services.TeamService
 import com.lowbudgetlcs.routes.dto.teams.NewTeamDto
 import com.lowbudgetlcs.routes.dto.teams.toDto

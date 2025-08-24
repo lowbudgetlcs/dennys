@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.*
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.domain.models.team.*
 import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.repositories.ITeamRepository
 
 class TeamService(
     private val teamRepository: ITeamRepository
