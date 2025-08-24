@@ -76,6 +76,8 @@ fun Application.routes() {
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
             allowHeader("api_key")
+            allowMethod(HttpMethod.Patch)
+            allowMethod(HttpMethod.Delete)
         }
         install(Resources)
         route("/") {
