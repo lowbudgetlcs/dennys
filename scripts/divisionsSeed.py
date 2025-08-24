@@ -56,7 +56,6 @@ with open("data/divisions.json") as f:
         # Create each team
         division = f"{prefix} {div}"
         eventId = getEventId(division)
-        print(eventId)
         if eventId is None:
             continue
         for teamName in teams:
