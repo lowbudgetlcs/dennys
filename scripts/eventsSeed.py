@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+# pyright: basic
 
+import url
 import requests
 import json
 from argparse import ArgumentParser
@@ -8,11 +10,10 @@ from zoneinfo import ZoneInfo
 
 from requests.models import HTTPError
 
-parser = ArgumentParser(description="Seed dennys database with events.")
-_ = parser.add_argument("environment")
-args = parser.parse_args()
-environment = args.environment
-url = f"https://{environment}.lowbudgetlcs.com/api/v1/event"
+parser = ArgumentParser()
+parser = url.args(parser)
+base = url.base(parser)
+url = f"{base}/event"
 
 prefix = "Season 15"
 events = [
@@ -22,7 +23,7 @@ events = [
     "Financial",
     "Audit",
     "Executive",
-    "Ceo",
+    "CEO",
     "LCS",
 ]
 start = "08/25/2025"
@@ -43,7 +44,6 @@ for e in events:
         "endDate": endstamp,
         "status": "ACTIVE",
     }
-    print(payload)
     res = requests.post(
         url, headers={"Content-Type": "application/json"}, data=json.dumps(payload)
     )

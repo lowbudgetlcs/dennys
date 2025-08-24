@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # pyright: basic
 
+import url
 import json
 import requests
 from argparse import ArgumentParser
 
-parser = ArgumentParser(description="Seed dennys database with events.")
-_ = parser.add_argument("environment")
-args = parser.parse_args()
-environment = args.environment
-url = f"https://{environment}.lowbudgetlcs.com/api/v1/team"
+parser = ArgumentParser()
+parser = url.args(parser)
+base = url.base(parser)
+url = f"{base}/team"
 
 with open("data/teams.json") as f:
     data = json.load(f)
