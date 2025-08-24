@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.eventEndpointsV1(
-    eventService: IEventService
+    eventService: IEventService,
+    seriesService: ISeriesService
 ) {
     get<EventResourcesV1> {
         logger.info("📩 Received GET on /v1/event")
@@ -51,6 +52,23 @@ fun Route.eventEndpointsV1(
         logger.info("📩 Received POST on /v1/event/{eventId}/teams/{teamId}")
         val team = call.receive<EventTeamLinkDto>()
         val event = eventService.addTeam(route.eventId.toEventId(), team.toTeamId())
+        call.respond(event.toDto())
+    }
+    get<EventResourcesV1.ByIdSeries> { route ->
+        logger.info("📩 Received GET on /v1/event/{id}/series")
+        val events = eventService.getEventWithSeries(route.eventId.toEventId())
+        call.respond(events.toDto())
+    }
+    post<EventResourcesV1.ByIdSeries> { route ->
+        logger.info("📩 Received POST on /v1/event/{eventId}/series")
+        val series = call.receive<EventSeriesLinkDto>()
+        val event = seriesService.addSeries(route.eventId.toEventId(), series.toSeriesId())
+        call.respond(event.toDto())
+    }
+    delete<EventResourcesV1.ByIdSeries> { route ->
+        logger.info("📩 Received DELETE on /v1/event/{eventId}/series/{seriesId}")
+        val series = call.receive<EventSeriesLinkDto>()
+        val event = seriesService.removeSeries(route.eventId.toEventId(), series.toSeriesId())
         call.respond(event.toDto())
     }
     delete<EventResourcesV1.ByIdTeams> { route ->
