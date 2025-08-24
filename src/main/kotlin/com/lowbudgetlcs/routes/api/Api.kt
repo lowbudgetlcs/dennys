@@ -64,16 +64,16 @@ fun Route.apiRoutes() {
     val teamRepository: ITeamRepository = TeamRepository(Database.dslContext)
     val teamService = TeamService(teamRepository)
 
-    val metadataRepo = MetadataRepository(Database.dslContext)
+    val metadataRepository = MetadataRepository(Database.dslContext)
     val tournamentGateway = TournamentGateway(
-        metadataRepo = metadataRepo,
+        metadataRepo = metadataRepository,
         client = riotHttpClient,
         apiKey = appConfig.riot.key,
         stub = appConfig.riot.useStubs,
     )
 
-    val eventRepo = EventRepository(Database.dslContext)
-    val eventService = EventService(eventRepo, tournamentGateway)
+    val eventRepository = EventRepository(Database.dslContext)
+    val eventService = EventService(eventRepository, tournamentGateway, teamRepository)
 
     route("/api/v1") {
         route("/riot-callback") {

@@ -1,25 +1,33 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.gateways.ITournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 
 class EventService(
-    private val eventRepo: IEventRepository, private val tournamentGateway: ITournamentGateway
+    private val eventRepo: IEventRepository,
+    private val tournamentGateway: ITournamentGateway,
+    private val teamRepo: ITeamRepository
 ) : IEventService {
     override fun getAllEvents(): List<Event> = eventRepo.getAll()
 
     override fun getEvent(id: EventId): Event =
-        eventRepo.getById(id) ?: throw NoSuchElementException("Event with ${id.value} not found.")
+        eventRepo.getById(id) ?: throw NoSuchElementException("Event with id '${id.value}' not found.")
+
+    override fun getEventWithTeams(id: EventId): EventWithTeams {
+        val event = getEvent(id)
+        val teams = teamRepo.getAll().filter { it.eventId == id }
+        return event.toEventWithTeams(teams)
+    }
 
     override fun createEvent(event: NewEvent, tournament: NewTournament): Event {
         if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
-        if (isNameTaken(event.name)) throw IllegalArgumentException("Event '${event.name}' already exists.")
+        isNameTaken(event.name)
         if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
-        // TODO: Services may need to be refactored to support suspend functions.
         val t = tournamentGateway.create(tournament)
             ?: throw DatabaseException("Failed to register tournament with Riot Games.")
         return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
@@ -27,28 +35,53 @@ class EventService(
 
     override fun patchEvent(id: EventId, update: EventUpdate): Event {
         val event = getEvent(id)
-        update.name?.let { if (isNameTaken(it)) throw IllegalArgumentException("Event '${update.name}' already exists.") }
+        update.name?.let { isNameTaken(it) }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
         return eventRepo.update(event.patch(update)) ?: throw DatabaseException("Failed to update event.")
     }
 
-    override fun getEventWithTeams(id: EventId): EventWithTeams =
-        eventRepo.getByIdWithTeams(id) ?: throw NoSuchElementException("Event with ${id.value} not found.")
-
     override fun addTeam(
         eventId: EventId, teamId: TeamId
     ): EventWithTeams {
-        TODO("Not yet implemented")
+        doesEventExist(eventId)
+        doesTeamExist(teamId)
+        teamRepo.updateEventId(teamId, eventId) ?: throw DatabaseException("Failed to add team to event.")
+        return getEventWithTeams(eventId)
     }
 
     override fun removeTeam(
         eventId: EventId, teamId: TeamId
     ): EventWithTeams {
-        TODO("Not yet implemented")
+        doesEventExist(eventId)
+        doesTeamExist(teamId)
+        teamRepo.updateEventId(teamId, null) ?: throw DatabaseException("Failed to remove team from event.")
+        return getEventWithTeams(eventId)
     }
 
+    /**
+     * Checks if an event name is taken.
+     * @return false if name is not taken.
+     * @throws IllegalArgumentException when name already exists.
+     */
+    private fun isNameTaken(name: String): Boolean = if (eventRepo.getAll()
+            .any { it.name == name }
+    ) throw IllegalArgumentException("Event '${name}' already exists.") else false
 
-    private fun isNameTaken(name: String): Boolean = eventRepo.getAll().any { it.name == name }
+    /**
+     * Checks if an event exists.
+     * @return true if event exists.
+     * @throws NoSuchElementException if event does not exist.
+     */
+    private fun doesEventExist(eventId: EventId) =
+        if (eventRepo.getById(eventId) == null) throw NoSuchElementException("Event with id '${eventId.value}' not found.") else true
+
+    /**
+     * Checks if team exists
+     * @return true if team exists.
+     * @throws NoSuchElementException if team does not exist.
+     */
+    private fun doesTeamExist(teamId: TeamId): Boolean =
+        if (teamRepo.getById(teamId) == null) throw NoSuchElementException("Team with id '${teamId.value}' not found.") else true
 }

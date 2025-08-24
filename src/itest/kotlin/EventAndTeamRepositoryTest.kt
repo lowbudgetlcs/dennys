@@ -2,15 +2,12 @@ import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventWithTeams
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toEventWithTeams
 import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.repositories.EventRepository
 import com.lowbudgetlcs.repositories.TeamRepository
@@ -20,6 +17,7 @@ import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
@@ -27,7 +25,7 @@ import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class EventAndTeamTest : StringSpec({
+class EventAndTeamRepositoryTest : StringSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
         withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }
@@ -59,7 +57,7 @@ class EventAndTeamTest : StringSpec({
     }
 
     fun checkTeam(team: Team) {
-        team.shouldBeEqualToIgnoringFields(expectedTeam, Team::id)
+        team.shouldBeEqualToIgnoringFields(expectedTeam, Team::id, Team::eventId)
     }
 
     "insert a new event" {
@@ -72,6 +70,7 @@ class EventAndTeamTest : StringSpec({
         val team = teamRepo.insert(newTeam)
         team.shouldNotBeNull()
         checkTeam(team)
+        team.eventId shouldBe null
     }
 
     "add team to event" {
@@ -81,25 +80,9 @@ class EventAndTeamTest : StringSpec({
         val teams = teamRepo.getAll()
         teams.shouldNotBeEmpty()
         val team = teams.first()
-        val e = eventRepo.associateTeam(event.id, team.id)
-        e.shouldNotBeNull()
-        checkEvent(e.toEvent())
-        e.teams.shouldNotBeEmpty()
-        val t = e.teams.first()
+        val t = teamRepo.updateEventId(team.id, event.id)
         t.shouldNotBeNull()
         checkTeam(t)
-    }
-
-    "can fetch event with teams" {
-        val events = eventRepo.getAll()
-        events.shouldNotBeEmpty()
-        val event = events.first()
-        val e = eventRepo.getByIdWithTeams(event.id)
-        e.shouldNotBeNull()
-        checkEvent(e.toEvent())
-        e.teams.shouldNotBeEmpty()
-        val t = e.teams.first()
-        t.shouldNotBeNull()
-        checkTeam(t)
+        t.eventId shouldBe event.id
     }
 })

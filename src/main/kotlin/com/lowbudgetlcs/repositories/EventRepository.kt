@@ -9,6 +9,7 @@ import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.storage.tables.references.EVENTS
+import org.jooq.storage.tables.references.TEAMS
 
 class EventRepository(private val dsl: DSLContext) : IEventRepository {
 
@@ -19,10 +20,6 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
 
     override fun getById(id: EventId): Event? =
         selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne()?.let(::rowToEvent)
-
-    override fun getByIdWithTeams(id: EventId): EventWithTeams? {
-        TODO("Not yet implemented")
-    }
 
     override fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event? = try {
         val insertedId = dsl.insertInto(
@@ -42,20 +39,6 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
             .set(EVENTS.STATUS, event.status.name).where(EVENTS.ID.eq(event.id.value)).returning(EVENTS.ID).fetchOne()
             ?.get(EVENTS.ID)
         return insertedId?.toEventId()?.let(::getById)
-    }
-
-    override fun associateTeam(
-        eventId: EventId,
-        teamId: TeamId
-    ): EventWithTeams? {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteTeam(
-        eventId: EventId,
-        teamId: TeamId
-    ): EventWithTeams? {
-        TODO("Not yet implemented")
     }
 
     private fun selectEvents() = dsl.select(

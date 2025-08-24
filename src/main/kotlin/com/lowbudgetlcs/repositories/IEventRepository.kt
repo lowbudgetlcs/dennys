@@ -11,10 +11,7 @@ import com.lowbudgetlcs.domain.models.tournament.TournamentId
 interface IEventRepository {
     fun getAll(): List<Event>
     fun getById(id: EventId): Event?
-    fun getByIdWithTeams(id: EventId): EventWithTeams?
     fun getAllByGroupId(groupId: EventGroupId): List<Event>
     fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event?
     fun update(event: Event): Event?
-    fun associateTeam(eventId: EventId, teamId: TeamId): EventWithTeams?
-    fun deleteTeam(eventId: EventId, teamId: TeamId): EventWithTeams?
 }

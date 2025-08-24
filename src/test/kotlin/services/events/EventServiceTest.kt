@@ -6,8 +6,8 @@ import com.lowbudgetlcs.domain.models.tournament.Tournament
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.gateways.ITournamentGateway
-import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -21,7 +21,7 @@ import java.time.temporal.ChronoUnit
 class EventServiceTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
     val tournamentGate = mockk<ITournamentGateway>()
-    val service = EventService(eventRepo, tournamentGate)
+    val service = EventService(eventRepo, tournamentGate, mockk<ITeamRepository>())
     val start = Instant.now()
     val end = Instant.now().plusSeconds(3600L)
     val newEvent = NewEvent(
@@ -33,7 +33,6 @@ class EventServiceTest : FunSpec({
         tournamentId = 9999.toTournamentId(),
     )
     val newTournament = NewTournament("Test")
-    val newGroup1 = NewEventGroup("Group 1")
 
     test("Creating event succeeds") {
         every {
