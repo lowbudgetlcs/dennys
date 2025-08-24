@@ -45,6 +45,7 @@ class SeriesRepository(
     }
 
     override fun removeSeries(seriesId: SeriesId): Series? {
+
         val updated = dsl.update(SERIES)
             .set(SERIES.id, null as Int?)
             .where(SERIES.ID.eq(seriesId.value))
@@ -53,6 +54,11 @@ class SeriesRepository(
         dsl.update(SERIES_RESULTS)
             .set(SERIES_RESULTS.SERIES_ID, null as Int?)
             .where(SERIES_RESULTS.SERIES_ID.eq(seriesId.value))
+            .execute()
+
+        dsl.update(TEAM_TO_SERIES)
+            .set(TEAM_TO_SERIES.SERIES_ID, null as Int?)
+            .where(TEAM_TO_SERIES.SERIES_ID.eq(seriesId.value))
             .execute()
 
         return if (updated > 0) getById(playerId) else null
