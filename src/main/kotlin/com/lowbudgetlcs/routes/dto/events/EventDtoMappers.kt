@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.routes.dto.events
 
-import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.EventWithTeams
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.routes.dto.teams.toDto
 

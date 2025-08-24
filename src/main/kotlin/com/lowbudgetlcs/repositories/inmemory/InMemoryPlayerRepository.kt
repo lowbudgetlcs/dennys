@@ -10,7 +10,7 @@ class InMemoryPlayerRepository : IPlayerRepository {
     private val accounts = mutableMapOf<RiotAccountId, RiotAccount>()
     private var currentAccountId = 0
 
-    override fun insert(newPlayer: NewPlayer): PlayerWithAccounts? {
+    override fun insert(newPlayer: NewPlayer): PlayerWithAccounts {
         val id = PlayerId(currentPlayerId++)
         val player = PlayerWithAccounts(
             id = id,

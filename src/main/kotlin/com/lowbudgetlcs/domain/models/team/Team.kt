@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.models.events.EventId
 
 @JvmInline
 value class TeamId(val value: Int)
+
 fun Int.toTeamId(): TeamId = TeamId(this)
 
 @JvmInline
@@ -13,10 +14,12 @@ value class TeamName(val value: String) {
         require(value.length < 80) { "Team name must be less than 80 characters" }
     }
 }
+
 fun String.toTeamName(): TeamName = TeamName(this)
 
 @JvmInline
 value class TeamLogoName(val value: String)
+
 fun String.toTeamLogoName(): TeamLogoName = TeamLogoName(this)
 
 data class Team(

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 
 interface IEventService {

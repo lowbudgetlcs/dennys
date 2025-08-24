@@ -1,15 +1,12 @@
 package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.storage.tables.references.EVENTS
-import org.jooq.storage.tables.references.TEAMS
 
 class EventRepository(private val dsl: DSLContext) : IEventRepository {
 

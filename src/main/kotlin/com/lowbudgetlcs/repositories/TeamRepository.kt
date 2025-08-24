@@ -1,22 +1,12 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.Player
 import com.lowbudgetlcs.domain.models.PlayerId
 import com.lowbudgetlcs.domain.models.PlayerName
-import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.team.TeamLogoName
-import com.lowbudgetlcs.domain.models.team.TeamName
-import com.lowbudgetlcs.domain.models.team.TeamWithPlayers
 import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.models.team.toTeamLogoName
-import com.lowbudgetlcs.domain.models.team.toTeamName
+import com.lowbudgetlcs.domain.models.team.*
 import org.jooq.DSLContext
 import org.jooq.Record
-import org.jooq.storage.tables.references.EVENTS
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.PLAYERS_TO_TEAM
 import org.jooq.storage.tables.references.TEAMS
@@ -61,7 +51,7 @@ class TeamRepository(
     }
 
     override fun insertPlayerToTeam(teamId: TeamId, playerId: PlayerId): TeamWithPlayers? {
-        val u = dsl.update(PLAYERS_TO_TEAM).set(PLAYERS_TO_TEAM.TEAM_ID, teamId.value)
+        dsl.update(PLAYERS_TO_TEAM).set(PLAYERS_TO_TEAM.TEAM_ID, teamId.value)
             .set(PLAYERS_TO_TEAM.PLAYER_ID, playerId.value)
         val updated = dsl.update(PLAYERS.playersToTeam).set(PLAYERS.playersToTeam.TEAM_ID, teamId.value)
             .where(PLAYERS.playersToTeam.PLAYER_ID.eq(playerId.value)).execute()

@@ -38,7 +38,11 @@ class TournamentGateway(
             setBody(CreateTournamentRequest(tournament.name, providerId))
         }
         when (res.status) {
-            HttpStatusCode.OK -> return@runBlocking Tournament(id = res.body<Int>().toTournamentId(), name = tournament.name)
+            HttpStatusCode.OK -> return@runBlocking Tournament(
+                id = res.body<Int>().toTournamentId(),
+                name = tournament.name
+            )
+
             else -> {
                 throw RiotApiException("Unexpected Riot API error: ${res.status}")
             }
