@@ -12,6 +12,7 @@ parser = ArgumentParser(description="Seed dennys database with events.")
 _ = parser.add_argument("environment")
 args = parser.parse_args()
 environment = args.environment
+url = f"https://{environment}.lowbudgetlcs.com/api/v1/event"
 
 prefix = "Season 15"
 events = [
@@ -33,7 +34,6 @@ endstamp = (
     datetime.strptime(end, "%m/%d/%Y").replace(tzinfo=ZoneInfo("UTC")).isoformat()
 )
 
-url = f"https://{environment}.lowbudgetlcs.com/api/v1/event"
 for e in events:
     name = f"{prefix} {e}"
     payload = {
