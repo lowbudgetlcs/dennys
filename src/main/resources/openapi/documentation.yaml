@@ -583,7 +583,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EventAddSeriesDto"
+              $ref: "#/components/schemas/EventCreateSeriesDto"
       responses:
         "200":
           description: Team added to event
@@ -591,8 +591,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventWithSeriesDto"
+        "400":
+          description: Request body is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
           description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            Invalid resource state
+
+            Possible reasons:
+            - One or more teams are not in this event.
+            - Series already exists between these teams.
           content:
             application/json:
               schema:
@@ -1372,11 +1389,12 @@ components:
           type: integer
           example: 3
 
-    EventAddSeriesDto:
+    EventCreateSeriesDto:
       type: object
       required:
         - team1Id
         - team2Id
+        - gamesToWin
       properties:
         team1Id:
           type: integer
@@ -1384,6 +1402,9 @@ components:
         team2Id:
           type: integer
           example: 456
+        gamesToWin:
+          type: integer
+          example: 3
 
     NewPlayerDto:
       type: object
@@ -1496,15 +1517,17 @@ components:
       type: object
       required:
         - id
-        - team1
-        - team2
+        - eventId
+        - teams
       properties:
         id:
           type: integer
-        team1:
-          $ref: "#/components/schemas/TeamDto"
-        team2:
-          $ref: "#/components/schemas/TeamDto"
+        eventId:
+          type: integer
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamDto"
 
     TeamWithPlayersDto:
       type: object

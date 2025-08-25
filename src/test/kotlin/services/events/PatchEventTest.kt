@@ -9,6 +9,8 @@ import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ISeriesRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -21,7 +23,8 @@ import java.time.temporal.ChronoUnit
 
 class PatchEventTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
-    val service = EventService(eventRepo, mockk<IRiotTournamentGateway>())
+    val service =
+        EventService(eventRepo, mockk<IRiotTournamentGateway>(), mockk<ITeamRepository>(), mockk<ISeriesRepository>())
     val start = Instant.now()
     val end = start.plusSeconds(40_000L)
     val testEvent = Event(

@@ -9,4 +9,7 @@ class EventResourcesV1 {
 
     @Resource("{eventId}/teams")
     data class ByIdTeams(val parent: EventResourcesV1 = EventResourcesV1(), val eventId: Int)
+
+    @Resource("{eventId}/series")
+    data class ByIdSeries(val parent: EventResourcesV1 = EventResourcesV1(), val eventId: Int)
 }

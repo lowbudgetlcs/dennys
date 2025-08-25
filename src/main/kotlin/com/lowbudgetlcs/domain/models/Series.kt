@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.models
 
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.team.TeamId
 
 @JvmInline
 value class SeriesId(val value: Int)

@@ -9,7 +9,7 @@ class InMemoryAccountRepository : IAccountRepository {
     private val accounts = mutableListOf<RiotAccount>()
     private var nextId = 0
 
-    override fun insert(newAccount: NewRiotAccount): RiotAccount? {
+    override fun insert(newAccount: NewRiotAccount): RiotAccount {
         val account = RiotAccount(
             id = RiotAccountId(nextId++),
             riotPuuid = newAccount.riotPuuid,

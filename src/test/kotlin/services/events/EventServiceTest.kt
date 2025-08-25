@@ -1,12 +1,13 @@
 package services.events
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.riot.tournament.NewRiotTournament
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ISeriesRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -21,7 +22,7 @@ import java.time.temporal.ChronoUnit
 class EventServiceTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
     val tournamentGate = mockk<IRiotTournamentGateway>()
-    val service = EventService(eventRepo, tournamentGate)
+    val service = EventService(eventRepo, tournamentGate, mockk<ITeamRepository>(), mockk<ISeriesRepository>())
     val start = Instant.now()
     val end = Instant.now().plusSeconds(3600L)
     val newEvent = NewEvent(

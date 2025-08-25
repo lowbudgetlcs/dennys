@@ -11,7 +11,7 @@ import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
-class JooqPlayerRepositoryTest : FunSpec({
+class PlayerRepositoryTest : FunSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
         withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }

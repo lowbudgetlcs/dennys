@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.models
 
 import com.lowbudgetlcs.domain.models.riot.tournament.Shortcode
+import com.lowbudgetlcs.domain.models.team.TeamId
 
 @JvmInline
 value class GameId(val value: Int)

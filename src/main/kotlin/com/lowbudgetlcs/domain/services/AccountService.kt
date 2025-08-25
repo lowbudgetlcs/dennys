@@ -5,12 +5,11 @@ import com.lowbudgetlcs.domain.models.riot.RiotAccount
 import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.domain.models.riot.RiotPuuid
 import com.lowbudgetlcs.gateways.IRiotAccountGateway
-import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.repositories.IAccountRepository
 
 class AccountService(
-    private val accountRepository: IAccountRepository,
-    private val riotAccountGateway: IRiotAccountGateway
+    private val accountRepository: IAccountRepository, private val riotAccountGateway: IRiotAccountGateway
 ) {
 
     suspend fun createAccount(account: NewRiotAccount): RiotAccount {

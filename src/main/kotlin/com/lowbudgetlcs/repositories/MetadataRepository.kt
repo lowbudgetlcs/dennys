@@ -5,7 +5,8 @@ import org.jooq.storage.tables.references.METADATA
 
 class MetadataRepository(private val dsl: DSLContext) : IMetadataRepository {
     override fun init(providerId: Int, bucketName: String): Boolean = try {
-        dsl.insertInto(METADATA).set(METADATA.RIOT_PROVIDER_ID, providerId).set(METADATA.LOGO_BUCKET_NAME, bucketName).execute()
+        dsl.insertInto(METADATA).set(METADATA.RIOT_PROVIDER_ID, providerId).set(METADATA.LOGO_BUCKET_NAME, bucketName)
+            .execute()
         true
     } catch (e: Throwable) {
         false

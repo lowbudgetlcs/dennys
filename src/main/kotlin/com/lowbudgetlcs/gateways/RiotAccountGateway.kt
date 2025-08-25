@@ -22,7 +22,7 @@ class RiotAccountGateway(
         }
 
         return when (response.status) {
-            HttpStatusCode.OK -> response.body()
+            HttpStatusCode.OK -> response.body<RiotAccountDto>()
             HttpStatusCode.BadRequest -> throw IllegalArgumentException("Invalid Riot PUUID")
             HttpStatusCode.NotFound -> throw NoSuchElementException("Riot account not found for PUUID")
             else -> throw RiotApiException("Unexpected Riot API error: ${response.status}")

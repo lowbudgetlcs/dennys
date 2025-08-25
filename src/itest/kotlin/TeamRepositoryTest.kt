@@ -1,6 +1,6 @@
-import com.lowbudgetlcs.domain.models.NewTeam
-import com.lowbudgetlcs.domain.models.TeamLogoName
-import com.lowbudgetlcs.domain.models.TeamName
+import com.lowbudgetlcs.domain.models.team.NewTeam
+import com.lowbudgetlcs.domain.models.team.TeamLogoName
+import com.lowbudgetlcs.domain.models.team.TeamName
 import com.lowbudgetlcs.repositories.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
@@ -12,7 +12,7 @@ import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
-class JooqTeamRepositoryTest : FunSpec({
+class TeamRepositoryTest : FunSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
         withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }
