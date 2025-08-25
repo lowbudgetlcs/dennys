@@ -1,5 +1,5 @@
-import com.lowbudgetlcs.domain.models.NewRiotAccount
-import com.lowbudgetlcs.domain.models.RiotPuuid
+import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
+import com.lowbudgetlcs.domain.models.riot.RiotPuuid
 import com.lowbudgetlcs.repositories.AccountRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
@@ -11,7 +11,7 @@ import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
-class JooqAccountRepositoryTest : FunSpec({
+class AccountRepositoryTest : FunSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
         withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }

@@ -1,14 +1,6 @@
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.team.NewTeam
-import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.team.toTeam
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.models.tournament.toTournamentId
+import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.team.*
 import com.lowbudgetlcs.repositories.EventRepository
 import com.lowbudgetlcs.repositories.TeamRepository
 import io.kotest.core.extensions.install
@@ -43,7 +35,7 @@ class EventAndTeamRepositoryTest : StringSpec({
         status = EventStatus.ACTIVE
     )
     val expectedEvent = newEvent.toEvent(
-        id = 1.toEventId(), createdAt = Instant.now(), tournamentId = 1245.toTournamentId()
+        id = 1.toEventId(), createdAt = Instant.now(), riotTournamentId = 1245.toRiotTournamentId()
     )
     val newTeam = NewTeam(
         name = "Test Team".toTeamName(),
@@ -53,7 +45,7 @@ class EventAndTeamRepositoryTest : StringSpec({
     )
 
     fun checkEvent(event: Event) {
-        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::id, Event::createdAt, Event::tournamentId)
+        event.shouldBeEqualToIgnoringFields(expectedEvent, Event::id, Event::createdAt, Event::riotTournamentId)
     }
 
     fun checkTeam(team: Team) {
@@ -61,7 +53,7 @@ class EventAndTeamRepositoryTest : StringSpec({
     }
 
     "insert a new event" {
-        val event = eventRepo.insert(newEvent, 1245.toTournamentId())
+        val event = eventRepo.insert(newEvent, 1245.toRiotTournamentId())
         event.shouldNotBeNull()
         checkEvent(event)
     }

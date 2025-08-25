@@ -1,22 +1,17 @@
 package services.events
 
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toEventWithTeams
+import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.models.tournament.toTournamentId
 import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.gateways.ITournamentGateway
+import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ISeriesRepository
 import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -26,9 +21,9 @@ import java.time.temporal.ChronoUnit
 
 class AddRemoveTeamTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
-    val tournamentGate = mockk<ITournamentGateway>()
+    val tournamentGate = mockk<IRiotTournamentGateway>()
     val teamRepo = mockk<ITeamRepository>()
-    val service = EventService(eventRepo, tournamentGate, teamRepo)
+    val service = EventService(eventRepo, tournamentGate, teamRepo, mockk<ISeriesRepository>())
     val start = Instant.now()
     val end = Instant.now().plusSeconds(3600L)
     val newEvent = NewEvent(
@@ -37,7 +32,7 @@ class AddRemoveTeamTest : FunSpec({
     val expectedEvent = newEvent.toEvent(
         id = 0.toEventId(),
         createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
-        tournamentId = 9999.toTournamentId(),
+        riotTournamentId = 9999.toRiotTournamentId(),
     )
     val newTeam = NewTeam(
         name = "TEST".toTeamName()
@@ -50,8 +45,7 @@ class AddRemoveTeamTest : FunSpec({
         every { teamRepo.getById(expectedTeam.id) } returns expectedTeam
         every {
             teamRepo.updateEventId(
-                expectedTeam.id,
-                expectedEvent.id
+                expectedTeam.id, expectedEvent.id
             )
         } returns expectedTeam
         every { teamRepo.getAll() } returns listOf(expectedTeam)
@@ -65,8 +59,7 @@ class AddRemoveTeamTest : FunSpec({
         every { teamRepo.getById(expectedTeam.id) } returns expectedTeam
         every {
             teamRepo.updateEventId(
-                expectedTeam.id,
-                null
+                expectedTeam.id, null
             )
         } returns expectedTeam.copy(eventId = null)
         every { teamRepo.getAll() } returns listOf(expectedTeam)

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.routes.api.v1.account
 
-import com.lowbudgetlcs.domain.models.toRiotAccountId
+import com.lowbudgetlcs.domain.models.riot.toRiotAccountId
 import com.lowbudgetlcs.domain.services.AccountService
-import com.lowbudgetlcs.routes.dto.accounts.NewRiotAccountDto
+import com.lowbudgetlcs.routes.dto.accounts.NewAccountDto
 import com.lowbudgetlcs.routes.dto.accounts.toDto
 import com.lowbudgetlcs.routes.dto.accounts.toNewRiotAccount
 import io.ktor.http.*
@@ -22,7 +22,7 @@ fun Route.accountEndpointsV1(
 ) {
     post<AccountResourcesV1> {
         logger.info("📩 Received POST /v1/account")
-        val dto = call.receive<NewRiotAccountDto>()
+        val dto = call.receive<NewAccountDto>()
         val newAccount = dto.toNewRiotAccount()
         val created = accountService.createAccount(newAccount)
         call.respond(HttpStatusCode.Created, created.toDto())

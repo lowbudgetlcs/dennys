@@ -1,18 +1,15 @@
 package com.lowbudgetlcs.domain.models.events
 
+import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
 import java.time.Instant
 
-fun NewEventGroup.toEventGroup(id: EventGroupId): EventGroup = EventGroup(
-    id = id, name = name
-)
-
-fun NewEvent.toEvent(id: EventId, createdAt: Instant, tournamentId: TournamentId): Event = Event(
+fun NewEvent.toEvent(id: EventId, createdAt: Instant, riotTournamentId: RiotTournamentId): Event = Event(
     id = id,
     name = name,
     description = description,
-    tournamentId = tournamentId,
+    riotTournamentId = riotTournamentId,
     createdAt = createdAt,
     startDate = startDate,
     endDate = endDate,
@@ -25,7 +22,7 @@ fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams = EventWithTeams(
     name = name,
     description = description,
     eventGroupId = eventGroupId,
-    tournamentId = tournamentId,
+    riotTournamentId = riotTournamentId,
     createdAt = createdAt,
     startDate = startDate,
     endDate = endDate,
@@ -33,14 +30,15 @@ fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams = EventWithTeams(
     teams = teams
 )
 
-fun EventWithTeams.toEvent(): Event = Event(
+fun Event.toEventWithSeries(series: List<Series>): EventWithSeries = EventWithSeries(
     id = id,
     name = name,
     description = description,
     eventGroupId = eventGroupId,
-    tournamentId = tournamentId,
+    riotTournamentId = riotTournamentId,
     createdAt = createdAt,
     startDate = startDate,
     endDate = endDate,
     status = status,
+    series = series
 )

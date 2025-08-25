@@ -1,10 +1,11 @@
 package services.events
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.tournament.toTournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.gateways.ITournamentGateway
+import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ISeriesRepository
 import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
@@ -18,13 +19,14 @@ import java.time.temporal.ChronoUnit
 
 class PatchEventTest : FunSpec({
     val eventRepo = mockk<IEventRepository>()
-    val service = EventService(eventRepo, mockk<ITournamentGateway>(), mockk<ITeamRepository>())
+    val service =
+        EventService(eventRepo, mockk<IRiotTournamentGateway>(), mockk<ITeamRepository>(), mockk<ISeriesRepository>())
     val start = Instant.now()
     val end = start.plusSeconds(40_000L)
     val testEvent = Event(
         id = 0.toEventId(),
         createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
-        tournamentId = 9999.toTournamentId(),
+        riotTournamentId = 9999.toRiotTournamentId(),
         name = "Test",
         description = "This is a test.",
         eventGroupId = null,
@@ -33,9 +35,7 @@ class PatchEventTest : FunSpec({
         status = EventStatus.NOT_STARTED,
     )
 
-    beforeTest {
-        every { eventRepo.getById(testEvent.id) } returns testEvent
-    }
+    beforeTest { every { eventRepo.getById(testEvent.id) } returns testEvent }
 
     /* service.patchEvent() */
     test("patchEvent() throws exception when event id not found") {
@@ -116,7 +116,11 @@ class PatchEventTest : FunSpec({
     test("patchEvent() cannot invalidate start and end dates.") {
         shouldThrow<IllegalArgumentException> {
             service.patchEvent(
-                testEvent.id, EventUpdate(endDate = testEvent.startDate, startDate = testEvent.endDate)
+                testEvent.id,
+                EventUpdate(
+                    endDate = testEvent.startDate,
+                    startDate = testEvent.endDate
+                )
             )
         }
     }

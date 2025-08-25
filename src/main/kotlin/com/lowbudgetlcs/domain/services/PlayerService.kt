@@ -1,26 +1,27 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.NewPlayer
+import com.lowbudgetlcs.domain.models.PlayerId
+import com.lowbudgetlcs.domain.models.PlayerName
+import com.lowbudgetlcs.domain.models.PlayerWithAccounts
+import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
 
 class PlayerService(
-    private val playerRepository: IPlayerRepository,
-    private val accountRepository: IAccountRepository
+    private val playerRepository: IPlayerRepository, private val accountRepository: IAccountRepository
 ) {
 
     fun createPlayer(player: NewPlayer): PlayerWithAccounts {
         if (player.name.value.isBlank()) throw IllegalArgumentException("Player name cannot be blank")
         if (isNameTaken(player.name.value)) throw IllegalStateException("Player name already exists")
 
-        return playerRepository.insert(player)
-            ?: throw DatabaseException("Failed to create player")
+        return playerRepository.insert(player) ?: throw DatabaseException("Failed to create player")
     }
 
     fun getPlayer(id: PlayerId): PlayerWithAccounts {
-        return playerRepository.getById(id)
-            ?: throw NoSuchElementException("Player not found")
+        return playerRepository.getById(id) ?: throw NoSuchElementException("Player not found")
     }
 
     fun getAllPlayers(): List<PlayerWithAccounts> = playerRepository.getAll()
@@ -42,11 +43,9 @@ class PlayerService(
     fun linkAccountToPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
         this.getPlayer(playerId) // throws if not found
 
-        val account = accountRepository.getById(accountId)
-            ?: throw NoSuchElementException("Account does not exist")
+        val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account does not exist")
 
-        if (account.playerId != null)
-            throw IllegalStateException("Account already linked to another player")
+        if (account.playerId != null) throw IllegalStateException("Account already linked to another player")
 
         return playerRepository.insertAccountToPlayer(playerId, accountId)
             ?: throw DatabaseException("Failed to link account to player")
@@ -55,11 +54,9 @@ class PlayerService(
     fun unlinkAccountFromPlayer(playerId: PlayerId, accountId: RiotAccountId): PlayerWithAccounts {
         val player = this.getPlayer(playerId) // throws if not found
 
-        val account = accountRepository.getById(accountId)
-            ?: throw NoSuchElementException("Account does not exist")
+        val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account does not exist")
 
-        if (player.accounts.none { it.id == account.id })
-            throw IllegalStateException("Account does not belong to player")
+        if (player.accounts.none { it.id == account.id }) throw IllegalStateException("Account does not belong to player")
 
         return playerRepository.removeAccount(playerId, accountId)
             ?: throw DatabaseException("Failed to unlink account from player")

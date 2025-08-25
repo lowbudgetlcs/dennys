@@ -1,11 +1,9 @@
 package com.lowbudgetlcs.routes.dto.events
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.EventWithTeams
-import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.routes.dto.series.toDto
 import com.lowbudgetlcs.routes.dto.teams.toDto
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
@@ -26,7 +24,7 @@ fun Event.toDto(): EventDto = EventDto(
     createdAt = createdAt,
     description = description,
     status = status,
-    tournamentId = tournamentId.value
+    tournamentId = riotTournamentId.value
 )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto = EventWithTeamsDto(
@@ -37,6 +35,16 @@ fun EventWithTeams.toDto(): EventWithTeamsDto = EventWithTeamsDto(
     createdAt = createdAt,
     description = description,
     status = status,
-    tournamentId = tournamentId.value,
-    teams = teams.map { t -> t.toDto() }
-)
+    tournamentId = riotTournamentId.value,
+    teams = teams.map { t -> t.toDto() })
+
+fun EventWithSeries.toDto(): EventWithSeriesDto = EventWithSeriesDto(
+    id = id.value,
+    name = name,
+    startDate = startDate,
+    endDate = endDate,
+    createdAt = createdAt,
+    description = description,
+    status = status,
+    riotTournamentId = riotTournamentId.value,
+    series = series.map { s -> s.toDto() })

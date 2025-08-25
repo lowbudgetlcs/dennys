@@ -2,12 +2,9 @@ package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
 
 interface IEventService {
-    /**
-     * Fetches all events.
-     */
+    /** Fetches all events. */
     fun getAllEvents(): List<Event>
 
     /**
@@ -25,13 +22,12 @@ interface IEventService {
      * Create an event from a NewEvent and NewTournament.
      *
      * @param NewEvent event details.
-     * @param NewTournament the riot tournament to include in the event.
      * @return the newly created event.
      *
      * @throws IllegalArgumentException if the event cannot be created.
      * @throws com.lowbudgetlcs.repositories.DatabaseException if the underlying repositories fail.
      */
-    fun createEvent(event: NewEvent, tournament: NewTournament): Event
+    suspend fun createEvent(event: NewEvent): Event
 
     /**
      * Updates event details.
@@ -41,7 +37,8 @@ interface IEventService {
      * @return the updated event.
      *
      * @throws IllegalArgumentException if the new details are invalid
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories fail.
+     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories
+     * fail.
      */
     fun patchEvent(id: EventId, update: EventUpdate): Event
 
@@ -54,6 +51,16 @@ interface IEventService {
      * @throws NoSuchElementException if the specified event cannot be found
      */
     fun getEventWithTeams(id: EventId): EventWithTeams
+
+    /**
+     * Fetches all events and includes series that are registered to the event
+     *
+     * @param EventId the event to fetch.
+     * @return the specified event with all child series.
+     *
+     * @throws NoSuchElementException if the specified event cannot be found
+     */
+    fun getEventWithSeries(id: EventId): EventWithSeries
 
     /**
      * Associate a team with an event

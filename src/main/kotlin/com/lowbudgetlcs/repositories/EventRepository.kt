@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
-import com.lowbudgetlcs.domain.models.tournament.toTournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.exception.IntegrityConstraintViolationException
@@ -18,11 +18,11 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
     override fun getById(id: EventId): Event? =
         selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne()?.let(::rowToEvent)
 
-    override fun insert(newEvent: NewEvent, tournamentId: TournamentId): Event? = try {
+    override fun insert(newEvent: NewEvent, riotTournamentId: RiotTournamentId): Event? = try {
         val insertedId = dsl.insertInto(
             EVENTS
         ).set(EVENTS.NAME, newEvent.name).set(EVENTS.DESCRIPTION, newEvent.description)
-            .set(EVENTS.RIOT_TOURNAMENT_ID, tournamentId.value).set(EVENTS.START_DATE, newEvent.startDate)
+            .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value).set(EVENTS.START_DATE, newEvent.startDate)
             .set(EVENTS.END_DATE, newEvent.endDate).set(EVENTS.STATUS, newEvent.status.name).returning(EVENTS.ID)
             .fetchOne()?.get(EVENTS.ID)
         insertedId?.toEventId()?.let(::getById)
@@ -54,7 +54,7 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
         val eventId = row[EVENTS.ID]?.toEventId() ?: return null
         val name = row[EVENTS.NAME] ?: return null
         val description = row[EVENTS.DESCRIPTION] ?: return null
-        val tournamentId = row[EVENTS.RIOT_TOURNAMENT_ID]?.toTournamentId() ?: return null
+        val tournamentId = row[EVENTS.RIOT_TOURNAMENT_ID]?.toRiotTournamentId() ?: return null
         val createdAt = row[EVENTS.CREATED_AT] ?: return null
         val startDate = row[EVENTS.START_DATE] ?: return null
         val endDate = row[EVENTS.END_DATE] ?: return null
@@ -64,7 +64,7 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
             id = eventId,
             name = name,
             description = description,
-            tournamentId = tournamentId,
+            riotTournamentId = tournamentId,
             createdAt = createdAt,
             startDate = startDate,
             endDate = endDate,

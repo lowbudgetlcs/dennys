@@ -18,7 +18,7 @@ class MetadataRepositoryTest : StringSpec({
 
     "getProviderId() succeeds and returns correct provider ID" {
         val id = repo.getProviderId()
-        id shouldBe 1 
+        id shouldBe 1
     }
 
     "setProviderId() succeeds and returns ID" {

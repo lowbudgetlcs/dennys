@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.PlayerId
+import com.lowbudgetlcs.domain.models.riot.*
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
