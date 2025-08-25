@@ -1,6 +1,5 @@
 package com.lowbudgetlcs.routes.dto.series
 
-import com.lowbudgetlcs.routes.dto.teams.TeamDto
 import kotlinx.serialization.Serializable
 
 @Serializable

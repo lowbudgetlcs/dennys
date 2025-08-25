@@ -1,15 +1,11 @@
 package com.lowbudgetlcs.gateways
 
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
-import com.lowbudgetlcs.domain.models.riot.tournament.NewRiotTournament
-import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
-import com.lowbudgetlcs.domain.models.riot.tournament.Shortcode
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.models.riot.tournament.toShortcode
+import com.lowbudgetlcs.domain.models.riot.tournament.*
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IMetadataRepository
-import com.lowbudgetlcs.routes.dto.riot.tournament.*
+import com.lowbudgetlcs.routes.dto.riot.tournament.RiotTournamentParametersDto
+import com.lowbudgetlcs.routes.dto.riot.tournament.toShortcodeParametersDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -63,7 +59,7 @@ class RiotTournamentGateway(
         }
         when (res.status) {
             HttpStatusCode.OK -> return res.body<List<String>>()[0].toShortcode()
-            else ->  throw RiotApiException("Unexpected Riot API error: ${res.status}")
+            else -> throw RiotApiException("Unexpected Riot API error: ${res.status}")
         }
     }
 }

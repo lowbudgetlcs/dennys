@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.routes.api.v1.player
 
-import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.models.riot.toRiotAccountId
+import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.routes.dto.players.*
 import io.ktor.http.*

@@ -13,7 +13,8 @@ fun Route.eventRoutesV1(eventService: IEventService, seriesService: ISeriesServi
                 when {
                     dto.name.isBlank() -> ValidationResult.Invalid("Event name cannot be blank.")
                     dto.endDate.isBefore(dto.startDate) ->
-                            ValidationResult.Invalid("Events cannot end before they start.")
+                        ValidationResult.Invalid("Events cannot end before they start.")
+
                     else -> ValidationResult.Valid
                 }
             }

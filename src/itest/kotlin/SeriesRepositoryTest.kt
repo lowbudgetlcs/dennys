@@ -12,7 +12,6 @@ import com.lowbudgetlcs.repositories.SeriesRepository
 import com.lowbudgetlcs.repositories.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.system.NoSystemErrListener.prepareSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty

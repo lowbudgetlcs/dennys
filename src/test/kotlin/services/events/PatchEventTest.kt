@@ -1,10 +1,6 @@
 package services.events
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.patch
-import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.gateways.IRiotTournamentGateway

@@ -9,7 +9,6 @@ import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.domain.services.SeriesService
@@ -24,7 +23,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.Instant
-import kotlin.test.expect
 
 class SeriesServiceTest : StringSpec({
     val teamRepo = mockk<ITeamRepository>(relaxed = false)

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IEventRepository

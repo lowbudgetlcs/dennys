@@ -7,7 +7,8 @@ import com.lowbudgetlcs.domain.models.toSeriesId
 import com.lowbudgetlcs.domain.services.IEventService
 import com.lowbudgetlcs.domain.services.ISeriesService
 import com.lowbudgetlcs.routes.dto.events.*
-import com.lowbudgetlcs.routes.dto.series.*
+import com.lowbudgetlcs.routes.dto.series.NewSeriesDto
+import com.lowbudgetlcs.routes.dto.series.toDto
 import io.ktor.http.*
 import io.ktor.server.application.Application
 import io.ktor.server.request.*

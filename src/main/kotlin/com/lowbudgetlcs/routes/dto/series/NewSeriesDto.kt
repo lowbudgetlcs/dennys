@@ -2,4 +2,5 @@ package com.lowbudgetlcs.routes.dto.series
 
 import kotlinx.serialization.Serializable
 
-@Serializable data class NewSeriesDto(val team1Id: Int, val team2Id: Int, val gamesToWin: Int)
+@Serializable
+data class NewSeriesDto(val team1Id: Int, val team2Id: Int, val gamesToWin: Int)

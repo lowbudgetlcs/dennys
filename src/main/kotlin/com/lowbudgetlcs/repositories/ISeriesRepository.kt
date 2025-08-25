@@ -1,6 +1,8 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.NewSeries
+import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.EventId
 
 interface ISeriesRepository {
