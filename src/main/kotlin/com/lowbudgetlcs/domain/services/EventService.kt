@@ -28,7 +28,7 @@ class EventService(
 
     override fun getEventWithSeries(id: EventId): EventWithSeries {
         val event = getEvent(id)
-        val series = seriesRepo.getAllFromEvent(id).filter { it.eventId == id }
+        val series = seriesRepo.getAllByEventId(id).filter { it.eventId == id }
         return event.toEventWithSeries(series)
     }
 
