@@ -1,6 +1,9 @@
 package com.lowbudgetlcs.domain.services
 
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.NewSeries
+import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.SeriesId
+import com.lowbudgetlcs.domain.models.events.EventId
 
 interface ISeriesService {
 
@@ -14,8 +17,8 @@ interface ISeriesService {
      * @throws com.lowbudgetlcs.repositories.DatabaseException if the underlying repositories fail.
      */
     fun createSeries(series: NewSeries): Series
-    /** Fetches all series. */
-    fun getAllSeries(): List<Series>
+    /** Fetches all series from an event. */
+    fun getAllSeriesFromEvent(id: EventId): List<Series>
 
     /**
      * Fetch a series by id.
@@ -36,5 +39,5 @@ interface ISeriesService {
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist
      */
-    fun removeTeam(seriesId): Series
+    fun removeSeries(id: SeriesId): Series
 }

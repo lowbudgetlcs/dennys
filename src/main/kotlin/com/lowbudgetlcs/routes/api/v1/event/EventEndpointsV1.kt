@@ -1,9 +1,14 @@
 package com.lowbudgetlcs.routes.api.v1.event
 
+import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.models.toSeriesId
 import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.services.IEventService
+import com.lowbudgetlcs.domain.services.ISeriesService
 import com.lowbudgetlcs.routes.dto.events.*
+import com.lowbudgetlcs.routes.dto.series.*
 import io.ktor.http.*
 import io.ktor.server.application.Application
 import io.ktor.server.request.*
@@ -17,10 +22,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.eventEndpointsV1(
-    eventService: IEventService,
-    seriesService: ISeriesService
-) {
+fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesService) {
     get<EventResourcesV1> {
         logger.info("📩 Received GET on /v1/event")
         val events = eventService.getAllEvents()
@@ -56,19 +58,27 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ByIdSeries> { route ->
         logger.info("📩 Received GET on /v1/event/{id}/series")
-        val events = eventService.getEventWithSeries(route.eventId.toEventId())
-        call.respond(events.toDto())
+        val event = eventService.getEventWithSeries(route.eventId.toEventId())
+        call.respond(event.toDto())
     }
     post<EventResourcesV1.ByIdSeries> { route ->
         logger.info("📩 Received POST on /v1/event/{eventId}/series")
-        val series = call.receive<EventSeriesLinkDto>()
-        val event = seriesService.addSeries(route.eventId.toEventId(), series.toSeriesId())
+        val dto = call.receive<NewSeriesDto>()
+        val newSeries =
+                NewSeries(
+                        route.eventId.toEventId(),
+                        dto.gamesToWin,
+                        listOf(dto.team1Id.toTeamId(), dto.team2Id.toTeamId())
+                )
+        seriesService.createSeries(newSeries)
+        val event = eventService.getEventWithSeries(route.eventId.toEventId())
         call.respond(event.toDto())
     }
     delete<EventResourcesV1.ByIdSeries> { route ->
         logger.info("📩 Received DELETE on /v1/event/{eventId}/series/{seriesId}")
         val series = call.receive<EventSeriesLinkDto>()
-        val event = seriesService.removeSeries(route.eventId.toEventId(), series.toSeriesId())
+        seriesService.removeSeries(series.seriesId.toSeriesId())
+        val event = eventService.getEventWithSeries(route.eventId.toEventId())
         call.respond(event.toDto())
     }
     delete<EventResourcesV1.ByIdTeams> { route ->

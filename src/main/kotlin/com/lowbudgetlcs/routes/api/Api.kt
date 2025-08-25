@@ -72,7 +72,7 @@ fun Route.apiRoutes() {
             )
 
     val eventRepository = EventRepository(Database.dslContext)
-    val eventService = EventService(eventRepository, tournamentGateway, teamRepository)
+    val eventService = EventService(eventRepository, tournamentGateway, teamRepository, seriesRepository)
 
     route("/api/v1") {
         route("/riot-callback") {

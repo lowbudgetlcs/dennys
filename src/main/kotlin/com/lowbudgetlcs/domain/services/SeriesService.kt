@@ -3,6 +3,7 @@ package com.lowbudgetlcs.domain.services
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
+import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.team.*
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.ISeriesRepository
@@ -34,7 +35,8 @@ class SeriesService(
         return seriesRepository.insert(series) ?: throw DatabaseException("Failed to create team")
     }
 
-    override fun getAllSeries(): List<Series> = seriesRepository.getAll()
+    override fun getAllSeriesFromEvent(id: EventId): List<Series> =
+            seriesRepository.getAllFromEvent(id)
 
     override fun getSeries(id: SeriesId): Series =
             seriesRepository.getById(id) ?: throw NoSuchElementException("Series not found")
