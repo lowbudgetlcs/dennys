@@ -9,6 +9,7 @@ import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.routes.api.v1.account.accountRoutesV1
 import com.lowbudgetlcs.routes.api.v1.event.eventRoutesV1
 import com.lowbudgetlcs.routes.api.v1.player.playerRoutesV1
+import com.lowbudgetlcs.routes.api.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.routes.api.v1.team.teamRoutesV1
 import com.lowbudgetlcs.routes.dto.InstantSerializer
 import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
@@ -55,8 +56,9 @@ fun Route.apiRoutes() {
     val seriesRepository: ISeriesRepository = SeriesRepository(Database.dslContext)
     val seriesService = SeriesService(seriesRepository, teamRepository)
 
+
     val metadataRepository = MetadataRepository(Database.dslContext)
-    val tournamentGateway = RiotTournamentGateway(
+    val riotTournamentGateway = RiotTournamentGateway(
         metadataRepo = metadataRepository,
         client = riotHttpClient,
         apiKey = appConfig.riot.key,
@@ -64,7 +66,16 @@ fun Route.apiRoutes() {
     )
 
     val eventRepository = EventRepository(Database.dslContext)
-    val eventService = EventService(eventRepository, tournamentGateway, teamRepository, seriesRepository)
+    val eventService = EventService(eventRepository, riotTournamentGateway, teamRepository, seriesRepository)
+
+    val gameRepository: IGameRepository = GameRepository(Database.dslContext)
+    val gameService = GameService(
+        gameRepo = gameRepository,
+        teamRepo = teamRepository,
+        seriesRepo = seriesRepository,
+        eventRepo = eventRepository,
+        gate = riotTournamentGateway
+    )
 
     route("/api/v1") {
         route("/riot-callback") {
@@ -79,5 +90,8 @@ fun Route.apiRoutes() {
         teamRoutesV1(teamService = teamService)
         playerRoutesV1(playerService = playerService)
         accountRoutesV1(accountService = accountService)
+        seriesRoutesV1(
+            gameService = gameService
+        )
     }
 }

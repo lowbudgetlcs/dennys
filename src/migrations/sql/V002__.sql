@@ -46,4 +46,6 @@ DROP TABLE IF EXISTS player_to_teams;
 
 ALTER TABLE teams ADD UNIQUE (name, event_id);
 
+ALTER TABLE games ADD COLUMN number INTEGER NOT NULL;
+
 COMMIT;

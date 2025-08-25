@@ -15,7 +15,7 @@ data class GameResult(
 
 data class Game(
     val id: GameId,
-    val shortCode: Shortcode,
+    val shortcode: Shortcode,
     val blueTeamId: TeamId,
     val redTeamId: TeamId,
     val seriesId: SeriesId,
@@ -26,5 +26,4 @@ data class Game(
 data class NewGame(
     val blueTeamId: TeamId,
     val redTeamId: TeamId,
-    val seriesId: Int,
 )
