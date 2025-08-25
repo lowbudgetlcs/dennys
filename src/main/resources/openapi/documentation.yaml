@@ -30,6 +30,9 @@ tags:
 
   - name: v1/event/series
     description: Create and get series from an event
+    
+  - name: v1/series/games
+    description: Create games inside of a series
 
   - name: v1/team
     description: Manage Teams (create/edit/delete)
@@ -645,6 +648,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+# Series Endpoints
+  /v1/series/{seriesId}/game:
+    post:
+      summary: Create a game in a series
+      operationId: createGame
+      tags:
+        - v1/series/games
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameDto"
+      responses:
+        "200":
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /v1/team:
     get:
       summary: Get all teams
@@ -1127,6 +1168,48 @@ paths:
 
 components:
   schemas:
+    # Game Schemas
+    GameDto:
+      type: object
+      required:
+        - id
+        - shortcode
+        - blueTeamId
+        - redTeamId
+        - seriesId
+        - number
+      properties:
+        id:
+          type: integer
+        shortcode:
+          type: string
+          example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
+        blueTeamId: 
+          type: integer
+          example: 2
+        redTeamId:
+          type: integer
+          example: 4
+        seriesId:
+          type: integer
+          example: 3
+        number:
+          type: integer
+          example: 1
+    CreateGameDto:
+      type: object
+      required:
+        - seriesId
+        - blueTeamId
+        - redTeamId
+      properties:
+        seriesId:
+          type: integer
+        blueTeamId:
+          type: integer
+        redTeamId:
+          type: integer
+          
     EventStatus:
       type: string
       enum:
