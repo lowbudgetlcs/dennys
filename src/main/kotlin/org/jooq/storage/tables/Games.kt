@@ -103,6 +103,11 @@ open class Games(
      */
     val SERIES_ID: TableField<GamesRecord, Int?> = createField(DSL.name("series_id"), SQLDataType.INTEGER, this, "")
 
+    /**
+     * The column <code>dennys.games.number</code>.
+     */
+    val NUMBER: TableField<GamesRecord, Int?> = createField(DSL.name("number"), SQLDataType.INTEGER.nullable(false), this, "")
+
     private constructor(alias: Name, aliased: Table<GamesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<GamesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<GamesRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)

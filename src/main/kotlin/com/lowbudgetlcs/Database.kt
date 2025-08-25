@@ -13,8 +13,8 @@ object Database {
         val config = HikariConfig().apply {
             jdbcUrl = dbConfig.url.value
             password = dbConfig.password.value
-            maximumPoolSize = 15
-            minimumIdle = 1
+            maximumPoolSize = 30
+            minimumIdle = 5
             idleTimeout = 10000
             connectionTimeout = 30000
         }

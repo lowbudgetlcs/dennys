@@ -1,14 +1,19 @@
 package com.lowbudgetlcs.gateways
 
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
-import com.lowbudgetlcs.domain.models.riot.tournament.*
+import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IMetadataRepository
+import com.lowbudgetlcs.routes.dto.riot.tournament.RiotShortcodeDto
 import com.lowbudgetlcs.routes.dto.riot.tournament.RiotTournamentParametersDto
 import com.lowbudgetlcs.routes.dto.riot.tournament.toShortcodeParametersDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 
 
@@ -20,12 +25,12 @@ class RiotTournamentGateway(
     private val baseUrl: String = "https://americas.api.riotgames.com"
 ) : IRiotTournamentGateway {
     private val url: String by lazy {
-        if (useStubs) "$baseUrl/lol/tournament-stub/v5/tournaments" else "$baseUrl/lol/tournament/v5/tournaments"
+        if (useStubs) "$baseUrl/lol/tournament-stub/v5" else "$baseUrl/lol/tournament/v5"
     }
 
     override suspend fun create(tournamentName: String): RiotTournament {
         val providerId = metadataRepo.getProviderId() ?: throw DatabaseException("Cannot find riot provider id.")
-        val res = client.post(url) {
+        val res = client.post("$url/tournaments") {
             headers {
                 append("X-Riot-Token", apiKey)
             }
@@ -44,12 +49,12 @@ class RiotTournamentGateway(
     }
 
     override suspend fun getCode(
-        riotTournament: RiotTournament, newShortcode: NewShortcode
-    ): Shortcode {
-        val res = client.post(url) {
+        riotTournamentId: RiotTournamentId, newShortcode: NewShortcode
+    ): RiotShortcodeDto {
+        val res = client.post("$url/codes") {
             url {
                 parameters.append("count", "1")
-                parameters.append("tournamentId", "${riotTournament.id.value}")
+                parameters.append("tournamentId", "${riotTournamentId.value}")
             }
             headers {
                 append("X-Riot-Token", apiKey)
@@ -58,7 +63,11 @@ class RiotTournamentGateway(
             setBody(newShortcode.toShortcodeParametersDto())
         }
         when (res.status) {
-            HttpStatusCode.OK -> return res.body<List<String>>()[0].toShortcode()
+            HttpStatusCode.OK -> {
+                val codes = res.body<List<String>>()
+                return RiotShortcodeDto(codes)
+            }
+
             else -> throw RiotApiException("Unexpected Riot API error: ${res.status}")
         }
     }

@@ -35,6 +35,10 @@ open class GamesRecord() : UpdatableRecordImpl<GamesRecord>(Games.GAMES) {
         set(value): Unit = set(4, value)
         get(): Int? = get(4) as Int?
 
+    open var number: Int?
+        set(value): Unit = set(5, value)
+        get(): Int? = get(5) as Int?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -44,12 +48,13 @@ open class GamesRecord() : UpdatableRecordImpl<GamesRecord>(Games.GAMES) {
     /**
      * Create a detached, initialised GamesRecord
      */
-    constructor(id: Int? = null, shortcode: String? = null, blueTeamId: Int? = null, redTeamId: Int? = null, seriesId: Int? = null): this() {
+    constructor(id: Int? = null, shortcode: String? = null, blueTeamId: Int? = null, redTeamId: Int? = null, seriesId: Int? = null, number: Int? = null): this() {
         this.id = id
         this.shortcode = shortcode
         this.blueTeamId = blueTeamId
         this.redTeamId = redTeamId
         this.seriesId = seriesId
+        this.number = number
         resetChangedOnNotNull()
     }
 }

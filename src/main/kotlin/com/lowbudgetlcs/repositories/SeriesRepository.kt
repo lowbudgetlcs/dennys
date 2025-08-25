@@ -3,11 +3,11 @@ package com.lowbudgetlcs.repositories
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
-import org.jooq.impl.DSL.multiset
-import org.jooq.impl.DSL.select
+import org.jooq.impl.DSL.*
 import org.jooq.storage.tables.references.SERIES
 import org.jooq.storage.tables.references.SERIES_RESULTS
 import org.jooq.storage.tables.references.TEAM_TO_SERIES
@@ -20,6 +20,17 @@ class SeriesRepository(private val dsl: DSLContext) : ISeriesRepository {
 
     override fun getAllByEventId(id: EventId): List<Series> =
         selectSeries().where(SERIES.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToSeries)
+
+    override fun getByParticipantIds(
+        team1Id: TeamId, team2Id: TeamId
+    ): Series? =
+        selectSeries().where(
+            SERIES.ID.`in`(
+                select(TEAM_TO_SERIES.SERIES_ID).from(TEAM_TO_SERIES)
+                    .where(TEAM_TO_SERIES.TEAM_ID.`in`(team1Id.value, team2Id.value)).groupBy(TEAM_TO_SERIES.SERIES_ID)
+                    .having(count().eq(2))
+            )
+        ).fetchOne()?.let(::rowToSeries)
 
 
     override fun insert(newSeries: NewSeries): Series? {
