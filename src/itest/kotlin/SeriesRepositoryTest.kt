@@ -1,6 +1,7 @@
 import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.TeamId
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.repositories.SeriesRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
@@ -27,14 +28,14 @@ class SeriesRepositoryTest :
             test("insert and fetch team by id") {
                 val newSeries =
                         NewSeries(
-                                eventId = EventId("123"),
+                                eventId = EventId(123),
                                 gamesToWin = 10,
-                                participantIds = listOf(TeamId("1"), TeamId("2"))
+                                participantIds = listOf(TeamId(1), TeamId(2))
                         )
 
                 val created = repo.insert(newSeries)
                 created.shouldNotBeNull()
-                created.gamesToWin shouldBe newTeam.gamesToWin
+                created.gamesToWin shouldBe newSeries.gamesToWin
 
                 val fetched = repo.getById(created.id)
                 fetched shouldBe created
