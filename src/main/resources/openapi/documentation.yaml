@@ -649,18 +649,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 # Series Endpoints
-  /v1/series/{seriesId}/game:
+  /v1/series/game:
     post:
       summary: Create a game in a series
       operationId: createGame
       tags:
         - v1/series/games
-      parameters:
-        - name: seriesId
-          in: path
-          required: true
-          schema:
-            type: integer
       requestBody:
         required: true
         content:
@@ -1199,12 +1193,9 @@ components:
     CreateGameDto:
       type: object
       required:
-        - seriesId
         - blueTeamId
         - redTeamId
       properties:
-        seriesId:
-          type: integer
         blueTeamId:
           type: integer
         redTeamId:
