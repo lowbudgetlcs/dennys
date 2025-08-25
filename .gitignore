@@ -4,6 +4,9 @@ build/
 gradlew.bat
 !**/src/main/**/build/
 !**/src/test/**/build/
+.kotlin
+secret.properties
+__pycache__
 
 ### STS ###
 .apt_generated

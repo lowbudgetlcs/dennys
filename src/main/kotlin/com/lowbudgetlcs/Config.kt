@@ -1,8 +1,15 @@
 package com.lowbudgetlcs
 
+import com.lowbudgetlcs.config.AppConfig
 import com.sksamuel.hoplite.ConfigLoaderBuilder
+import com.sksamuel.hoplite.addEnvironmentSource
 import com.sksamuel.hoplite.addResourceSource
 
-object Config {
-    val binder = ConfigLoaderBuilder.default().addResourceSource("/config.properties").build().configBinder()
+val appConfig: AppConfig by lazy {
+    ConfigLoaderBuilder.default()
+        .addEnvironmentSource()
+        .addResourceSource("/default.properties")
+        .addResourceSource("/secret.properties", optional = true)
+        .build()
+        .loadConfigOrThrow<AppConfig>()
 }

@@ -1,24 +1,32 @@
 package com.lowbudgetlcs.domain.models
 
+import com.lowbudgetlcs.domain.models.riot.RiotAccount
+
 @JvmInline
 value class PlayerId(val value: Int)
 
 fun Int.toPlayerId(): PlayerId = PlayerId(this)
 
 @JvmInline
-value class PlayerName(val name: String) {
+value class PlayerName(val value: String) {
     init {
-        // Riot IDs are of the form ruuffian#FUNZ
-        require(name.contains("#")) { "Invalid name: Missing '#'" }
+        require(value.isNotBlank()) { "Player name cannot be blank" }
     }
 }
 
 fun String.toPlayerName(): PlayerName = PlayerName(this)
 
 data class Player(
-    val id: PlayerId, val name: PlayerName
+    val id: PlayerId,
+    val name: PlayerName
 )
 
 data class NewPlayer(
-    val name: PlayerName, val teamId: TeamId?
+    val name: PlayerName
+)
+
+data class PlayerWithAccounts(
+    val id: PlayerId,
+    val name: PlayerName,
+    val accounts: List<RiotAccount>
 )

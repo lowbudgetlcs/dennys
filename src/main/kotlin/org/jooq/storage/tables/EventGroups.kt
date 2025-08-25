@@ -7,6 +7,7 @@ package org.jooq.storage.tables
 import java.time.Instant
 
 import kotlin.collections.Collection
+import kotlin.collections.List
 
 import org.jooq.Condition
 import org.jooq.Field
@@ -32,6 +33,7 @@ import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.EVENTS__EVENTS_EVENT_GROUP_ID_FKEY
+import org.jooq.storage.keys.EVENT_GROUPS_NAME_KEY
 import org.jooq.storage.keys.EVENT_GROUPS_PKEY
 import org.jooq.storage.tables.Events.EventsPath
 import org.jooq.storage.tables.records.EventGroupsRecord
@@ -123,6 +125,7 @@ open class EventGroups(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<EventGroupsRecord, Int?> = super.getIdentity() as Identity<EventGroupsRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<EventGroupsRecord> = EVENT_GROUPS_PKEY
+    override fun getUniqueKeys(): List<UniqueKey<EventGroupsRecord>> = listOf(EVENT_GROUPS_NAME_KEY)
 
     private lateinit var _events: EventsPath
 

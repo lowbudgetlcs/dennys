@@ -1,40 +1,94 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
-import com.lowbudgetlcs.gateways.ITournamentGateway
-import com.lowbudgetlcs.repositories.IEventGroupRepository
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.gateways.GatewayException
+import com.lowbudgetlcs.gateways.IRiotTournamentGateway
+import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.ISeriesRepository
+import com.lowbudgetlcs.repositories.ITeamRepository
 
 class EventService(
     private val eventRepo: IEventRepository,
-    private val eventGroupRepo: IEventGroupRepository,
-    private val tournamentGateway: ITournamentGateway
-) {
-    fun createEvent(event: NewEvent, tournament: NewTournament): Event? = tournamentGateway.create(tournament)?.let {
-        eventRepo.insert(event, it.id)
+    private val tournamentGateway: IRiotTournamentGateway,
+    private val teamRepo: ITeamRepository,
+    private val seriesRepo: ISeriesRepository
+) : IEventService {
+    override fun getAllEvents(): List<Event> = eventRepo.getAll()
+
+    override fun getEvent(id: EventId): Event =
+        eventRepo.getById(id) ?: throw NoSuchElementException("Event with id '${id.value}' not found.")
+
+    override fun getEventWithTeams(id: EventId): EventWithTeams {
+        val event = getEvent(id)
+        val teams = teamRepo.getAll().filter { it.eventId == id }
+        return event.toEventWithTeams(teams)
     }
 
-    fun createEventGroup(group: NewEventGroup): EventGroup? = eventGroupRepo.insert(group)
-
-    fun getEventsWithGroups(): List<EventWithGroup> {
-        val events = eventRepo.getAll()
-        val groups = eventGroupRepo.getAll()
-        return events.mapNotNull { e ->
-            val group = groups.firstOrNull { g -> e.eventGroupId == g.id }
-            group?.let { e.toEventWithGroup(it) }
-        }
+    override fun getEventWithSeries(id: EventId): EventWithSeries {
+        val event = getEvent(id)
+        val series = seriesRepo.getAllByEventId(id).filter { it.eventId == id }
+        return event.toEventWithSeries(series)
     }
 
-    fun getEventsByGroupId(group: EventGroupId): List<EventWithGroup> {
-        val events = eventRepo.getAllByGroupId(group)
-        val group = eventGroupRepo.getById(group)
-        return events.map { it.toEventWithGroup(group) }
+    override suspend fun createEvent(event: NewEvent): Event {
+        if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
+        if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
+        val t = tournamentGateway.create(event.name)
+            ?: throw GatewayException("Failed to register tournament with Riot Games.")
+        isNameTaken(event.name)
+        return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
     }
 
-    fun getEventGroups(): List<EventGroup> = eventGroupRepo.getAll()
+    override fun patchEvent(id: EventId, update: EventUpdate): Event {
+        val event = getEvent(id)
+        update.name?.let { isNameTaken(it) }
+        val start = update.startDate ?: event.startDate
+        val end = update.endDate ?: event.endDate
+        if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
+        return eventRepo.update(event.patch(update)) ?: throw DatabaseException("Failed to update event.")
+    }
 
-    fun getEventGroupById(id: EventGroupId): EventGroup? = eventGroupRepo.getById(id)
+    override fun addTeam(eventId: EventId, teamId: TeamId): EventWithTeams {
+        doesEventExist(eventId)
+        doesTeamExist(teamId)
+        teamRepo.updateEventId(teamId, eventId) ?: throw DatabaseException("Failed to add team to event.")
+        return getEventWithTeams(eventId)
+    }
 
-    fun getEvent(id: EventId): Event? = eventRepo.getById(id)
+    override fun removeTeam(eventId: EventId, teamId: TeamId): EventWithTeams {
+        doesEventExist(eventId)
+        doesTeamExist(teamId)
+        teamRepo.updateEventId(teamId, null) ?: throw DatabaseException("Failed to remove team from event.")
+        return getEventWithTeams(eventId)
+    }
+
+    /**
+     * Checks if an event name is taken.
+     * @return false if name is not taken.
+     * @throws IllegalArgumentException when name already exists.
+     */
+    private fun isNameTaken(name: String): Boolean = if (eventRepo.getAll()
+            .any { it.name == name }
+    ) throw IllegalArgumentException("Event '${name}' already exists.")
+    else false
+
+    /**
+     * Checks if an event exists.
+     * @return true if event exists.
+     * @throws NoSuchElementException if event does not exist.
+     */
+    private fun doesEventExist(eventId: EventId) =
+        if (eventRepo.getById(eventId) == null) throw NoSuchElementException("Event with id '${eventId.value}' not found.")
+        else true
+
+    /**
+     * Checks if team exists
+     * @return true if team exists.
+     * @throws NoSuchElementException if team does not exist.
+     */
+    private fun doesTeamExist(teamId: TeamId): Boolean =
+        if (teamRepo.getById(teamId) == null) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
+        else true
 }

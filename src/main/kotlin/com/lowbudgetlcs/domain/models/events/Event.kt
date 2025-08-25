@@ -1,6 +1,8 @@
 package com.lowbudgetlcs.domain.models.events
 
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
+import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
+import com.lowbudgetlcs.domain.models.team.Team
 import java.time.Instant
 
 @JvmInline
@@ -17,9 +19,35 @@ data class Event(
     val name: String,
     val description: String,
     val eventGroupId: EventGroupId?,
-    val tournamentId: TournamentId,
+    val riotTournamentId: RiotTournamentId,
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus
+)
+
+data class EventWithTeams(
+    val id: EventId,
+    val name: String,
+    val description: String,
+    val eventGroupId: EventGroupId?,
+    val riotTournamentId: RiotTournamentId,
+    val createdAt: Instant,
+    val startDate: Instant,
+    val endDate: Instant,
+    val status: EventStatus,
+    val teams: List<Team>
+)
+
+data class EventWithSeries(
+    val id: EventId,
+    val name: String,
+    val description: String,
+    val eventGroupId: EventGroupId?,
+    val riotTournamentId: RiotTournamentId,
+    val createdAt: Instant,
+    val startDate: Instant,
+    val endDate: Instant,
+    val status: EventStatus,
+    val series: List<Series>
 )

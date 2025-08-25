@@ -3,6 +3,12 @@
 pkgs.mkShell {
     buildInputs = with pkgs; [
       jdk21 gnumake
+      yaml-language-server
+      docker
+      ruff basedpyright
+      (python3.withPackages(p: with p; [
+        requests
+      ]))
     ];
     env = {
       TEST="Hello there...";

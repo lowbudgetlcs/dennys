@@ -1,0 +1,68 @@
+[versions]
+kotlin = "2.2.0"
+ktor = "3.2.1"
+logback = "1.5.18"
+jooq = "3.19.18"
+kotest = "5.9.0"
+testcontainers = "1.21.3"
+hikaricp = "5.1.0"
+postgres = "42.7.7"
+hoplite = "2.9.0"
+mockk = "1.14.5"
+
+[libraries]
+# kotlin
+reflect-core = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+junit-core = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+# logback
+logback-core = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+# ktor server
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor" }
+# ktor server plugins
+ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
+ktor-server-config-yaml = { group = "io.ktor", name = "ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktor" }
+ktor-server-content-serialization = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
+ktor-server-request-validation = { group = "io.ktor", name = "ktor-server-request-validation", version.ref = "ktor" }
+ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
+ktor-server-resources = { group = "io.ktor", name = "ktor-server-resources", version.ref = "ktor" }
+# ktor-client
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+# ktor-client plugins
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
+# jooq
+jooq-core = { group = "org.jooq", name = "jooq", version.ref = "jooq" }
+jooq-meta = { group = "org.jooq", name = "jooq-meta", version.ref = "jooq" }
+jooq-codegen = { group = "org.jooq", name = "jooq-codegen", version.ref = "jooq" }
+# hikari
+hikari-core = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikaricp" }
+# postgres
+postgresql-core = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
+# hoplite
+hoplite-core = { group = "com.sksamuel.hoplite", name = "hoplite-core", version.ref = "hoplite" }
+# kotest
+kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
+# kotest extensions
+kotest-testcontainers = { group = "io.kotest.extensions", name = "kotest-extensions-testcontainers", version = "2.0.2" }
+# testcontainers
+testcontainers-core = { group = "org.testcontainers", name = "testcontainers", version.ref = "testcontainers" }
+testcontainers-postgres = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
+# mockk
+mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+
+
+[bundles]
+ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-config-yaml", ]
+ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-request-validation", "ktor-server-status-pages", "ktor-server-resources"]
+ktor-client = ["ktor-client-core", "ktor-client-cio"]
+ktor-client-plugins = ["ktor-client-content-negotiation"]
+jooq-codegen = ["jooq-meta", "jooq-codegen"]
+database = ["jooq-core", "postgresql-core"]
+kotest-unit = ["junit-core", "kotest-runner", "kotest-assertions", "mockk-core"]
+kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "mockk-core", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]

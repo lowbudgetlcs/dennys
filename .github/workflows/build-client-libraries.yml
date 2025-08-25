@@ -1,0 +1,34 @@
+name: Build supported client libraries.
+
+on:
+  push:
+    paths:
+      - 'src/main/kotlin/**'
+
+    branches:
+      - 'main'
+
+jobs:
+  build-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate typescript package
+        run: |
+          mkdir ts-sdk
+          docker run --rm \
+            -v ./:/out \
+            -v ./src/main/resources/openapi:/local \
+            openapitools/openapi-generator-cli generate \
+            -i /local/documentation.yaml \
+            -g typescript \
+            -o /out/ts-sdk \
+            --additional-properties=npmName=@lblcs/dennys-sdk-typescript,npmRepository=https://${{ secrets.NEXUS_URL }}/repository/npm-lblcs,platform=node
+
+      - name: Publish package to npm repo 
+        run: |
+          echo '//${{ secrets.NEXUS_URL }}/repository/:_authToken=NpmToken.${{ secrets.NPM_TOKEN }}' > ~/.npmrc
+          cd ts-sdk
+          npm i
+          npm publish .

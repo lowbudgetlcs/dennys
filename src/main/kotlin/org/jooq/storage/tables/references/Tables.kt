@@ -15,11 +15,11 @@ import org.jooq.storage.tables.PlayerFarming
 import org.jooq.storage.tables.PlayerGameFacts
 import org.jooq.storage.tables.PlayerInventories
 import org.jooq.storage.tables.PlayerPings
-import org.jooq.storage.tables.PlayerToTeams
 import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
+import org.jooq.storage.tables.PlayersToEvent
+import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
-import org.jooq.storage.tables.RiotAccountsToPlayer
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.TeamToSeries
@@ -83,11 +83,6 @@ val PLAYER_INVENTORIES: PlayerInventories = PlayerInventories.PLAYER_INVENTORIES
 val PLAYER_PINGS: PlayerPings = PlayerPings.PLAYER_PINGS
 
 /**
- * The table <code>dennys.player_to_teams</code>.
- */
-val PLAYER_TO_TEAMS: PlayerToTeams = PlayerToTeams.PLAYER_TO_TEAMS
-
-/**
  * The table <code>dennys.player_vision</code>.
  */
 val PLAYER_VISION: PlayerVision = PlayerVision.PLAYER_VISION
@@ -98,14 +93,19 @@ val PLAYER_VISION: PlayerVision = PlayerVision.PLAYER_VISION
 val PLAYERS: Players = Players.PLAYERS
 
 /**
+ * The table <code>dennys.players_to_event</code>.
+ */
+val PLAYERS_TO_EVENT: PlayersToEvent = PlayersToEvent.PLAYERS_TO_EVENT
+
+/**
+ * The table <code>dennys.players_to_team</code>.
+ */
+val PLAYERS_TO_TEAM: PlayersToTeam = PlayersToTeam.PLAYERS_TO_TEAM
+
+/**
  * The table <code>dennys.riot_accounts</code>.
  */
 val RIOT_ACCOUNTS: RiotAccounts = RiotAccounts.RIOT_ACCOUNTS
-
-/**
- * The table <code>dennys.riot_accounts_to_player</code>.
- */
-val RIOT_ACCOUNTS_TO_PLAYER: RiotAccountsToPlayer = RiotAccountsToPlayer.RIOT_ACCOUNTS_TO_PLAYER
 
 /**
  * The table <code>dennys.series</code>.

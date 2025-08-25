@@ -32,13 +32,14 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.PLAYERS_NAME_KEY
 import org.jooq.storage.keys.PLAYERS_PKEY
-import org.jooq.storage.keys.PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY
-import org.jooq.storage.keys.PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_PLAYER_ID_FKEY
-import org.jooq.storage.keys.RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_PLAYER_ID_FKEY
+import org.jooq.storage.keys.PLAYERS_TO_EVENT__PLAYERS_TO_EVENT_PLAYER_FKEY
+import org.jooq.storage.keys.PLAYERS_TO_TEAM__PLAYERS_TO_TEAM_PLAYER_FKEY
+import org.jooq.storage.keys.RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY
 import org.jooq.storage.tables.Events.EventsPath
-import org.jooq.storage.tables.PlayerToTeams.PlayerToTeamsPath
+import org.jooq.storage.tables.PlayersToEvent.PlayersToEventPath
+import org.jooq.storage.tables.PlayersToTeam.PlayersToTeamPath
 import org.jooq.storage.tables.RiotAccounts.RiotAccountsPath
-import org.jooq.storage.tables.RiotAccountsToPlayer.RiotAccountsToPlayerPath
+import org.jooq.storage.tables.Teams.TeamsPath
 import org.jooq.storage.tables.records.PlayersRecord
 
 
@@ -89,11 +90,6 @@ open class Players(
      */
     val NAME: TableField<PlayersRecord, String?> = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "")
 
-    /**
-     * The column <code>dennys.players.main_account_id</code>.
-     */
-    val MAIN_ACCOUNT_ID: TableField<PlayersRecord, Int?> = createField(DSL.name("main_account_id"), SQLDataType.INTEGER, this, "")
-
     private constructor(alias: Name, aliased: Table<PlayersRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<PlayersRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<PlayersRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -129,17 +125,48 @@ open class Players(
     override fun getIdentity(): Identity<PlayersRecord, Int?> = super.getIdentity() as Identity<PlayersRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PlayersRecord> = PLAYERS_PKEY
     override fun getUniqueKeys(): List<UniqueKey<PlayersRecord>> = listOf(PLAYERS_NAME_KEY)
-    override fun getReferences(): List<ForeignKey<PlayersRecord, *>> = listOf(PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY)
+
+    private lateinit var _playersToEvent: PlayersToEventPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.players_to_event</code> table
+     */
+    fun playersToEvent(): PlayersToEventPath {
+        if (!this::_playersToEvent.isInitialized)
+            _playersToEvent = PlayersToEventPath(this, null, PLAYERS_TO_EVENT__PLAYERS_TO_EVENT_PLAYER_FKEY.inverseKey)
+
+        return _playersToEvent;
+    }
+
+    val playersToEvent: PlayersToEventPath
+        get(): PlayersToEventPath = playersToEvent()
+
+    private lateinit var _playersToTeam: PlayersToTeamPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.players_to_team</code> table
+     */
+    fun playersToTeam(): PlayersToTeamPath {
+        if (!this::_playersToTeam.isInitialized)
+            _playersToTeam = PlayersToTeamPath(this, null, PLAYERS_TO_TEAM__PLAYERS_TO_TEAM_PLAYER_FKEY.inverseKey)
+
+        return _playersToTeam;
+    }
+
+    val playersToTeam: PlayersToTeamPath
+        get(): PlayersToTeamPath = playersToTeam()
 
     private lateinit var _riotAccounts: RiotAccountsPath
 
     /**
-     * Get the implicit join path to the <code>dennys.riot_accounts</code>
-     * table.
+     * Get the implicit to-many join path to the
+     * <code>dennys.riot_accounts</code> table
      */
     fun riotAccounts(): RiotAccountsPath {
         if (!this::_riotAccounts.isInitialized)
-            _riotAccounts = RiotAccountsPath(this, PLAYERS__PLAYERS_MAIN_ACCOUNT_ID_FKEY, null)
+            _riotAccounts = RiotAccountsPath(this, null, RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY.inverseKey)
 
         return _riotAccounts;
     }
@@ -147,44 +174,19 @@ open class Players(
     val riotAccounts: RiotAccountsPath
         get(): RiotAccountsPath = riotAccounts()
 
-    private lateinit var _playerToTeams: PlayerToTeamsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.player_to_teams</code> table
-     */
-    fun playerToTeams(): PlayerToTeamsPath {
-        if (!this::_playerToTeams.isInitialized)
-            _playerToTeams = PlayerToTeamsPath(this, null, PLAYER_TO_TEAMS__PLAYER_TO_TEAMS_PLAYER_ID_FKEY.inverseKey)
-
-        return _playerToTeams;
-    }
-
-    val playerToTeams: PlayerToTeamsPath
-        get(): PlayerToTeamsPath = playerToTeams()
-
-    private lateinit var _riotAccountsToPlayer: RiotAccountsToPlayerPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.riot_accounts_to_player</code> table
-     */
-    fun riotAccountsToPlayer(): RiotAccountsToPlayerPath {
-        if (!this::_riotAccountsToPlayer.isInitialized)
-            _riotAccountsToPlayer = RiotAccountsToPlayerPath(this, null, RIOT_ACCOUNTS_TO_PLAYER__RIOT_ACCOUNTS_TO_PLAYER_PLAYER_ID_FKEY.inverseKey)
-
-        return _riotAccountsToPlayer;
-    }
-
-    val riotAccountsToPlayer: RiotAccountsToPlayerPath
-        get(): RiotAccountsToPlayerPath = riotAccountsToPlayer()
-
     /**
      * Get the implicit many-to-many join path to the <code>dennys.events</code>
      * table
      */
     val events: EventsPath
-        get(): EventsPath = playerToTeams().events()
+        get(): EventsPath = playersToEvent().events()
+
+    /**
+     * Get the implicit many-to-many join path to the <code>dennys.teams</code>
+     * table
+     */
+    val teams: TeamsPath
+        get(): TeamsPath = playersToTeam().teams()
     override fun `as`(alias: String): Players = Players(DSL.name(alias), this)
     override fun `as`(alias: Name): Players = Players(alias, this)
     override fun `as`(alias: Table<*>): Players = Players(alias.qualifiedName, this)

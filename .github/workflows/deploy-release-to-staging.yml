@@ -1,0 +1,107 @@
+name: Build and deploy release to staging environment.
+
+on:
+  push:
+    paths-ignore:
+      - 'docker/**'
+      - '.gitignore'
+      - '*.md'
+      - '*.txt'
+      - 'shell.nix'
+      - 'Makefile'
+      - 'compose.yml'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'src/itest/**'
+      - 'src/test/**'
+
+    branches: 
+      - 'release/*'
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Utilizes Gradle cache
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test project
+        run: ./gradlew test
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Utilizes Gradle cache
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Test project
+        run: ./gradlew itest
+
+  build:
+    runs-on: ubuntu-24.04-arm
+    needs: 
+      - unit
+      - integration
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version number
+        shell: bash
+        run: |
+          echo "VERSION=$(cat VERSION)" > $GITHUB_ENV
+                
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          file: docker/Dockerfile
+          push: true
+          tags: lblcs/dennys:${{ env.VERSION }}
+            
+  deploy-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version number
+        shell: bash
+        run: |
+          echo "VERSION=$(cat VERSION)" > $GITHUB_ENV
+
+      - name: Copy db migrations to Remote Server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST}}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: src/migrations/sql/*
+          target: /lblcs/scripts/dennys/${{ env.VERSION }}/migrations
+          overwrite: true
+          strip_components: 3 
+
+      - name: Deploy release in staging
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /lblcs/scripts/dennys
+            ./release.sh -v ${{ env.VERSION }} -z ${{ secrets.ZONE_ID }} -c ${{ secrets.CLOUDFLARE_DNS_TOKEN }} ${{ secrets.RIOT_API_TOKEN }}

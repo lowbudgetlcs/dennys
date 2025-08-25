@@ -1,31 +1,50 @@
 package com.lowbudgetlcs.routes.dto.events
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventGroup
-import com.lowbudgetlcs.domain.models.events.EventGroupId
-import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.routes.dto.series.toDto
+import com.lowbudgetlcs.routes.dto.teams.toDto
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
-    name = name,
-    description = description,
-    startDate = startDate,
-    endDate = endDate,
-    eventGroupId = eventGroupId?.let { EventGroupId(it) },
-    status = status
+    name = name, description = description, startDate = startDate, endDate = endDate, status = status
 )
 
-fun EventGroup.toDto(): EventGroupDto = EventGroupDto(
-    id = id.value, name = name
+fun PatchEventDto.toEventUpdate(): EventUpdate = EventUpdate(
+    name = name, description = description, startDate = startDate, endDate = endDate, status = status
 )
 
-fun Event.toDto(group: EventGroup?): EventDto = EventDto(
+fun EventTeamLinkDto.toTeamId(): TeamId = teamId.toTeamId()
+
+fun Event.toDto(): EventDto = EventDto(
     id = id.value,
     name = name,
     startDate = startDate,
     endDate = endDate,
     createdAt = createdAt,
     description = description,
-    tournamentId = tournamentId.value,
-    eventGroup = group?.toDto(),
     status = status,
+    tournamentId = riotTournamentId.value
 )
+
+fun EventWithTeams.toDto(): EventWithTeamsDto = EventWithTeamsDto(
+    id = id.value,
+    name = name,
+    startDate = startDate,
+    endDate = endDate,
+    createdAt = createdAt,
+    description = description,
+    status = status,
+    tournamentId = riotTournamentId.value,
+    teams = teams.map { t -> t.toDto() })
+
+fun EventWithSeries.toDto(): EventWithSeriesDto = EventWithSeriesDto(
+    id = id.value,
+    name = name,
+    startDate = startDate,
+    endDate = endDate,
+    createdAt = createdAt,
+    description = description,
+    status = status,
+    riotTournamentId = riotTournamentId.value,
+    series = series.map { s -> s.toDto() })

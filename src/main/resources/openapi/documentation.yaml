@@ -13,65 +13,95 @@ externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
 servers:
-  - url: http://localhost:9292
+  - url: /api
 
 tags:
+  - name: v1/eventGroup
+    description: Manage event groups
+
+  - name: v1/eventGroup/events
+    description: Add/remove events to event groups
+
   - name: v1/event
-    description: Access to LBLCS events
+    description: Manage Event
+
+  - name: v1/event/teams
+    description: Assign/remove teams from events
+
+  - name: v1/event/series
+    description: Create and get series from an event
+    
+  - name: v1/series/games
+    description: Create games inside of a series
+
+  - name: v1/team
+    description: Manage Teams (create/edit/delete)
+
+  - name: v1/team/players
+    description: Add/remove players from teams
+
+  - name: v1/player
+    description: Player basic operations
+
+  - name: v1/player/accounts
+    description: Riot account linking/removal
+
+  - name: v1/account
+    description: Create and inspect Riot accounts
+
 paths:
-  /api/v1/event:
+  /v1/eventGroup:
     get:
+      summary: Get all event groups
+      operationId: getEventGroups
       tags:
-        - v1/event
-      summary: Get all events
-      description: Fetch a list of all events.
-      operationId: getEvents
-      parameters:
-        - name: eventGroup
-          in: query
-          description: Filter by this event group
-          required: false
-          schema:
-            type: string
+        - v1/eventGroup
       responses:
-        '200':
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EventDto'
+                  $ref: "#/components/schemas/EventGroupDto"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
+      summary: Create a new event group
+      operationId: createEventGroup
       tags:
-        - v1/event
-      summary: Create a new event.
-      description: Registers an event with Dennys.
-      operationId: addEvent
+        - v1/eventGroup
       requestBody:
-        description: Event specification
+        description: Event group specification
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEventDto'
+              $ref: "#/components/schemas/CreateEventGroupDto"
         required: true
       responses:
-        '200':
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventDto'
-        '400':
+                $ref: "#/components/schemas/EventGroupDto"
+        "400":
           description: Invalid input
-        '422':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
           description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -79,12 +109,246 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/event/{eventId}:
+  /v1/eventGroup/{eventGroupId}:
+    get:
+      summary: Get an event group by ID
+      operationId: getEventGroupById
+      tags:
+        - v1/eventGroup
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          description: ID of the event group to retrieve
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Event group found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventGroupDto"
+        "404":
+          description: Event group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Patch an event group's data
+      operationId: patchEventGroup
+      tags:
+        - v1/eventGroup
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          description: ID of the event group to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Fields to update on the event group
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchEventGroupDto"
+      responses:
+        "200":
+          description: Event group updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventGroupDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Event group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/eventGroup/{eventGroupId}/events:
+    get:
+      summary: Get an event group with all events included
+      operationId: getEventsInEventGroup
+      tags:
+        - v1/eventGroup/events
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          description: ID of the event group
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of events in the event group
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventGroupWithEventsDto"
+        "404":
+          description: Event group not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Assign an event to an event group
+      operationId: addEventToEventGroup
+      tags:
+        - v1/eventGroup/events
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventGroupAddEventDto"
+      responses:
+        "200":
+          description: Event added to event group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventGroupWithEventsDto"
+        "404":
+          description: Event group or event not found
+        "409":
+          description: |
+            Invalid resource state
+
+            Possible reasons:
+            - Event is already assigned to another event group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/eventGroup/{eventGroupId}/events/{eventId}:
+    delete:
+      summary: Remove an event from an event group
+      operationId: removeEventFromEventGroup
+      tags:
+        - v1/eventGroup/events
+      parameters:
+        - name: eventGroupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Event removed from event groups
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventGroupWithEventsDto"
+        "404":
+          description: Event or team not found
+
+  /v1/event:
     get:
       tags:
         - v1/event
-      summary: Find event by ID.
-      description: Returns a single event.
+      summary: Get all events
+      description: Fetch a list of all events.
+      operationId: getEvents
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventDto"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      tags:
+        - v1/event
+      summary: Create a new event.
+      description: |
+        Registers an event with Dennys, and optionally assign it to an event group
+      operationId: addEvent
+      requestBody:
+        description: Event specification
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEventDto"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/event/{eventId}:
+    get:
+      tags:
+        - v1/event
+      summary: Get an event by ID.
+      description: Returns a single event with the associated teams.
       operationId: getEventById
       parameters:
         - name: eventId
@@ -95,16 +359,24 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventDto'
-        '400':
+                $ref: "#/components/schemas/EventDto"
+        "400":
           description: Missing or malformed id
-        '404':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
           description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -112,10 +384,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-    put:
+    patch:
       tags:
         - v1/event
-      summary: Update an event.
+      summary: Patch an event's data
       parameters:
         - name: eventId
           in: path
@@ -124,25 +396,33 @@ paths:
           schema:
             type: integer
             format: int64
-      operationId: updateEvent
+      operationId: patchEvent
       requestBody:
         required: true
-        description: Update existing event.
+        description: Patch existing event.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEventDto'
+              $ref: "#/components/schemas/PatchEventDto"
       responses:
-        '200':
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventDto'
-        '400':
+                $ref: "#/components/schemas/EventDto"
+        "400":
           description: Invalid input
-        '422':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
           description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -150,8 +430,777 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /v1/event/{eventId}/teams:
+    get:
+      summary: Get an event with all teams included
+      operationId: getTeamsInEvent
+      tags:
+        - v1/event/teams
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID of the event
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of teams in the event
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventWithTeamsDto"
+        "404":
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Link a team to an event
+      operationId: addTeamToEvent
+      tags:
+        - v1/event/teams
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventAddTeamDto"
+      responses:
+        "200":
+          description: Team added to event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventWithTeamsDto"
+        "404":
+          description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            Invalid resource state
+
+            Possible reasons:
+            - Team is already assigned to a different event
+            - One or more players on this team are already assigned to a different team in this event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/event/{eventId}/teams/{teamId}:
+    delete:
+      summary: Remove a team from an event
+      operationId: removeTeamFromEvent
+      tags:
+        - v1/event/teams
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Team removed from event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventWithTeamsDto"
+        "404":
+          description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/event/{eventId}/series:
+    get:
+      summary: Get all the series of an event
+      operationId: getSeriesInEvent
+      tags:
+        - v1/event/series
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID of the event
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of series in the event
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventWithSeriesDto"
+        "404":
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a series for an event.
+      operationId: addSeriesToEvent
+      tags:
+        - v1/event/series
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventCreateSeriesDto"
+      responses:
+        "200":
+          description: Team added to event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDto"
+        "400":
+          description: Request body is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Event or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            Invalid resource state
+
+            Possible reasons:
+            - One or more teams are not in this event.
+            - Series already exists between these teams.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/event/{eventId}/series/{seriesId}:
+    delete:
+      summary: Remove a series from an event
+      operationId: removeSeriesFromEvent
+      tags:
+        - v1/event/series
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Series removed from event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventWithSeriesDto"
+        "404":
+          description: Event or series not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+# Series Endpoints
+  /v1/series/game:
+    post:
+      summary: Create a game in a series
+      operationId: createGame
+      tags:
+        - v1/series/games
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameDto"
+      responses:
+        "200":
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/team:
+    get:
+      summary: Get all teams
+      operationId: getTeams
+      tags:
+        - v1/team
+      responses:
+        "200":
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamDto"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a new team
+      operationId: addTeam
+      tags:
+        - v1/team
+      requestBody:
+        required: true
+        description: New team details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewTeamDto"
+      responses:
+        "200":
+          description: Team created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/team/{teamId}:
+    get:
+      summary: Get a team by ID
+      operationId: getTeamById
+      tags:
+        - v1/team
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          description: ID of the team
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Team found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamDto"
+        "404":
+          description: Team not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      summary: Patch a team's data.
+      operationId: patchTeam
+      tags:
+        - v1/team
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          description: ID of the team to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Fields to update for the team
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchTeamDto"
+      responses:
+        "200":
+          description: Team updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Team not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/team/{teamId}/players:
+    get:
+      summary: Get a team with all the players included
+      operationId: getPlayersOnTeam
+      tags:
+        - v1/team/players
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          description: ID of the team
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Players on the team
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamWithPlayersDto"
+        "404":
+          description: Team not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Add a player to a team
+      operationId: addPlayerToTeam
+      tags:
+        - v1/team/players
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamPlayerLinkRequestDto"
+      responses:
+        "200":
+          description: Player added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamWithPlayersDto"
+        "404":
+          description: Team or player not found
+        "409":
+          description: |
+            Invalid resource state
+
+            Possible reasons:
+            - Player is already assigned to a different team in this event
+            - Player is already assigned to this team
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/team/{teamId}/players/{playerId}:
+    delete:
+      summary: Remove a player from a team
+      operationId: removePlayerFromTeam
+      tags:
+        - v1/team/players
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Player removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamWithPlayersDto"
+        "404":
+          description: Team or player not found
+
+  /v1/player:
+    get:
+      summary: Get all players
+      operationId: getPlayers
+      tags:
+        - v1/player
+      responses:
+        "200":
+          description: List of all players
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlayerDto"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a new player
+      operationId: addPlayer
+      tags:
+        - v1/player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPlayerDto"
+      responses:
+        "200":
+          description: Player created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerDto"
+        "400":
+          description: Name field is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Player name already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/player/{playerId}:
+    get:
+      summary: Get player by ID
+      operationId: getPlayerById
+      tags:
+        - v1/player
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player to retrieve
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Player found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerDto"
+        "404":
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      summary: Patch a player's data
+      operationId: patchPlayer
+      tags:
+        - v1/player
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player to rename
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Updated player data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchPlayerDto"
+      responses:
+        "200":
+          description: Player renamed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Player not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/player/{playerId}/accounts:
+    post:
+      summary: Link a Riot account to a player
+      operationId: linkAccountToPlayer
+      tags:
+        - v1/player/accounts
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountLinkRequestDto"
+      responses:
+        "200":
+          description: Riot account linked to player
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerDto"
+        "400":
+          description: Invalid input
+        "404":
+          description: Player or Riot account not found
+        "409":
+          description: Riot account already assigned to another player
+        default:
+          description: Unexpected error
+
+  /v1/player/{playerId}/accounts/{accountId}:
+    delete:
+      summary: Remove a Riot account from a player
+      operationId: removeAccountFromPlayer
+      tags:
+        - v1/player/accounts
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          description: ID of the player
+          schema:
+            type: integer
+        - name: accountId
+          in: path
+          required: true
+          description: ID of the Riot account to remove
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Riot account removed from player
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerDto"
+        "404":
+          description: Player or account not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/account:
+    get:
+      summary: Get all Riot accounts
+      operationId: getAllRiotAccounts
+      tags:
+        - v1/account
+      responses:
+        "200":
+          description: List of all Riot accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiotAccountDto"
+        default:
+          description: Unexpected error
+
+    post:
+      summary: Create a new Riot account
+      operationId: createRiotAccountDto
+      tags:
+        - v1/account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewRiotAccountDto"
+      responses:
+        "201":
+          description: Riot account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiotAccountDto"
+        "400":
+          description: Invalid PUUID format
+        "404":
+          description: Riot account not found from Riot API
+        "409":
+          description: Riot account already exists
+        default:
+          description: Unexpected error
+
+  /v1/account/{accountId}:
+    get:
+      summary: Get Riot account by ID
+      operationId: getRiotAccountDtoById
+      tags:
+        - v1/account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Internal database ID of the Riot account
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Riot account found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiotAccountDto"
+        "404":
+          description: Riot account not found
+        default:
+          description: Unexpected error
+
 components:
   schemas:
+    # Game Schemas
+    GameDto:
+      type: object
+      required:
+        - id
+        - shortcode
+        - blueTeamId
+        - redTeamId
+        - seriesId
+        - number
+      properties:
+        id:
+          type: integer
+        shortcode:
+          type: string
+          example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
+        blueTeamId: 
+          type: integer
+          example: 2
+        redTeamId:
+          type: integer
+          example: 4
+        seriesId:
+          type: integer
+          example: 3
+        number:
+          type: integer
+          example: 1
+    CreateGameDto:
+      type: object
+      required:
+        - blueTeamId
+        - redTeamId
+      properties:
+        blueTeamId:
+          type: integer
+        redTeamId:
+          type: integer
+          
     EventStatus:
       type: string
       enum:
@@ -161,6 +1210,61 @@ components:
         - PAUSED
         - COMPLETED
 
+    # Event Group Schemas
+    CreateEventGroupDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Season 14
+    EventGroupDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 0
+        name:
+          type: string
+          example: Season 14
+    EventGroupWithEventsDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Season 14
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventDto"
+    PatchEventGroupDto:
+      type: object
+      description: Fields to update on an event group
+      properties:
+        name:
+          type: string
+          example: Season 14 But New
+    EventGroupAddEventDto:
+      type: object
+      required:
+        - eventId
+      properties:
+        eventId:
+          type: integer
+          format: int64
+          example: 1
+
+    # Event Schemas
     CreateEventDto:
       type: object
       required:
@@ -179,42 +1283,16 @@ components:
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
-        eventGroup:
-          type: integer
-          description: An optional event grouping. Invalid IDs will not cause event creation failure.
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
             - description: The intended starting status of the event.
             - example: NOT_STARTED
-            - $ref: '#/components/schemas/EventStatus'
-
-    UpdateEventDto:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Event name
-          example: Season 14 Commercial
-        description:
-          type: string
-          example: Season 14's plat-emerald league!
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-        eventGroupId:
-          type: integer
-        status:
-          allOf:
-            - description: The new event status.
-            - example: CANCELED
-            - $ref: '#/components/schemas/EventStatus'
-
+            - $ref: "#/components/schemas/EventStatus"
     EventDto:
       type: object
       required:
@@ -225,10 +1303,12 @@ components:
         - startDate
         - endDate
         - status
+        - tournamentId
       properties:
         id:
           type: integer
           format: int64
+          example: 1
         name:
           type: string
           description: Event name
@@ -239,30 +1319,325 @@ components:
         createdAt:
           type: string
           format: date-time
+          example: "2025-08-21T15:34:23.105Z"
         startDate:
           type: string
           format: date-time
+          example: "2025-08-22T15:34:23.105Z"
         endDate:
           type: string
           format: date-time
-        eventGroup:
-          type: object
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
+          example: "2025-08-27T15:34:23.105Z"
         status:
           allOf:
+            - $ref: "#/components/schemas/EventStatus"
             - description: The current event status.
             - example: NOT_STARTED
-            - $ref: '#/components/schemas/EventStatus'
+        tournamentId:
+          type: integer
+          format: int64
+          example: 1234
+    EventWithTeamsDto:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - startDate
+        - endDate
+        - status
+        - tournamentId
+        - teams
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Season 15 Audit
+        description:
+          type: string
+          example: The Season 15 plat-emerald league!
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-08-21T15:34:23.105Z"
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-08-22T15:34:23.105Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-08-27T15:34:23.105Z"
+        tournamentId:
+          type: integer
+          format: int64
+          example: 54142
+        status:
+          allOf:
+            - $ref: "#/components/schemas/EventStatus"
+            - description: The current event status.
+            - example: NOT_STARTED
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamDto"
+    EventWithSeriesDto:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - startDate
+        - endDate
+        - status
+        - tournamentId
+        - series
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Season 15 Audit
+        description:
+          type: string
+          example: The Season 15 plat-emerald league!
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-08-21T15:34:23.105Z"
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-08-22T15:34:23.105Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-08-27T15:34:23.105Z"
+        tournamentId:
+          type: integer
+          format: int64
+          example: 54142
+        status:
+          allOf:
+            - $ref: "#/components/schemas/EventStatus"
+            - description: The current event status.
+            - example: NOT_STARTED
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeriesDto"
+    PatchEventDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Event name
+          example: Season 14 Commercial
+        description:
+          type: string
+          example: Season 14's plat-emerald league!
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-08-22T15:34:23.105Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-08-27T15:34:23.105Z"
+        status:
+          allOf:
+            - description: The new event status.
+            - example: CANCELED
+            - $ref: "#/components/schemas/EventStatus"
+    EventAddTeamDto:
+      type: object
+      required:
+        - teamId
+      properties:
+        teamId:
+          type: integer
+          example: 3
+
+    EventCreateSeriesDto:
+      type: object
+      required:
+        - team1Id
+        - team2Id
+        - gamesToWin
+      properties:
+        team1Id:
+          type: integer
+          example: 123
+        team2Id:
+          type: integer
+          example: 456
+        gamesToWin:
+          type: integer
+          example: 3
+
+    NewPlayerDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: ruuffian#FUNZ
+
+    NewRiotAccountDto:
+      type: object
+      required:
+        - riotPuuid
+      properties:
+        riotPuuid:
+          type: string
+          description: Riot's permanent unique user ID (78 chars)
+
+    RiotAccountDto:
+      type: object
+      required:
+        - id
+        - riotPuuid
+      properties:
+        id:
+          type: integer
+        riotPuuid:
+          type: string
+          description: Riot's permanent unique user ID (78 chars)
+        playerId:
+          type: integer
+          nullable: true
+
+    PlayerDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        accounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiotAccountDto"
+
+    AccountLinkRequestDto:
+      type: object
+      required:
+        - accountId
+      properties:
+        accountId:
+          type: integer
+
+    PatchPlayerDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: New player name (not necessarily a Riot ID)
+          example: newname
+
+    NewTeamDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 80
+          example: Golden Guardians
+        logoName:
+          type: string
+          nullable: true
+          example: ggs.png
+
+    PatchTeamDto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 80
+          example: Golden Guardians Rebranded
+        logoName:
+          type: string
+          nullable: true
+          example: new-logo.png
+
+    TeamDto:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        logoName:
+          type: string
+          nullable: true
+        eventId:
+          type: integer
+          nullable: true
+
+    SeriesDto:
+      type: object
+      required:
+        - id
+        - eventId
+        - teams
+      properties:
+        id:
+          type: integer
+        eventId:
+          type: integer
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamDto"
+
+    TeamWithPlayersDto:
+      type: object
+      required:
+        - id
+        - name
+        - players
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        logoName:
+          type: string
+          nullable: true
+        eventId:
+          type: integer
+          nullable: true
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlayerDto"
+
+    TeamPlayerLinkRequestDto:
+      type: object
+      required:
+        - playerId
+      properties:
+        playerId:
+          type: integer
 
     Error:
       type: object
       properties:
         code:
-          type: string
+          type: integer
         message:
           type: string
       required:
