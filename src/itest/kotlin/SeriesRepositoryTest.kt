@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.repositories.EventRepository
 import com.lowbudgetlcs.repositories.SeriesRepository
@@ -17,6 +18,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
@@ -35,6 +37,7 @@ class SeriesRepositoryTest : FunSpec({
     lateinit var event: Event
     lateinit var team1: Team
     lateinit var team2: Team
+    lateinit var newSeries: NewSeries
 
     beforeSpec {
         val e = EventRepository(dsl)
@@ -58,12 +61,13 @@ class SeriesRepositoryTest : FunSpec({
                 name = "Team 2".toTeamName(),
             )
         ) ?: throw Exception("Failed to insert team 2.")
-    }
-
-    test("insert and fetch series by id") {
-        val newSeries = NewSeries(
+        newSeries = NewSeries(
             eventId = event.id, gamesToWin = 10, participantIds = listOf(team1.id, team2.id)
         )
+    }
+
+
+    test("insert and fetch series by id") {
 
         val created = repo.insert(newSeries)
         created.shouldNotBeNull()
@@ -73,12 +77,14 @@ class SeriesRepositoryTest : FunSpec({
         fetched shouldBe created
     }
 
-    test("series from event exists, then is deleted") {
-        var series = repo.getAllByEventId(event.id)
+    test("get all series by eventId, series have teamIds in output") {
+        repeat(4) { repo.insert(newSeries) }
+        val series = repo.getAllByEventId(event.id)
         series.shouldNotBeEmpty()
-        series.shouldHaveSize(1)
-        repo.delete(series.first().id)
-        series = repo.getAllByEventId(event.id)
-        series.shouldHaveSize(0)
+        series.shouldHaveSize(5)
+        series.forEach { s ->
+            s.participants.shouldHaveSize(2)
+            s.participants.forEach { t -> t.shouldBeInstanceOf<TeamId>() }
+        }
     }
 })

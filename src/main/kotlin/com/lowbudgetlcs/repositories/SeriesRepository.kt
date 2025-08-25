@@ -6,7 +6,6 @@ import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
-import org.jooq.Record1
 import org.jooq.impl.DSL.multiset
 import org.jooq.impl.DSL.select
 import org.jooq.storage.tables.references.SERIES

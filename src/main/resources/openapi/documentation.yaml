@@ -1524,10 +1524,10 @@ components:
           type: integer
         eventId:
           type: integer
-        teams:
+        teamIds:
           type: array
           items:
-            $ref: "#/components/schemas/TeamDto"
+            type: int
 
     TeamWithPlayersDto:
       type: object

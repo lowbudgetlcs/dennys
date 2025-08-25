@@ -66,9 +66,8 @@ fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesSe
         val newSeries = NewSeries(
             route.eventId.toEventId(), dto.gamesToWin, listOf(dto.team1Id.toTeamId(), dto.team2Id.toTeamId())
         )
-        seriesService.createSeries(newSeries)
-        val event = eventService.getEventWithSeries(route.eventId.toEventId())
-        call.respond(event.toDto())
+        val series = seriesService.createSeries(newSeries)
+        call.respond(HttpStatusCode.Created, series.toDto())
     }
     delete<EventResourcesV1.ByIdSeries> { route ->
         logger.info("📩 Received DELETE on /v1/event/{eventId}/series/{seriesId}")
