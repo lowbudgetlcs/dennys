@@ -18,14 +18,14 @@ class SeriesService(
         if (series.gamesToWin < 1) throw IllegalArgumentException("Games to win must be at least 1")
 
         series.participantIds.forEach { id ->
-            val team = teamRepository.getById(id) ?: throw IllegalArgumentException("Team with id $id not found")
+            val team = teamRepository.getById(id) ?: throw NoSuchElementException("Team with id $id not found")
 
             if (team.eventId != series.eventId) {
                 throw IllegalArgumentException("Team with id $id is not part of the event")
             }
         }
 
-        return seriesRepository.insert(series) ?: throw DatabaseException("Failed to create team")
+        return seriesRepository.insert(series) ?: throw DatabaseException("Failed to create series")
     }
 
     override fun getAllSeriesFromEvent(id: EventId): List<Series> = seriesRepository.getAllByEventId(id)
