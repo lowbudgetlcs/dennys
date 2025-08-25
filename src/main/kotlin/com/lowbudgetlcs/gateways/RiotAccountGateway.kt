@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.gateways
 
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
-import com.lowbudgetlcs.routes.dto.riot.account.AccountDto
+import com.lowbudgetlcs.routes.dto.riot.account.RiotAccountDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -14,7 +14,7 @@ class RiotAccountGateway(
     private val baseUrl: String = "https://americas.api.riotgames.com"
 ) : IRiotAccountGateway {
 
-    override suspend fun getAccountByPuuid(puuid: String): AccountDto {
+    override suspend fun getAccountByPuuid(puuid: String): RiotAccountDto {
         val response: HttpResponse = client.get("$baseUrl/riot/account/v1/accounts/by-puuid/$puuid") {
             headers {
                 append("X-Riot-Token", apiKey)

@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.events
 
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import java.time.Instant
 
 fun NewEventGroup.toEventGroup(id: EventGroupId): EventGroup = EventGroup(
@@ -8,11 +8,11 @@ fun NewEventGroup.toEventGroup(id: EventGroupId): EventGroup = EventGroup(
     name = name
 )
 
-fun NewEvent.toEvent(id: EventId, createdAt: Instant, tournamentId: TournamentId): Event = Event(
+fun NewEvent.toEvent(id: EventId, createdAt: Instant, riotTournamentId: RiotTournamentId): Event = Event(
     id = id,
     name = name,
     description = description,
-    tournamentId = tournamentId,
+    riotTournamentId = riotTournamentId,
     createdAt = createdAt,
     startDate = startDate,
     endDate = endDate,

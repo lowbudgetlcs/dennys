@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.routes
 
+import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.routes.api.apiRoutes
 import com.lowbudgetlcs.routes.dto.Error
@@ -60,6 +61,12 @@ fun Application.routes() {
             }
             exception<DatabaseException> { call, cause ->
                 logger.error("⚠️ Database Exception: $call", cause)
+                val code = HttpStatusCode.InternalServerError
+                val e = Error(code = code.value, message = cause.message ?: "Internal server error")
+                call.respond(code, e)
+            }
+            exception<GatewayException> { call, cause ->
+                logger.error("⚠️ Gateway Exception: $call", cause)
                 val code = HttpStatusCode.InternalServerError
                 val e = Error(code = code.value, message = cause.message ?: "Internal server error")
                 call.respond(code, e)

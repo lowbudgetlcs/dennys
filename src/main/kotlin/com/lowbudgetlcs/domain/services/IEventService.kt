@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
+import com.lowbudgetlcs.domain.models.riot.tournament.NewRiotTournament
 
 interface IEventService {
     /**
@@ -24,13 +24,12 @@ interface IEventService {
      * Create an event from a NewEvent and NewTournament.
      *
      * @param NewEvent event details.
-     * @param NewTournament the riot tournament to include in the event.
      * @return the newly created event.
      *
      * @throws IllegalArgumentException if the event cannot be created.
      * @throws com.lowbudgetlcs.repositories.DatabaseException if the underlying repositories fail.
      */
-    fun createEvent(event: NewEvent, tournament: NewTournament): Event
+    suspend fun createEvent(event: NewEvent): Event
 
     /**
      * Updates event details.

@@ -24,7 +24,7 @@ fun Event.toDto(): EventDto = EventDto(
     createdAt = createdAt,
     description = description,
     status = status,
-    tournamentId = tournamentId.value
+    tournamentId = riotTournamentId.value
 )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto = EventWithTeamsDto(
@@ -35,6 +35,6 @@ fun EventWithTeams.toDto(): EventWithTeamsDto = EventWithTeamsDto(
     createdAt = createdAt,
     description = description,
     status = status,
-    tournamentId = tournamentId.value,
+    tournamentId = riotTournamentId.value,
     teams = teams.map { t -> t.toDto() }
 )

@@ -1,7 +1,6 @@
 package com.lowbudgetlcs.routes.api.v1.event
 
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
 import com.lowbudgetlcs.domain.services.IEventService
 import com.lowbudgetlcs.routes.dto.events.*
 import io.ktor.http.*
@@ -28,7 +27,7 @@ fun Route.eventEndpointsV1(
     post<EventResourcesV1> {
         logger.info("📩 Received POST on /v1/event")
         val dto = call.receive<CreateEventDto>()
-        val created = eventService.createEvent(dto.toNewEvent(), NewTournament(dto.name))
+        val created = eventService.createEvent(dto.toNewEvent())
         call.respond(HttpStatusCode.Created, created.toDto())
     }
     get<EventResourcesV1.ById> { route ->

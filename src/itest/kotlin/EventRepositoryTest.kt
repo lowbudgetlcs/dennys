@@ -1,5 +1,5 @@
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.tournament.toTournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.repositories.EventRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -50,7 +50,7 @@ class EventRepositoryTest : StringSpec({
     }
 
     "insert() creates new Event" {
-        val tid = 0.toTournamentId()
+        val tid = 0.toRiotTournamentId()
         val event = repo.insert(newEvent, tid)
         event.shouldNotBeNull()
         event.shouldBeEqualToIgnoringFields(
@@ -59,11 +59,11 @@ class EventRepositoryTest : StringSpec({
     }
 
     "insert() cannot insert duplicate Event" {
-        repo.insert(newEvent, 1.toTournamentId()) shouldBe null
+        repo.insert(newEvent, 1.toRiotTournamentId()) shouldBe null
     }
 
     "getById() fetches correct Event" {
-        val created = repo.insert(newEvent2, 8888.toTournamentId())
+        val created = repo.insert(newEvent2, 8888.toRiotTournamentId())
         created.shouldNotBeNull()
         val event = repo.getById(created.id)
         event shouldBe created

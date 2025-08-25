@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories.inmemory
 
-import com.lowbudgetlcs.domain.models.NewRiotAccount
-import com.lowbudgetlcs.domain.models.RiotAccount
-import com.lowbudgetlcs.domain.models.RiotAccountId
+import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
+import com.lowbudgetlcs.domain.models.riot.RiotAccount
+import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.repositories.IAccountRepository
 
 class InMemoryAccountRepository : IAccountRepository {

@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 
 interface IPlayerRepository {
     fun insert(newPlayer: NewPlayer): PlayerWithAccounts?

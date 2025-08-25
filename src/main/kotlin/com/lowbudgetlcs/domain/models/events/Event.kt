@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.models.events
 
 import com.lowbudgetlcs.domain.models.Team
-import com.lowbudgetlcs.domain.models.tournament.TournamentId
+import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import java.time.Instant
 
 @JvmInline
@@ -18,7 +18,7 @@ data class Event(
     val name: String,
     val description: String,
     val eventGroupId: EventGroupId?,
-    val tournamentId: TournamentId,
+    val riotTournamentId: RiotTournamentId,
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,
@@ -30,7 +30,7 @@ data class EventWithTeams(
     val name: String,
     val description: String,
     val eventGroupId: EventGroupId?,
-    val tournamentId: TournamentId,
+    val riotTournamentId: RiotTournamentId,
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,

@@ -1,13 +1,13 @@
 package com.lowbudgetlcs.domain.services
 
 import com.lowbudgetlcs.domain.models.events.*
-import com.lowbudgetlcs.domain.models.tournament.NewTournament
-import com.lowbudgetlcs.gateways.ITournamentGateway
+import com.lowbudgetlcs.gateways.GatewayException
+import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IEventRepository
 
 class EventService(
-    private val eventRepo: IEventRepository, private val tournamentGateway: ITournamentGateway
+    private val eventRepo: IEventRepository, private val tournamentGateway: IRiotTournamentGateway
 ) : IEventService {
     override fun getAllEvents(): List<Event> = eventRepo.getAll()
 
@@ -16,13 +16,12 @@ class EventService(
     override fun getEvent(id: EventId): Event =
         eventRepo.getById(id) ?: throw NoSuchElementException("Event with ${id.value} not found.")
 
-    override fun createEvent(event: NewEvent, tournament: NewTournament): Event {
+    override suspend fun createEvent(event: NewEvent): Event {
         if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
         if (isNameTaken(event.name)) throw IllegalArgumentException("Event '${event.name}' already exists.")
         if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
-        // TODO: Services may need to be refactored to support suspend functions.
-        val t = tournamentGateway.create(tournament)
-            ?: throw DatabaseException("Failed to register tournament with Riot Games.")
+        val t = tournamentGateway.create(event.name)
+            ?: throw GatewayException("Failed to register tournament with Riot Games.")
         return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
     }
 

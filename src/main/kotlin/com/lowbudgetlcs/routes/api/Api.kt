@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.services.EventService
 import com.lowbudgetlcs.domain.services.PlayerService
 import com.lowbudgetlcs.domain.services.TeamService
 import com.lowbudgetlcs.gateways.RiotAccountGateway
-import com.lowbudgetlcs.gateways.TournamentGateway
+import com.lowbudgetlcs.gateways.RiotTournamentGateway
 import com.lowbudgetlcs.repositories.EventRepository
 import com.lowbudgetlcs.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.IPlayerRepository
@@ -65,15 +65,15 @@ fun Route.apiRoutes() {
     val teamService = TeamService(teamRepository)
 
     val metadataRepo = MetadataRepository(Database.dslContext)
-    val tournamentGateway = TournamentGateway(
+    val riotTournamentGateway = RiotTournamentGateway(
         metadataRepo = metadataRepo,
         client = riotHttpClient,
         apiKey = appConfig.riot.key,
-        stub = appConfig.riot.useStubs,
+        useStubs = appConfig.riot.useStubs,
     )
 
     val eventRepo = EventRepository(Database.dslContext)
-    val eventService = EventService(eventRepo, tournamentGateway)
+    val eventService = EventService(eventRepo, riotTournamentGateway)
 
     route("/api/v1") {
         route("/riot-callback") {
