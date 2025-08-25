@@ -590,7 +590,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EventWithSeriesDto"
+                $ref: "#/components/schemas/SeriesDto"
         "400":
           description: Request body is invalid.
           content:
@@ -1524,10 +1524,10 @@ components:
           type: integer
         eventId:
           type: integer
-        teamIds:
+        teams:
           type: array
           items:
-            type: int
+            $ref: "#/components/schemas/TeamDto"
 
     TeamWithPlayersDto:
       type: object
