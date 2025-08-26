@@ -62,7 +62,7 @@ fun Route.apiRoutes() {
         metadataRepo = metadataRepository,
         client = riotHttpClient,
         apiKey = appConfig.riot.key,
-        useStubs = appConfig.riot.useStubs,
+        useStubs = appConfig.riot.usestubs,
     )
 
     val eventRepository = EventRepository(Database.dslContext)
