@@ -6,7 +6,7 @@ import com.sksamuel.hoplite.addEnvironmentSource
 import com.sksamuel.hoplite.addResourceSource
 
 val appConfig: AppConfig by lazy {
-    ConfigLoaderBuilder.default()
+    ConfigLoaderBuilder.default().withReport()
         .addEnvironmentSource()
         .addResourceSource("/default.properties")
         .addResourceSource("/secret.properties", optional = true)
