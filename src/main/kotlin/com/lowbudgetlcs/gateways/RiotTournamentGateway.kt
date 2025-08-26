@@ -13,7 +13,6 @@ import com.lowbudgetlcs.routes.dto.riot.tournament.toShortcodeParametersDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 
 
@@ -52,6 +51,7 @@ class RiotTournamentGateway(
         riotTournamentId: RiotTournamentId, newShortcode: NewShortcode
     ): RiotShortcodeDto {
         val res = client.post("$url/codes") {
+            println(url)
             url {
                 parameters.append("count", "1")
                 parameters.append("tournamentId", "${riotTournamentId.value}")
@@ -62,6 +62,10 @@ class RiotTournamentGateway(
             contentType(ContentType.Application.Json)
             setBody(newShortcode.toShortcodeParametersDto())
         }
+        print(res.toString())
+        print(newShortcode.toShortcodeParametersDto())
+        print(riotTournamentId)
+        println("stubs: $useStubs")
         when (res.status) {
             HttpStatusCode.OK -> {
                 val codes = res.body<List<String>>()
