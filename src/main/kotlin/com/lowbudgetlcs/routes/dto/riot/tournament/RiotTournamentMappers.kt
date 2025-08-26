@@ -6,7 +6,4 @@ fun NewShortcode.toShortcodeParametersDto(): RiotShortcodeParametersDto = RiotSh
     mapType = mapType.name,
     pickType = pickType.name,
     metadata = metadata,
-    enoughPlayers = true,
-    spectatorType = "ALL",
-    teamSize = 5
 )

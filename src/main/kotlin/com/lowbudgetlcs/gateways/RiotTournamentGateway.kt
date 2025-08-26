@@ -52,11 +52,6 @@ class RiotTournamentGateway(
         riotTournamentId: RiotTournamentId, newShortcode: NewShortcode
     ): RiotShortcodeDto {
         val res: HttpResponse = client.post("$url/codes") {
-            println("stubs: $useStubs")
-            println(url)
-            val b = newShortcode.toShortcodeParametersDto()
-            println(b)
-            println(b.teamSize)
             url {
                 parameters.append("tournamentId", "${riotTournamentId.value}")
                 parameters.append("count", "1")
@@ -65,13 +60,8 @@ class RiotTournamentGateway(
                 append("X-Riot-Token", apiKey)
             }
             contentType(ContentType.Application.Json)
-            setBody(b)
+            setBody(newShortcode.toShortcodeParametersDto())
         }
-        println(res.request.url)
-        println(res.request.headers)
-        println(res.toString())
-        println(newShortcode.toShortcodeParametersDto())
-        println(riotTournamentId)
         when (res.status) {
             HttpStatusCode.OK -> {
                 val codes = res.body<List<String>>()
@@ -79,7 +69,6 @@ class RiotTournamentGateway(
             }
 
             else -> {
-                println(res.bodyAsText())
                 throw RiotApiException("Unexpected Riot API error: ${res.status}")
             }
         }
