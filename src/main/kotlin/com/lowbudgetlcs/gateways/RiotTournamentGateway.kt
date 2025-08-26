@@ -63,9 +63,9 @@ class RiotTournamentGateway(
             contentType(ContentType.Application.Json)
             setBody(newShortcode.toShortcodeParametersDto())
         }
-        print(res.toString())
-        print(newShortcode.toShortcodeParametersDto())
-        print(riotTournamentId)
+        println(res.toString())
+        println(newShortcode.toShortcodeParametersDto())
+        println(riotTournamentId)
         println("stubs: $useStubs")
         when (res.status) {
             HttpStatusCode.OK -> {

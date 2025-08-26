@@ -29,7 +29,7 @@ class GameService(
             ?: throw DatabaseException("Series found with no parent event.")
         // fetch shortcode
         val shortcode =
-            gate.getCode(tid, NewShortcode())?.codes?.first() ?: throw GatewayException("Failed to create shortcode.")
+            gate.getCode(tid, NewShortcode(metadata = "Test"))?.codes?.first() ?: throw GatewayException("Failed to create shortcode.")
         // insert data
         return gameRepo.insert(newGame, shortcode.toShortcode(), series.id) ?: throw DatabaseException("Failed to save game.")
     }
