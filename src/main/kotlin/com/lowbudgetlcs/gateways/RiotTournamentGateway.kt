@@ -13,6 +13,7 @@ import com.lowbudgetlcs.routes.dto.riot.tournament.toShortcodeParametersDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 
 
@@ -72,7 +73,10 @@ class RiotTournamentGateway(
                 return RiotShortcodeDto(codes)
             }
 
-            else -> throw RiotApiException("Unexpected Riot API error: ${res.status}")
+            else -> {
+                println(res.bodyAsText())
+                throw RiotApiException("Unexpected Riot API error: ${res.status}")
+            }
         }
     }
 }
