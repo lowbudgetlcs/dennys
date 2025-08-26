@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.hikari.core)
     implementation(libs.logback.core)
     implementation(libs.hoplite.core)
+    implementation("io.ktor:ktor-client-logging:3.2.1")
 
     // Jooq Code Generation
     "jooqImplementation"(libs.bundles.jooq.codegen)

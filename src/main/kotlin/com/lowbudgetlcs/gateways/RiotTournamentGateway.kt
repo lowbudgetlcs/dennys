@@ -67,7 +67,8 @@ class RiotTournamentGateway(
             contentType(ContentType.Application.Json)
             setBody(b)
         }
-        println(res.request)
+        println(res.request.url)
+        println(res.request.headers)
         println(res.toString())
         println(newShortcode.toShortcodeParametersDto())
         println(riotTournamentId)

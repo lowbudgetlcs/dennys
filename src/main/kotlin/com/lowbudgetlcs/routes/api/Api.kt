@@ -16,6 +16,9 @@ import com.lowbudgetlcs.routes.dto.riot.PostMatchDto
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -24,11 +27,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.Instant
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+//private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.apiRoutes() {
     // Manual dependency wiring. Could be extracted to a DI framework.
@@ -40,6 +41,10 @@ fun Route.apiRoutes() {
                         contextual(Instant::class, InstantSerializer)
                     }
                 })
+        }
+        install(io.ktor.client.plugins.logging.Logging) {
+            level = LogLevel.ALL  // log headers, bodies, everything
+            logger = Logger.DEFAULT
         }
     }
     val riotAccountGateway = RiotAccountGateway(client = riotHttpClient, apiKey = appConfig.riot.key)
@@ -81,9 +86,9 @@ fun Route.apiRoutes() {
         route("/riot-callback") {
             post {
                 val callback = call.receive<PostMatchDto>()
-                logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
+//                logger.info("📩 Received Riot callback: ${Json.encodeToString(callback)}")
                 call.respond(HttpStatusCode.OK)
-                logger.info("✅ Callback successfully parsed!")
+//                logger.info("✅ Callback successfully parsed!")
             }
         }
         eventRoutesV1(eventService = eventService, seriesService = seriesService)
