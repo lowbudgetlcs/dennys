@@ -37,6 +37,7 @@ fun Route.apiRoutes() {
         install(ContentNegotiation) {
             json(
                 Json {
+                    encodeDefaults = true
                     serializersModule = SerializersModule {
                         contextual(Instant::class, InstantSerializer)
                     }
