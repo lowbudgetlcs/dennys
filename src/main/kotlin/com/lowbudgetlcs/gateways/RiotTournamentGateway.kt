@@ -13,7 +13,7 @@ import com.lowbudgetlcs.routes.dto.riot.tournament.toShortcodeParametersDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.*
 import io.ktor.http.*
 
 
@@ -51,22 +51,26 @@ class RiotTournamentGateway(
     override suspend fun getCode(
         riotTournamentId: RiotTournamentId, newShortcode: NewShortcode
     ): RiotShortcodeDto {
-        val res = client.post("$url/codes") {
+        val res: HttpResponse = client.post("$url/codes") {
+            println("stubs: $useStubs")
             println(url)
+            val b = newShortcode.toShortcodeParametersDto()
+            println(b)
+            println(b.teamSize)
             url {
-                parameters.append("count", "1")
                 parameters.append("tournamentId", "${riotTournamentId.value}")
+                parameters.append("count", "1")
             }
             headers {
                 append("X-Riot-Token", apiKey)
             }
             contentType(ContentType.Application.Json)
-            setBody(newShortcode.toShortcodeParametersDto())
+            setBody(b)
         }
+        println(res.request)
         println(res.toString())
         println(newShortcode.toShortcodeParametersDto())
         println(riotTournamentId)
-        println("stubs: $useStubs")
         when (res.status) {
             HttpStatusCode.OK -> {
                 val codes = res.body<List<String>>()
