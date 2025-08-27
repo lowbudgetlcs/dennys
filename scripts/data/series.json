@@ -1,0 +1,993 @@
+{
+  "Economy": {
+    "Cuddly League Guys": [
+      "Greed Gaming",
+      "Death by Deep Ward",
+      "Imperial Marauders",
+      "The Sheep Herd",
+      "NG Gremlins",
+      "Old Baes",
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Greed Gaming": [
+      "Death by Deep Ward",
+      "Imperial Marauders",
+      "The Sheep Herd",
+      "NG Gremlins",
+      "Old Baes",
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Death by Deep Ward": [
+      "Imperial Marauders",
+      "The Sheep Herd",
+      "NG Gremlins",
+      "Old Baes",
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Imperial Marauders": [
+      "The Sheep Herd",
+      "NG Gremlins",
+      "Old Baes",
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "The Sheep Herd": [
+      "NG Gremlins",
+      "Old Baes",
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "NG Gremlins": [
+      "Old Baes",
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Old Baes": [
+      "The Kickin' Squids",
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "The Kickin' Squids": [
+      "Forge Esports Vanguard",
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Forge Esports Vanguard": [
+      "High Alert Legion",
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "High Alert Legion": [
+      "Only Krugs",
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Only Krugs": [
+      "Rat Tactics Jesters",
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Rat Tactics Jesters": [
+      "Panther Corps Aces",
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Panther Corps Aces": [
+      "Talking Ben Esports",
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "Talking Ben Esports": [
+      "2Town Gaming",
+      "The Poro Professors"
+    ],
+    "2Town Gaming": [
+      "The Poro Professors"
+    ]
+  },
+  "Commercial": {
+    "Team Front Flip": [
+      "Castaways",
+      "Literally Free Money",
+      "NG WAVYS in Motion",
+      "Wintrading",
+      "Hoedors",
+      "Team Sucks Mid",
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Castaways": [
+      "Literally Free Money",
+      "NG WAVYS in Motion",
+      "Wintrading",
+      "Hoedors",
+      "Team Sucks Mid",
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Literally Free Money": [
+      "NG WAVYS in Motion",
+      "Wintrading",
+      "Hoedors",
+      "Team Sucks Mid",
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "NG WAVYS in Motion": [
+      "Wintrading",
+      "Hoedors",
+      "Team Sucks Mid",
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Wintrading": [
+      "Hoedors",
+      "Team Sucks Mid",
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Hoedors": [
+      "Team Sucks Mid",
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Team Sucks Mid": [
+      "SRIKS",
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "SRIKS": [
+      "Team Backflip",
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Team Backflip": [
+      "Silversong Academy",
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Silversong Academy": [
+      "Expedition 60",
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Expedition 60": [
+      "Rat Tactics",
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Rat Tactics": [
+      "Forgot to Buy",
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "Forgot to Buy": [
+      "The Crew",
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "The Crew": [
+      "OML vs Everybody",
+      "Forge Esports Aero"
+    ],
+    "OML vs Everybody": [
+      "Forge Esports Aero"
+    ]
+  },
+  "Tax Haven": {
+    "Apollo Gaming": [
+      "League of Lumni",
+      "Swag Order Gang",
+      "Taco Bell McNuggets",
+      "The Globetrotters",
+      "Big Farma",
+      "Fifth Spectrum",
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "League of Lumni": [
+      "Swag Order Gang",
+      "Taco Bell McNuggets",
+      "The Globetrotters",
+      "Big Farma",
+      "Fifth Spectrum",
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Swag Order Gang": [
+      "Taco Bell McNuggets",
+      "The Globetrotters",
+      "Big Farma",
+      "Fifth Spectrum",
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Taco Bell McNuggets": [
+      "The Globetrotters",
+      "Big Farma",
+      "Fifth Spectrum",
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "The Globetrotters": [
+      "Big Farma",
+      "Fifth Spectrum",
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Big Farma": [
+      "Fifth Spectrum",
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Fifth Spectrum": [
+      "Needlessly Large Rods",
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Needlessly Large Rods": [
+      "Team Volatility Avalanche",
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Team Volatility Avalanche": [
+      "Dogs That Bark",
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Dogs That Bark": [
+      "Conduit Evergreen",
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Conduit Evergreen": [
+      "Cancun on Three",
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Cancun on Three": [
+      "Nefarious Enclave",
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Nefarious Enclave": [
+      "Team Severely Mid",
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Team Severely Mid": [
+      "Spoiled Milk",
+      "A Couple of Quackers"
+    ],
+    "Spoiled Milk": [
+      "A Couple of Quackers"
+    ]
+  },
+  "Financial": {
+    "Omega Gaming UncLeashed": [
+      "SYN City",
+      "Weez and Sons",
+      "B1 Udyr",
+      "Cheenis Boys",
+      "Panther Corps Divas",
+      "Hardstuck Casterlow",
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "SYN City": [
+      "Weez and Sons",
+      "B1 Udyr",
+      "Cheenis Boys",
+      "Panther Corps Divas",
+      "Hardstuck Casterlow",
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Weez and Sons": [
+      "B1 Udyr",
+      "Cheenis Boys",
+      "Panther Corps Divas",
+      "Hardstuck Casterlow",
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "B1 Udyr": [
+      "Cheenis Boys",
+      "Panther Corps Divas",
+      "Hardstuck Casterlow",
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Cheenis Boys": [
+      "Panther Corps Divas",
+      "Hardstuck Casterlow",
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Panther Corps Divas": [
+      "Hardstuck Casterlow",
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Hardstuck Casterlow": [
+      "Jobless Piggies",
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Jobless Piggies": [
+      "Undetermined Team Name",
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Undetermined Team Name": [
+      "Forge Esports Chaos",
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Forge Esports Chaos": [
+      "High Alert Henchmen",
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "High Alert Henchmen": [
+      "2% Milk",
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "2% Milk": [
+      "LPP Boiz",
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "LPP Boiz": [
+      "Lurkers",
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Lurkers": [
+      "Marmotte Flip",
+      "Old Man Lan Original Geezers"
+    ],
+    "Marmotte Flip": [
+      "Old Man Lan Original Geezers"
+    ]
+  },
+  "Audit": {
+    "Kappaplongus": [
+      "Bloerb",
+      "Imperial Legion",
+      "MSG Esports",
+      "Ribbit Revolution",
+      "Buy Are Food",
+      "FE Ginyu Force",
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "Bloerb": [
+      "Imperial Legion",
+      "MSG Esports",
+      "Ribbit Revolution",
+      "Buy Are Food",
+      "FE Ginyu Force",
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "Imperial Legion": [
+      "MSG Esports",
+      "Ribbit Revolution",
+      "Buy Are Food",
+      "FE Ginyu Force",
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "MSG Esports": [
+      "Ribbit Revolution",
+      "Buy Are Food",
+      "FE Ginyu Force",
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "Ribbit Revolution": [
+      "Buy Are Food",
+      "FE Ginyu Force",
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "Buy Are Food": [
+      "FE Ginyu Force",
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "FE Ginyu Force": [
+      "KaygeAndTheFourMelees",
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "KaygeAndTheFourMelees": [
+      "Tree Gang",
+      "Pil' Country Pirates"
+    ],
+    "Tree Gang": [
+      "Pil' Country Pirates"
+    ]
+  },
+  "Executive": {
+    "TRK: Rat Rock Bottom": [
+      "Milky Masters",
+      "Naughty Bois???",
+      "Dinner Died For This",
+      "Nefarious Juggernauts",
+      "Sisters of the Loam",
+      "The Scuttlers",
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Milky Masters": [
+      "Naughty Bois???",
+      "Dinner Died For This",
+      "Nefarious Juggernauts",
+      "Sisters of the Loam",
+      "The Scuttlers",
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Naughty Bois???": [
+      "Dinner Died For This",
+      "Nefarious Juggernauts",
+      "Sisters of the Loam",
+      "The Scuttlers",
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Dinner Died For This": [
+      "Nefarious Juggernauts",
+      "Sisters of the Loam",
+      "The Scuttlers",
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Nefarious Juggernauts": [
+      "Sisters of the Loam",
+      "The Scuttlers",
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Sisters of the Loam": [
+      "The Scuttlers",
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "The Scuttlers": [
+      "The Five Musketeers",
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "The Five Musketeers": [
+      "Water Buffalo",
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Water Buffalo": [
+      "UNC Charlotte Alumni",
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "UNC Charlotte Alumni": [
+      "High Alert Gurxed Crew",
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "High Alert Gurxed Crew": [
+      "Boom What Up 2.0",
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Boom What Up 2.0": [
+      "OML Elderly Zoomers",
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "OML Elderly Zoomers": [
+      "The Manorites",
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "The Manorites": [
+      "Crowd Control Inhouses",
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Crowd Control Inhouses": [
+      "Team Daybreak",
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Team Daybreak": [
+      "Big Back Bandits",
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Big Back Bandits": [
+      "2Town Elites",
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "2Town Elites": [
+      "Kitten Krew XD",
+      "VOID LOBTER"
+    ],
+    "Kitten Krew XD": [
+      "VOID LOBTER"
+    ]
+  },
+  "CEO": {
+    "New League Team": [
+      "Goatmilk Lifestyle",
+      "Big DIG Flex",
+      "Le Boolin Bouis",
+      "Surely Not CEO",
+      "Hunter's Association",
+      "Toes On Xenoliths",
+      "What The Bread"
+    ],
+    "Goatmilk Lifestyle": [
+      "Big DIG Flex",
+      "Le Boolin Bouis",
+      "Surely Not CEO",
+      "Hunter's Association",
+      "Toes On Xenoliths",
+      "What The Bread"
+    ],
+    "Big DIG Flex": [
+      "Le Boolin Bouis",
+      "Surely Not CEO",
+      "Hunter's Association",
+      "Toes On Xenoliths",
+      "What The Bread"
+    ],
+    "Le Boolin Bouis": [
+      "Surely Not CEO",
+      "Hunter's Association",
+      "Toes On Xenoliths",
+      "What The Bread"
+    ],
+    "Surely Not CEO": [
+      "Hunter's Association",
+      "Toes On Xenoliths",
+      "What The Bread"
+    ],
+    "Hunter's Association": [
+      "Toes On Xenoliths",
+      "What The Bread"
+    ],
+    "Toes On Xenoliths": [
+      "What The Bread"
+    ]
+  },
+  "LCS": {
+    "Filet-O-Fish": [
+      "Lane Zero Glue Eating Reapers",
+      "TRK: Squeak Squad",
+      "Zafa and Pals",
+      "Rice to the bottom",
+      "AP Krog Maw",
+      "Team Fried Chicken",
+      "Silversong Serenity"
+    ],
+    "Lane Zero Glue Eating Reapers": [
+      "TRK: Squeak Squad",
+      "Zafa and Pals",
+      "Rice to the bottom",
+      "AP Krog Maw",
+      "Team Fried Chicken",
+      "Silversong Serenity"
+    ],
+    "TRK: Squeak Squad": [
+      "Zafa and Pals",
+      "Rice to the bottom",
+      "AP Krog Maw",
+      "Team Fried Chicken",
+      "Silversong Serenity"
+    ],
+    "Zafa and Pals": [
+      "Rice to the bottom",
+      "AP Krog Maw",
+      "Team Fried Chicken",
+      "Silversong Serenity"
+    ],
+    "Rice to the bottom": [
+      "AP Krog Maw",
+      "Team Fried Chicken",
+      "Silversong Serenity"
+    ],
+    "AP Krog Maw": [
+      "Team Fried Chicken",
+      "Silversong Serenity"
+    ],
+    "Team Fried Chicken": [
+      "Silversong Serenity"
+    ]
+  }
+}
