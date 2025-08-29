@@ -17,7 +17,7 @@ fun Route.seriesEndpointsV1(gameService: IGameService) {
     post<SeriesResourcesV1.Game> {
         logger.info("📩 Received POST on /v1/series/game")
         val dto = call.receive<CreateGameDto>()
-        logger.debug("Body: {}", dto)
+        logger.debug("\uD83C\uDF81 Body: {}", dto)
         val created = gameService.createGame(dto.toNewGame())
         call.respond(HttpStatusCode.Created, created.toDto())
     }

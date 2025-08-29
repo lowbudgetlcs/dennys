@@ -29,7 +29,7 @@ fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesSe
     post<EventResourcesV1> {
         logger.info("📩 Received POST on /v1/event")
         val dto = call.receive<CreateEventDto>()
-        logger.debug("Body: {}", dto)
+        logger.debug("\uD83C\uDF81 Body: {}", dto)
         val created = eventService.createEvent(dto.toNewEvent())
         call.respond(HttpStatusCode.Created, created.toDto())
     }
@@ -41,7 +41,7 @@ fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesSe
     patch<EventResourcesV1.ById> { route ->
         logger.info("📩 Received PATCH on /v1/event/${route.eventId}")
         val dto = call.receive<PatchEventDto>()
-        logger.debug("Body: {}", dto)
+        logger.debug("\uD83C\uDF81 Body: {}", dto)
         val updated = eventService.patchEvent(route.eventId.toEventId(), dto.toEventUpdate())
         call.respond(updated.toDto())
     }
@@ -53,7 +53,7 @@ fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesSe
     post<EventResourcesV1.ByIdTeams> { route ->
         logger.info("📩 Received POST on /v1/event/${route.eventId}/teams")
         val dto = call.receive<EventTeamLinkDto>()
-        logger.debug("Body: {}", dto)
+        logger.debug("\uD83C\uDF81 Body: {}", dto)
         val event = eventService.addTeam(route.eventId.toEventId(), dto.toTeamId())
         call.respond(event.toDto())
     }
@@ -65,7 +65,7 @@ fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesSe
     post<EventResourcesV1.ByIdSeries> { route ->
         logger.info("📩 Received POST on /v1/event/${route.eventId}/series")
         val dto = call.receive<NewSeriesDto>()
-        logger.debug("Body: {}", dto)
+        logger.debug("\uD83C\uDF81 Body: {}", dto)
         val series = seriesService.createSeries(dto.toNewSeries(route.eventId))
         call.respond(HttpStatusCode.Created, series.toDto())
     }

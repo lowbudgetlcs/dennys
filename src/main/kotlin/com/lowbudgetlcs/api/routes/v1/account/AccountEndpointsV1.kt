@@ -23,7 +23,7 @@ fun Route.accountEndpointsV1(
     post<AccountResourcesV1> {
         logger.info("📩 Received POST /v1/account")
         val dto = call.receive<NewAccountDto>()
-        logger.debug("Body: {}", dto)
+        logger.debug("\uD83C\uDF81 Body: {}", dto)
         val created = accountService.createAccount(dto.toNewRiotAccount())
         call.respond(HttpStatusCode.Created, created.toDto())
     }
