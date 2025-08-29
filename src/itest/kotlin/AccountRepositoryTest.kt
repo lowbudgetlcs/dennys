@@ -1,5 +1,5 @@
-import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
-import com.lowbudgetlcs.domain.models.riot.RiotPuuid
+import com.lowbudgetlcs.domain.models.riot.account.NewRiotAccount
+import com.lowbudgetlcs.domain.models.riot.account.RiotPuuid
 import com.lowbudgetlcs.repositories.account.AccountRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec

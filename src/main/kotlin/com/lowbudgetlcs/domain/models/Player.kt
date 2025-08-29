@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models
 
-import com.lowbudgetlcs.domain.models.riot.RiotAccount
+import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
 
 @JvmInline
 value class PlayerId(val value: Int)

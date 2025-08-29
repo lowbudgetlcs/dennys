@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.account
 
-import com.lowbudgetlcs.domain.models.riot.toRiotAccountId
+import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.api.dto.accounts.NewAccountDto
 import com.lowbudgetlcs.api.dto.accounts.toDto

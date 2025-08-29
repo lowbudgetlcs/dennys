@@ -3,7 +3,7 @@ package com.lowbudgetlcs.domain.services.player
 import com.lowbudgetlcs.domain.models.NewPlayer
 import com.lowbudgetlcs.domain.models.PlayerId
 import com.lowbudgetlcs.domain.models.PlayerWithAccounts
-import com.lowbudgetlcs.domain.models.riot.RiotAccountId
+import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
 
 interface IPlayerService {
     fun getAllPlayers(): List<PlayerWithAccounts>

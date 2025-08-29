@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models.riot
+package com.lowbudgetlcs.domain.models.riot.account
 
 import com.lowbudgetlcs.domain.models.PlayerId
 

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.api.dto.accounts
 
-import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
-import com.lowbudgetlcs.domain.models.riot.RiotAccount
-import com.lowbudgetlcs.domain.models.riot.RiotPuuid
+import com.lowbudgetlcs.domain.models.riot.account.NewRiotAccount
+import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
+import com.lowbudgetlcs.domain.models.riot.account.RiotPuuid
 
 fun NewAccountDto.toNewRiotAccount(): NewRiotAccount =
     NewRiotAccount(
