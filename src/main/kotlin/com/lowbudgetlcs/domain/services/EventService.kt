@@ -37,13 +37,20 @@ class EventService(
         if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
         val t = tournamentGateway.create(event.name)
             ?: throw GatewayException("Failed to register tournament with Riot Games.")
-        isNameTaken(event.name)
+        if (isNameTaken(event.name)) {
+        throw IllegalArgumentException("Event '${event.name}' already exists.")
+    }
         return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
     }
 
     override fun patchEvent(id: EventId, update: EventUpdate): Event {
         val event = getEvent(id)
-        update.name?.let { isNameTaken(it) }
+
+        update.name?.let { newName ->
+        if (isNameTaken(newName) && newName != event.name) {
+            throw IllegalArgumentException("Event '$newName' already exists.")
+        }
+        }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
@@ -67,12 +74,10 @@ class EventService(
     /**
      * Checks if an event name is taken.
      * @return false if name is not taken.
-     * @throws IllegalArgumentException when name already exists.
+     * @return true when name already exists.
      */
-    private fun isNameTaken(name: String): Boolean = if (eventRepo.getAll()
-            .any { it.name == name }
-    ) throw IllegalArgumentException("Event '${name}' already exists.")
-    else false
+    public fun isNameTaken(name: String): Boolean =
+    eventRepo.getAll().any { it.name == name }
 
     /**
      * Checks if an event exists.
