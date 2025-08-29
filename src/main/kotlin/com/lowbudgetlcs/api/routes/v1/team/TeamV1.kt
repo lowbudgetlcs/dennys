@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
-import com.lowbudgetlcs.domain.services.TeamService
+import com.lowbudgetlcs.domain.services.team.TeamService
 import com.lowbudgetlcs.api.dto.teams.NewTeamDto
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*

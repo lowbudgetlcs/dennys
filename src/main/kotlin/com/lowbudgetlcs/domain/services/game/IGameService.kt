@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.services
+package com.lowbudgetlcs.domain.services.game
 
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.NewGame

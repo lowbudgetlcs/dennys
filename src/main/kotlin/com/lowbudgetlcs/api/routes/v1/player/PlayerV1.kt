@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.player
 
-import com.lowbudgetlcs.domain.services.PlayerService
+import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.api.dto.players.AccountLinkRequestDto
 import com.lowbudgetlcs.api.dto.players.NewPlayerDto
 import com.lowbudgetlcs.api.dto.players.PatchPlayerDto

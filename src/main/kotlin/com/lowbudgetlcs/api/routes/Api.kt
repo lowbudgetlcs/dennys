@@ -13,6 +13,12 @@ import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
 import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
+import com.lowbudgetlcs.domain.services.account.AccountService
+import com.lowbudgetlcs.domain.services.event.EventService
+import com.lowbudgetlcs.domain.services.game.GameService
+import com.lowbudgetlcs.domain.services.player.PlayerService
+import com.lowbudgetlcs.domain.services.series.SeriesService
+import com.lowbudgetlcs.domain.services.team.TeamService
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*

@@ -11,7 +11,7 @@ import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.services.SeriesService
+import com.lowbudgetlcs.domain.services.series.SeriesService
 import com.lowbudgetlcs.repositories.ISeriesRepository
 import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow

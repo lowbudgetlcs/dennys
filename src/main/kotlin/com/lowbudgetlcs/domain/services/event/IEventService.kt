@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.services
+package com.lowbudgetlcs.domain.services.event
 
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.team.TeamId
@@ -10,7 +10,7 @@ interface IEventService {
     /**
      * Fetch an event by id.
      *
-     * @param EventId the id of the event.
+     * @param com.lowbudgetlcs.domain.models.events.EventId the id of the event.
      * @return the specified event.
      *
      * @throws NoSuchElementException when the event is not found.
@@ -21,7 +21,7 @@ interface IEventService {
     /**
      * Create an event from a NewEvent and NewTournament.
      *
-     * @param NewEvent event details.
+     * @param com.lowbudgetlcs.domain.models.events.NewEvent event details.
      * @return the newly created event.
      *
      * @throws IllegalArgumentException if the event cannot be created.
@@ -33,7 +33,7 @@ interface IEventService {
      * Updates event details.
      *
      * @param Event the event to update.
-     * @param EventUpdate the new event information.
+     * @param com.lowbudgetlcs.domain.models.events.EventUpdate the new event information.
      * @return the updated event.
      *
      * @throws IllegalArgumentException if the new details are invalid
@@ -66,7 +66,7 @@ interface IEventService {
      * Associate a team with an event
      *
      * @param EventId the target event.
-     * @param TeamId the team to add.
+     * @param com.lowbudgetlcs.domain.models.team.TeamId the team to add.
      * @return the event with all registered teams.
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist

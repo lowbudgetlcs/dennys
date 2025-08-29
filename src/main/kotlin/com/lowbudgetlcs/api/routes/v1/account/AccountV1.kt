@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.account
 
-import com.lowbudgetlcs.domain.services.AccountService
+import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.api.dto.accounts.NewAccountDto
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*

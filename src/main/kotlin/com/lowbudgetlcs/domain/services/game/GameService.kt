@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.services
+package com.lowbudgetlcs.domain.services.game
 
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.NewGame
@@ -31,6 +31,7 @@ class GameService(
         val shortcode =
             gate.getCode(tid, NewShortcode())?.codes?.first() ?: throw GatewayException("Failed to create shortcode.")
         // insert data
-        return gameRepo.insert(newGame, shortcode.toShortcode(), series.id) ?: throw DatabaseException("Failed to save game.")
+        return gameRepo.insert(newGame, shortcode.toShortcode(), series.id)
+            ?: throw DatabaseException("Failed to save game.")
     }
 }

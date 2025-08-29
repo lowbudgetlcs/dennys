@@ -1,7 +1,7 @@
 package services
 
 import com.lowbudgetlcs.domain.models.team.*
-import com.lowbudgetlcs.domain.services.TeamService
+import com.lowbudgetlcs.domain.services.team.TeamService
 import com.lowbudgetlcs.repositories.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

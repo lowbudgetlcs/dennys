@@ -3,8 +3,8 @@ package com.lowbudgetlcs.api.routes.v1.event
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.services.IEventService
-import com.lowbudgetlcs.domain.services.ISeriesService
+import com.lowbudgetlcs.domain.services.event.IEventService
+import com.lowbudgetlcs.domain.services.series.ISeriesService
 import com.lowbudgetlcs.api.dto.events.*
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto

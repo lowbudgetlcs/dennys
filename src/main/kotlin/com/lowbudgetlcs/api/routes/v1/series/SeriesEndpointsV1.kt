@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.series
 
-import com.lowbudgetlcs.domain.services.IGameService
+import com.lowbudgetlcs.domain.services.game.IGameService
 import com.lowbudgetlcs.api.dto.games.CreateGameDto
 import com.lowbudgetlcs.api.dto.games.toDto
 import com.lowbudgetlcs.api.dto.games.toNewGame

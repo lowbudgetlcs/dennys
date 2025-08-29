@@ -3,7 +3,7 @@ package services
 import com.lowbudgetlcs.domain.models.NewPlayer
 import com.lowbudgetlcs.domain.models.PlayerId
 import com.lowbudgetlcs.domain.models.toPlayerName
-import com.lowbudgetlcs.domain.services.PlayerService
+import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
 import com.lowbudgetlcs.repositories.inmemory.InMemoryPlayerRepository
 import io.kotest.assertions.throwables.shouldThrow

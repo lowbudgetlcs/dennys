@@ -3,7 +3,7 @@ package services.events
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.services.EventService
+import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.gateways.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.ISeriesRepository
