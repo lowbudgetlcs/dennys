@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.models.riot.RiotPuuid
 import com.lowbudgetlcs.domain.services.AccountService
 import com.lowbudgetlcs.gateways.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
-import com.lowbudgetlcs.routes.dto.riot.account.RiotAccountDto
+import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

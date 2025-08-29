@@ -7,9 +7,9 @@ import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IMetadataRepository
-import com.lowbudgetlcs.routes.dto.riot.tournament.RiotShortcodeDto
-import com.lowbudgetlcs.routes.dto.riot.tournament.RiotTournamentParametersDto
-import com.lowbudgetlcs.routes.dto.riot.tournament.toShortcodeParametersDto
+import com.lowbudgetlcs.api.dto.riot.tournament.RiotShortcodeDto
+import com.lowbudgetlcs.api.dto.riot.tournament.RiotTournamentParametersDto
+import com.lowbudgetlcs.api.dto.riot.tournament.toShortcodeParametersDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
