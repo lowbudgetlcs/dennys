@@ -4,7 +4,7 @@ import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
 import com.lowbudgetlcs.domain.models.riot.RiotAccount
 import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.domain.models.riot.RiotPuuid
-import com.lowbudgetlcs.gateways.IRiotAccountGateway
+import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.IAccountRepository
 

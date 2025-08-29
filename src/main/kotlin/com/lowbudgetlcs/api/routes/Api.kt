@@ -2,9 +2,8 @@ package com.lowbudgetlcs.api.routes
 
 import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.appConfig
-import com.lowbudgetlcs.domain.services.*
-import com.lowbudgetlcs.gateways.RiotAccountGateway
-import com.lowbudgetlcs.gateways.RiotTournamentGateway
+import com.lowbudgetlcs.gateways.riot.account.RiotAccountGateway
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGateway
 import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1

@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.domain.services.event.EventService
-import com.lowbudgetlcs.gateways.IRiotTournamentGateway
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.ISeriesRepository
 import com.lowbudgetlcs.repositories.ITeamRepository

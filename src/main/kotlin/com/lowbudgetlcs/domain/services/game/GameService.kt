@@ -5,7 +5,7 @@ import com.lowbudgetlcs.domain.models.NewGame
 import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
 import com.lowbudgetlcs.domain.models.riot.tournament.toShortcode
 import com.lowbudgetlcs.gateways.GatewayException
-import com.lowbudgetlcs.gateways.IRiotTournamentGateway
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.*
 
 class GameService(

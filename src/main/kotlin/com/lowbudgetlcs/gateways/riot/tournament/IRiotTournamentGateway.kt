@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.gateways
+package com.lowbudgetlcs.gateways.riot.tournament
 
 import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
