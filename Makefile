@@ -21,11 +21,11 @@ stop:
 
 # Build the application
 build:
-	docker build -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile .
+	docker build -t $(APP_NAME):$(TAG) --target localapp -f ./docker/Dockerfile .
 
 # Build without caching and readable output
 debug-build:
-	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile . 
+	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target localapp -f ./docker/Dockerfile .
 
 # Run all containers
 run: 
