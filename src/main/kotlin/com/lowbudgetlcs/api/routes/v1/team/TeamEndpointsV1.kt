@@ -6,6 +6,7 @@ import com.lowbudgetlcs.api.dto.teams.NewTeamDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.api.dto.teams.toNewTeam
 import io.ktor.http.*
+import io.ktor.server.application.Application
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.post
@@ -15,7 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-private val logger: Logger = LoggerFactory.getLogger("TeamEndpointsV1")
+private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.teamEndpointsV1(
     teamService: TeamService

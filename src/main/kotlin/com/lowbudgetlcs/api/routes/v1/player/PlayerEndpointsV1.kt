@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.api.dto.players.*
 import io.ktor.http.*
+import io.ktor.server.application.Application
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.patch
@@ -14,7 +15,7 @@ import io.ktor.server.routing.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val logger: Logger = LoggerFactory.getLogger("PlayerEndpointsV1")
+private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.playerEndpointsV1(
     playerService: PlayerService

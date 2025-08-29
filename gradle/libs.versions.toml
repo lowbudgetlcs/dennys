@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.0"
-ktor = "3.2.1"
+ktor = "3.2.3"
 logback = "1.5.18"
 jooq = "3.19.18"
 kotest = "5.9.0"
@@ -9,6 +9,8 @@ hikaricp = "5.1.0"
 postgres = "42.7.7"
 hoplite = "2.9.0"
 mockk = "1.14.5"
+kotlinx-coroutines = "1.10.2"
+slf4j = "2.0.17"
 
 [libraries]
 # kotlin
@@ -16,6 +18,8 @@ reflect-core = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", versio
 junit-core = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 # logback
 logback-core = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+slf4j-core = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}
+slf4j-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-slf4j", version.ref = "kotlinx-coroutines"}
 # ktor server
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor" }
@@ -60,6 +64,7 @@ mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 [bundles]
 ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-config-yaml", ]
 ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-request-validation", "ktor-server-status-pages", "ktor-server-resources"]
+server-logging = ["logback-core", "slf4j-core", "slf4j-coroutines"]
 ktor-client = ["ktor-client-core", "ktor-client-cio"]
 ktor-client-plugins = ["ktor-client-content-negotiation", "ktor-client-logging"]
 jooq-codegen = ["jooq-meta", "jooq-codegen"]

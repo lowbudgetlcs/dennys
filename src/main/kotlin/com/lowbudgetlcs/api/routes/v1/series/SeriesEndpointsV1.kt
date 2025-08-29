@@ -5,6 +5,7 @@ import com.lowbudgetlcs.api.dto.games.CreateGameDto
 import com.lowbudgetlcs.api.dto.games.toDto
 import com.lowbudgetlcs.api.dto.games.toNewGame
 import io.ktor.http.*
+import io.ktor.server.application.Application
 import io.ktor.server.request.*
 import io.ktor.server.resources.post
 import io.ktor.server.response.*
@@ -12,7 +13,7 @@ import io.ktor.server.routing.Route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val logger: Logger = LoggerFactory.getLogger("SeriesEndpointsV1")
+private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.seriesEndpointsV1(gameService: IGameService) {
     post<SeriesResourcesV1.Game> {
         logger.info("📩 Received POST on /v1/series/game")
