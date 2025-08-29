@@ -1,47 +1,59 @@
 package services
 
-import com.lowbudgetlcs.domain.models.NewPlayer
-import com.lowbudgetlcs.domain.models.PlayerId
-import com.lowbudgetlcs.domain.models.toPlayerName
+import com.lowbudgetlcs.domain.models.player.*
 import com.lowbudgetlcs.domain.services.player.PlayerService
-import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
-import com.lowbudgetlcs.repositories.inmemory.InMemoryPlayerRepository
+import com.lowbudgetlcs.repositories.account.IAccountRepository
+import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 
 class PlayerServiceTest : StringSpec({
 
-    val playerRepo = InMemoryPlayerRepository()
-    val accountRepo = InMemoryAccountRepository()
+    val playerRepo = mockk<IPlayerRepository>()
+    val accountRepo = mockk<IAccountRepository>()
     val service = PlayerService(playerRepo, accountRepo)
 
-    beforeTest {
-        playerRepo.clear()
-        accountRepo.clear()
+    "getAllPlayers() should return empty list when no players exist" {
+        every { playerRepo.getAll() } returns listOf()
+        val players = service.getAllPlayers()
+        players.shouldBeEmpty()
+    }
+
+    "getAllPlayers returns created players" {
+        val newPlayer1 = NewPlayer("player#123".toPlayerName())
+        val newPlayer2 = NewPlayer("pla#125".toPlayerName())
+        val expectedPlayers = listOf(
+            newPlayer1.toPlayer(0.toPlayerId()).toPlayerWithAccounts(listOf()),
+            newPlayer2.toPlayer(1.toPlayerId()).toPlayerWithAccounts(listOf())
+        )
+        every { playerRepo.getAll() } returns expectedPlayers
+
+        val all = service.getAllPlayers()
+        all shouldContainExactly expectedPlayers
     }
 
     "Successfully create player" {
         val newPlayer = NewPlayer("player#123".toPlayerName())
+        val expectedPlayer = newPlayer.toPlayer(0.toPlayerId()).toPlayerWithAccounts(listOf())
+
+        every { playerRepo.getAll() } returns listOf()
+        every { playerRepo.insert(newPlayer) } returns expectedPlayer
         val created = service.createPlayer(newPlayer)
 
         created.shouldNotBeNull()
-        created.name shouldBe newPlayer.name
-        created.accounts shouldBe emptyList()
-
-        // Ensure retrievable
-        val fetched = service.getPlayer(created.id)
-        fetched shouldBe created
+        created shouldBe expectedPlayer
     }
 
     "Creating duplicate player names fails" {
         val newPlayer = NewPlayer("player#123".toPlayerName())
-        val created = service.createPlayer(newPlayer)
-        created.shouldNotBeNull()
-
+        val duplicatePlayer = newPlayer.toPlayer(0.toPlayerId())
+        every { playerRepo.getAll() } returns listOf(duplicatePlayer.toPlayerWithAccounts(listOf()))
         val exception = shouldThrow<IllegalStateException> {
             service.createPlayer(newPlayer)
         }
@@ -50,91 +62,53 @@ class PlayerServiceTest : StringSpec({
 
     "Creating a blank player name throws" {
         val exception = shouldThrow<IllegalArgumentException> {
-            val blankPlayer = NewPlayer("".toPlayerName())
-            service.createPlayer(blankPlayer)
+            "".toPlayerName()
         }
-
         exception.message shouldBe "Player name cannot be blank"
-    }
-
-    "getAllPlayers returns created players" {
-        val newPlayer = NewPlayer("player#123".toPlayerName())
-        val p1 = service.createPlayer(newPlayer.copy(name = "one#AAA".toPlayerName()))
-        val p2 = service.createPlayer(newPlayer.copy(name = "two#BBB".toPlayerName()))
-
-        val all = service.getAllPlayers()
-        all.shouldContainExactly(p1, p2)
-    }
-
-    "getPlayer throws for unknown ID" {
-        val exception = shouldThrow<NoSuchElementException> {
-            service.getPlayer(PlayerId(999))
-        }
-        exception.message shouldBe "Player not found"
     }
 
     "isNameTaken returns true for existing names" {
         val newPlayer = NewPlayer("player#123".toPlayerName())
-        service.createPlayer(newPlayer)
-        service.isNameTaken("player#123") shouldBe true
-        service.isNameTaken("unknown#123") shouldBe false
+        every { playerRepo.getAll() } returns listOf()
+        service.isNameTaken(newPlayer.name.value) shouldBe false
+        every { playerRepo.getAll() } returns listOf(newPlayer.toPlayer(0.toPlayerId()).toPlayerWithAccounts(listOf()))
+        service.isNameTaken(newPlayer.name.value) shouldBe true
     }
 
-    "Blank or invalid Riot names should throw" {
-        shouldThrow<IllegalArgumentException> {
-            NewPlayer(name = "".toPlayerName())
+    "getPlayer throws for unknown ID" {
+        val unknownPlayer = 0.toPlayerId()
+        every { playerRepo.getById(unknownPlayer) } throws NoSuchElementException("Player not found")
+        val exception = shouldThrow<NoSuchElementException> {
+            service.getPlayer(unknownPlayer)
         }
-        // Add more invalid names here when you can think of any
-    }
-
-    "getAllPlayers() should return empty list when no players exist" {
-        val players = service.getAllPlayers()
-        players.shouldBeEmpty()
-    }
-
-    "getAllPlayers() should return all players with accounts" {
-        val player1 = NewPlayer("PlayerOne#AAA".toPlayerName())
-        val player2 = NewPlayer("PlayerTwo#BBB".toPlayerName())
-
-        val created1 = service.createPlayer(player1)
-        val created2 = service.createPlayer(player2)
-
-        val all = service.getAllPlayers()
-
-        all.map { it.name.value } shouldContainExactly listOf("PlayerOne#AAA", "PlayerTwo#BBB")
-        all.any { it.accounts.isEmpty() } shouldBe true
-    }
-
-    "getAllPlayers() should reflect newly added players" {
-        val initial = service.getAllPlayers()
-        initial.shouldBeEmpty()
-
-        val player = NewPlayer("NewPlayer#XYZ".toPlayerName())
-        val created = service.createPlayer(player)
-
-        val updated = service.getAllPlayers()
-        updated.map { it.id } shouldContainExactly listOf(created.id)
-    }
-
-    "getPlayer should return correct player among many" {
-        val one = service.createPlayer(NewPlayer("One#A".toPlayerName()))!!
-        val two = service.createPlayer(NewPlayer("Two#B".toPlayerName()))!!
-
-        service.getPlayer(one.id) shouldBe one
-        service.getPlayer(two.id) shouldBe two
+        exception.message shouldBe "Player not found"
     }
 
     "renamePlayer should succeed for valid input" {
-        val player = service.createPlayer(NewPlayer("OldName#123".toPlayerName()))
-        val updated = service.renamePlayer(player.id, "NewName#123")
+        val player = Player(
+            id = 0.toPlayerId(), name = "player".toPlayerName()
+        ).toPlayerWithAccounts(listOf())
+        val newName = "new".toPlayerName()
+        val newPlayer = player.copy(name = newName)
+        every { playerRepo.getAll() } returns listOf(player)
+        every { playerRepo.getById(player.id) } returns player
+        every {
+            playerRepo.renamePlayer(
+                player.id, newName
+            )
+        } returns player.copy(name = newName)
+        val updated = service.renamePlayer(player.id, newName.value)
 
-        updated.id shouldBe player.id
-        updated.name.value shouldBe "NewName#123"
+        updated shouldBe newPlayer
     }
 
+    // NOTE: This test is eliminated by refactoring renamePlayer to accept PlayerName instead of String,
     "renamePlayer should throw if name is blank" {
-        val player = service.createPlayer(NewPlayer("Player#1".toPlayerName()))
-
+        val player = Player(
+            id = 0.toPlayerId(), name = "player".toPlayerName()
+        ).toPlayerWithAccounts(listOf())
+        every { playerRepo.getAll() } returns listOf(player)
+        every { playerRepo.getById(player.id) } returns player
         val exception = shouldThrow<IllegalArgumentException> {
             service.renamePlayer(player.id, "")
         }
@@ -142,37 +116,23 @@ class PlayerServiceTest : StringSpec({
     }
 
     "renamePlayer should throw if name already taken" {
-        service.createPlayer(NewPlayer("Taken#1".toPlayerName()))
-        val player = service.createPlayer(NewPlayer("Free#1".toPlayerName()))
-
+        val player = Player(
+            id = 0.toPlayerId(), name = "player".toPlayerName()
+        ).toPlayerWithAccounts(listOf())
+        every { playerRepo.getAll() } returns listOf(player)
+        every { playerRepo.getById(player.id) } returns player
         val exception = shouldThrow<IllegalStateException> {
-            service.renamePlayer(player.id, "Taken#1")
+            service.renamePlayer(player.id, player.name.value)
         }
         exception.message shouldBe "Player name already exists"
     }
 
     "renamePlayer should throw for nonexistent player ID" {
+        every { playerRepo.getAll() } returns listOf()
+        every { playerRepo.getById(any()) } returns null
         val exception = shouldThrow<NoSuchElementException> {
-            service.renamePlayer(PlayerId(9999), "AnyName#123")
+            service.renamePlayer(9999.toPlayerId(), "irrelevant")
         }
         exception.message shouldBe "Player not found"
-    }
-
-    "renamePlayer should update the stored value" {
-        val created = service.createPlayer(NewPlayer("Initial#Name".toPlayerName()))!!
-        service.renamePlayer(created.id, "Updated#Name")
-
-        val fetched = service.getPlayer(created.id)
-        fetched.shouldNotBeNull()
-        fetched.name.value shouldBe "Updated#Name"
-    }
-
-    "getAllPlayers should reflect additions" {
-        service.getAllPlayers().shouldBeEmpty()
-
-        val p1 = service.createPlayer(NewPlayer("One#1".toPlayerName()))
-        val p2 = service.createPlayer(NewPlayer("Two#2".toPlayerName()))
-
-        service.getAllPlayers().map { it.id } shouldContainExactly listOf(p1.id, p2.id)
     }
 })

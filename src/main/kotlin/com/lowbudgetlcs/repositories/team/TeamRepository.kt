@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories.team
 
-import com.lowbudgetlcs.domain.models.Player
-import com.lowbudgetlcs.domain.models.PlayerId
-import com.lowbudgetlcs.domain.models.PlayerName
+import com.lowbudgetlcs.domain.models.player.Player
+import com.lowbudgetlcs.domain.models.player.PlayerId
+import com.lowbudgetlcs.domain.models.player.PlayerName
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.team.*
 import org.jooq.DSLContext

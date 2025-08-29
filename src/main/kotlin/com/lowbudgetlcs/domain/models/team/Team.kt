@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.team
 
-import com.lowbudgetlcs.domain.models.Player
+import com.lowbudgetlcs.domain.models.player.Player
 import com.lowbudgetlcs.domain.models.events.EventId
 
 @JvmInline

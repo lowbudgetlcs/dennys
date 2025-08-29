@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.player
 
-import com.lowbudgetlcs.domain.models.NewPlayer
-import com.lowbudgetlcs.domain.models.PlayerId
-import com.lowbudgetlcs.domain.models.PlayerName
-import com.lowbudgetlcs.domain.models.PlayerWithAccounts
+import com.lowbudgetlcs.domain.models.player.NewPlayer
+import com.lowbudgetlcs.domain.models.player.PlayerId
+import com.lowbudgetlcs.domain.models.player.PlayerName
+import com.lowbudgetlcs.domain.models.player.PlayerWithAccounts
 import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
 
 interface IPlayerRepository {

@@ -1,9 +1,9 @@
 package services
 
 import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
+import com.lowbudgetlcs.domain.models.player.toPlayerId
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
 import com.lowbudgetlcs.domain.models.riot.account.*
-import com.lowbudgetlcs.domain.models.toPlayerId
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.account.IAccountRepository
@@ -50,9 +50,12 @@ class AccountServiceTest : StringSpec({
         exception.message shouldBe "Riot account already exists"
     }
 
+    // NOTE: These should probably be put into a RiotAccountGateway test instead of in the service.
+    // We are stubbing the gateway, so testing it here is incorrect.
     "createAccount should throw IllegalArgumentException for malformed PUUID (400)" {
         val invalidAccount = NewRiotAccount(RiotPuuid(puuid))
 
+        every { repo.getAccountByPuuid(puuid) } returns null
         coEvery { gateway.getAccountByPuuid(puuid) } throws IllegalArgumentException("Invalid Riot PUUID")
 
         val exception = shouldThrow<IllegalArgumentException> {
@@ -64,6 +67,7 @@ class AccountServiceTest : StringSpec({
     "createAccount should throw NoSuchElementException for non-existent account (404)" {
         val nonExistantAccount = NewRiotAccount(RiotPuuid(puuid))
 
+        every { repo.getAccountByPuuid(puuid) } returns null
         coEvery { gateway.getAccountByPuuid(puuid) } throws NoSuchElementException("Riot account not found for PUUID")
 
         val exception = shouldThrow<NoSuchElementException> {
@@ -75,6 +79,7 @@ class AccountServiceTest : StringSpec({
     "createAccount should throw RiotApiException for unexpected Riot API failure" {
         val failedAccount = NewRiotAccount(RiotPuuid(puuid))
 
+        every { repo.getAccountByPuuid(puuid) } returns null
         coEvery { gateway.getAccountByPuuid(puuid) } throws RiotApiException("Unexpected Riot API error: 500 Internal Server Error")
 
         val exception = shouldThrow<RiotApiException> {

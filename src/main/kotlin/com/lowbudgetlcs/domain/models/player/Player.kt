@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models
+package com.lowbudgetlcs.domain.models.player
 
 import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
 
