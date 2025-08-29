@@ -1,4 +1,6 @@
-package com.lowbudgetlcs.domain.models.events
+package com.lowbudgetlcs.domain.models.events.group
+
+import com.lowbudgetlcs.domain.models.events.Event
 
 @JvmInline
 value class EventGroupId(val value: Int)

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories
 
-import com.lowbudgetlcs.domain.models.events.EventGroup
-import com.lowbudgetlcs.domain.models.events.EventGroupId
-import com.lowbudgetlcs.domain.models.events.NewEventGroup
+import com.lowbudgetlcs.domain.models.events.group.EventGroup
+import com.lowbudgetlcs.domain.models.events.group.EventGroupId
+import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 
 interface IEventGroupRepository {
     fun getAll(): List<EventGroup>

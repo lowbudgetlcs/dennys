@@ -1,6 +1,8 @@
 package com.lowbudgetlcs.repositories
 
 import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.group.EventGroupId
+import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import org.jooq.DSLContext

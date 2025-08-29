@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.domain.services.event.group
 
-import com.lowbudgetlcs.domain.models.events.EventGroup
-import com.lowbudgetlcs.domain.models.events.EventGroupId
-import com.lowbudgetlcs.domain.models.events.EventGroupWithEvents
-import com.lowbudgetlcs.domain.models.events.NewEventGroup
+import com.lowbudgetlcs.domain.models.events.group.EventGroup
+import com.lowbudgetlcs.domain.models.events.group.EventGroupId
+import com.lowbudgetlcs.domain.models.events.group.EventGroupWithEvents
+import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.repositories.IEventGroupRepository
 import com.lowbudgetlcs.repositories.IEventRepository
 
