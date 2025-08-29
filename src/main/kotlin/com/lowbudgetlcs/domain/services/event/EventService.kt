@@ -5,9 +5,9 @@ import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.IEventRepository
-import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 
 class EventService(
     private val eventRepo: IEventRepository,

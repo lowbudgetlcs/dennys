@@ -5,8 +5,8 @@ import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 
 class SeriesService(
     private val seriesRepository: ISeriesRepository, private val teamRepository: ITeamRepository

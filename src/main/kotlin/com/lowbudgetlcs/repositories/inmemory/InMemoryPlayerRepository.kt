@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.models.riot.RiotAccount
 import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.domain.models.riot.RiotPuuid
-import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.player.IPlayerRepository
 
 class InMemoryPlayerRepository : IPlayerRepository {
     private val players = mutableListOf<PlayerWithAccounts>()

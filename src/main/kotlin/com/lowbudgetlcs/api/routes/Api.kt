@@ -4,7 +4,6 @@ import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.appConfig
 import com.lowbudgetlcs.gateways.riot.account.RiotAccountGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGateway
-import com.lowbudgetlcs.repositories.*
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
@@ -18,6 +17,18 @@ import com.lowbudgetlcs.domain.services.game.GameService
 import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.domain.services.series.SeriesService
 import com.lowbudgetlcs.domain.services.team.TeamService
+import com.lowbudgetlcs.repositories.account.AccountRepository
+import com.lowbudgetlcs.repositories.account.IAccountRepository
+import com.lowbudgetlcs.repositories.event.EventRepository
+import com.lowbudgetlcs.repositories.game.GameRepository
+import com.lowbudgetlcs.repositories.game.IGameRepository
+import com.lowbudgetlcs.repositories.metadata.MetadataRepository
+import com.lowbudgetlcs.repositories.player.IPlayerRepository
+import com.lowbudgetlcs.repositories.player.PlayerRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.series.SeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
+import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*

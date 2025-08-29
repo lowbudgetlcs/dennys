@@ -3,7 +3,7 @@ package com.lowbudgetlcs.repositories.inmemory
 import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
 import com.lowbudgetlcs.domain.models.riot.RiotAccount
 import com.lowbudgetlcs.domain.models.riot.RiotAccountId
-import com.lowbudgetlcs.repositories.IAccountRepository
+import com.lowbudgetlcs.repositories.account.IAccountRepository
 
 class InMemoryAccountRepository : IAccountRepository {
     private val accounts = mutableListOf<RiotAccount>()

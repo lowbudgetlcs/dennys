@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.game
 
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.GameId

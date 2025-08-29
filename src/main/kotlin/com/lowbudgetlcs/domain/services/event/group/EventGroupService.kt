@@ -4,8 +4,8 @@ import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.events.group.EventGroupWithEvents
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
-import com.lowbudgetlcs.repositories.IEventGroupRepository
-import com.lowbudgetlcs.repositories.IEventRepository
+import com.lowbudgetlcs.repositories.event.group.IEventGroupRepository
+import com.lowbudgetlcs.repositories.event.IEventRepository
 
 class EventGroupService(private val eventGroupRepo: IEventGroupRepository, private val eventRepo: IEventRepository) :
     IEventGroupService {

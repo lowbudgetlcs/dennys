@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.domain.models.riot.RiotPuuid
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.IAccountRepository
+import com.lowbudgetlcs.repositories.account.IAccountRepository
 
 class AccountService(
     private val accountRepository: IAccountRepository, private val riotAccountGateway: IRiotAccountGateway
@@ -31,7 +31,7 @@ class AccountService(
         return accountRepository.insert(account) ?: throw DatabaseException("Failed to insert account")
     }
 
-    private fun isPuuidTaken(puuid: RiotPuuid): Boolean {
+    fun isPuuidTaken(puuid: RiotPuuid): Boolean {
         return accountRepository.getAccountByPuuid(puuid.value) != null
     }
 

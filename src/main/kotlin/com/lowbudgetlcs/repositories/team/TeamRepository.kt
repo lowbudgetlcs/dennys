@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.team
 
 import com.lowbudgetlcs.domain.models.Player
 import com.lowbudgetlcs.domain.models.PlayerId

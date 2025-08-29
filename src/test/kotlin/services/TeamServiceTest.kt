@@ -2,7 +2,7 @@ package services
 
 import com.lowbudgetlcs.domain.models.team.*
 import com.lowbudgetlcs.domain.services.team.TeamService
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

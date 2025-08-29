@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.game
 
 import com.lowbudgetlcs.domain.models.*
 import com.lowbudgetlcs.domain.models.riot.tournament.Shortcode

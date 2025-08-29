@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.IMetadataRepository
+import com.lowbudgetlcs.repositories.metadata.IMetadataRepository
 import com.lowbudgetlcs.api.dto.riot.tournament.RiotShortcodeDto
 import com.lowbudgetlcs.api.dto.riot.tournament.RiotTournamentParametersDto
 import com.lowbudgetlcs.api.dto.riot.tournament.toShortcodeParametersDto

@@ -6,8 +6,8 @@ import com.lowbudgetlcs.domain.models.PlayerName
 import com.lowbudgetlcs.domain.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.models.riot.RiotAccountId
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.IAccountRepository
-import com.lowbudgetlcs.repositories.IPlayerRepository
+import com.lowbudgetlcs.repositories.account.IAccountRepository
+import com.lowbudgetlcs.repositories.player.IPlayerRepository
 
 class PlayerService(
     private val playerRepository: IPlayerRepository, private val accountRepository: IAccountRepository
@@ -57,7 +57,7 @@ class PlayerService(
             ?: throw DatabaseException("Failed to unlink account from player")
     }
 
-    private fun isNameTaken(name: String): Boolean {
+    fun isNameTaken(name: String): Boolean {
         return playerRepository.getAll().any { it.name.value == name }
     }
 }

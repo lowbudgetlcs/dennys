@@ -1,7 +1,6 @@
-package com.lowbudgetlcs.repositories
+package com.lowbudgetlcs.repositories.metadata
 
 interface IMetadataRepository {
-    fun init(providerId: Int, bucketName: String): Boolean
     fun getProviderId(): Int?
     fun setProviderId(id: Int): Int?
 }
