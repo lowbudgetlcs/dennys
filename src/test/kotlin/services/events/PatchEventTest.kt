@@ -56,7 +56,7 @@ class PatchEventTest : FunSpec({
         val name = "ABCDEFG"
         val update = EventUpdate(name = name)
         val patched = testEvent.patch(update)
-        every { eventRepo.getAll() } returns listOf(testEvent)
+        every { eventRepo.getByName(name) } returns null
         every { eventRepo.update(patched) } returns patched
 
         val event = service.patchEvent(testEvent.id, update)
@@ -125,7 +125,7 @@ class PatchEventTest : FunSpec({
         }
     }
     test("patchEvent() throws exception when name is taken") {
-        every { eventRepo.getAll() } returns listOf(testEvent)
+        every { eventRepo.getByName(testEvent.name) } returns testEvent
         shouldThrow<IllegalArgumentException> {
             service.patchEvent(testEvent.id, EventUpdate(name = testEvent.name))
         }
