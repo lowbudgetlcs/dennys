@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.api.dto.accounts.NewAccountDto
 import com.lowbudgetlcs.api.dto.accounts.toDto
 import com.lowbudgetlcs.api.dto.accounts.toNewRiotAccount
+import com.lowbudgetlcs.api.setCidContext
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -21,23 +22,28 @@ fun Route.accountEndpointsV1(
     accountService: AccountService
 ) {
     post<AccountResourcesV1> {
-        logger.info("📩 Received POST /v1/account")
-        val dto = call.receive<NewAccountDto>()
-        logger.debug("\uD83C\uDF81 Body: {}", dto)
-        val created = accountService.createAccount(dto.toNewRiotAccount())
-        call.respond(HttpStatusCode.Created, created.toDto())
+        call.setCidContext {
+            logger.info("📩 Received POST /v1/account")
+            val dto = call.receive<NewAccountDto>()
+            logger.debug(dto.toString())
+            val created = accountService.createAccount(dto.toNewRiotAccount())
+            call.respond(HttpStatusCode.Created, created.toDto())
+        }
     }
 
     get<AccountResourcesV1> {
-        logger.info("📩 Received GET /v1/account")
-        val accounts = accountService.getAllAccounts()
-        call.respond(HttpStatusCode.OK, accounts.map { it.toDto() })
+        call.setCidContext {
+            logger.info("📩 Received GET /v1/account")
+            val accounts = accountService.getAllAccounts()
+            call.respond(HttpStatusCode.OK, accounts.map { it.toDto() })
+        }
     }
 
     get<AccountResourcesV1.ById> { route ->
-        logger.info("📩 Received GET /v1/account/${route.accountId}")
-        val accountId = route.accountId.toRiotAccountId()
-        val account = accountService.getAccount(accountId) // throws if not found
-        call.respond(account.toDto())
+        call.setCidContext {
+            logger.info("📩 Received GET /v1/account/${route.accountId}")
+            val account = accountService.getAccount(route.accountId.toRiotAccountId()) // throws if not found
+            call.respond(account.toDto())
+        }
     }
 }

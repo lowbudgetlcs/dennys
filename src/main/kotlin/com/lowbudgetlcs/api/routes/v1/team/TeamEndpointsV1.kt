@@ -1,10 +1,11 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.services.team.TeamService
 import com.lowbudgetlcs.api.dto.teams.NewTeamDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.api.dto.teams.toNewTeam
+import com.lowbudgetlcs.api.setCidContext
+import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.services.team.TeamService
 import io.ktor.http.*
 import io.ktor.server.application.Application
 import io.ktor.server.request.*
@@ -22,19 +23,26 @@ fun Route.teamEndpointsV1(
     teamService: TeamService
 ) {
     post<TeamResourcesV1> {
-        logger.info("📩 Received POST /v1/team")
-        val dto = call.receive<NewTeamDto>()
-        val created = teamService.createTeam(dto.toNewTeam())
-        call.respond(HttpStatusCode.Created, created.toDto())
+        call.setCidContext {
+            logger.info("📩 Received POST /v1/team")
+            val dto = call.receive<NewTeamDto>()
+            logger.debug(dto.toString())
+            val created = teamService.createTeam(dto.toNewTeam())
+            call.respond(HttpStatusCode.Created, created.toDto())
+        }
     }
     get<TeamResourcesV1> {
-        logger.info("📩 Received GET /v1/team")
-        val teams = teamService.getAllTeams()
-        call.respond(teams.map { it.toDto() })
+        call.setCidContext {
+            logger.info("📩 Received GET /v1/team")
+            val teams = teamService.getAllTeams()
+            call.respond(teams.map { it.toDto() })
+        }
     }
     get<TeamResourcesV1.ById> { route ->
-        logger.info("📩 Received GET /v1/team/${route.teamId}")
-        val team = teamService.getTeam(route.teamId.toTeamId())
-        call.respond(team.toDto())
+        call.setCidContext {
+            logger.info("📩 Received GET /v1/team/${route.teamId}")
+            val team = teamService.getTeam(route.teamId.toTeamId())
+            call.respond(team.toDto())
+        }
     }
 }
