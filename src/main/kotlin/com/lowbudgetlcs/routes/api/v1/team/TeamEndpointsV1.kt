@@ -16,7 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+private val logger: Logger = LoggerFactory.getLogger("TeamEndpointsV1")
 
 fun Route.teamEndpointsV1(
     teamService: TeamService

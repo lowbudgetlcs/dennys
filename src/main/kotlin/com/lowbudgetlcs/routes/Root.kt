@@ -86,6 +86,7 @@ fun Application.routes() {
             allowMethod(HttpMethod.Patch)
             allowMethod(HttpMethod.Delete)
         }
+        install(CorrelationIdPlugin)
         install(Resources)
         route("/") {
             get {
