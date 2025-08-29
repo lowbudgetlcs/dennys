@@ -34,7 +34,6 @@ ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 # ktor-client plugins
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
 # jooq
 jooq-core = { group = "org.jooq", name = "jooq", version.ref = "jooq" }
 jooq-meta = { group = "org.jooq", name = "jooq-meta", version.ref = "jooq" }
