@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.api.dto.events
 
+import com.lowbudgetlcs.api.dto.series.NewSeriesDto
+import com.lowbudgetlcs.api.dto.series.toDto
+import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.api.dto.series.NewSeriesDto
-import com.lowbudgetlcs.api.dto.series.toDto
-import com.lowbudgetlcs.api.dto.teams.toDto
 
 fun CreateEventDto.toNewEvent(): NewEvent = NewEvent(
     name = name, description = description, startDate = startDate, endDate = endDate, status = status
@@ -32,7 +32,6 @@ fun Event.toDto(): EventDto = EventDto(
     createdAt = createdAt,
     description = description,
     status = status,
-    tournamentId = riotTournamentId.value
 )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto = EventWithTeamsDto(

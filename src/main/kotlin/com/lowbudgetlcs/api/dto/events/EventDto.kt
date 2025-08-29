@@ -17,5 +17,4 @@ data class EventDto(
     @Contextual
     val endDate: Instant,
     val status: EventStatus,
-    val tournamentId: Int
 )
