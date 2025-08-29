@@ -6,11 +6,11 @@ import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.gateways.IRiotTournamentGateway
-import com.lowbudgetlcs.repositories.IEventRepository
-import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.domain.services.event.EventService
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
+import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe

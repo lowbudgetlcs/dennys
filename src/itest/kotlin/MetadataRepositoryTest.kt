@@ -1,4 +1,4 @@
-import com.lowbudgetlcs.repositories.MetadataRepository
+import com.lowbudgetlcs.repositories.metadata.MetadataRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension

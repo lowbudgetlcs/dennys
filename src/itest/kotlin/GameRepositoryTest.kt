@@ -9,10 +9,10 @@ import com.lowbudgetlcs.domain.models.riot.tournament.toShortcode
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.repositories.EventRepository
-import com.lowbudgetlcs.repositories.GameRepository
-import com.lowbudgetlcs.repositories.SeriesRepository
-import com.lowbudgetlcs.repositories.TeamRepository
+import com.lowbudgetlcs.repositories.event.EventRepository
+import com.lowbudgetlcs.repositories.game.GameRepository
+import com.lowbudgetlcs.repositories.series.SeriesRepository
+import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension

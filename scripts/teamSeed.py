@@ -1,28 +1,20 @@
 #!/usr/bin/env python3
 # pyright: basic
 
-import url
+import dennys
+import args
 import json
-import requests
 from argparse import ArgumentParser
 
 parser = ArgumentParser()
-parser = url.args(parser)
-base = url.base(parser)
+parser = args.args(parser)
+base = args.baseUrl(parser)
+dataPath = args.dataPath(parser)
 url = f"{base}/team"
 
-with open("data/teams.json") as f:
+with open(f"{dataPath}/teams.json") as f:
     data = json.load(f)
     for team in data:
         # Create each team
-        payload = {"name": team}
-        res = requests.post(
-            f"{url}",
-            headers={"Content-Type": "application/json"},
-            data=json.dumps(payload),
-        )
-        try:
-            res.raise_for_status()
-        except requests.HTTPError as e:
-            print(f"Failed to create team: {team}")
-            print(e)
+        if dennys.createTeam(url, team) is None:
+            print(f"Failed to create {team}.")

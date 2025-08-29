@@ -3,7 +3,7 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev
+.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev seed
 
 # Build and run by default
 all: build run
@@ -21,17 +21,23 @@ stop:
 
 # Build the application
 build:
-	docker build -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile .
+	docker build -t $(APP_NAME):$(TAG) --target localapp -f ./docker/Dockerfile .
 
 # Build without caching and readable output
 debug-build:
-	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile . 
+	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target localapp -f ./docker/Dockerfile .
 
 # Run all containers
 run: 
 	docker compose up dennys db --attach dennys
 
-# Start database tools
+seed:
+	./scripts/seed_local.sh
+
+drop:
+	docker volume rm main_dennys-data
+
+# Start database
 db:
 	docker compose up db 
 

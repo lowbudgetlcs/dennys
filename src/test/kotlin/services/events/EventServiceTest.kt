@@ -3,11 +3,11 @@ package services.events
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.gateways.IRiotTournamentGateway
-import com.lowbudgetlcs.repositories.IEventRepository
-import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.domain.services.event.EventService
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
+import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -42,7 +42,7 @@ class EventServiceTest : FunSpec({
             id = 9999.toRiotTournamentId(), name = "Test"
         )
         every { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
-        every { eventRepo.getAll() } returns listOf()
+        every { eventRepo.getByName(newEvent.name) } returns null
         val event = service.createEvent(newEvent)
         event.shouldNotBeNull()
         // We ignore generated fields as those are out-of-scope for this test
@@ -52,18 +52,9 @@ class EventServiceTest : FunSpec({
     }
 
     test("getEvent() returns valid event") {
-        coEvery {
-            tournamentGate.create(newRiotTournament)
-        } returns RiotTournament(
-            id = 9999.toRiotTournamentId(), name = "Test"
-        )
-        every { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
         every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
-        every { eventRepo.getAll() } returns listOf()
-        val e = service.createEvent(newEvent)
-        e.shouldNotBeNull()
-        val fetched = service.getEvent(e.id)
-        fetched shouldBe e
+        val fetched = service.getEvent(expectedEvent.id)
+        fetched shouldBe expectedEvent
     }
 
     test("Fetching event that doesn't exist throws NoSuchElementException") {

@@ -39,6 +39,7 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: lblcs/dennys:latest
+          target: ciapp
 
   deploy:
     needs: build

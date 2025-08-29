@@ -1,6 +1,6 @@
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.repositories.EventRepository
+import com.lowbudgetlcs.repositories.event.EventRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
