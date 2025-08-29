@@ -3,37 +3,43 @@
 # pyright: basic
 from argparse import ArgumentParser
 import json
-import url
-import requests
-import filters
-
+import dennys
+import args
 
 parser = ArgumentParser()
-parser = url.args(parser)
-url = url.base(parser)
-header = {"Content-Type": "application/json"}
+parser = args.args(parser)
+url = args.baseUrl(parser)
 prefix = "Season 15"
+dataPath = args.dataPath(parser)
 
-res = requests.get(f"{url}/event", headers=header)
-res.raise_for_status()
-EVENTS = res.json()
 
-with open("data/series.json") as f:
+with open(f"{dataPath}/series.json") as f:
     data = json.load(f)
+    events = dennys.getEvents(url)
+    if events is None:
+        print("Failed to fetch events.")
+        exit(1)
     for d, matchups in data.items():
         division = f"{prefix} {d}"
-        eventId = filters.getEventId(division, EVENTS)
-        res = requests.get(f"{url}/event/{eventId}/teams")
-        res.raise_for_status()
-        teams = res.json()["teams"]
+        eventId = dennys.findEventId(division, events)
+        if eventId is None:
+            print(f"Failed to find id for {division}.")
+            continue
+        divisions = dennys.getEventWithTeams(url, eventId)
+        if divisions is None:
+            print(f"Failed to get event with teams {division}.")
+            continue
+        teams = divisions["teams"]
         for team, opps in matchups.items():
-            lhsId = filters.getTeamId(team, teams)
+            lhsId = dennys.findTeamId(team, teams)
+            if lhsId is None:
+                print(f"Failed to find teamId for {team}")
+                continue
             for opp in opps:
-                rhsId = filters.getTeamId(opp, teams)
-                payload = {"team1Id": lhsId, "team2Id": rhsId, "gamesToWin": 2}
-                res = requests.post(
-                    f"{url}/event/{eventId}/series",
-                    headers=header,
-                    data=json.dumps(payload),
-                )
-                res.raise_for_status()
+                rhsId = dennys.findTeamId(opp, teams)
+                if rhsId is None:
+                    print(f"Failed to find teamId for {opp}")
+                    continue
+                series = dennys.createSeries(url, eventId, lhsId, rhsId, 2)
+                if series is None:
+                    print(f"Failed to create series between {lhsId}, {rhsId}")

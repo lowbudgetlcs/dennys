@@ -5,6 +5,9 @@ from argparse import ArgumentParser
 
 def args(parser: ArgumentParser):
     parser.add_argument(
+        "-p", "--data", help="Data file directory.", default="./scripts/data"
+    )
+    parser.add_argument(
         "-s",
         action="store_true",
         default=False,
@@ -25,7 +28,7 @@ def args(parser: ArgumentParser):
     return parser
 
 
-def base(parser: ArgumentParser):
+def baseUrl(parser: ArgumentParser):
     args = parser.parse_args()
     environment = args.environment
     domain = args.domain
@@ -35,3 +38,7 @@ def base(parser: ArgumentParser):
     if environment != "":
         environment = f"{environment}."
     return f"{protocol}://{environment}{domain}/api/v1"
+
+def dataPath(parser: ArgumentParser):
+    args = parser.parse_args()
+    return args.data

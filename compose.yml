@@ -26,6 +26,7 @@ services:
     volumes:
       # DB Init Scripts
       - ./docker/postgres/sql:/docker-entrypoint-initdb.d
+      - dennys-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
       interval: 5s 
@@ -42,3 +43,5 @@ services:
     environment:
       SWAGGER_FILE: /spec/openapi.yaml
 
+volumes:
+  dennys-data:

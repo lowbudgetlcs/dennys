@@ -1,46 +1,40 @@
 #!/usr/bin/env python3
 # pyright: basic
 
-import url
+import dennys
+import args
 import json
-import requests
 from argparse import ArgumentParser
-from filters  import getEventId, getTeamId
 
 parser = ArgumentParser()
-parser = url.args(parser)
-url = url.base(parser)
-header = {"Content-Type": "application/json"}
-
-res = requests.get(f"{url}/event", headers=header)
-res.raise_for_status()
-EVENTS = res.json()
-
-res = requests.get(f"{url}/team", headers=header)
-res.raise_for_status()
-TEAMS = res.json()
+parser = args.args(parser)
+url = args.baseUrl(parser)
+dataPath = args.dataPath(parser)
 
 prefix = "Season 15"
-with open("data/divisions.json") as f:
+with open(f"{dataPath}/divisions.json") as f:
     data = json.load(f)
+    EVENTS = dennys.getEvents(url)
+    if EVENTS is None:
+        print("Failed to fetch events.")
+        exit(1)
+    TEAMS= dennys.getTeams(url)
+    if TEAMS is None:
+        print("Failed to fetch teams.")
+        exit(1)
     for div, teams in data.items():
         # Create each team
         division = f"{prefix} {div}"
-        eventId = getEventId(division, EVENTS)
+        print(division)
+        eventId = dennys.findEventId(division, EVENTS)
         if eventId is None:
+            print(f"Failed to find id for {division}.")
             continue
         for teamName in teams:
-            try:
-                teamId = getTeamId(teamName, TEAMS)
-                if teamId is None:
-                    continue
-                payload = {"teamId": teamId}
-                res = requests.post(
-                    f"{url}/event/{eventId}/teams",
-                    headers=header,
-                    data=json.dumps(payload),
-                )
-                res.raise_for_status()
-            except requests.HTTPError as e:
-                print(f"Failed to create team: {teamName}")
-                print(e)
+            print(teamName)
+            teamId = dennys.findTeamId(teamName, TEAMS)
+            if teamId is None:
+                print(f"Failed to find id for {teamName}.")
+                continue
+            if dennys.addTeamToEvent(url, eventId, teamId) is None:
+                print(f"Failed to add {teamName} to {division}.")
