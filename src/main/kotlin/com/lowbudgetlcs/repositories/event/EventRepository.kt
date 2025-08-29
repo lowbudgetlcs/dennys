@@ -20,6 +20,9 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
     override fun getById(id: EventId): Event? =
         selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne()?.let(::rowToEvent)
 
+    override fun getByName(name: String): Event? =
+        selectEvents().where(EVENTS.NAME.eq(name)).fetchOne()?.let(::rowToEvent)
+
     override fun insert(newEvent: NewEvent, riotTournamentId: RiotTournamentId): Event? = try {
         val insertedId = dsl.insertInto(
             EVENTS
