@@ -8,13 +8,13 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser = args.args(parser)
-base = args.baseUrl(parser)
-dataPath = args.dataPath(parser)
+base = args.base_url(parser)
+data_path = args.data_path(parser)
 url = f"{base}/team"
 
-with open(f"{dataPath}/teams.json") as f:
+with open(f"{data_path}/teams.json") as f:
     data = json.load(f)
     for team in data:
         # Create each team
-        if dennys.createTeam(url, team) is None:
+        if dennys.create_team(url, team) is None:
             print(f"Failed to create {team}.")

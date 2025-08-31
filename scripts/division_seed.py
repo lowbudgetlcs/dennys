@@ -8,17 +8,17 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser = args.args(parser)
-url = args.baseUrl(parser)
-dataPath = args.dataPath(parser)
+url = args.base_url(parser)
+dataPath = args.data_path(parser)
 
 prefix = "Season 15"
 with open(f"{dataPath}/divisions.json") as f:
     data = json.load(f)
-    EVENTS = dennys.getEvents(url)
+    EVENTS = dennys.get_events(url)
     if EVENTS is None:
         print("Failed to fetch events.")
         exit(1)
-    TEAMS= dennys.getTeams(url)
+    TEAMS = dennys.get_teams(url)
     if TEAMS is None:
         print("Failed to fetch teams.")
         exit(1)
@@ -26,15 +26,15 @@ with open(f"{dataPath}/divisions.json") as f:
         # Create each team
         division = f"{prefix} {div}"
         print(division)
-        eventId = dennys.findEventId(division, EVENTS)
+        eventId = dennys.find_event_id(division, EVENTS)
         if eventId is None:
             print(f"Failed to find id for {division}.")
             continue
         for teamName in teams:
             print(teamName)
-            teamId = dennys.findTeamId(teamName, TEAMS)
+            teamId = dennys.find_team_id(teamName, TEAMS)
             if teamId is None:
                 print(f"Failed to find id for {teamName}.")
                 continue
-            if dennys.addTeamToEvent(url, eventId, teamId) is None:
+            if dennys.add_team_to_event(url, eventId, teamId) is None:
                 print(f"Failed to add {teamName} to {division}.")

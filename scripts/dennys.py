@@ -1,13 +1,12 @@
 import requests
 import json
-# pyright: basic
 # TODO: Stronger typing, less any.
-# TODO: Bind the url to the module instead of passinge to every function.
+# TODO: Bind the url to the module instead of passing to every function.
 
 HEADERS = {"Content-Type": "application/json"}
 
 
-def getEvents(url: str):
+def get_events(url: str):
     try:
         res = requests.get(f"{url}/event", headers=HEADERS)
         res.raise_for_status()
@@ -16,7 +15,7 @@ def getEvents(url: str):
         return None
 
 
-def getTeams(url: str):
+def get_teams(url: str):
     try:
         res = requests.get(f"{url}/team", headers=HEADERS)
         res.raise_for_status()
@@ -25,16 +24,16 @@ def getTeams(url: str):
         return None
 
 
-def getEventWithTeams(url: str, eventId):
+def get_event_with_teams(url: str, event_id: int):
     try:
-        res = requests.get(f"{url}/event/{eventId}/teams", headers=HEADERS)
+        res = requests.get(f"{url}/event/{event_id}/teams", headers=HEADERS)
         res.raise_for_status()
         return res.json()
     except requests.HTTPError:
         return None
 
 
-def createEvent(url, name, start, end):
+def create_event(url: str, name: str, start: str, end: str):
     payload = {
         "name": name,
         "description": "Welcome to Season 15!",
@@ -54,7 +53,7 @@ def createEvent(url, name, start, end):
         return None
 
 
-def createTeam(url, name):
+def create_team(url: str, name: str):
     payload = {"name": name}
     try:
         res = requests.post(
@@ -68,11 +67,14 @@ def createTeam(url, name):
         return None
 
 
-def createSeries(url, eventId, lhsTeamId, rhsTeamId, gamesToWin):
-    payload = {"team1Id": lhsTeamId, "team2Id": rhsTeamId, "gamesToWin": gamesToWin}
+def create_series(
+    url: str, event_id: int, team_ids: tuple[int, int], games_to_win: int
+):
+    team1, team2 = team_ids
+    payload = {"team1Id": team1, "team2Id": team2, "gamesToWin": games_to_win}
     try:
         res = requests.post(
-            f"{url}/event/{eventId}/series",
+            f"{url}/event/{event_id}/series",
             headers=HEADERS,
             data=json.dumps(payload),
         )
@@ -82,11 +84,11 @@ def createSeries(url, eventId, lhsTeamId, rhsTeamId, gamesToWin):
         return None
 
 
-def addTeamToEvent(url: str, eventId: int, teamId: int):
-    payload = {"teamId": teamId}
+def add_team_to_event(url: str, event_id: int, team_id: int):
+    payload = {"teamId": team_id}
     try:
         res = requests.post(
-            f"{url}/event/{eventId}/teams",
+            f"{url}/event/{event_id}/teams",
             headers=HEADERS,
             data=json.dumps(payload),
         )
@@ -96,7 +98,7 @@ def addTeamToEvent(url: str, eventId: int, teamId: int):
         return None
 
 
-def findEventId(name, events):
+def find_event_id(name: str, events):
     e = [x["id"] for x in events if x["name"] == name]
     count = len(e)
     if count == 0:
@@ -105,7 +107,7 @@ def findEventId(name, events):
         return e[0]
 
 
-def findTeamId(name, teams):
+def find_team_id(name: str, teams):
     t = [x["id"] for x in teams if x["name"] == name]
     count = len(t)
     if count == 0:

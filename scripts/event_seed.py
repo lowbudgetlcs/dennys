@@ -10,9 +10,9 @@ from zoneinfo import ZoneInfo
 
 parser = ArgumentParser()
 parser = args.args(parser)
-base = args.baseUrl(parser)
+base = args.base_url(parser)
 url = f"{base}/event"
-dataPath = args.dataPath(parser)
+data_path = args.data_path(parser)
 
 
 prefix = "Season 15"
@@ -25,9 +25,9 @@ endstamp = (
     datetime.strptime(end, "%m/%d/%Y").replace(tzinfo=ZoneInfo("UTC")).isoformat()
 )
 
-with open(f"{dataPath}/events.json") as f:
+with open(f"{data_path}/events.json") as f:
     events = json.load(f)
     for e in events:
         name = f"{prefix} {e}"
-        if dennys.createEvent(url, name, startstamp, endstamp) is None:
+        if dennys.create_event(url, name, startstamp, endstamp) is None:
             print(f"Failed to create event '{e}'.")

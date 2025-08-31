@@ -1,25 +1,23 @@
-# pyright: basic
-
 from argparse import ArgumentParser
 
 
 def args(parser: ArgumentParser):
-    parser.add_argument(
+    _ = parser.add_argument(
         "-p", "--data", help="Data file directory.", default="./scripts/data"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "-s",
         action="store_true",
         default=False,
         help="Toggles the 'https' protocol (default '%(default)s').",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "-e",
         "--environment",
         default="",
         help="The environment to target (default: '%(default)s').",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "-d",
         "--domain",
         default="localhost:9292",
@@ -28,7 +26,7 @@ def args(parser: ArgumentParser):
     return parser
 
 
-def baseUrl(parser: ArgumentParser):
+def base_url(parser: ArgumentParser):
     args = parser.parse_args()
     environment = args.environment
     domain = args.domain
@@ -39,6 +37,7 @@ def baseUrl(parser: ArgumentParser):
         environment = f"{environment}."
     return f"{protocol}://{environment}{domain}/api/v1"
 
-def dataPath(parser: ArgumentParser):
+
+def data_path(parser: ArgumentParser) -> str:
     args = parser.parse_args()
     return args.data

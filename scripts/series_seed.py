@@ -8,38 +8,38 @@ import args
 
 parser = ArgumentParser()
 parser = args.args(parser)
-url = args.baseUrl(parser)
-prefix = "Season 15"
-dataPath = args.dataPath(parser)
+url = args.base_url(parser)
+event_prefix = "Season 15"
+data_path = args.data_path(parser)
 
 
-with open(f"{dataPath}/series.json") as f:
+with open(f"{data_path}/series.json") as f:
     data = json.load(f)
-    events = dennys.getEvents(url)
+    events = dennys.get_events(url)
     if events is None:
         print("Failed to fetch events.")
         exit(1)
     for d, matchups in data.items():
-        division = f"{prefix} {d}"
-        eventId = dennys.findEventId(division, events)
-        if eventId is None:
+        division = f"{event_prefix} {d}"
+        event_id = dennys.find_event_id(division, events)
+        if event_id is None:
             print(f"Failed to find id for {division}.")
             continue
-        divisions = dennys.getEventWithTeams(url, eventId)
+        divisions = dennys.get_event_with_teams(url, event_id)
         if divisions is None:
             print(f"Failed to get event with teams {division}.")
             continue
         teams = divisions["teams"]
         for team, opps in matchups.items():
-            lhsId = dennys.findTeamId(team, teams)
-            if lhsId is None:
+            team1 = dennys.find_team_id(team, teams)
+            if team1 is None:
                 print(f"Failed to find teamId for {team}")
                 continue
             for opp in opps:
-                rhsId = dennys.findTeamId(opp, teams)
-                if rhsId is None:
+                team2 = dennys.find_team_id(opp, teams)
+                if team2 is None:
                     print(f"Failed to find teamId for {opp}")
                     continue
-                series = dennys.createSeries(url, eventId, lhsId, rhsId, 2)
+                series = dennys.create_series(url, event_id, (team1, team2), 2)
                 if series is None:
-                    print(f"Failed to create series between {lhsId}, {rhsId}")
+                    print(f"Failed to create series between {team1}, {team2}")
