@@ -27,22 +27,17 @@ class GameService(
     override suspend fun createGame(newGame: NewGame): Game {
         logger.debug("Creating new game...")
         logger.debug(newGame.toString())
-        // validate teams exist
         listOf(newGame.blueTeamId, newGame.redTeamId).forEach { teamId ->
             doesTeamExist(teamId) ?: throw NoSuchElementException("Team with id ${teamId.value} not found.")
         }
-        // validate + get series id
         logger.debug("Fetching series between '${newGame.blueTeamId}' and '${newGame.redTeamId}'...")
         val series = seriesRepo.getByParticipantIds(newGame.blueTeamId, newGame.redTeamId)
             ?: throw NoSuchElementException("Series with ${newGame.blueTeamId.value} and ${newGame.redTeamId.value} teams not found.")
-        // Get tournament id
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
         val tid = eventRepo.getById(series.eventId)?.riotTournamentId
             ?: throw DatabaseException("Series found with no parent event.")
-        // fetch shortcode
         val shortcode =
             gate.getCode(tid, NewShortcode())?.codes?.first() ?: throw GatewayException("Failed to create shortcode.")
-        // insert data
         return gameRepo.insert(newGame, shortcode.toShortcode(), series.id)
             ?: throw DatabaseException("Failed to save game.")
     }
