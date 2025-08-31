@@ -34,6 +34,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.Application
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -43,7 +44,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
-private val logger: Logger = LoggerFactory.getLogger("ApiEndpoint")
+private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.apiRoutes() {
     // Manual dependency wiring. Could be extracted to a DI framework.
