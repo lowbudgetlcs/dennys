@@ -32,5 +32,5 @@ for s in "${scripts[@]}"; do
   [ -n "${domain}" ] && cmd+=( "-d" "${domain}" )
   cmd+=( "-p" "${data}" )
   # Execute
-  "${SCRIPT_DIR}/${cmd[*]}"
+  "${SCRIPT_DIR}/${cmd[@]}"
 done

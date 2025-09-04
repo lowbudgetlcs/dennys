@@ -7,6 +7,10 @@ import json
 from argparse import ArgumentParser
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 parser = ArgumentParser()
 parser = args.args(parser)
@@ -29,5 +33,6 @@ with open(f"{data_path}/events.json") as f:
     events = json.load(f)
     for e in events:
         name = f"{prefix} {e}"
+        logger.info(f"Creating event '{name}'...")
         if dennys.create_event(url, name, startstamp, endstamp) is None:
             print(f"Failed to create event '{e}'.")
