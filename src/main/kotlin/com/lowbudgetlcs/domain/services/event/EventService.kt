@@ -17,7 +17,7 @@ class EventService(
     private val teamRepo: ITeamRepository,
     private val seriesRepo: ISeriesRepository
 ) : IEventService {
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override fun getAllEvents(): List<Event> {
         logger.debug("Fetching all events...")
         return eventRepo.getAll()

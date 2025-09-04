@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.api
 
+import com.lowbudgetlcs.api.dto.Error
+import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.api.routes.apiRoutes
-import com.lowbudgetlcs.api.dto.Error
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.application.*

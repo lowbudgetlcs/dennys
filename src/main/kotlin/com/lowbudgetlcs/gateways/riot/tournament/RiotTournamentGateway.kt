@@ -29,7 +29,7 @@ class RiotTournamentGateway(
     private val url: String by lazy {
         if (useStubs) "$baseUrl/lol/tournament-stub/v5" else "$baseUrl/lol/tournament/v5"
     }
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun create(tournamentName: String): RiotTournament {
         logger.debug("Creating tournament named '$tournamentName'...")

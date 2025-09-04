@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto.events
 
-import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.api.dto.teams.TeamDto
+import com.lowbudgetlcs.domain.models.events.EventStatus
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.Instant

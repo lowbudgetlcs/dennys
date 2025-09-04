@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 class AccountService(
     private val accountRepository: IAccountRepository, private val riotAccountGateway: IRiotAccountGateway
 ) : IAccountService {
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun getAccount(accountId: RiotAccountId): RiotAccount {
         logger.debug("Fetching account '$accountId'...")

@@ -15,7 +15,7 @@ class PlayerService(
     private val playerRepository: IPlayerRepository, private val accountRepository: IAccountRepository
 ) : IPlayerService {
 
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override fun getAllPlayers(): List<PlayerWithAccounts> {
         logger.debug("Fetching all players...")
         return playerRepository.getAll()

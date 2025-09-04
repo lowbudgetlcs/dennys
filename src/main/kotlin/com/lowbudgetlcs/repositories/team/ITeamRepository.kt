@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.team
 
-import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.team.*
 
 interface ITeamRepository {

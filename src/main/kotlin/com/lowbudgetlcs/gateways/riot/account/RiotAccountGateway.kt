@@ -16,7 +16,7 @@ class RiotAccountGateway(
     private val baseUrl: String = "https://americas.api.riotgames.com"
 ) : IRiotAccountGateway {
 
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override suspend fun getAccountByPuuid(puuid: String): RiotAccountDto {
         logger.debug("Fetching account for '$puuid'...")
         val response: HttpResponse = client.get("$baseUrl/riot/account/v1/accounts/by-puuid/$puuid") {

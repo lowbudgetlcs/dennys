@@ -23,7 +23,7 @@ class GameService(
     private val eventRepo: IEventRepository,
     private val gate: IRiotTournamentGateway
 ) : IGameService {
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override suspend fun createGame(newGame: NewGame): Game {
         logger.debug("Creating new game...")
         logger.debug(newGame.toString())
@@ -34,10 +34,11 @@ class GameService(
         val series = seriesRepo.getByParticipantIds(newGame.blueTeamId, newGame.redTeamId)
             ?: throw NoSuchElementException("Series with ${newGame.blueTeamId.value} and ${newGame.redTeamId.value} teams not found.")
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
-        val tid = eventRepo.getById(series.eventId)?.riotTournamentId
-            ?: throw DatabaseException("Series found with no parent event.")
-        val shortcode =
-            gate.getCode(tid, NewShortcode())?.codes?.first() ?: throw GatewayException("Failed to create shortcode.")
+        val event = eventRepo.getById(series.eventId)
+            ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+        val response = gate.getCode(event.riotTournamentId, NewShortcode())
+            ?: throw GatewayException("Failed to create shortcode.")
+        val shortcode = response.codes.first()
         return gameRepo.insert(newGame, shortcode.toShortcode(), series.id)
             ?: throw DatabaseException("Failed to save game.")
     }

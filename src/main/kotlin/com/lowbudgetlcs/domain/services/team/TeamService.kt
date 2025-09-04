@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 class TeamService(
     private val teamRepository: ITeamRepository
 ) : ITeamService {
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override fun getAllTeams(): List<Team> {
         logger.debug("Fetching all teams...")
         return teamRepository.getAll()

@@ -14,7 +14,7 @@ class SeriesService(
     private val seriesRepository: ISeriesRepository, private val teamRepository: ITeamRepository
 ) : ISeriesService {
 
-    private val logger: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
         logger.debug(series.toString())

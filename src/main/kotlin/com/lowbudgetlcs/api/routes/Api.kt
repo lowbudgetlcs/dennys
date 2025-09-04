@@ -1,22 +1,22 @@
 package com.lowbudgetlcs.api.routes
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.appConfig
-import com.lowbudgetlcs.gateways.riot.account.RiotAccountGateway
-import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGateway
+import com.lowbudgetlcs.api.dto.InstantSerializer
+import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
-import com.lowbudgetlcs.api.dto.InstantSerializer
-import com.lowbudgetlcs.api.dto.riot.PostMatchDto
+import com.lowbudgetlcs.appConfig
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.domain.services.game.GameService
 import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.domain.services.series.SeriesService
 import com.lowbudgetlcs.domain.services.team.TeamService
+import com.lowbudgetlcs.gateways.riot.account.RiotAccountGateway
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGateway
 import com.lowbudgetlcs.repositories.account.AccountRepository
 import com.lowbudgetlcs.repositories.account.IAccountRepository
 import com.lowbudgetlcs.repositories.event.EventRepository
@@ -34,7 +34,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.Application
+import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
