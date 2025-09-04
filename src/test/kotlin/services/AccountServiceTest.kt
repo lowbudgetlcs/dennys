@@ -1,129 +1,138 @@
 package services
 
-import com.lowbudgetlcs.domain.models.riot.NewRiotAccount
-import com.lowbudgetlcs.domain.models.riot.RiotAccountId
+import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
+import com.lowbudgetlcs.domain.models.player.toPlayerId
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
-import com.lowbudgetlcs.domain.models.riot.RiotPuuid
-import com.lowbudgetlcs.domain.services.AccountService
-import com.lowbudgetlcs.gateways.IRiotAccountGateway
-import com.lowbudgetlcs.repositories.inmemory.InMemoryAccountRepository
-import com.lowbudgetlcs.routes.dto.riot.account.RiotAccountDto
+import com.lowbudgetlcs.domain.models.riot.account.*
+import com.lowbudgetlcs.domain.services.account.AccountService
+import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
+import com.lowbudgetlcs.repositories.account.IAccountRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 
 class AccountServiceTest : StringSpec({
 
-    val repo = InMemoryAccountRepository()
+    val repo = mockk<IAccountRepository>()
     val gateway = mockk<IRiotAccountGateway>()
     val service = AccountService(repo, gateway)
 
-    val validPuuid = "a".repeat(78)
-    val duplicatePuuid = "b".repeat(78)
-    val badRequestPuuid = "c".repeat(78)
-    val notFoundPuuid = "d".repeat(78)
-    val apiErrorPuuid = "e".repeat(78)
-
-    beforeTest {
-        repo.clear()
-    }
+    val puuid = "a".repeat(78)
+    val puuid2 = "c".repeat(78)
 
     "createAccount should succeed for a new valid Riot account" {
-        val newAccount = NewRiotAccount(RiotPuuid(validPuuid))
-        coEvery { gateway.getAccountByPuuid(validPuuid) } returns RiotAccountDto(puuid = validPuuid)
+        val newAccount = NewRiotAccount(RiotPuuid(puuid))
+        val expectedAccount = newAccount.toRiotAccount(
+            1.toRiotAccountId(), 1.toPlayerId()
+        )
+        every { repo.getAccountByPuuid(puuid) } returns null
+        coEvery { gateway.getAccountByPuuid(puuid) } returns RiotAccountDto(puuid = puuid)
+        every { repo.insert(newAccount) } returns expectedAccount
 
         val created = service.createAccount(newAccount)
 
-        created.riotPuuid.value shouldBe validPuuid
-        repo.getAll().shouldContainExactly(created)
+        created.riotPuuid.value shouldBe puuid
+        created shouldBe expectedAccount
     }
 
     "createAccount should throw if puuid is already taken" {
-        val puuid = RiotPuuid(duplicatePuuid)
-        val newAccount = NewRiotAccount(puuid)
-
-        coEvery { gateway.getAccountByPuuid(duplicatePuuid) } returns RiotAccountDto(puuid = duplicatePuuid)
-        service.createAccount(newAccount)
+        val duplicateAccount = NewRiotAccount(RiotPuuid(puuid))
+        val expectedAccount = duplicateAccount.toRiotAccount(1.toRiotAccountId(), 1.toPlayerId())
+        every { repo.getAccountByPuuid(puuid) } returns expectedAccount
 
         val exception = shouldThrow<IllegalStateException> {
-            service.createAccount(newAccount)
+            service.createAccount(duplicateAccount)
         }
         exception.message shouldBe "Riot account already exists"
     }
 
+    // NOTE: These should probably be put into a RiotAccountGateway test instead of in the service.
+    // We are stubbing the gateway, so testing it here is incorrect.
     "createAccount should throw IllegalArgumentException for malformed PUUID (400)" {
-        val puuid = RiotPuuid(badRequestPuuid)
-        val newAccount = NewRiotAccount(puuid)
+        val invalidAccount = NewRiotAccount(RiotPuuid(puuid))
 
-        coEvery { gateway.getAccountByPuuid(badRequestPuuid) } throws IllegalArgumentException("Invalid Riot PUUID")
+        every { repo.getAccountByPuuid(puuid) } returns null
+        coEvery { gateway.getAccountByPuuid(puuid) } throws IllegalArgumentException("Invalid Riot PUUID")
 
         val exception = shouldThrow<IllegalArgumentException> {
-            service.createAccount(newAccount)
+            service.createAccount(invalidAccount)
         }
         exception.message shouldBe "Invalid Riot PUUID"
     }
 
     "createAccount should throw NoSuchElementException for non-existent account (404)" {
-        val puuid = RiotPuuid(notFoundPuuid)
-        val newAccount = NewRiotAccount(puuid)
+        val nonExistantAccount = NewRiotAccount(RiotPuuid(puuid))
 
-        coEvery { gateway.getAccountByPuuid(notFoundPuuid) } throws NoSuchElementException("Riot account not found for PUUID")
+        every { repo.getAccountByPuuid(puuid) } returns null
+        coEvery { gateway.getAccountByPuuid(puuid) } throws NoSuchElementException("Riot account not found for PUUID")
 
         val exception = shouldThrow<NoSuchElementException> {
-            service.createAccount(newAccount)
+            service.createAccount(nonExistantAccount)
         }
         exception.message shouldBe "Riot account not found for PUUID"
     }
 
     "createAccount should throw RiotApiException for unexpected Riot API failure" {
-        val puuid = RiotPuuid(apiErrorPuuid)
-        val newAccount = NewRiotAccount(puuid)
+        val failedAccount = NewRiotAccount(RiotPuuid(puuid))
 
-        coEvery { gateway.getAccountByPuuid(apiErrorPuuid) } throws RiotApiException("Unexpected Riot API error: 500 Internal Server Error")
+        every { repo.getAccountByPuuid(puuid) } returns null
+        coEvery { gateway.getAccountByPuuid(puuid) } throws RiotApiException("Unexpected Riot API error: 500 Internal Server Error")
 
         val exception = shouldThrow<RiotApiException> {
-            service.createAccount(newAccount)
+            service.createAccount(failedAccount)
         }
         exception.message shouldBe "Unexpected Riot API error: 500 Internal Server Error"
     }
 
     "getAccount should return a stored Riot account" {
-        val puuid = RiotPuuid(validPuuid)
-        coEvery { gateway.getAccountByPuuid(validPuuid) } returns RiotAccountDto(puuid = validPuuid)
+        val newAccount = NewRiotAccount(RiotPuuid(puuid))
+        val expectedAccount = newAccount.toRiotAccount(1.toRiotAccountId(), 1.toPlayerId())
+        every { repo.getById(expectedAccount.id) } returns expectedAccount
 
-        val created = service.createAccount(NewRiotAccount(puuid))
-        val found = service.getAccount(created.id)
+        val found = service.getAccount(expectedAccount.id)
 
-        found shouldBe created
+        found shouldBe expectedAccount
     }
 
     "getAccount should throw if ID not found" {
+        val newAccount = NewRiotAccount(RiotPuuid(puuid))
+        val expectedAccount = newAccount.toRiotAccount(1.toRiotAccountId(), 1.toPlayerId())
+        every { repo.getById(expectedAccount.id) } throws NoSuchElementException("Account not found")
+
         val exception = shouldThrow<NoSuchElementException> {
-            service.getAccount(RiotAccountId(999))
+            service.getAccount(expectedAccount.id)
         }
         exception.message shouldBe "Account not found"
     }
 
     "getAllAccounts should return all stored accounts" {
-        coEvery { gateway.getAccountByPuuid(validPuuid) } returns RiotAccountDto(puuid = validPuuid)
+        val accounts = listOf(
+            RiotAccount(
+                id = 0.toRiotAccountId(), riotPuuid = RiotPuuid(puuid), playerId = 1.toPlayerId()
+            ),
 
-        val created = service.createAccount(NewRiotAccount(RiotPuuid(validPuuid)))
+            RiotAccount(
+                id = 1.toRiotAccountId(), riotPuuid = RiotPuuid(puuid2), playerId = 2.toPlayerId()
+            )
+        )
+        every { repo.getAll() } returns accounts
+
         val all = service.getAllAccounts()
 
-        all shouldContainExactly listOf(created)
+        all shouldContainExactly accounts
     }
 
     "isPuuidTaken should reflect correct state" {
-        val puuid = RiotPuuid(validPuuid)
+        val newAccount = NewRiotAccount(RiotPuuid(puuid))
+        val expectedAccount = newAccount.toRiotAccount(1.toRiotAccountId(), 1.toPlayerId())
+        every { repo.getAccountByPuuid(puuid) } returns null
+        service.isPuuidTaken(RiotPuuid(puuid)) shouldBe false
 
-        service.isPuuidTaken(puuid) shouldBe false
-
-        coEvery { gateway.getAccountByPuuid(validPuuid) } returns RiotAccountDto(puuid = validPuuid)
-        service.createAccount(NewRiotAccount(puuid))
-
-        service.isPuuidTaken(puuid) shouldBe true
+        every { repo.getAccountByPuuid(puuid) } returns expectedAccount
+        service.isPuuidTaken(RiotPuuid(puuid)) shouldBe true
     }
 })

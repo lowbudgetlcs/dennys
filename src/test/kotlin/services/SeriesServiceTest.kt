@@ -11,9 +11,9 @@ import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.services.SeriesService
-import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.domain.services.series.SeriesService
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly

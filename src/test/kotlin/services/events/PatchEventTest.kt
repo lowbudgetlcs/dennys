@@ -2,11 +2,11 @@ package services.events
 
 import com.lowbudgetlcs.domain.models.events.*
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.services.EventService
-import com.lowbudgetlcs.gateways.IRiotTournamentGateway
-import com.lowbudgetlcs.repositories.IEventRepository
-import com.lowbudgetlcs.repositories.ISeriesRepository
-import com.lowbudgetlcs.repositories.ITeamRepository
+import com.lowbudgetlcs.domain.services.event.EventService
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
+import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -56,7 +56,7 @@ class PatchEventTest : FunSpec({
         val name = "ABCDEFG"
         val update = EventUpdate(name = name)
         val patched = testEvent.patch(update)
-        every { eventRepo.getAll() } returns listOf(testEvent)
+        every { eventRepo.getByName(name) } returns null
         every { eventRepo.update(patched) } returns patched
 
         val event = service.patchEvent(testEvent.id, update)
@@ -125,7 +125,7 @@ class PatchEventTest : FunSpec({
         }
     }
     test("patchEvent() throws exception when name is taken") {
-        every { eventRepo.getAll() } returns listOf(testEvent)
+        every { eventRepo.getByName(testEvent.name) } returns testEvent
         shouldThrow<IllegalArgumentException> {
             service.patchEvent(testEvent.id, EventUpdate(name = testEvent.name))
         }

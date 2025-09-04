@@ -1,7 +1,7 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.routes.dto.InstantSerializer
-import com.lowbudgetlcs.routes.routes
+import com.lowbudgetlcs.api.dto.InstantSerializer
+import com.lowbudgetlcs.api.routes
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*

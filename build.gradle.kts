@@ -57,8 +57,8 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.ktor.client.plugins)
     implementation(libs.bundles.database)
+    implementation(libs.bundles.server.logging)
     implementation(libs.hikari.core)
-    implementation(libs.logback.core)
     implementation(libs.hoplite.core)
 
     // Jooq Code Generation

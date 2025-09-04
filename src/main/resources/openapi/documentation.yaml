@@ -1303,7 +1303,7 @@ components:
         - startDate
         - endDate
         - status
-        - tournamentId
+
       properties:
         id:
           type: integer
@@ -1333,10 +1333,6 @@ components:
             - $ref: "#/components/schemas/EventStatus"
             - description: The current event status.
             - example: NOT_STARTED
-        tournamentId:
-          type: integer
-          format: int64
-          example: 1234
     EventWithTeamsDto:
       type: object
       required:
@@ -1347,7 +1343,6 @@ components:
         - startDate
         - endDate
         - status
-        - tournamentId
         - teams
       properties:
         id:
@@ -1371,10 +1366,6 @@ components:
           type: string
           format: date-time
           example: "2025-08-27T15:34:23.105Z"
-        tournamentId:
-          type: integer
-          format: int64
-          example: 54142
         status:
           allOf:
             - $ref: "#/components/schemas/EventStatus"
@@ -1394,7 +1385,6 @@ components:
         - startDate
         - endDate
         - status
-        - tournamentId
         - series
       properties:
         id:
@@ -1418,10 +1408,6 @@ components:
           type: string
           format: date-time
           example: "2025-08-27T15:34:23.105Z"
-        tournamentId:
-          type: integer
-          format: int64
-          example: 54142
         status:
           allOf:
             - $ref: "#/components/schemas/EventStatus"
