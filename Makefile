@@ -59,7 +59,7 @@ test:
 hook:
 	./gradlew installGitHooks
 
-# Manual auto format (this is done automatically by the pre-commit hook if installed)
+# Manual format (this is done automatically by the pre-commit hook if installed)
 format:
 	./gradlew ktlintFormat
 
