@@ -1,3 +1,4 @@
+import io.gitlab.arturbosch.detekt.Detekt
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -31,8 +32,14 @@ ktlint {
     android.set(false)
     outputToConsole.set(true)
     ignoreFailures.set(false)
+    filter {
+        exclude("**/org/jooq/**")
+    }
 }
 
+tasks.withType<Detekt>().configureEach {
+    exclude("**/org/jooq/**")
+}
 
 tasks.register<Test>("generateJooq") {
     group = "codegen"
@@ -78,7 +85,6 @@ sourceSets {
         resources.srcDir(migrationsDir)
         compileClasspath += sourceSets["main"].output
         runtimeClasspath += sourceSets["main"].output
-
     }
 }
 
