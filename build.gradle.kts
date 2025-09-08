@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.application)
@@ -48,6 +51,20 @@ tasks.register<Test>("itest") {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+tasks.register("installGitHooks") {
+    group = "build setup"
+    description = "Install pre-commit Git hook"
+    doLast {
+        val src = file("scripts/pre-commit").toPath()
+        val destinationDirectory = file(".git/hooks").toPath()
+        Files.createDirectories(destinationDirectory)
+        val destination = destinationDirectory.resolve("pre-commit")
+        Files.copy(src, destination, StandardCopyOption.REPLACE_EXISTING)
+        destination.toFile().setExecutable(true)
+        println("✓ Installed Git hook: $destination")
+    }
 }
 
 sourceSets {
