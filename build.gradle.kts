@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm") version ("2.2.0")
-    id("application")
-    id("org.jetbrains.kotlin.plugin.serialization") version ("2.2.0")
-    id("io.gitlab.arturbosch.detekt") version "1.23.6"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
 }
 
 group = "com.lowbudgetlcs"

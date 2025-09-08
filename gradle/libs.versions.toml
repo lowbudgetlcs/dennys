@@ -11,8 +11,8 @@ hoplite = "2.9.0"
 mockk = "1.14.5"
 kotlinx-coroutines = "1.10.2"
 slf4j = "2.0.17"
-detekt = "1.23.6"
-ktlint = "12.1.1"
+detekt = "1.23.8"
+ktlint = "13.0.0"
 
 [libraries]
 # kotlin
