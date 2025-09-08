@@ -1,4 +1,6 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -34,11 +36,8 @@ ktlint {
     ignoreFailures.set(false)
     filter {
         exclude("**/org/jooq/**")
+        exclude("src/main/kotlin/org/jooq/**")
     }
-}
-
-tasks.withType<Detekt>().configureEach {
-    exclude("**/org/jooq/**")
 }
 
 tasks.register<Test>("generateJooq") {
@@ -58,6 +57,28 @@ tasks.register<Test>("itest") {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+tasks.withType<Detekt>().configureEach {
+    exclude("**/org/jooq/**")
+}
+
+tasks.matching { it.name.startsWith("ktlintJooqSourceSet") }.configureEach {
+    enabled = false
+}
+
+tasks.matching { it.name.startsWith("runKtlintFormatOverJooqSourceSet") }.configureEach {
+    enabled = false
+}
+
+tasks.withType<KtLintCheckTask>().configureEach {
+    exclude("**/org/jooq/**")
+    exclude("src/main/kotlin/org/jooq/**")
+
+}
+tasks.withType<KtLintFormatTask>().configureEach {
+    exclude("**/org/jooq/**")
+    exclude("src/main/kotlin/org/jooq/**")
 }
 
 tasks.register("installGitHooks") {
