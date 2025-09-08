@@ -18,6 +18,18 @@ repositories {
     google()
 }
 
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/detekt.yml"))
+}
+
+ktlint {
+    android.set(false)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+}
+
 
 tasks.register<Test>("generateJooq") {
     group = "codegen"
