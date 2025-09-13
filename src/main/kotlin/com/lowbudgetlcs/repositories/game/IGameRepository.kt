@@ -8,5 +8,10 @@ import com.lowbudgetlcs.domain.models.riot.tournament.Shortcode
 
 interface IGameRepository {
     fun getById(id: GameId): Game?
-    fun insert(newGame: NewGame, shortcode: Shortcode, seriesId: SeriesId): Game?
+
+    fun insert(
+        newGame: NewGame,
+        shortcode: Shortcode,
+        seriesId: SeriesId,
+    ): Game?
 }

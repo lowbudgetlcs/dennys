@@ -16,12 +16,9 @@ import io.ktor.server.routing.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.teamEndpointsV1(
-    teamService: TeamService
-) {
+fun Route.teamEndpointsV1(teamService: TeamService) {
     post<TeamResourcesV1> {
         call.setCidContext {
             logger.info("📩 Received POST /v1/team")

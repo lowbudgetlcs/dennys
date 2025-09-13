@@ -22,7 +22,10 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.eventEndpointsV1(eventService: IEventService, seriesService: ISeriesService) {
+fun Route.eventEndpointsV1(
+    eventService: IEventService,
+    seriesService: ISeriesService,
+) {
     get<EventResourcesV1> {
         call.setCidContext {
             logger.info("📩 Received GET on /v1/event")

@@ -12,5 +12,5 @@ data class PostMatchDto(
     val gameType: String = "",
     val gameMap: Int = -1,
     val gameMode: String = "",
-    val region: String = ""
+    val region: String = "",
 )

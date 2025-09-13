@@ -4,7 +4,6 @@ import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
 import com.lowbudgetlcs.domain.models.riot.RiotApiException
 
 interface IRiotAccountGateway {
-
     /**
      * @throws IllegalArgumentException if the PUUID is invalid (400)
      * @throws NoSuchElementException if no Riot account is found (404)

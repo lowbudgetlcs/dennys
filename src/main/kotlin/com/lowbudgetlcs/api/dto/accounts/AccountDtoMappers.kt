@@ -6,12 +6,12 @@ import com.lowbudgetlcs.domain.models.riot.account.RiotPuuid
 
 fun NewAccountDto.toNewRiotAccount(): NewRiotAccount =
     NewRiotAccount(
-        riotPuuid = RiotPuuid(riotPuuid)
+        riotPuuid = RiotPuuid(riotPuuid),
     )
 
 fun RiotAccount.toDto(): AcountDto =
     AcountDto(
         id = id.value,
         riotPuuid = riotPuuid.value,
-        playerId = playerId?.value
+        playerId = playerId?.value,
     )

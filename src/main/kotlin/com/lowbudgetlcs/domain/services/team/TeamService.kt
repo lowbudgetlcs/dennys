@@ -7,9 +7,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class TeamService(
-    private val teamRepository: ITeamRepository
+    private val teamRepository: ITeamRepository,
 ) : ITeamService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     override fun getAllTeams(): List<Team> {
         logger.debug("Fetching all teams...")
         return teamRepository.getAll()
@@ -30,7 +31,10 @@ class TeamService(
             ?: throw DatabaseException("Failed to create team")
     }
 
-    override fun renameTeam(id: TeamId, newName: String): Team {
+    override fun renameTeam(
+        id: TeamId,
+        newName: String,
+    ): Team {
         logger.debug("Renaming team '$id' to '$newName'...")
         if (newName.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
 
@@ -38,7 +42,10 @@ class TeamService(
             ?: throw DatabaseException("Failed to rename team")
     }
 
-    override fun updateLogoName(id: TeamId, newLogoName: String?): Team {
+    override fun updateLogoName(
+        id: TeamId,
+        newLogoName: String?,
+    ): Team {
         logger.debug("Changing team '$id' logoName to '$newLogoName'...")
         val value = newLogoName ?: throw IllegalArgumentException("Logo name cannot be null")
         return teamRepository.updateTeamLogoName(id, TeamLogoName(value))

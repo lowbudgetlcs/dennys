@@ -9,6 +9,5 @@ data class RiotShortcodeParametersDto(
     val mapType: String,
     val pickType: String,
     val spectatorType: String = "ALL",
-    val teamSize: Int = 5
+    val teamSize: Int = 5,
 )
-

@@ -7,23 +7,23 @@ import org.jooq.Record
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
 class AccountRepository(
-    private val dsl: DSLContext
+    private val dsl: DSLContext,
 ) : IAccountRepository {
-
     override fun insert(newAccount: NewRiotAccount): RiotAccount? {
-        val insertedId = dsl.insertInto(RIOT_ACCOUNTS).set(RIOT_ACCOUNTS.RIOT_PUUID, newAccount.riotPuuid.value)
-            .returning(RIOT_ACCOUNTS.ID).fetchOne()?.get(RIOT_ACCOUNTS.ID)
+        val insertedId =
+            dsl
+                .insertInto(RIOT_ACCOUNTS)
+                .set(RIOT_ACCOUNTS.RIOT_PUUID, newAccount.riotPuuid.value)
+                .returning(RIOT_ACCOUNTS.ID)
+                .fetchOne()
+                ?.get(RIOT_ACCOUNTS.ID)
 
         return insertedId?.toRiotAccountId()?.let(::getById)
     }
 
-    override fun getAll(): List<RiotAccount> {
-        return fetchAccountRows().mapNotNull(::rowToRiotAccount)
-    }
+    override fun getAll(): List<RiotAccount> = fetchAccountRows().mapNotNull(::rowToRiotAccount)
 
-    override fun getById(accountId: RiotAccountId): RiotAccount? {
-        return getAccountRowById(accountId)?.let(::rowToRiotAccount)
-    }
+    override fun getById(accountId: RiotAccountId): RiotAccount? = getAccountRowById(accountId)?.let(::rowToRiotAccount)
 
     override fun getAccountByPuuid(puuid: String): RiotAccount? = getAccountRowByPuuid(puuid)?.let(::rowToRiotAccount)
 
@@ -33,12 +33,18 @@ class AccountRepository(
         dsl.select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID, RIOT_ACCOUNTS.PLAYER_ID).from(RIOT_ACCOUNTS).fetch()
 
     private fun getAccountRowById(accountId: RiotAccountId) =
-        dsl.select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID, RIOT_ACCOUNTS.PLAYER_ID).from(RIOT_ACCOUNTS)
-            .where(RIOT_ACCOUNTS.ID.eq(accountId.value)).fetchOne()
+        dsl
+            .select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID, RIOT_ACCOUNTS.PLAYER_ID)
+            .from(RIOT_ACCOUNTS)
+            .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+            .fetchOne()
 
     private fun getAccountRowByPuuid(puuid: String) =
-        dsl.select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID, RIOT_ACCOUNTS.PLAYER_ID).from(RIOT_ACCOUNTS)
-            .where(RIOT_ACCOUNTS.RIOT_PUUID.eq(puuid)).fetchOne()
+        dsl
+            .select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID, RIOT_ACCOUNTS.PLAYER_ID)
+            .from(RIOT_ACCOUNTS)
+            .where(RIOT_ACCOUNTS.RIOT_PUUID.eq(puuid))
+            .fetchOne()
 
     private fun rowToRiotAccount(row: Record): RiotAccount? {
         val accountId = row[RIOT_ACCOUNTS.ID]?.toRiotAccountId() ?: return null
@@ -46,7 +52,9 @@ class AccountRepository(
         val playerId = row[RIOT_ACCOUNTS.PLAYER_ID]?.let { PlayerId(it) }
 
         return RiotAccount(
-            id = accountId, riotPuuid = riotPuuid, playerId = playerId
+            id = accountId,
+            riotPuuid = riotPuuid,
+            playerId = playerId,
         )
     }
 }

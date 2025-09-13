@@ -13,15 +13,20 @@ import java.time.Instant
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>) =
+    io.ktor.server.netty.EngineMain
+        .main(args)
 
 fun Application.configureRouting() {
     install(ContentNegotiation) {
-        json(Json {
-            serializersModule = SerializersModule {
-                contextual(Instant::class, InstantSerializer)
-            }
-        })
+        json(
+            Json {
+                serializersModule =
+                    SerializersModule {
+                        contextual(Instant::class, InstantSerializer)
+                    }
+            },
+        )
     }
     routes()
 }
@@ -31,4 +36,3 @@ fun Application.module() {
     configureRouting()
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
 }
-

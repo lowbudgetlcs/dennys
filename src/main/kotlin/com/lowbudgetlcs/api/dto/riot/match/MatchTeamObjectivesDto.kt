@@ -12,5 +12,5 @@ data class MatchTeamObjectivesDto(
     @SerialName("horde") val horde: MatchTeamObjectiveDto? = null,
     @SerialName("inhibitor") val inhibitor: MatchTeamObjectiveDto? = null,
     @SerialName("riftHerald") val riftHerald: MatchTeamObjectiveDto? = null,
-    @SerialName("tower") val tower: MatchTeamObjectiveDto? = null
+    @SerialName("tower") val tower: MatchTeamObjectiveDto? = null,
 )

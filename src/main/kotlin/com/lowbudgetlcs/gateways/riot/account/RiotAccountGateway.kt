@@ -13,17 +13,18 @@ import org.slf4j.LoggerFactory
 class RiotAccountGateway(
     private val client: HttpClient,
     private val apiKey: String,
-    private val baseUrl: String = "https://americas.api.riotgames.com"
+    private val baseUrl: String = "https://americas.api.riotgames.com",
 ) : IRiotAccountGateway {
-
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     override suspend fun getAccountByPuuid(puuid: String): RiotAccountDto {
         logger.debug("Fetching account for '$puuid'...")
-        val response: HttpResponse = client.get("$baseUrl/riot/account/v1/accounts/by-puuid/$puuid") {
-            headers {
-                append("X-Riot-Token", apiKey)
+        val response: HttpResponse =
+            client.get("$baseUrl/riot/account/v1/accounts/by-puuid/$puuid") {
+                headers {
+                    append("X-Riot-Token", apiKey)
+                }
             }
-        }
 
         return when (response.status) {
             HttpStatusCode.OK -> {

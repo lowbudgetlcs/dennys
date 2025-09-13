@@ -16,5 +16,5 @@ data class EventWithSeriesDto(
     @Contextual val endDate: Instant,
     val status: EventStatus,
     val riotTournamentId: Int,
-    val series: List<SeriesDto>
+    val series: List<SeriesDto>,
 )

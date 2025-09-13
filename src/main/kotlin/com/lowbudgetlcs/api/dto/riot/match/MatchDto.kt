@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MatchDto(
     @SerialName("metadata") val metaData: MatchMetadataDto,
-    @SerialName("info") val matchInfo: MatchInfoDto
+    @SerialName("info") val matchInfo: MatchInfoDto,
 )

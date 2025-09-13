@@ -10,8 +10,9 @@ import org.jooq.Record
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.storage.tables.references.EVENTS
 
-class EventRepository(private val dsl: DSLContext) : IEventRepository {
-
+class EventRepository(
+    private val dsl: DSLContext,
+) : IEventRepository {
     override fun getAll(): List<Event> = selectEvents().fetch().mapNotNull(::rowToEvent)
 
     override fun getAllByGroupId(groupId: EventGroupId): List<Event> =
@@ -23,37 +24,58 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
     override fun getByName(name: String): Event? =
         selectEvents().where(EVENTS.NAME.eq(name)).fetchOne()?.let(::rowToEvent)
 
-    override fun insert(newEvent: NewEvent, riotTournamentId: RiotTournamentId): Event? = try {
-        val insertedId = dsl.insertInto(
-            EVENTS
-        ).set(EVENTS.NAME, newEvent.name).set(EVENTS.DESCRIPTION, newEvent.description)
-            .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value).set(EVENTS.START_DATE, newEvent.startDate)
-            .set(EVENTS.END_DATE, newEvent.endDate).set(EVENTS.STATUS, newEvent.status.name).returning(EVENTS.ID)
-            .fetchOne()?.get(EVENTS.ID)
-        insertedId?.toEventId()?.let(::getById)
-    } catch (e: IntegrityConstraintViolationException) {
-        null
-    }
+    override fun insert(
+        newEvent: NewEvent,
+        riotTournamentId: RiotTournamentId,
+    ): Event? =
+        try {
+            val insertedId =
+                dsl
+                    .insertInto(
+                        EVENTS,
+                    ).set(EVENTS.NAME, newEvent.name)
+                    .set(EVENTS.DESCRIPTION, newEvent.description)
+                    .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
+                    .set(EVENTS.START_DATE, newEvent.startDate)
+                    .set(EVENTS.END_DATE, newEvent.endDate)
+                    .set(EVENTS.STATUS, newEvent.status.name)
+                    .returning(EVENTS.ID)
+                    .fetchOne()
+                    ?.get(EVENTS.ID)
+            insertedId?.toEventId()?.let(::getById)
+        } catch (e: IntegrityConstraintViolationException) {
+            null
+        }
 
     override fun update(event: Event): Event? {
-        val insertedId = dsl.update(EVENTS).set(EVENTS.NAME, event.name).set(EVENTS.DESCRIPTION, event.description)
-            .set(EVENTS.START_DATE, event.startDate).set(EVENTS.END_DATE, event.endDate)
-            .set(EVENTS.STATUS, event.status.name).where(EVENTS.ID.eq(event.id.value)).returning(EVENTS.ID).fetchOne()
-            ?.get(EVENTS.ID)
+        val insertedId =
+            dsl
+                .update(EVENTS)
+                .set(EVENTS.NAME, event.name)
+                .set(EVENTS.DESCRIPTION, event.description)
+                .set(EVENTS.START_DATE, event.startDate)
+                .set(EVENTS.END_DATE, event.endDate)
+                .set(EVENTS.STATUS, event.status.name)
+                .where(EVENTS.ID.eq(event.id.value))
+                .returning(EVENTS.ID)
+                .fetchOne()
+                ?.get(EVENTS.ID)
         return insertedId?.toEventId()?.let(::getById)
     }
 
-    private fun selectEvents() = dsl.select(
-        EVENTS.ID,
-        EVENTS.NAME,
-        EVENTS.DESCRIPTION,
-        EVENTS.RIOT_TOURNAMENT_ID,
-        EVENTS.CREATED_AT,
-        EVENTS.START_DATE,
-        EVENTS.END_DATE,
-        EVENTS.STATUS,
-        EVENTS.EVENT_GROUP_ID
-    ).from(EVENTS)
+    private fun selectEvents() =
+        dsl
+            .select(
+                EVENTS.ID,
+                EVENTS.NAME,
+                EVENTS.DESCRIPTION,
+                EVENTS.RIOT_TOURNAMENT_ID,
+                EVENTS.CREATED_AT,
+                EVENTS.START_DATE,
+                EVENTS.END_DATE,
+                EVENTS.STATUS,
+                EVENTS.EVENT_GROUP_ID,
+            ).from(EVENTS)
 
     fun rowToEvent(row: Record): Event? {
         val eventId = row[EVENTS.ID]?.toEventId() ?: return null
@@ -74,7 +96,7 @@ class EventRepository(private val dsl: DSLContext) : IEventRepository {
             startDate = startDate,
             endDate = endDate,
             eventGroupId = eventGroupId,
-            status = status
+            status = status,
         )
     }
 }

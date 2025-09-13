@@ -8,21 +8,39 @@ import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.GAMES
 
-class GameRepository(private val dsl: DSLContext) : IGameRepository {
+class GameRepository(
+    private val dsl: DSLContext,
+) : IGameRepository {
     override fun getById(id: GameId) = selectGames().where(GAMES.ID.eq(id.value)).fetchOne()?.let(::rowToGames)
+
     override fun insert(
-        newGame: NewGame, shortcode: Shortcode, seriesId: SeriesId
+        newGame: NewGame,
+        shortcode: Shortcode,
+        seriesId: SeriesId,
     ): Game? {
         val insertedId =
-            dsl.insertInto(GAMES).set(GAMES.SHORTCODE, shortcode.value).set(GAMES.SERIES_ID, seriesId.value)
-                .set(GAMES.BLUE_TEAM_ID, newGame.blueTeamId.value).set(GAMES.RED_TEAM_ID, newGame.redTeamId.value)
-                .returning(GAMES.ID).fetchOne()?.get(GAMES.ID)
+            dsl
+                .insertInto(GAMES)
+                .set(GAMES.SHORTCODE, shortcode.value)
+                .set(GAMES.SERIES_ID, seriesId.value)
+                .set(GAMES.BLUE_TEAM_ID, newGame.blueTeamId.value)
+                .set(GAMES.RED_TEAM_ID, newGame.redTeamId.value)
+                .returning(GAMES.ID)
+                .fetchOne()
+                ?.get(GAMES.ID)
         return insertedId?.toGameId()?.let(::getById)
     }
 
-    private fun selectGames() = dsl.select(
-        GAMES.ID, GAMES.SHORTCODE, GAMES.BLUE_TEAM_ID, GAMES.RED_TEAM_ID, GAMES.SERIES_ID, GAMES.NUMBER
-    ).from(GAMES)
+    private fun selectGames() =
+        dsl
+            .select(
+                GAMES.ID,
+                GAMES.SHORTCODE,
+                GAMES.BLUE_TEAM_ID,
+                GAMES.RED_TEAM_ID,
+                GAMES.SERIES_ID,
+                GAMES.NUMBER,
+            ).from(GAMES)
 
     fun rowToGames(row: Record): Game? {
         val gameId = row[GAMES.ID]?.toGameId() ?: return null
@@ -39,7 +57,7 @@ class GameRepository(private val dsl: DSLContext) : IGameRepository {
             redTeamId = redTeamId,
             seriesId = seriesId,
             number = number,
-            result = null
+            result = null,
         )
     }
 }

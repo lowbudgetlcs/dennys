@@ -8,7 +8,7 @@ import com.lowbudgetlcs.domain.models.team.toTeamName
 fun NewTeamDto.toNewTeam(): NewTeam =
     NewTeam(
         name = name.toTeamName(),
-        logoName = logoName?.toTeamLogoName()
+        logoName = logoName?.toTeamLogoName(),
     )
 
 fun Team.toDto(): TeamDto =
@@ -16,5 +16,5 @@ fun Team.toDto(): TeamDto =
         id = id.value,
         name = name.value,
         logoName = logoName?.value,
-        eventId = eventId?.value
+        eventId = eventId?.value,
     )

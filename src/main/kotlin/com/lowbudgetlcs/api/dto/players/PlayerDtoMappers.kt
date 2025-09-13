@@ -7,12 +7,12 @@ import com.lowbudgetlcs.domain.models.player.PlayerWithAccounts
 
 fun NewPlayerDto.toNewPlayer(): NewPlayer =
     NewPlayer(
-        name = PlayerName(name)
+        name = PlayerName(name),
     )
 
 fun PlayerWithAccounts.toDto(): PlayerDto =
     PlayerDto(
         id = id.value,
         name = name.value,
-        accounts = accounts.map { it.toDto() }
+        accounts = accounts.map { it.toDto() },
     )

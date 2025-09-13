@@ -19,46 +19,58 @@ import io.mockk.mockk
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class EventServiceTest : FunSpec({
-    val eventRepo = mockk<IEventRepository>()
-    val tournamentGate = mockk<IRiotTournamentGateway>()
-    val service = EventService(eventRepo, tournamentGate, mockk<ITeamRepository>(), mockk<ISeriesRepository>())
-    val start = Instant.now()
-    val end = Instant.now().plusSeconds(3600L)
-    val newEvent = NewEvent(
-        name = "Test", description = "This is a test.", startDate = start, endDate = end, status = EventStatus.ACTIVE
-    )
-    val expectedEvent = newEvent.toEvent(
-        id = 0.toEventId(),
-        createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
-        riotTournamentId = 9999.toRiotTournamentId(),
-    )
-    val newRiotTournament = expectedEvent.name
+class EventServiceTest :
+    FunSpec({
+        val eventRepo = mockk<IEventRepository>()
+        val tournamentGate = mockk<IRiotTournamentGateway>()
+        val service = EventService(eventRepo, tournamentGate, mockk<ITeamRepository>(), mockk<ISeriesRepository>())
+        val start = Instant.now()
+        val end = Instant.now().plusSeconds(3600L)
+        val newEvent =
+            NewEvent(
+                name = "Test",
+                description = "This is a test.",
+                startDate = start,
+                endDate = end,
+                status = EventStatus.ACTIVE,
+            )
+        val expectedEvent =
+            newEvent.toEvent(
+                id = 0.toEventId(),
+                createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
+                riotTournamentId = 9999.toRiotTournamentId(),
+            )
+        val newRiotTournament = expectedEvent.name
 
-    test("Creating event succeeds") {
-        coEvery {
-            tournamentGate.create(newRiotTournament)
-        } returns RiotTournament(
-            id = 9999.toRiotTournamentId(), name = "Test"
-        )
-        every { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
-        every { eventRepo.getByName(newEvent.name) } returns null
-        val event = service.createEvent(newEvent)
-        event.shouldNotBeNull()
-        // We ignore generated fields as those are out-of-scope for this test
-        event.shouldBeEqualToIgnoringFields(
-            expectedEvent, Event::id, Event::riotTournamentId, Event::createdAt
-        )
-    }
+        test("Creating event succeeds") {
+            coEvery {
+                tournamentGate.create(newRiotTournament)
+            } returns
+                RiotTournament(
+                    id = 9999.toRiotTournamentId(),
+                    name = "Test",
+                )
+            every { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
+            every { eventRepo.getByName(newEvent.name) } returns null
+            val event = service.createEvent(newEvent)
+            event.shouldNotBeNull()
+            // We ignore generated fields as those are out-of-scope for this test
+            event.shouldBeEqualToIgnoringFields(
+                expectedEvent,
+                Event::id,
+                Event::riotTournamentId,
+                Event::createdAt,
+            )
+        }
 
-    test("getEvent() returns valid event") {
-        every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
-        val fetched = service.getEvent(expectedEvent.id)
-        fetched shouldBe expectedEvent
-    }
+        test("getEvent() returns valid event") {
+            every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
+            val fetched = service.getEvent(expectedEvent.id)
+            fetched shouldBe expectedEvent
+        }
 
-    test("Fetching event that doesn't exist throws NoSuchElementException") {
-        every { eventRepo.getById(expectedEvent.id) } returns null
-        shouldThrow<NoSuchElementException> { service.getEvent(expectedEvent.id) }
-    }
-})
+        test("Fetching event that doesn't exist throws NoSuchElementException") {
+            every { eventRepo.getById(expectedEvent.id) } returns null
+            shouldThrow<NoSuchElementException> { service.getEvent(expectedEvent.id) }
+        }
+    })

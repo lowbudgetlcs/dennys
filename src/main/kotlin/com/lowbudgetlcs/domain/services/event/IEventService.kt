@@ -40,7 +40,10 @@ interface IEventService {
      * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories
      * fail.
      */
-    fun patchEvent(id: EventId, update: EventUpdate): Event
+    fun patchEvent(
+        id: EventId,
+        update: EventUpdate,
+    ): Event
 
     /**
      * Fetches all events and includes teams that are registered to the event
@@ -71,7 +74,10 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist
      */
-    fun addTeam(eventId: EventId, teamId: TeamId): EventWithTeams
+    fun addTeam(
+        eventId: EventId,
+        teamId: TeamId,
+    ): EventWithTeams
 
     /**
      * Unassociate a team with an event
@@ -82,5 +88,8 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist
      */
-    fun removeTeam(eventId: EventId, teamId: TeamId): EventWithTeams
+    fun removeTeam(
+        eventId: EventId,
+        teamId: TeamId,
+    ): EventWithTeams
 }

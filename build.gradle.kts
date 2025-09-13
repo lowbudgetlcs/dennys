@@ -74,8 +74,8 @@ tasks.matching { it.name.startsWith("runKtlintFormatOverJooqSourceSet") }.config
 tasks.withType<KtLintCheckTask>().configureEach {
     exclude("**/org/jooq/**")
     exclude("src/main/kotlin/org/jooq/**")
-
 }
+
 tasks.withType<KtLintFormatTask>().configureEach {
     exclude("**/org/jooq/**")
     exclude("src/main/kotlin/org/jooq/**")

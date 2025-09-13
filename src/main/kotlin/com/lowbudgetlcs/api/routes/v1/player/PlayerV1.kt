@@ -7,10 +7,7 @@ import com.lowbudgetlcs.domain.services.player.PlayerService
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*
 
-
-fun Route.playerRoutesV1(
-    playerService: PlayerService
-) {
+fun Route.playerRoutesV1(playerService: PlayerService) {
     route("/player") {
         install(RequestValidation) {
             validate<NewPlayerDto> { dto ->

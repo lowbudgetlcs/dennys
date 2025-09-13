@@ -7,5 +7,5 @@ data class TeamDto(
     val id: Int,
     val name: String,
     val logoName: String?,
-    val eventId: Int?
+    val eventId: Int?,
 )

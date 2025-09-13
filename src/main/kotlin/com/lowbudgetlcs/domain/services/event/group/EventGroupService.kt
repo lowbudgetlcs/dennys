@@ -7,8 +7,10 @@ import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.event.group.IEventGroupRepository
 
-class EventGroupService(private val eventGroupRepo: IEventGroupRepository, private val eventRepo: IEventRepository) :
-    IEventGroupService {
+class EventGroupService(
+    private val eventGroupRepo: IEventGroupRepository,
+    private val eventRepo: IEventRepository,
+) : IEventGroupService {
     override fun getAllEventGroups(): List<EventGroup> = eventGroupRepo.getAll()
 
     override fun getEventGroupWithEvents(id: EventGroupId): List<EventGroupWithEvents> = TODO("Not implemented.")

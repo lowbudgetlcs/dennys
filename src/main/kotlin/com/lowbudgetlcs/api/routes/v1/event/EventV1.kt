@@ -6,7 +6,10 @@ import com.lowbudgetlcs.domain.services.series.ISeriesService
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*
 
-fun Route.eventRoutesV1(eventService: IEventService, seriesService: ISeriesService) {
+fun Route.eventRoutesV1(
+    eventService: IEventService,
+    seriesService: ISeriesService,
+) {
     route("/event") {
         install(RequestValidation) {
             validate<CreateEventDto> { dto ->

@@ -18,9 +18,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.accountEndpointsV1(
-    accountService: AccountService
-) {
+fun Route.accountEndpointsV1(accountService: AccountService) {
     post<AccountResourcesV1> {
         call.setCidContext {
             logger.info("📩 Received POST /v1/account")

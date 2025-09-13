@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class AcountDto(
     val id: Int,
     val riotPuuid: String,
-    val playerId: Int?
+    val playerId: Int?,
 )

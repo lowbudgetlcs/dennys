@@ -7,13 +7,14 @@ data class EventUpdate(
     val description: String? = null,
     val startDate: Instant? = null,
     val endDate: Instant? = null,
-    val status: EventStatus? = null
+    val status: EventStatus? = null,
 )
 
-fun Event.patch(update: EventUpdate): Event = copy(
-    name = update.name ?: this.name,
-    description = update.description ?: this.description,
-    startDate = update.startDate ?: this.startDate,
-    endDate = update.endDate ?: this.endDate,
-    status = update.status ?: this.status,
-)
+fun Event.patch(update: EventUpdate): Event =
+    copy(
+        name = update.name ?: this.name,
+        description = update.description ?: this.description,
+        startDate = update.startDate ?: this.startDate,
+        endDate = update.endDate ?: this.endDate,
+        status = update.status ?: this.status,
+    )
