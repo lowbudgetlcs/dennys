@@ -63,6 +63,6 @@ hook:
 format:
 	./gradlew ktlintFormat
 
-# Checks lints from detekt and ktlint (this is done automatically by the pre-commit hook if installed)
+# Checks lints from detekt and ktlint (we should be doing this passively to fix lints)
 check:
 	./gradlew ktlintCheck detekt

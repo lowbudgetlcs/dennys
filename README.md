@@ -140,7 +140,9 @@ The `Makefile` contains many useful commands to build/run this application local
 * `make stop` - Stops all containers, and removes them. It is a good habit to run this after ctrl-C-ing `make run`.
 * `make db` - Starts the database and pgadmin.
 * `make swag` - Starts the Swagger Editor, accessible within your browser.
-
+* `make hook` - Installs pre-commit hook, recommended to do first
+* `make format` - Manual format (this is done automatically by the pre-commit hook if installed)
+* `make check` - Checks lints from detekt and ktlint
 
 Below are example post-match callbacks Riot will send when a tournament game completes:
 

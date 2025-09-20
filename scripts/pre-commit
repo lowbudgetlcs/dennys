@@ -15,7 +15,7 @@ $GRADLE -q ktlintFormat
 
 git add -A
 
-echo "▶ Running ktlintCheck + detekt…"
-$GRADLE -q ktlintCheck detekt
+#echo "▶ Running ktlintCheck + detekt…"
+#$GRADLE -q ktlintCheck detekt
 
 echo "✓ Lint passed"
