@@ -48,17 +48,20 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.apiRoutes() {
     // Manual dependency wiring. Could be extracted to a DI framework.
-    val riotHttpClient = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    encodeDefaults = true
-                    serializersModule = SerializersModule {
-                        contextual(Instant::class, InstantSerializer)
-                    }
-                })
+    val riotHttpClient =
+        HttpClient(CIO) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        encodeDefaults = true
+                        serializersModule =
+                            SerializersModule {
+                                contextual(Instant::class, InstantSerializer)
+                            }
+                    },
+                )
+            }
         }
-    }
     val riotAccountGateway = RiotAccountGateway(client = riotHttpClient, apiKey = appConfig.riot.key)
 
     val accountRepository: IAccountRepository = AccountRepository(Database.dslContext)
@@ -73,26 +76,27 @@ fun Route.apiRoutes() {
     val seriesRepository: ISeriesRepository = SeriesRepository(Database.dslContext)
     val seriesService = SeriesService(seriesRepository, teamRepository)
 
-
     val metadataRepository = MetadataRepository(Database.dslContext)
-    val riotTournamentGateway = RiotTournamentGateway(
-        metadataRepo = metadataRepository,
-        client = riotHttpClient,
-        apiKey = appConfig.riot.key,
-        useStubs = appConfig.riot.usestubs,
-    )
+    val riotTournamentGateway =
+        RiotTournamentGateway(
+            metadataRepo = metadataRepository,
+            client = riotHttpClient,
+            apiKey = appConfig.riot.key,
+            useStubs = appConfig.riot.usestubs,
+        )
 
     val eventRepository = EventRepository(Database.dslContext)
     val eventService = EventService(eventRepository, riotTournamentGateway, teamRepository, seriesRepository)
 
     val gameRepository: IGameRepository = GameRepository(Database.dslContext)
-    val gameService = GameService(
-        gameRepo = gameRepository,
-        teamRepo = teamRepository,
-        seriesRepo = seriesRepository,
-        eventRepo = eventRepository,
-        gate = riotTournamentGateway
-    )
+    val gameService =
+        GameService(
+            gameRepo = gameRepository,
+            teamRepo = teamRepository,
+            seriesRepo = seriesRepository,
+            eventRepo = eventRepository,
+            gate = riotTournamentGateway,
+        )
 
     route("/api/v1") {
         route("/riot-callback") {
@@ -108,7 +112,7 @@ fun Route.apiRoutes() {
         playerRoutesV1(playerService = playerService)
         accountRoutesV1(accountService = accountService)
         seriesRoutesV1(
-            gameService = gameService
+            gameService = gameService,
         )
     }
 }

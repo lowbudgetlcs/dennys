@@ -5,10 +5,7 @@ import com.lowbudgetlcs.domain.services.account.AccountService
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*
 
-
-fun Route.accountRoutesV1(
-    accountService: AccountService
-) {
+fun Route.accountRoutesV1(accountService: AccountService) {
     route("/account") {
         install(RequestValidation) {
             validate<NewAccountDto> { dto ->

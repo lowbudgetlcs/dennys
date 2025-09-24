@@ -7,5 +7,9 @@ import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 
 interface IRiotTournamentGateway {
     suspend fun create(tournamentName: String): RiotTournament?
-    suspend fun getCode(riotTournamentId: RiotTournamentId, newShortcode: NewShortcode): RiotShortcodeDto?
+
+    suspend fun getCode(
+        riotTournamentId: RiotTournamentId,
+        newShortcode: NewShortcode,
+    ): RiotShortcodeDto?
 }

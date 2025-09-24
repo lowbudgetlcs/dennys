@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class MatchPerkStyle(
     @SerialName("description") val description: String,
     @SerialName("selections") val selections: List<PerkStyleSelection>,
-    @SerialName("style") val style: Int
+    @SerialName("style") val style: Int,
 )

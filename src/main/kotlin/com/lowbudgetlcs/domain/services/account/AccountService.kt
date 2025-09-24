@@ -11,7 +11,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class AccountService(
-    private val accountRepository: IAccountRepository, private val riotAccountGateway: IRiotAccountGateway
+    private val accountRepository: IAccountRepository,
+    private val riotAccountGateway: IRiotAccountGateway,
 ) : IAccountService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -42,5 +43,4 @@ class AccountService(
         logger.debug("Checking if '$puuid' is taken...")
         return accountRepository.getAccountByPuuid(puuid.value) != null
     }
-
 }

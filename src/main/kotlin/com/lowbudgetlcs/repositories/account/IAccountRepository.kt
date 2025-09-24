@@ -6,7 +6,10 @@ import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
 
 interface IAccountRepository {
     fun insert(newAccount: NewRiotAccount): RiotAccount?
+
     fun getAll(): List<RiotAccount>
+
     fun getById(accountId: RiotAccountId): RiotAccount?
+
     fun getAccountByPuuid(puuid: String): RiotAccount?
 }

@@ -5,9 +5,7 @@ import com.lowbudgetlcs.domain.services.team.TeamService
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.routing.*
 
-fun Route.teamRoutesV1(
-    teamService: TeamService
-) {
+fun Route.teamRoutesV1(teamService: TeamService) {
     route("/team") {
         install(RequestValidation) {
             validate<NewTeamDto> { dto ->

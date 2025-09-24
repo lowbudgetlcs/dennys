@@ -8,8 +8,15 @@ import com.lowbudgetlcs.domain.models.team.TeamId
 
 interface ISeriesRepository {
     fun insert(newSeries: NewSeries): Series?
+
     fun getById(id: SeriesId): Series?
+
     fun getAllByEventId(id: EventId): List<Series>
-    fun getByParticipantIds(team1Id: TeamId, team2Id: TeamId): Series?
+
+    fun getByParticipantIds(
+        team1Id: TeamId,
+        team2Id: TeamId,
+    ): Series?
+
     fun delete(id: SeriesId)
 }

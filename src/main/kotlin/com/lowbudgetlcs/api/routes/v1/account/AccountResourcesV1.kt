@@ -6,6 +6,7 @@ import io.ktor.resources.*
 class AccountResourcesV1 {
     @Resource("{accountId}")
     data class ById(
-        val parent: AccountResourcesV1 = AccountResourcesV1(), val accountId: Int
+        val parent: AccountResourcesV1 = AccountResourcesV1(),
+        val accountId: Int,
     )
 }

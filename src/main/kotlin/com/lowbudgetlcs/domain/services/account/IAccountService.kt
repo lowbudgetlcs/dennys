@@ -6,6 +6,8 @@ import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
 
 interface IAccountService {
     fun getAccount(accountId: RiotAccountId): RiotAccount
+
     fun getAllAccounts(): List<RiotAccount>
+
     suspend fun createAccount(account: NewRiotAccount): RiotAccount
 }

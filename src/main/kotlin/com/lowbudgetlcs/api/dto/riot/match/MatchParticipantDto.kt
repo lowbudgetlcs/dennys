@@ -16,7 +16,6 @@ data class MatchParticipantDto(
     @SerialName("championName") val championName: String,
     @SerialName("role") val role: String?, // Can be an Enum if needed
     @SerialName("individualPosition") val position: String?,
-
     // **Performance Metrics**
     @SerialName("kills") val kills: Int,
     @SerialName("deaths") val deaths: Int,
@@ -32,7 +31,6 @@ data class MatchParticipantDto(
     @SerialName("damageDealtToTurrets") val damageDealtToTurrets: Long,
     @SerialName("longestTimeSpentLiving") val longestTimeSpentLiving: Long,
     @SerialName("largestCriticalStrike") val largestCriticalStrike: Int,
-
     // **Multi-kill Statistics**
     @SerialName("largestMultiKill") val largestMultiKill: Short,
     @SerialName("largestKillingSpree") val largestKillingSpree: Short,
@@ -40,15 +38,12 @@ data class MatchParticipantDto(
     @SerialName("tripleKills") val tripleKills: Short,
     @SerialName("quadraKills") val quadraKills: Short,
     @SerialName("pentaKills") val pentaKills: Short,
-
     // **First Blood**
     @SerialName("firstBloodAssist") val firstBloodAssist: Boolean,
     @SerialName("firstBloodKill") val firstBloodKill: Boolean,
-
     // **Creep Score**
     @SerialName("totalMinionsKilled") val totalMinionsKilled: Int,
     @SerialName("neutralMinionsKilled") val neutralMinionsKilled: Int,
-
     // **Items**
     @SerialName("item0") val item0: Int,
     @SerialName("item1") val item1: Int,
@@ -57,17 +52,13 @@ data class MatchParticipantDto(
     @SerialName("item4") val item4: Int,
     @SerialName("item5") val item5: Int,
     @SerialName("item6") val item6: Int,
-
     // **Perks**
     @SerialName("perks") val perks: MatchParticipantPerks,
-
     // **Summoner Spells**
     @SerialName("summoner1Id") val summoner1Id: Int,
     @SerialName("summoner2Id") val summoner2Id: Int,
-
     // **Win Status**
     @SerialName("win") val win: Boolean,
-
     // **Player Interactions - Pings**
     @SerialName("allInPings") val allInPings: Short,
     @SerialName("assistMePings") val assistMePings: Short,
@@ -79,7 +70,6 @@ data class MatchParticipantDto(
     @SerialName("onMyWayPings") val onMyWayPings: Short,
     @SerialName("needVisionPings") val needVisionPings: Short,
     @SerialName("pushPings") val pushPings: Short,
-
     // **Objective Stats**
     @SerialName("baronKills") val baronKills: Short,
     @SerialName("dragonKills") val dragonKills: Short,
@@ -91,11 +81,9 @@ data class MatchParticipantDto(
     @SerialName("inhibitorTakedowns") val inhibitorTakedowns: Short,
     @SerialName("inhibitorsLost") val inhibitorsLost: Short,
     @SerialName("objectivesStolen") val objectivesStolen: Short,
-
-
     // **Vision Stats**
     @SerialName("visionScore") val visionScore: Long,
     @SerialName("detectorWardsPlaced") val detectorWardsPlaced: Short,
     @SerialName("wardsKilled") val wardsKilled: Short,
-    @SerialName("wardsPlaced") val wardsPlaced: Short
+    @SerialName("wardsPlaced") val wardsPlaced: Short,
 )

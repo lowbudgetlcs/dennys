@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class RiotAccountDto(
     @SerialName("puuid") val puuid: String,
     @SerialName("gameName") val gameName: String? = null,
-    @SerialName("tagLine") val tagLine: String? = null
+    @SerialName("tagLine") val tagLine: String? = null,
 )

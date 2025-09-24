@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class PlayerDto(
     val id: Int,
     val name: String,
-    val accounts: List<AcountDto>
+    val accounts: List<AcountDto>,
 )

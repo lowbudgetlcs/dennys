@@ -3,7 +3,7 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev seed
+.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev seed hook format check
 
 # Build and run by default
 all: build run
@@ -54,3 +54,15 @@ jooq:
 # Run tests
 test:
 	./gradlew test itest
+
+# Run to install pre-commit hooks (Recommended to do first)
+hook:
+	./gradlew installGitHooks
+
+# Manual format (this is done automatically by the pre-commit hook if installed)
+format:
+	./gradlew ktlintFormat
+
+# Checks lints from detekt and ktlint (we should be doing this passively to fix lints)
+check:
+	./gradlew ktlintCheck detekt

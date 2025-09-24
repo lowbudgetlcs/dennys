@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventGroupAddEventDto(
-    val eventId: Int
+    val eventId: Int,
 )

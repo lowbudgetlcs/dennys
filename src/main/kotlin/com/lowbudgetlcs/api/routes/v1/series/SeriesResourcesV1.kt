@@ -4,7 +4,8 @@ import io.ktor.resources.*
 
 @Resource("/")
 class SeriesResourcesV1 {
-
     @Resource("game")
-    data class Game(val parent: SeriesResourcesV1 = SeriesResourcesV1())
+    data class Game(
+        val parent: SeriesResourcesV1 = SeriesResourcesV1(),
+    )
 }

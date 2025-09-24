@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateGameDto(
-    val blueTeamId: Int, val redTeamId: Int
+    val blueTeamId: Int,
+    val redTeamId: Int,
 )

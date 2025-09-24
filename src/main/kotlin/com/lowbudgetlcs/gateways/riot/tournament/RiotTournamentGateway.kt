@@ -18,13 +18,12 @@ import io.ktor.http.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
 class RiotTournamentGateway(
     private val metadataRepo: IMetadataRepository,
     private val client: HttpClient,
     private val apiKey: String,
     private val useStubs: Boolean,
-    private val baseUrl: String = "https://americas.api.riotgames.com"
+    private val baseUrl: String = "https://americas.api.riotgames.com",
 ) : IRiotTournamentGateway {
     private val url: String by lazy {
         if (useStubs) "$baseUrl/lol/tournament-stub/v5" else "$baseUrl/lol/tournament/v5"
@@ -34,16 +33,18 @@ class RiotTournamentGateway(
     override suspend fun create(tournamentName: String): RiotTournament {
         logger.debug("Creating tournament named '$tournamentName'...")
         val providerId = metadataRepo.getProviderId() ?: throw DatabaseException("Cannot find riot provider id.")
-        val res = client.post("$url/tournaments") {
-            headers {
-                append("X-Riot-Token", apiKey)
+        val res =
+            client.post("$url/tournaments") {
+                headers {
+                    append("X-Riot-Token", apiKey)
+                }
+                contentType(ContentType.Application.Json)
+                setBody(RiotTournamentParametersDto(tournamentName, providerId))
             }
-            contentType(ContentType.Application.Json)
-            setBody(RiotTournamentParametersDto(tournamentName, providerId))
-        }
         when (res.status) {
             HttpStatusCode.OK -> return RiotTournament(
-                id = res.body<Int>().toRiotTournamentId(), name = tournamentName
+                id = res.body<Int>().toRiotTournamentId(),
+                name = tournamentName,
             )
 
             else -> {
@@ -53,22 +54,24 @@ class RiotTournamentGateway(
     }
 
     override suspend fun getCode(
-        riotTournamentId: RiotTournamentId, newShortcode: NewShortcode
+        riotTournamentId: RiotTournamentId,
+        newShortcode: NewShortcode,
     ): RiotShortcodeDto {
         logger.debug("Fetching tournament code for tournament '$riotTournamentId'...")
         val body = newShortcode.toShortcodeParametersDto()
         logger.debug(body.toString())
-        val res: HttpResponse = client.post("$url/codes") {
-            url {
-                parameters.append("tournamentId", "${riotTournamentId.value}")
-                parameters.append("count", "1")
+        val res: HttpResponse =
+            client.post("$url/codes") {
+                url {
+                    parameters.append("tournamentId", "${riotTournamentId.value}")
+                    parameters.append("count", "1")
+                }
+                headers {
+                    append("X-Riot-Token", apiKey)
+                }
+                contentType(ContentType.Application.Json)
+                setBody(body)
             }
-            headers {
-                append("X-Riot-Token", apiKey)
-            }
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
         when (res.status) {
             HttpStatusCode.OK -> {
                 logger.debug("Successfully created codes.")

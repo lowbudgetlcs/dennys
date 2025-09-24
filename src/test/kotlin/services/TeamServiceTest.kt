@@ -12,100 +12,102 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 
-class TeamServiceTest : StringSpec({
+class TeamServiceTest :
+    StringSpec({
 
-    val repo = mockk<ITeamRepository>(relaxed = false)
-    val service = TeamService(repo)
+        val repo = mockk<ITeamRepository>(relaxed = false)
+        val service = TeamService(repo)
 
-    beforeTest { clearAllMocks() }
+        beforeTest { clearAllMocks() }
 
-    "createTeam succeeds for valid input" {
-        val newTeam = NewTeam(TeamName("Golden Guardians"), null)
-        val created = Team(
-            id = TeamId(1),
-            name = TeamName("Golden Guardians"),
-            logoName = null,
-            eventId = null
-        )
+        "createTeam succeeds for valid input" {
+            val newTeam = NewTeam(TeamName("Golden Guardians"), null)
+            val created =
+                Team(
+                    id = TeamId(1),
+                    name = TeamName("Golden Guardians"),
+                    logoName = null,
+                    eventId = null,
+                )
 
-        every { repo.insert(newTeam) } returns created
+            every { repo.insert(newTeam) } returns created
 
-        service.createTeam(newTeam) shouldBe created
+            service.createTeam(newTeam) shouldBe created
 
-        verify(exactly = 1) { repo.insert(newTeam) }
-    }
-
-    "createTeam fails for blank name" {
-        shouldThrow<IllegalArgumentException> {
-            service.createTeam(NewTeam(TeamName(""), null))
+            verify(exactly = 1) { repo.insert(newTeam) }
         }
-        // repo.insert should never be called
-        verify(exactly = 0) { repo.insert(any()) }
-    }
 
-    "createTeam fails for too-long name" {
-        shouldThrow<IllegalArgumentException> {
-            service.createTeam(NewTeam(TeamName("x".repeat(81)), null))
+        "createTeam fails for blank name" {
+            shouldThrow<IllegalArgumentException> {
+                service.createTeam(NewTeam(TeamName(""), null))
+            }
+            // repo.insert should never be called
+            verify(exactly = 0) { repo.insert(any()) }
         }
-        verify(exactly = 0) { repo.insert(any()) }
-    }
 
-    "getAllTeams returns repo data" {
-        val t1 = Team(TeamId(1), TeamName("A"), null, null)
-        val t2 = Team(TeamId(2), TeamName("B"), TeamLogoName("b.png"), null)
+        "createTeam fails for too-long name" {
+            shouldThrow<IllegalArgumentException> {
+                service.createTeam(NewTeam(TeamName("x".repeat(81)), null))
+            }
+            verify(exactly = 0) { repo.insert(any()) }
+        }
 
-        every { repo.getAll() } returns listOf(t1, t2)
+        "getAllTeams returns repo data" {
+            val t1 = Team(TeamId(1), TeamName("A"), null, null)
+            val t2 = Team(TeamId(2), TeamName("B"), TeamLogoName("b.png"), null)
 
-        val result = service.getAllTeams()
-        result.map { it.id } shouldContainExactly listOf(t1.id, t2.id)
+            every { repo.getAll() } returns listOf(t1, t2)
 
-        verify(exactly = 1) { repo.getAll() }
-    }
+            val result = service.getAllTeams()
+            result.map { it.id } shouldContainExactly listOf(t1.id, t2.id)
 
-    "getTeam throws for unknown id" {
-        val id = TeamId(999)
-        every { repo.getById(id) } returns null
+            verify(exactly = 1) { repo.getAll() }
+        }
 
-        val ex = shouldThrow<NoSuchElementException> { service.getTeam(id) }
-        ex.message shouldBe "Team not found"
+        "getTeam throws for unknown id" {
+            val id = TeamId(999)
+            every { repo.getById(id) } returns null
 
-        verify(exactly = 1) { repo.getById(id) }
-    }
+            val ex = shouldThrow<NoSuchElementException> { service.getTeam(id) }
+            ex.message shouldBe "Team not found"
 
-    "renameTeam updates name" {
-        val id = TeamId(5)
-        val updated = Team(id, TeamName("New"), null, null)
+            verify(exactly = 1) { repo.getById(id) }
+        }
 
-        every { repo.updateTeamName(id, TeamName("New")) } returns updated
+        "renameTeam updates name" {
+            val id = TeamId(5)
+            val updated = Team(id, TeamName("New"), null, null)
 
-        service.renameTeam(id, "New") shouldBe updated
+            every { repo.updateTeamName(id, TeamName("New")) } returns updated
 
-        verify(exactly = 1) { repo.updateTeamName(id, TeamName("New")) }
-    }
+            service.renameTeam(id, "New") shouldBe updated
 
-    "renameTeam rejects blank and overlong names" {
-        val id = TeamId(3)
+            verify(exactly = 1) { repo.updateTeamName(id, TeamName("New")) }
+        }
 
-        shouldThrow<IllegalArgumentException> { service.renameTeam(id, "") }
-        shouldThrow<IllegalArgumentException> { service.renameTeam(id, "x".repeat(81)) }
+        "renameTeam rejects blank and overlong names" {
+            val id = TeamId(3)
 
-        verify(exactly = 0) { repo.updateTeamName(any(), any()) }
-    }
+            shouldThrow<IllegalArgumentException> { service.renameTeam(id, "") }
+            shouldThrow<IllegalArgumentException> { service.renameTeam(id, "x".repeat(81)) }
 
-    "updateLogoName sets logo when non-null" {
-        val id = TeamId(7)
-        val updated = Team(id, TeamName("Logo Team"), TeamLogoName("logo.png"), null)
+            verify(exactly = 0) { repo.updateTeamName(any(), any()) }
+        }
 
-        every { repo.updateTeamLogoName(id, TeamLogoName("logo.png")) } returns updated
+        "updateLogoName sets logo when non-null" {
+            val id = TeamId(7)
+            val updated = Team(id, TeamName("Logo Team"), TeamLogoName("logo.png"), null)
 
-        service.updateLogoName(id, "logo.png") shouldBe updated
+            every { repo.updateTeamLogoName(id, TeamLogoName("logo.png")) } returns updated
 
-        verify(exactly = 1) { repo.updateTeamLogoName(id, TeamLogoName("logo.png")) }
-    }
+            service.updateLogoName(id, "logo.png") shouldBe updated
 
-    "updateLogoName rejects null" {
-        val id = TeamId(8)
-        shouldThrow<IllegalArgumentException> { service.updateLogoName(id, null) }
-        verify(exactly = 0) { repo.updateTeamLogoName(any(), any()) }
-    }
-})
+            verify(exactly = 1) { repo.updateTeamLogoName(id, TeamLogoName("logo.png")) }
+        }
+
+        "updateLogoName rejects null" {
+            val id = TeamId(8)
+            shouldThrow<IllegalArgumentException> { service.updateLogoName(id, null) }
+            verify(exactly = 0) { repo.updateTeamLogoName(any(), any()) }
+        }
+    })

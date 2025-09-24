@@ -10,14 +10,15 @@ import javax.sql.DataSource
 object Database {
     private val dbConfig: DatabaseConfig = appConfig.database
     private val dataSource: DataSource by lazy {
-        val config = HikariConfig().apply {
-            jdbcUrl = dbConfig.url.value
-            password = dbConfig.password.value
-            maximumPoolSize = 30
-            minimumIdle = 5
-            idleTimeout = 10000
-            connectionTimeout = 30000
-        }
+        val config =
+            HikariConfig().apply {
+                jdbcUrl = dbConfig.url.value
+                password = dbConfig.password.value
+                maximumPoolSize = 30
+                minimumIdle = 5
+                idleTimeout = 10000
+                connectionTimeout = 30000
+            }
         HikariDataSource(config)
     }
     val dslContext = DSL.using(dataSource, SQLDialect.POSTGRES)

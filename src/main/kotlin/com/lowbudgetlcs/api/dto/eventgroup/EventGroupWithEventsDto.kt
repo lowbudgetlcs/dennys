@@ -5,5 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventGroupWithEventsDto(
-    val id: Integer, val name: String, val events: List<EventDto>
+    val id: Integer,
+    val name: String,
+    val events: List<EventDto>,
 )

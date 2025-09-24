@@ -19,5 +19,5 @@ data class EventWithTeamsDto(
     val endDate: Instant,
     val status: EventStatus,
     val tournamentId: Int,
-    val teams: List<TeamDto>
+    val teams: List<TeamDto>,
 )

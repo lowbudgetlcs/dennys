@@ -15,9 +15,10 @@ class EventService(
     private val eventRepo: IEventRepository,
     private val tournamentGateway: IRiotTournamentGateway,
     private val teamRepo: ITeamRepository,
-    private val seriesRepo: ISeriesRepository
+    private val seriesRepo: ISeriesRepository,
 ) : IEventService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     override fun getAllEvents(): List<Event> {
         logger.debug("Fetching all events...")
         return eventRepo.getAll()
@@ -46,14 +47,23 @@ class EventService(
         logger.debug("Creating new event...")
         logger.debug(event.toString())
         if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
-        if (!event.startDate.isBefore(event.endDate)) throw IllegalArgumentException("Events cannot start after they end.")
-        val t = tournamentGateway.create(event.name)
-            ?: throw GatewayException("Failed to register tournament with Riot Games.")
+        if (!event.startDate.isBefore(
+                event.endDate,
+            )
+        ) {
+            throw IllegalArgumentException("Events cannot start after they end.")
+        }
+        val t =
+            tournamentGateway.create(event.name)
+                ?: throw GatewayException("Failed to register tournament with Riot Games.")
         isNameTaken(event.name)
         return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
     }
 
-    override fun patchEvent(id: EventId, update: EventUpdate): Event {
+    override fun patchEvent(
+        id: EventId,
+        update: EventUpdate,
+    ): Event {
         logger.debug("Patching event '$id'...")
         logger.debug(update.toString())
         val event = getEvent(id)
@@ -66,7 +76,10 @@ class EventService(
         return eventRepo.update(event.patch(update)) ?: throw DatabaseException("Failed to update event.")
     }
 
-    override fun addTeam(eventId: EventId, teamId: TeamId): EventWithTeams {
+    override fun addTeam(
+        eventId: EventId,
+        teamId: TeamId,
+    ): EventWithTeams {
         logger.debug("Adding team '$teamId' to event '$eventId'...")
         doesEventExist(eventId)
         doesTeamExist(teamId)
@@ -74,7 +87,10 @@ class EventService(
         return getEventWithTeams(eventId)
     }
 
-    override fun removeTeam(eventId: EventId, teamId: TeamId): EventWithTeams {
+    override fun removeTeam(
+        eventId: EventId,
+        teamId: TeamId,
+    ): EventWithTeams {
         logger.debug("Removing team '$teamId' from event '$eventId'...")
         doesEventExist(eventId)
         doesTeamExist(teamId)
@@ -89,8 +105,11 @@ class EventService(
      */
     private fun isNameTaken(name: String): Boolean {
         logger.debug("Checking if '$name' is available...")
-        return if (eventRepo.getByName(name) != null) throw IllegalArgumentException("Event '${name}' already exists.")
-        else false
+        return if (eventRepo.getByName(name) != null) {
+            throw IllegalArgumentException("Event '$name' already exists.")
+        } else {
+            false
+        }
     }
 
     /**
@@ -100,8 +119,13 @@ class EventService(
      */
     private fun doesEventExist(eventId: EventId): Boolean {
         logger.debug("Checking if event '$eventId' exists...")
-        return if (eventRepo.getById(eventId) == null) throw NoSuchElementException("Event with id '${eventId.value}' not found.")
-        else true
+        return if (eventRepo.getById(eventId) ==
+            null
+        ) {
+            throw NoSuchElementException("Event with id '${eventId.value}' not found.")
+        } else {
+            true
+        }
     }
 
     /**
@@ -111,7 +135,12 @@ class EventService(
      */
     private fun doesTeamExist(teamId: TeamId): Boolean {
         logger.debug("Checking if team '$teamId' exists...")
-        return if (teamRepo.getById(teamId) == null) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
-        else true
+        return if (teamRepo.getById(teamId) ==
+            null
+        ) {
+            throw NoSuchElementException("Team with id '${teamId.value}' not found.")
+        } else {
+            true
+        }
     }
 }

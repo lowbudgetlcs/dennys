@@ -15,6 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+
 fun Route.seriesEndpointsV1(gameService: IGameService) {
     post<SeriesResourcesV1.Game> {
         call.setCidContext {

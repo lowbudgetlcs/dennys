@@ -24,5 +24,5 @@ data class MatchInfoDto(
     val platformId: String, // TODO: Make an Enum
     val queueId: Int, // TODO: Make an Enum
     val teams: List<MatchTeamDto>,
-    val tournamentCode: String
+    val tournamentCode: String,
 )

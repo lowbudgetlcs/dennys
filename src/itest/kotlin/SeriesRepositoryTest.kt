@@ -24,66 +24,72 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 import java.time.Instant
 
-class SeriesRepositoryTest : FunSpec({
-    val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
-        withCopyFileToContainer(
-            MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/"
-        )
-    }
-    val ds = install(JdbcDatabaseContainerExtension(postgres))
-    val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-    val repo = SeriesRepository(dsl)
-    lateinit var event: Event
-    lateinit var team1: Team
-    lateinit var team2: Team
-    lateinit var newSeries: NewSeries
+class SeriesRepositoryTest :
+    FunSpec({
+        val postgres =
+            PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+                withCopyFileToContainer(
+                    MountableFile.forClasspathResource("sql"),
+                    "/docker-entrypoint-initdb.d/",
+                )
+            }
+        val ds = install(JdbcDatabaseContainerExtension(postgres))
+        val dsl = DSL.using(ds, SQLDialect.POSTGRES)
+        val repo = SeriesRepository(dsl)
+        lateinit var event: Event
+        lateinit var team1: Team
+        lateinit var team2: Team
+        lateinit var newSeries: NewSeries
 
-    beforeSpec {
-        val e = EventRepository(dsl)
-        event = e.insert(
-            NewEvent(
-                name = "Test",
-                description = "Testing series.",
-                startDate = Instant.now(),
-                endDate = Instant.now().plusSeconds(3_600L),
-                status = EventStatus.ACTIVE
-            ), riotTournamentId = 1.toRiotTournamentId()
-        ) ?: throw Exception("Failed to insert initial event.")
-        val t = TeamRepository(dsl)
-        team1 = t.insert(
-            NewTeam(
-                name = "Team 1".toTeamName(),
-            )
-        ) ?: throw Exception("Failed to insert team 1.")
-        team2 = t.insert(
-            NewTeam(
-                name = "Team 2".toTeamName(),
-            )
-        ) ?: throw Exception("Failed to insert team 2.")
-        newSeries = NewSeries(
-            eventId = event.id, gamesToWin = 10, participantIds = listOf(team1.id, team2.id)
-        )
-    }
-
-
-    test("insert and fetch series by id") {
-
-        val created = repo.insert(newSeries)
-        created.shouldNotBeNull()
-        created.gamesToWin shouldBe newSeries.gamesToWin
-
-        val fetched = repo.getById(created.id)
-        fetched shouldBe created
-    }
-
-    test("get all series by eventId, series have teamIds in output") {
-        repeat(4) { repo.insert(newSeries) }
-        val series = repo.getAllByEventId(event.id)
-        series.shouldNotBeEmpty()
-        series.shouldHaveSize(5)
-        series.forEach { s ->
-            s.participants.shouldHaveSize(2)
-            s.participants.forEach { t -> t.shouldBeInstanceOf<TeamId>() }
+        beforeSpec {
+            val e = EventRepository(dsl)
+            event = e.insert(
+                NewEvent(
+                    name = "Test",
+                    description = "Testing series.",
+                    startDate = Instant.now(),
+                    endDate = Instant.now().plusSeconds(3_600L),
+                    status = EventStatus.ACTIVE,
+                ),
+                riotTournamentId = 1.toRiotTournamentId(),
+            ) ?: throw Exception("Failed to insert initial event.")
+            val t = TeamRepository(dsl)
+            team1 = t.insert(
+                NewTeam(
+                    name = "Team 1".toTeamName(),
+                ),
+            ) ?: throw Exception("Failed to insert team 1.")
+            team2 = t.insert(
+                NewTeam(
+                    name = "Team 2".toTeamName(),
+                ),
+            ) ?: throw Exception("Failed to insert team 2.")
+            newSeries =
+                NewSeries(
+                    eventId = event.id,
+                    gamesToWin = 10,
+                    participantIds = listOf(team1.id, team2.id),
+                )
         }
-    }
-})
+
+        test("insert and fetch series by id") {
+
+            val created = repo.insert(newSeries)
+            created.shouldNotBeNull()
+            created.gamesToWin shouldBe newSeries.gamesToWin
+
+            val fetched = repo.getById(created.id)
+            fetched shouldBe created
+        }
+
+        test("get all series by eventId, series have teamIds in output") {
+            repeat(4) { repo.insert(newSeries) }
+            val series = repo.getAllByEventId(event.id)
+            series.shouldNotBeEmpty()
+            series.shouldHaveSize(5)
+            series.forEach { s ->
+                s.participants.shouldHaveSize(2)
+                s.participants.forEach { t -> t.shouldBeInstanceOf<TeamId>() }
+            }
+        }
+    })

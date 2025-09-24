@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class PerkStats(
     @SerialName("defense") val defense: Int,
     @SerialName("flex") val flex: Int,
-    @SerialName("offense") val offense: Int
+    @SerialName("offense") val offense: Int,
 )

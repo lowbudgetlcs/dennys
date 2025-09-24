@@ -7,12 +7,13 @@ import kotlinx.coroutines.withContext
 import org.slf4j.MDC
 import java.util.*
 
-val CorrelationIdPlugin = createApplicationPlugin(name = "CorrelationIdPlugin") {
-    onCall { call ->
-        val cid = call.request.headers["X-Request-Id"] ?: UUID.randomUUID().toString().take(8)
-        call.attributes.put(CorrelationIdKey, cid)
+val CorrelationIdPlugin =
+    createApplicationPlugin(name = "CorrelationIdPlugin") {
+        onCall { call ->
+            val cid = call.request.headers["X-Request-Id"] ?: UUID.randomUUID().toString().take(8)
+            call.attributes.put(CorrelationIdKey, cid)
+        }
     }
-}
 
 val CorrelationIdKey = AttributeKey<String>("CID")
 

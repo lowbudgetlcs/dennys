@@ -7,7 +7,10 @@ import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 
 interface IEventGroupService {
     fun getAllEventGroups(): List<EventGroup>
+
     fun getEventGroupWithEvents(id: EventGroupId): List<EventGroupWithEvents>
+
     fun createEventGroup(group: NewEventGroup): EventGroup
+
     fun getEventGroupById(id: EventGroupId): EventGroup
 }

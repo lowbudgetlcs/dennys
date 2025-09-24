@@ -4,12 +4,16 @@ import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.player.Player
 
 @JvmInline
-value class TeamId(val value: Int)
+value class TeamId(
+    val value: Int,
+)
 
 fun Int.toTeamId(): TeamId = TeamId(this)
 
 @JvmInline
-value class TeamName(val value: String) {
+value class TeamName(
+    val value: String,
+) {
     init {
         require(value.length < 80) { "Team name must be less than 80 characters" }
     }
@@ -18,7 +22,9 @@ value class TeamName(val value: String) {
 fun String.toTeamName(): TeamName = TeamName(this)
 
 @JvmInline
-value class TeamLogoName(val value: String)
+value class TeamLogoName(
+    val value: String,
+)
 
 fun String.toTeamLogoName(): TeamLogoName = TeamLogoName(this)
 
@@ -26,12 +32,12 @@ data class Team(
     val id: TeamId,
     val name: TeamName,
     val logoName: TeamLogoName?,
-    val eventId: EventId?
+    val eventId: EventId?,
 )
 
 data class NewTeam(
     val name: TeamName,
-    val logoName: TeamLogoName? = null
+    val logoName: TeamLogoName? = null,
 )
 
 data class TeamWithPlayers(
@@ -39,6 +45,5 @@ data class TeamWithPlayers(
     val name: TeamName,
     val logoName: TeamLogoName?,
     val eventId: EventId?,
-    val players: List<Player>
+    val players: List<Player>,
 )
-

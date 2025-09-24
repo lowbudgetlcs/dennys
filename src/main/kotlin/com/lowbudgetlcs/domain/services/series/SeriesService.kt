@@ -11,15 +11,20 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class SeriesService(
-    private val seriesRepository: ISeriesRepository, private val teamRepository: ITeamRepository
+    private val seriesRepository: ISeriesRepository,
+    private val teamRepository: ITeamRepository,
 ) : ISeriesService {
-
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
         logger.debug(series.toString())
 
-        if (series.participantIds.count() < 2) throw IllegalArgumentException("Series must have at least two participants")
+        if (series.participantIds.count() <
+            2
+        ) {
+            throw IllegalArgumentException("Series must have at least two participants")
+        }
 
         if (series.gamesToWin < 1) throw IllegalArgumentException("Games to win must be at least 1")
 

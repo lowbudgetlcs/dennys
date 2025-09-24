@@ -13,5 +13,5 @@ data class PatchEventDto(
     val startDate: Instant? = null,
     @Contextual
     val endDate: Instant? = null,
-    val status: EventStatus? = null
+    val status: EventStatus? = null,
 )

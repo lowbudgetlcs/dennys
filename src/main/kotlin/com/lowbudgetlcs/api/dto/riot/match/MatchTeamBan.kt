@@ -6,6 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MatchTeamBan(
     @SerialName("championId") val championId: Int,
-    @SerialName("pickTurn") val pickTurn: Int
+    @SerialName("pickTurn") val pickTurn: Int,
 )
-

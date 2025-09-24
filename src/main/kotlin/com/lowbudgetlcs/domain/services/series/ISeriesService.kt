@@ -6,7 +6,6 @@ import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.EventId
 
 interface ISeriesService {
-
     /**
      * Create an event from a NewSeries.
      *
