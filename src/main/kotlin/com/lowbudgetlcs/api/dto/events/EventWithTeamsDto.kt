@@ -18,6 +18,6 @@ data class EventWithTeamsDto(
     @Contextual
     val endDate: Instant,
     val status: EventStatus,
-    val tournamentId: Int,
+    val eventGroupId: Int? = null,
     val teams: List<TeamDto>,
-)
+    )

@@ -14,4 +14,5 @@ data class CreateEventDto(
     @Contextual
     val endDate: Instant,
     val status: EventStatus,
+    val eventGroupId: Int? = null
 )
