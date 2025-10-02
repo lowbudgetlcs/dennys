@@ -2,6 +2,7 @@ package com.lowbudgetlcs.repositories.event.group
 
 import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
+import com.lowbudgetlcs.domain.models.events.group.EventGroupName
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 
 interface IEventGroupRepository {
@@ -10,4 +11,8 @@ interface IEventGroupRepository {
     fun getById(id: EventGroupId): EventGroup?
 
     fun insert(group: NewEventGroup): EventGroup?
+
+    fun getByName(name: EventGroupName): EventGroup?
+
+    fun update(update: EventGroup): EventGroup?
 }

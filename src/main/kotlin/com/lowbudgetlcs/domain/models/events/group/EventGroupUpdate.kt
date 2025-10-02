@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.models.events.group
 
 data class EventGroupUpdate(
-    val name: String? = null,
+    val name: EventGroupName? = null,
 )
 
 fun EventGroup.patch(update: EventGroupUpdate): EventGroup =

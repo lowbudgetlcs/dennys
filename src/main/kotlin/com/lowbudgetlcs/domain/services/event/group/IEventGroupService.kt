@@ -19,7 +19,7 @@ interface IEventGroupService {
         update: EventGroupUpdate,
     ): EventGroup
 
-    fun getEventGroupWithEvents(id: EventGroupId): List<EventGroupWithEvents>
+    fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents
 
     fun addEvent(
         eventGroupId: EventGroupId,

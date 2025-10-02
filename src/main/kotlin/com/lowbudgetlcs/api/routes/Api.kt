@@ -5,7 +5,7 @@ import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
-import com.lowbudgetlcs.api.routes.v1.eventgroup.eventGroupEndpointsV1
+import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
@@ -122,6 +122,6 @@ fun Route.apiRoutes() {
         seriesRoutesV1(
             gameService = gameService,
         )
-        eventGroupEndpointsV1(eventGroupService)
+        eventGroupRoutesV1(eventGroupService)
     }
 }

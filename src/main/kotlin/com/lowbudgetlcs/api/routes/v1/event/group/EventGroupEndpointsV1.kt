@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.routes.v1.eventgroup
+package com.lowbudgetlcs.api.routes.v1.event.group
 
 import com.lowbudgetlcs.api.dto.events.groups.CreateEventGroupDto
 import com.lowbudgetlcs.api.dto.events.groups.EventGroupAddEventDto
@@ -69,7 +69,7 @@ fun Route.eventGroupEndpointsV1(eventGroupService: IEventGroupService) {
         call.setCidContext {
             logCall(call)
             val groups = eventGroupService.getEventGroupWithEvents(route.eventGroupId.toEventGroupId())
-            call.respond(groups.map { it.toDto() })
+            call.respond(groups.toDto())
         }
     }
     post<EventGroupResourcesV1.ByIdEvents> { route ->

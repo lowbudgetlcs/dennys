@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.routes.v1.eventgroup
+package com.lowbudgetlcs.api.routes.v1.event.group
 
 import io.ktor.resources.Resource
 
