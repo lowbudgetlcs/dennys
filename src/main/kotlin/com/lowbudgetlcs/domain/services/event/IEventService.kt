@@ -1,6 +1,11 @@
 package com.lowbudgetlcs.domain.services.event
 
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.EventWithSeries
+import com.lowbudgetlcs.domain.models.events.EventWithTeams
+import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.team.TeamId
 
 interface IEventService {

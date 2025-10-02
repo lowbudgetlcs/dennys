@@ -1,13 +1,19 @@
 package com.lowbudgetlcs.repositories.series
 
-import com.lowbudgetlcs.domain.models.*
+import com.lowbudgetlcs.domain.models.NewSeries
+import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.SeriesId
+import com.lowbudgetlcs.domain.models.SeriesResult
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.models.toSeriesId
 import org.jooq.DSLContext
 import org.jooq.Record
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.count
+import org.jooq.impl.DSL.multiset
+import org.jooq.impl.DSL.select
 import org.jooq.storage.tables.references.SERIES
 import org.jooq.storage.tables.references.SERIES_RESULTS
 import org.jooq.storage.tables.references.TEAM_TO_SERIES

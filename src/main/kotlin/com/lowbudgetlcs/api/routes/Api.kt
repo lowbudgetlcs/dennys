@@ -5,12 +5,14 @@ import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
+import com.lowbudgetlcs.api.routes.v1.eventgroup.eventGroupEndpointsV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
 import com.lowbudgetlcs.appConfig
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.domain.services.event.EventService
+import com.lowbudgetlcs.domain.services.event.group.EventGroupService
 import com.lowbudgetlcs.domain.services.game.GameService
 import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.domain.services.series.SeriesService
@@ -20,6 +22,7 @@ import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGateway
 import com.lowbudgetlcs.repositories.account.AccountRepository
 import com.lowbudgetlcs.repositories.account.IAccountRepository
 import com.lowbudgetlcs.repositories.event.EventRepository
+import com.lowbudgetlcs.repositories.event.group.EventGroupRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.metadata.MetadataRepository
@@ -29,15 +32,17 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
@@ -98,6 +103,9 @@ fun Route.apiRoutes() {
             gate = riotTournamentGateway,
         )
 
+    val eventGroupRepository = EventGroupRepository(Database.dslContext)
+    val eventGroupService = EventGroupService(eventGroupRepository, eventRepository)
+
     route("/api/v1") {
         route("/riot-callback") {
             post {
@@ -114,5 +122,6 @@ fun Route.apiRoutes() {
         seriesRoutesV1(
             gameService = gameService,
         )
+        eventGroupEndpointsV1(eventGroupService)
     }
 }

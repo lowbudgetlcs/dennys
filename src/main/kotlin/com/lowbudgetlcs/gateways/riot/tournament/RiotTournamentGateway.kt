@@ -10,11 +10,15 @@ import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.metadata.IMetadataRepository
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

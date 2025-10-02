@@ -1,6 +1,14 @@
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.toEvent
+import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.models.team.*
+import com.lowbudgetlcs.domain.models.team.NewTeam
+import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.team.toTeam
+import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install

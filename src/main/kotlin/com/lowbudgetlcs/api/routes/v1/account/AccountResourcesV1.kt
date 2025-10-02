@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.account
 
-import io.ktor.resources.*
+import io.ktor.resources.Resource
 
 @Resource("/")
 class AccountResourcesV1 {

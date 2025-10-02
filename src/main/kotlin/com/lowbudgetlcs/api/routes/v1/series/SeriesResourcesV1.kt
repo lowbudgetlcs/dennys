@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.series
 
-import io.ktor.resources.*
+import io.ktor.resources.Resource
 
 @Resource("/")
 class SeriesResourcesV1 {

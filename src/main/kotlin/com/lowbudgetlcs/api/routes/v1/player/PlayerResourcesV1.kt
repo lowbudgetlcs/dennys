@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.player
 
-import io.ktor.resources.*
+import io.ktor.resources.Resource
 
 @Resource("/")
 class PlayerResourcesV1 {

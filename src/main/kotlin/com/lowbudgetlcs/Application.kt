@@ -2,9 +2,10 @@ package com.lowbudgetlcs
 
 import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.routes
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger

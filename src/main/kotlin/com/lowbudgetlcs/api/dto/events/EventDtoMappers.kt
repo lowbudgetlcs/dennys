@@ -4,7 +4,12 @@ import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.EventWithSeries
+import com.lowbudgetlcs.domain.models.events.EventWithTeams
+import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 

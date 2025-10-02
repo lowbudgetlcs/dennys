@@ -1,12 +1,16 @@
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import java.util.Properties
 import org.jooq.codegen.GenerationTool
-import org.jooq.meta.jaxb.*
+import org.jooq.meta.jaxb.Configuration
+import org.jooq.meta.jaxb.Database
+import org.jooq.meta.jaxb.ForcedType
+import org.jooq.meta.jaxb.Generator
+import org.jooq.meta.jaxb.Jdbc
 import org.jooq.meta.jaxb.Target
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
-import java.util.*
 
 class JooqGenerator : FunSpec({
     val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {

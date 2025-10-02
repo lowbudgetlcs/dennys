@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
-import io.ktor.resources.*
+import io.ktor.resources.Resource
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -20,4 +20,4 @@ data class EventWithTeamsDto(
     val status: EventStatus,
     val eventGroupId: Int? = null,
     val teams: List<TeamDto>,
-    )
+)
