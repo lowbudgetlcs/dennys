@@ -1,7 +1,6 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
-import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
@@ -9,11 +8,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.JsonConvertException
-import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.statuspages.StatusPages
@@ -24,11 +21,8 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.Instant
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
@@ -86,7 +80,7 @@ fun Application.routes() {
             exception<Throwable> { call, cause ->
                 logger.error("⚠️ Internal server error: $call", cause)
                 val code = HttpStatusCode.InternalServerError
-                val e = Error(code = code.value, message = cause.message ?: "Internal server error")
+                val e = Error(code = code.value)
                 call.respond(code, e)
             }
         }
@@ -97,17 +91,6 @@ fun Application.routes() {
             allowHeader("api_key")
             allowMethod(HttpMethod.Patch)
             allowMethod(HttpMethod.Delete)
-        }
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    serializersModule =
-                        SerializersModule {
-                            contextual(Instant::class, InstantSerializer)
-                        }
-                    encodeDefaults = true
-                },
-            )
         }
         install(CorrelationIdPlugin)
         install(Resources)
