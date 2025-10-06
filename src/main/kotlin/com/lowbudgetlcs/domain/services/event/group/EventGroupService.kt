@@ -64,20 +64,34 @@ class EventGroupService(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents {
-        TODO("Not yet implemented")
+        logger.info("Adding '$eventId' to event group '$eventGroupId'...")
+        val event =
+            eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
+        val group =
+            eventGroupRepo.getById(eventGroupId)
+                ?: throw NoSuchElementException("Event group with id '${eventGroupId.value}' not found.")
+        eventRepo.update(event.copy(eventGroupId = group.id))
+            ?: throw DatabaseException("Failed to add event to event group.")
+        return getEventGroupWithEvents(eventGroupId)
     }
 
     override fun removeEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents {
-        TODO("Not yet implemented")
+        logger.info("Removing '$eventId' from event group '$eventGroupId'...")
+        val event =
+            eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
+        eventRepo.update(event.copy(eventGroupId = null))
+            ?: throw DatabaseException("Failed to remove event from event group.")
+        return getEventGroupWithEvents(eventGroupId)
     }
 
     /**
      * Checks if an event name is taken.
+     *
+     * @param name the name of the event.
      * @return false if name is not taken.
-     * @throws IllegalArgumentException when name already exists.
      */
     fun isNameTaken(name: EventGroupName): Boolean {
         logger.debug("Checking if '$name' is available...")

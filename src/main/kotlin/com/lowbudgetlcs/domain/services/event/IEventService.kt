@@ -7,26 +7,31 @@ import com.lowbudgetlcs.domain.models.events.EventWithSeries
 import com.lowbudgetlcs.domain.models.events.EventWithTeams
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.repositories.DatabaseException
 
 interface IEventService {
-    /** Fetches all events. */
+    /**
+     *  Fetches all events.
+     *
+     * @return a list containing all events.
+     */
     fun getAllEvents(): List<Event>
 
     /**
      * Fetch an event by id.
      *
-     * @param com.lowbudgetlcs.domain.models.events.EventId the id of the event.
+     * @param EventId the id of the event.
      * @return the specified event.
      *
      * @throws NoSuchElementException when the event is not found.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repository fails.
+     * @throws DatabaseException when the underlying repository fails.
      */
     fun getEvent(id: EventId): Event
 
     /**
      * Create an event from a NewEvent and NewTournament.
      *
-     * @param com.lowbudgetlcs.domain.models.events.NewEvent event details.
+     * @param NewEvent event details.
      * @return the newly created event.
      *
      * @throws IllegalArgumentException if the event cannot be created.

@@ -29,19 +29,26 @@ class EventGroupRepository(
         return insertedId?.toEventGroupId()?.let(::getById)
     }
 
-    override fun getByName(name: EventGroupName): EventGroup? {
-        TODO("Not yet implemented")
-    }
+    override fun getByName(name: EventGroupName): EventGroup? =
+        select().where(EVENT_GROUPS.NAME.eq(name.value)).fetchOne()?.let(::rowToEventGroup)
 
     override fun update(update: EventGroup): EventGroup? {
-        TODO("Not yet implemented")
+        val insertedId =
+            dsl
+                .update(EVENT_GROUPS)
+                .set(EVENT_GROUPS.NAME, update.name.value)
+                .returning(EVENT_GROUPS.ID)
+                .fetchOne()
+                ?.get(EVENT_GROUPS.ID)
+        return insertedId?.toEventGroupId()?.let(::getById)
     }
 
     private fun select() =
-        dsl.select(
-            EVENT_GROUPS.ID,
-            EVENT_GROUPS.NAME,
-        )
+        dsl
+            .select(
+                EVENT_GROUPS.ID,
+                EVENT_GROUPS.NAME,
+            ).from(EVENT_GROUPS)
 
     private fun rowToEventGroup(row: Record): EventGroup? {
         val id = row[EVENT_GROUPS.ID]?.toEventGroupId() ?: return null
