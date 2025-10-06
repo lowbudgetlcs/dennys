@@ -44,7 +44,10 @@ class EventGroupService(
         logger.debug("Creating new event group...")
         logger.debug(group.toString())
         if (isNameTaken(group.name)) throw IllegalArgumentException("Event group '${group.name}' already exists.")
-        return eventGroupRepo.insert(group) ?: throw DatabaseException("Failed to create event group.")
+        val created = eventGroupRepo.insert(group) ?: throw DatabaseException("Failed to create event group.")
+        // TODO: How do we report errors from the following step? What if 1 event doesnt exist and 10 do? Hard problem...
+        group.events?.forEach { eventId -> addEvent(created.id, eventId) }
+        return created
     }
 
     override fun patchEventGroup(

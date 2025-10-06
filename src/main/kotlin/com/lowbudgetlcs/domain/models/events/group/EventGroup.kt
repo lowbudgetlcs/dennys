@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.models.events.group
 
 import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventId
 
 @JvmInline
 value class EventGroupId(
@@ -33,4 +34,5 @@ data class EventGroupWithEvents(
 
 data class NewEventGroup(
     val name: EventGroupName,
+    val events: List<EventId>? = null,
 )

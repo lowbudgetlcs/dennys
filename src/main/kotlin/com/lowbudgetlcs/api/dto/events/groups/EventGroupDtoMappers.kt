@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.models.events.group.EventGroupName
 import com.lowbudgetlcs.domain.models.events.group.EventGroupUpdate
 import com.lowbudgetlcs.domain.models.events.group.EventGroupWithEvents
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
+import com.lowbudgetlcs.domain.models.events.toEventId
 
 fun EventGroup.toDto(): EventGroupDto =
     EventGroupDto(
@@ -16,6 +17,7 @@ fun EventGroup.toDto(): EventGroupDto =
 fun CreateEventGroupDto.toNewEventGroup(): NewEventGroup =
     NewEventGroup(
         name = EventGroupName(name),
+        events = eventIds?.map { it.toEventId() },
     )
 
 fun PatchEventGroupDto.toEventGroupUpdate(): EventGroupUpdate =

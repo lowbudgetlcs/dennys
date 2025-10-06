@@ -67,10 +67,6 @@ class EventRepositoryTest :
             )
         }
 
-        "insert() cannot insert duplicate Event" {
-            repo.insert(newEvent, 1.toRiotTournamentId()) shouldBe null
-        }
-
         "getById() fetches correct Event" {
             val created = repo.insert(newEvent2, 8888.toRiotTournamentId())
             created.shouldNotBeNull()

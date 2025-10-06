@@ -55,6 +55,7 @@ class EventRepository(
                 .set(EVENTS.DESCRIPTION, event.description)
                 .set(EVENTS.START_DATE, event.startDate)
                 .set(EVENTS.END_DATE, event.endDate)
+                .set(EVENTS.EVENT_GROUP_ID, event.eventGroupId?.value)
                 .set(EVENTS.STATUS, event.status.name)
                 .where(EVENTS.ID.eq(event.id.value))
                 .returning(EVENTS.ID)
