@@ -49,6 +49,7 @@ fun Event.toDto(): EventDto =
         createdAt = createdAt,
         description = description,
         status = status,
+        eventGroupId = eventGroupId?.value,
     )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto =

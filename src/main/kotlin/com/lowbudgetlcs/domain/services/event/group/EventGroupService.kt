@@ -68,11 +68,11 @@ class EventGroupService(
         eventId: EventId,
     ): EventGroupWithEvents {
         logger.info("Adding '$eventId' to event group '$eventGroupId'...")
-        val event =
-            eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
         val group =
             eventGroupRepo.getById(eventGroupId)
                 ?: throw NoSuchElementException("Event group with id '${eventGroupId.value}' not found.")
+        val event =
+            eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
         eventRepo.update(event.copy(eventGroupId = group.id))
             ?: throw DatabaseException("Failed to add event to event group.")
         return getEventGroupWithEvents(eventGroupId)
