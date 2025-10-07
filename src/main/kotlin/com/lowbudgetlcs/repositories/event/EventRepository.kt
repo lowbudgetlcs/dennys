@@ -1,13 +1,16 @@
 package com.lowbudgetlcs.repositories.event
 
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
+import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import org.jooq.DSLContext
 import org.jooq.Record
-import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.storage.tables.references.EVENTS
 
 class EventRepository(
@@ -27,25 +30,22 @@ class EventRepository(
     override fun insert(
         newEvent: NewEvent,
         riotTournamentId: RiotTournamentId,
-    ): Event? =
-        try {
-            val insertedId =
-                dsl
-                    .insertInto(
-                        EVENTS,
-                    ).set(EVENTS.NAME, newEvent.name)
-                    .set(EVENTS.DESCRIPTION, newEvent.description)
-                    .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
-                    .set(EVENTS.START_DATE, newEvent.startDate)
-                    .set(EVENTS.END_DATE, newEvent.endDate)
-                    .set(EVENTS.STATUS, newEvent.status.name)
-                    .returning(EVENTS.ID)
-                    .fetchOne()
-                    ?.get(EVENTS.ID)
-            insertedId?.toEventId()?.let(::getById)
-        } catch (e: IntegrityConstraintViolationException) {
-            null
-        }
+    ): Event? {
+        val insertedId =
+            dsl
+                .insertInto(
+                    EVENTS,
+                ).set(EVENTS.NAME, newEvent.name)
+                .set(EVENTS.DESCRIPTION, newEvent.description)
+                .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
+                .set(EVENTS.START_DATE, newEvent.startDate)
+                .set(EVENTS.END_DATE, newEvent.endDate)
+                .set(EVENTS.STATUS, newEvent.status.name)
+                .returning(EVENTS.ID)
+                .fetchOne()
+                ?.get(EVENTS.ID)
+        return insertedId?.toEventId()?.let(::getById)
+    }
 
     override fun update(event: Event): Event? {
         val insertedId =
@@ -55,6 +55,7 @@ class EventRepository(
                 .set(EVENTS.DESCRIPTION, event.description)
                 .set(EVENTS.START_DATE, event.startDate)
                 .set(EVENTS.END_DATE, event.endDate)
+                .set(EVENTS.EVENT_GROUP_ID, event.eventGroupId?.value)
                 .set(EVENTS.STATUS, event.status.name)
                 .where(EVENTS.ID.eq(event.id.value))
                 .returning(EVENTS.ID)

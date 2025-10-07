@@ -4,7 +4,12 @@ import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.EventWithSeries
+import com.lowbudgetlcs.domain.models.events.EventWithTeams
+import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 
@@ -44,6 +49,7 @@ fun Event.toDto(): EventDto =
         createdAt = createdAt,
         description = description,
         status = status,
+        eventGroupId = eventGroupId?.value,
     )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto =
@@ -55,7 +61,6 @@ fun EventWithTeams.toDto(): EventWithTeamsDto =
         createdAt = createdAt,
         description = description,
         status = status,
-        tournamentId = riotTournamentId.value,
         teams = teams.map { t -> t.toDto() },
     )
 
@@ -68,6 +73,5 @@ fun EventWithSeries.toDto(): EventWithSeriesDto =
         createdAt = createdAt,
         description = description,
         status = status,
-        riotTournamentId = riotTournamentId.value,
         series = series.map { s -> s.toDto() },
     )

@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.event
 
-import io.ktor.resources.*
+import io.ktor.resources.Resource
 
 @Resource("/")
 class EventResourcesV1 {

@@ -4,8 +4,10 @@ import com.lowbudgetlcs.api.dto.players.AccountLinkRequestDto
 import com.lowbudgetlcs.api.dto.players.NewPlayerDto
 import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
 import com.lowbudgetlcs.domain.services.player.PlayerService
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.routing.*
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.ValidationResult
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.route
 
 fun Route.playerRoutesV1(playerService: PlayerService) {
     route("/player") {

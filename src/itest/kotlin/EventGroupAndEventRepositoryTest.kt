@@ -1,16 +1,16 @@
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.group.EventGroup
+import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
+import com.lowbudgetlcs.domain.models.events.group.toEventGroup
+import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
+import com.lowbudgetlcs.domain.models.events.group.toEventGroupName
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.models.team.NewTeam
-import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.team.toTeam
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.repositories.event.EventRepository
-import com.lowbudgetlcs.repositories.team.TeamRepository
+import com.lowbudgetlcs.repositories.event.group.EventGroupRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
@@ -25,7 +25,7 @@ import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class EventAndTeamRepositoryTest :
+class EventGroupAndEventRepositoryTest :
     StringSpec({
         val postgres =
             PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
@@ -33,8 +33,8 @@ class EventAndTeamRepositoryTest :
             }
         val ds = install(JdbcDatabaseContainerExtension(postgres))
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
+        val eventGroupRepo = EventGroupRepository(dslContext)
         val eventRepo = EventRepository(dslContext)
-        val teamRepo = TeamRepository(dslContext)
         // Data
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)
         val newEvent =
@@ -51,47 +51,52 @@ class EventAndTeamRepositoryTest :
                 createdAt = Instant.now(),
                 riotTournamentId = 1245.toRiotTournamentId(),
             )
-        val newTeam =
-            NewTeam(
-                name = "Test Team".toTeamName(),
+        val newGroup =
+            NewEventGroup(
+                name = "Test Group".toEventGroupName(),
             )
-        val expectedTeam =
-            newTeam.toTeam(
-                0.toTeamId(),
-                eventId = null,
+        val expectedGroup =
+            newGroup.toEventGroup(
+                0.toEventGroupId(),
             )
 
         fun checkEvent(event: Event) {
-            event.shouldBeEqualToIgnoringFields(expectedEvent, Event::id, Event::createdAt, Event::riotTournamentId)
+            event.shouldBeEqualToIgnoringFields(
+                expectedEvent,
+                Event::id,
+                Event::createdAt,
+                Event::riotTournamentId,
+                Event::eventGroupId,
+            )
         }
 
-        fun checkTeam(team: Team) {
-            team.shouldBeEqualToIgnoringFields(expectedTeam, Team::id, Team::eventId)
+        fun checkEventGroup(eventGroup: EventGroup) {
+            eventGroup.shouldBeEqualToIgnoringFields(expectedGroup, EventGroup::id)
+        }
+
+        "insert a new event group" {
+            val created = eventGroupRepo.insert(newGroup)
+            created.shouldNotBeNull()
+            checkEventGroup(created)
         }
 
         "insert a new event" {
-            val event = eventRepo.insert(newEvent, 1245.toRiotTournamentId())
-            event.shouldNotBeNull()
-            checkEvent(event)
+            val created = eventRepo.insert(newEvent, 1234.toRiotTournamentId())
+            created.shouldNotBeNull()
+            checkEvent(created)
+            created.eventGroupId shouldBe null
         }
 
-        "insert a new team" {
-            val team = teamRepo.insert(newTeam)
-            team.shouldNotBeNull()
-            checkTeam(team)
-            team.eventId shouldBe null
-        }
-
-        "add team to event" {
+        "add event to event group" {
+            val groups = eventGroupRepo.getAll()
+            groups.shouldNotBeEmpty()
+            val group = groups.first()
             val events = eventRepo.getAll()
             events.shouldNotBeEmpty()
             val event = events.first()
-            val teams = teamRepo.getAll()
-            teams.shouldNotBeEmpty()
-            val team = teams.first()
-            val t = teamRepo.updateEventId(team.id, event.id)
-            t.shouldNotBeNull()
-            checkTeam(t)
-            t.eventId shouldBe event.id
+            val updated = eventRepo.update(event.copy(eventGroupId = group.id))
+            updated.shouldNotBeNull()
+            checkEvent(updated)
+            updated.eventGroupId shouldBe group.id
         }
     })

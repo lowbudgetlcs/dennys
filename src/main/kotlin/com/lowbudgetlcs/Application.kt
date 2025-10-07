@@ -2,9 +2,10 @@ package com.lowbudgetlcs
 
 import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.routes
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
@@ -17,7 +18,8 @@ fun main(args: Array<String>) =
     io.ktor.server.netty.EngineMain
         .main(args)
 
-fun Application.configureRouting() {
+fun Application.module() {
+    logger.info("🔧 Performing opening duties...")
     install(ContentNegotiation) {
         json(
             Json {
@@ -25,14 +27,10 @@ fun Application.configureRouting() {
                     SerializersModule {
                         contextual(Instant::class, InstantSerializer)
                     }
+                encodeDefaults = true
             },
         )
     }
     routes()
-}
-
-fun Application.module() {
-    logger.info("🔧 Performing opening duties...")
-    configureRouting()
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
 }

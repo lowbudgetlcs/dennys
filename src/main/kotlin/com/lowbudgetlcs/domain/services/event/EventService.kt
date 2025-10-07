@@ -1,6 +1,14 @@
 package com.lowbudgetlcs.domain.services.event
 
-import com.lowbudgetlcs.domain.models.events.*
+import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.EventWithSeries
+import com.lowbudgetlcs.domain.models.events.EventWithTeams
+import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.patch
+import com.lowbudgetlcs.domain.models.events.toEventWithSeries
+import com.lowbudgetlcs.domain.models.events.toEventWithTeams
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
@@ -32,6 +40,7 @@ class EventService(
     override fun getEventWithTeams(id: EventId): EventWithTeams {
         logger.debug("Getting event by '$id' (with teams)...")
         val event = getEvent(id)
+        // TODO: getAllByEventId()
         val teams = teamRepo.getAll().filter { it.eventId == id }
         return event.toEventWithTeams(teams)
     }
@@ -53,10 +62,10 @@ class EventService(
         ) {
             throw IllegalArgumentException("Events cannot start after they end.")
         }
+        isNameTaken(event.name)
         val t =
             tournamentGateway.create(event.name)
                 ?: throw GatewayException("Failed to register tournament with Riot Games.")
-        isNameTaken(event.name)
         return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
     }
 
@@ -73,7 +82,8 @@ class EventService(
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
-        return eventRepo.update(event.patch(update)) ?: throw DatabaseException("Failed to update event.")
+        return eventRepo.update(event.patch(update))
+            ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
     }
 
     override fun addTeam(

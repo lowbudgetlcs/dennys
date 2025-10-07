@@ -1,6 +1,10 @@
 package services
 
-import com.lowbudgetlcs.domain.models.team.*
+import com.lowbudgetlcs.domain.models.team.NewTeam
+import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.models.team.TeamLogoName
+import com.lowbudgetlcs.domain.models.team.TeamName
 import com.lowbudgetlcs.domain.services.team.TeamService
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow

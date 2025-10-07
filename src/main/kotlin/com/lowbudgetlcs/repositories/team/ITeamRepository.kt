@@ -2,7 +2,12 @@ package com.lowbudgetlcs.repositories.team
 
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.player.PlayerId
-import com.lowbudgetlcs.domain.models.team.*
+import com.lowbudgetlcs.domain.models.team.NewTeam
+import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.models.team.TeamLogoName
+import com.lowbudgetlcs.domain.models.team.TeamName
+import com.lowbudgetlcs.domain.models.team.TeamWithPlayers
 
 interface ITeamRepository {
     fun insert(newTeam: NewTeam): Team?

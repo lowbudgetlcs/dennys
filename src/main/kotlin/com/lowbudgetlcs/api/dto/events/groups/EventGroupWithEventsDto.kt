@@ -1,11 +1,11 @@
-package com.lowbudgetlcs.api.dto.eventgroup
+package com.lowbudgetlcs.api.dto.events.groups
 
 import com.lowbudgetlcs.api.dto.events.EventDto
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventGroupWithEventsDto(
-    val id: Integer,
+    val id: Int,
     val name: String,
     val events: List<EventDto>,
 )

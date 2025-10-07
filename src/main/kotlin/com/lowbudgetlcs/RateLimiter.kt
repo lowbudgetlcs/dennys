@@ -1,6 +1,6 @@
 package com.lowbudgetlcs
 
-import io.ktor.client.statement.*
+import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap

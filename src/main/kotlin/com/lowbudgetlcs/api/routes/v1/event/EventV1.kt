@@ -3,8 +3,10 @@ package com.lowbudgetlcs.api.routes.v1.event
 import com.lowbudgetlcs.api.dto.events.CreateEventDto
 import com.lowbudgetlcs.domain.services.event.IEventService
 import com.lowbudgetlcs.domain.services.series.ISeriesService
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.routing.*
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.ValidationResult
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.route
 
 fun Route.eventRoutesV1(
     eventService: IEventService,
