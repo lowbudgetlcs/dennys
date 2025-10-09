@@ -16,6 +16,8 @@ servers:
   - url: /api
 
 tags:
+  - name: auth
+    description: Create users and api keys
   - name: v1/eventGroup
     description: Manage event groups
   - name: v1/eventGroup/events
@@ -40,6 +42,121 @@ tags:
     description: Create and inspect Riot accounts
 
 paths:
+  # Auth Endpoints
+  /auth/login:
+    post:
+      security: []
+      summary: Login with username/password
+      description: Returns signed JWT bearer token
+      operationId: login
+      tags:
+        - auth
+      requestBody:
+        description: Login credentials
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            string:
+              example: ABCDEFGJ
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/user:
+    post:
+      security: []
+      summary: Create a new user
+      description: Requires a special API key to create new users
+      operationId: createUser
+      tags:
+        - auth
+      requestBody:
+        description: User specification
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/key:
+    post:
+      security:
+        - bearerToken: []
+      summary: Create a new API key for a user
+      operationId: createApiKey
+      tags:
+        - auth
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            string:
+              example: ABCD1234
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
   # Event Group Endpoints
   /v1/eventGroup:
     get:
@@ -678,7 +795,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  
+
   # Team Endpoints
   /v1/team:
     get:
@@ -1155,6 +1272,16 @@ paths:
           description: Unexpected error
 
 components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-Dennys-Token
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     # Enums
     EventStatus:
@@ -1165,6 +1292,48 @@ components:
         - CANCELED
         - PAUSED
         - COMPLETED
+
+    # Auth Schemas
+    UserDto:
+      type: object
+      required:
+        - id
+        - username
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+          example: ruuffian
+
+    CreateUserDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: ruuffian
+        password:
+          type: string
+          example: password123
+        secretKey:
+          type: string
+          example: ABCDEFG
+
+    LoginDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: ruuffian
+        password:
+          type: string
+          example: password123
 
     # Game Schemas
     GameDto:
@@ -1182,7 +1351,7 @@ components:
         shortcode:
           type: string
           example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
-        blueTeamId: 
+        blueTeamId:
           type: integer
           example: 2
         redTeamId:
@@ -1194,7 +1363,7 @@ components:
         number:
           type: integer
           example: 1
-          
+
     CreateGameDto:
       type: object
       required:
@@ -1221,7 +1390,7 @@ components:
             type: integer
             example: 123
           nullable: true
-            
+
     EventGroupDto:
       type: object
       required:
@@ -1234,7 +1403,7 @@ components:
         name:
           type: string
           example: Season 14 Regular Season
-          
+
     EventGroupWithEventsDto:
       type: object
       required:
@@ -1251,7 +1420,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EventDto"
-            
+
     PatchEventGroupDto:
       type: object
       description: Fields to update on an event group
@@ -1259,7 +1428,7 @@ components:
         name:
           type: string
           example: Season 14 But New
-          
+
     EventGroupAddEventDto:
       type: object
       required:
@@ -1303,7 +1472,7 @@ components:
           type: integer
           example: 1
           nullable: true
-            
+
     EventDto:
       type: object
       required:
@@ -1348,7 +1517,7 @@ components:
           type: integer
           example: 1
           nullable: true
-          
+
     EventWithTeamsDto:
       type: object
       required:
@@ -1396,7 +1565,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TeamDto"
-            
+
     EventWithSeriesDto:
       type: object
       required:
@@ -1444,7 +1613,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SeriesDto"
-            
+
     PatchEventDto:
       type: object
       properties:
@@ -1468,7 +1637,7 @@ components:
             - description: The new event status.
             - example: CANCELED
             - $ref: "#/components/schemas/EventStatus"
-            
+
     EventAddTeamDto:
       type: object
       required:
@@ -1535,7 +1704,7 @@ components:
           type: string
           description: New player name (not necessarily a Riot ID)
           example: newname
-    
+
     # Riot Account Schemas
     NewRiotAccountDto:
       type: object
@@ -1604,7 +1773,7 @@ components:
         eventId:
           type: integer
           nullable: true
-    
+
     TeamWithPlayersDto:
       type: object
       required:
@@ -1662,3 +1831,6 @@ components:
       required:
         - code
         - message
+
+security:
+  - apiKey: []
