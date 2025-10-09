@@ -9,6 +9,7 @@ import kotlin.collections.List
 import org.jooq.Catalog
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
+import org.jooq.storage.tables.ApiKeys
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
@@ -29,6 +30,7 @@ import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
 
 
 /**
@@ -43,6 +45,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
          */
         val DENNYS: Dennys = Dennys()
     }
+
+    /**
+     * The table <code>dennys.api_keys</code>.
+     */
+    val API_KEYS: ApiKeys get() = ApiKeys.API_KEYS
 
     /**
      * The table <code>dennys.event_groups</code>.
@@ -144,9 +151,15 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      */
     val TEAMS: Teams get() = Teams.TEAMS
 
+    /**
+     * The table <code>dennys.users</code>.
+     */
+    val USERS: Users get() = Users.USERS
+
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
+        ApiKeys.API_KEYS,
         EventGroups.EVENT_GROUPS,
         Events.EVENTS,
         GameResults.GAME_RESULTS,
@@ -166,6 +179,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         Series.SERIES,
         SeriesResults.SERIES_RESULTS,
         TeamToSeries.TEAM_TO_SERIES,
-        Teams.TEAMS
+        Teams.TEAMS,
+        Users.USERS
     )
 }

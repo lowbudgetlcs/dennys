@@ -25,6 +25,8 @@ slf4j-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines
 # ktor server
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktor" }
+ktor-server-jwt = { group = "io.ktor", name = "ktor-server-auth-jwt", version.ref = "ktor" }
 # ktor server plugins
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
 ktor-server-config-yaml = { group = "io.ktor", name = "ktor-server-config-yaml", version.ref = "ktor" }
@@ -70,7 +72,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 
 [bundles]
-ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-config-yaml", ]
+ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-config-yaml", "ktor-server-auth", "ktor-server-jwt"]
 ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-request-validation", "ktor-server-status-pages", "ktor-server-resources"]
 server-logging = ["logback-core", "slf4j-core", "slf4j-coroutines"]
 ktor-client = ["ktor-client-core", "ktor-client-cio"]

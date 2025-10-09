@@ -8,6 +8,7 @@ import org.jooq.ForeignKey
 import org.jooq.UniqueKey
 import org.jooq.impl.DSL
 import org.jooq.impl.Internal
+import org.jooq.storage.tables.ApiKeys
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
@@ -27,6 +28,8 @@ import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
+import org.jooq.storage.tables.records.ApiKeysRecord
 import org.jooq.storage.tables.records.EventGroupsRecord
 import org.jooq.storage.tables.records.EventsRecord
 import org.jooq.storage.tables.records.GameResultsRecord
@@ -46,6 +49,7 @@ import org.jooq.storage.tables.records.SeriesRecord
 import org.jooq.storage.tables.records.SeriesResultsRecord
 import org.jooq.storage.tables.records.TeamToSeriesRecord
 import org.jooq.storage.tables.records.TeamsRecord
+import org.jooq.storage.tables.records.UsersRecord
 
 
 
@@ -53,6 +57,7 @@ import org.jooq.storage.tables.records.TeamsRecord
 // UNIQUE and PRIMARY KEY definitions
 // -------------------------------------------------------------------------
 
+val API_KEYS_PKEY: UniqueKey<ApiKeysRecord> = Internal.createUniqueKey(ApiKeys.API_KEYS, DSL.name("api_keys_pkey"), arrayOf(ApiKeys.API_KEYS.KEY), true)
 val EVENT_GROUPS_NAME_KEY: UniqueKey<EventGroupsRecord> = Internal.createUniqueKey(EventGroups.EVENT_GROUPS, DSL.name("event_groups_name_key"), arrayOf(EventGroups.EVENT_GROUPS.NAME), true)
 val EVENT_GROUPS_PKEY: UniqueKey<EventGroupsRecord> = Internal.createUniqueKey(EventGroups.EVENT_GROUPS, DSL.name("event_groups_pkey"), arrayOf(EventGroups.EVENT_GROUPS.ID), true)
 val EVENTS_NAME_KEY: UniqueKey<EventsRecord> = Internal.createUniqueKey(Events.EVENTS, DSL.name("events_name_key"), arrayOf(Events.EVENTS.NAME), true)
@@ -79,11 +84,14 @@ val SERIES_RESULTS_PKEY: UniqueKey<SeriesResultsRecord> = Internal.createUniqueK
 val TEAM_TO_SERIES_PKEY: UniqueKey<TeamToSeriesRecord> = Internal.createUniqueKey(TeamToSeries.TEAM_TO_SERIES, DSL.name("team_to_series_pkey"), arrayOf(TeamToSeries.TEAM_TO_SERIES.TEAM_ID, TeamToSeries.TEAM_TO_SERIES.SERIES_ID), true)
 val TEAMS_NAME_EVENT_ID_KEY: UniqueKey<TeamsRecord> = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_name_event_id_key"), arrayOf(Teams.TEAMS.NAME, Teams.TEAMS.EVENT_ID), true)
 val TEAMS_PKEY: UniqueKey<TeamsRecord> = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_pkey"), arrayOf(Teams.TEAMS.ID), true)
+val USERS_PKEY: UniqueKey<UsersRecord> = Internal.createUniqueKey(Users.USERS, DSL.name("users_pkey"), arrayOf(Users.USERS.ID), true)
+val USERS_USERNAME_KEY: UniqueKey<UsersRecord> = Internal.createUniqueKey(Users.USERS, DSL.name("users_username_key"), arrayOf(Users.USERS.USERNAME), true)
 
 // -------------------------------------------------------------------------
 // FOREIGN KEY definitions
 // -------------------------------------------------------------------------
 
+val API_KEYS__API_KEYS_USER_ID_FKEY: ForeignKey<ApiKeysRecord, UsersRecord> = Internal.createForeignKey(ApiKeys.API_KEYS, DSL.name("api_keys_user_id_fkey"), arrayOf(ApiKeys.API_KEYS.USER_ID), org.jooq.storage.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true)
 val EVENTS__EVENTS_EVENT_GROUP_ID_FKEY: ForeignKey<EventsRecord, EventGroupsRecord> = Internal.createForeignKey(Events.EVENTS, DSL.name("events_event_group_id_fkey"), arrayOf(Events.EVENTS.EVENT_GROUP_ID), org.jooq.storage.keys.EVENT_GROUPS_PKEY, arrayOf(EventGroups.EVENT_GROUPS.ID), true)
 val GAME_RESULTS__GAME_RESULTS_GAME_ID_FKEY: ForeignKey<GameResultsRecord, GamesRecord> = Internal.createForeignKey(GameResults.GAME_RESULTS, DSL.name("game_results_game_id_fkey"), arrayOf(GameResults.GAME_RESULTS.GAME_ID), org.jooq.storage.keys.GAMES_PKEY, arrayOf(Games.GAMES.ID), true)
 val GAME_RESULTS__GAME_RESULTS_LOSER_TEAM_ID_FKEY: ForeignKey<GameResultsRecord, TeamsRecord> = Internal.createForeignKey(GameResults.GAME_RESULTS, DSL.name("game_results_loser_team_id_fkey"), arrayOf(GameResults.GAME_RESULTS.LOSER_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)

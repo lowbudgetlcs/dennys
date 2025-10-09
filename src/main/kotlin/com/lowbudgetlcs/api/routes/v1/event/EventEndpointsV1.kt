@@ -10,6 +10,7 @@ import com.lowbudgetlcs.api.dto.events.toNewSeries
 import com.lowbudgetlcs.api.dto.events.toTeamId
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto
+import com.lowbudgetlcs.api.log
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.toTeamId
@@ -36,14 +37,14 @@ fun Route.eventEndpointsV1(
 ) {
     get<EventResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event")
+            call.log()
             val events = eventService.getAllEvents()
             call.respond(events.map { it.toDto() })
         }
     }
     post<EventResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/event")
+            call.log()
             val dto = call.receive<CreateEventDto>()
             logger.debug(dto.toString())
             val created = eventService.createEvent(dto.toNewEvent())
@@ -52,14 +53,14 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event/${route.eventId}")
+            call.log()
             val event = eventService.getEvent(route.eventId.toEventId())
             call.respond(event.toDto())
         }
     }
     patch<EventResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received PATCH on /v1/event/${route.eventId}")
+            call.log()
             val dto = call.receive<PatchEventDto>()
             logger.debug("\uD83C\uDF81 Body: {}", dto)
             val updated = eventService.patchEvent(route.eventId.toEventId(), dto.toEventUpdate())
@@ -68,14 +69,14 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ByIdTeams> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event/${route.eventId}/teams")
+            call.log()
             val events = eventService.getEventWithTeams(route.eventId.toEventId())
             call.respond(events.toDto())
         }
     }
     post<EventResourcesV1.ByIdTeams> { route ->
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/event/${route.eventId}/teams")
+            call.log()
             val dto = call.receive<EventTeamLinkDto>()
             logger.debug(dto.toString())
             val event = eventService.addTeam(route.eventId.toEventId(), dto.toTeamId())
@@ -84,14 +85,14 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ByIdSeries> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event/${route.eventId}/series")
+            call.log()
             val event = eventService.getEventWithSeries(route.eventId.toEventId())
             call.respond(event.toDto())
         }
     }
     post<EventResourcesV1.ByIdSeries> { route ->
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/event/${route.eventId}/series")
+            call.log()
             val dto = call.receive<NewSeriesDto>()
             logger.debug(dto.toString())
             val series = seriesService.createSeries(dto.toNewSeries(route.eventId))
@@ -100,7 +101,7 @@ fun Route.eventEndpointsV1(
     }
     delete<EventResourcesV1.ByIdSeriesId> { route ->
         call.setCidContext {
-            logger.info("📩 Received DELETE on /v1/event/${route.eventId}/series/${route.seriesId}")
+            call.log()
             seriesService.removeSeries(route.seriesId.toSeriesId())
             val event = eventService.getEventWithSeries(route.eventId.toEventId())
             call.respond(event.toDto())
@@ -108,7 +109,7 @@ fun Route.eventEndpointsV1(
     }
     delete<EventResourcesV1.ByIdTeamsId> { route ->
         call.setCidContext {
-            logger.info("📩 Received DELETE on /v1/event/${route.eventId}/teams/${route.teamId}")
+            call.log()
             val event = eventService.removeTeam(route.eventId.toEventId(), route.teamId.toTeamId())
             call.respond(event.toDto())
         }

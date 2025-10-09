@@ -4,6 +4,7 @@
 package org.jooq.storage.tables.references
 
 
+import org.jooq.storage.tables.ApiKeys
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
@@ -24,8 +25,14 @@ import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
 
 
+
+/**
+ * The table <code>dennys.api_keys</code>.
+ */
+val API_KEYS: ApiKeys = ApiKeys.API_KEYS
 
 /**
  * The table <code>dennys.event_groups</code>.
@@ -126,3 +133,8 @@ val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
  * The table <code>dennys.teams</code>.
  */
 val TEAMS: Teams = Teams.TEAMS
+
+/**
+ * The table <code>dennys.users</code>.
+ */
+val USERS: Users = Users.USERS

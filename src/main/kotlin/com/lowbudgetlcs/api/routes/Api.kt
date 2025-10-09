@@ -3,13 +3,14 @@ package com.lowbudgetlcs.api.routes
 import com.lowbudgetlcs.Database
 import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
+import com.lowbudgetlcs.api.routes.auth.authRoutes
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
-import com.lowbudgetlcs.appConfig
+import com.lowbudgetlcs.config.appConfig
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.domain.services.event.group.EventGroupService
@@ -17,6 +18,7 @@ import com.lowbudgetlcs.domain.services.game.GameService
 import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.domain.services.series.SeriesService
 import com.lowbudgetlcs.domain.services.team.TeamService
+import com.lowbudgetlcs.domain.services.user.UserService
 import com.lowbudgetlcs.gateways.riot.account.RiotAccountGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGateway
 import com.lowbudgetlcs.repositories.account.AccountRepository
@@ -32,6 +34,7 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
+import com.lowbudgetlcs.repositories.user.UserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -106,6 +109,9 @@ fun Route.apiRoutes() {
     val eventGroupRepository = EventGroupRepository(Database.dslContext)
     val eventGroupService = EventGroupService(eventGroupRepository, eventRepository)
 
+    val userRepository = UserRepository(Database.dslContext)
+    val userService = UserService(userRepository)
+
     route("/api/v1") {
         route("/riot-callback") {
             post {
@@ -123,5 +129,8 @@ fun Route.apiRoutes() {
             gameService = gameService,
         )
         eventGroupRoutesV1(eventGroupService)
+    }
+    route("/api") {
+        authRoutes(userService = userService)
     }
 }
