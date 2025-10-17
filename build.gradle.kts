@@ -1,7 +1,15 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 plugins {
-    kotlin("jvm") version ("2.2.0")
-    id("application")
-    id("org.jetbrains.kotlin.plugin.serialization") version ("2.2.0")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint)
 }
 
 group = "com.lowbudgetlcs"
@@ -16,6 +24,21 @@ repositories {
     google()
 }
 
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/detekt.yml"))
+}
+
+ktlint {
+    android.set(false)
+    outputToConsole.set(true)
+    ignoreFailures.set(false)
+    filter {
+        exclude("**/org/jooq/**")
+        exclude("src/main/kotlin/org/jooq/**")
+    }
+}
 
 tasks.register<Test>("generateJooq") {
     group = "codegen"
@@ -36,6 +59,42 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+tasks.withType<Detekt>().configureEach {
+    exclude("**/org/jooq/**")
+}
+
+tasks.matching { it.name.startsWith("ktlintJooqSourceSet") }.configureEach {
+    enabled = false
+}
+
+tasks.matching { it.name.startsWith("runKtlintFormatOverJooqSourceSet") }.configureEach {
+    enabled = false
+}
+
+tasks.withType<KtLintCheckTask>().configureEach {
+    exclude("**/org/jooq/**")
+    exclude("src/main/kotlin/org/jooq/**")
+}
+
+tasks.withType<KtLintFormatTask>().configureEach {
+    exclude("**/org/jooq/**")
+    exclude("src/main/kotlin/org/jooq/**")
+}
+
+tasks.register("installGitHooks") {
+    group = "build setup"
+    description = "Install pre-commit Git hook"
+    doLast {
+        val src = file("scripts/pre-commit").toPath()
+        val destinationDirectory = file(".git/hooks").toPath()
+        Files.createDirectories(destinationDirectory)
+        val destination = destinationDirectory.resolve("pre-commit")
+        Files.copy(src, destination, StandardCopyOption.REPLACE_EXISTING)
+        destination.toFile().setExecutable(true)
+        println("✓ Installed Git hook: $destination")
+    }
+}
+
 sourceSets {
     val migrationsDir = "src/migrations"
     main {}
@@ -47,7 +106,6 @@ sourceSets {
         resources.srcDir(migrationsDir)
         compileClasspath += sourceSets["main"].output
         runtimeClasspath += sourceSets["main"].output
-
     }
 }
 
@@ -57,8 +115,8 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.ktor.client.plugins)
     implementation(libs.bundles.database)
+    implementation(libs.bundles.server.logging)
     implementation(libs.hikari.core)
-    implementation(libs.logback.core)
     implementation(libs.hoplite.core)
 
     // Jooq Code Generation

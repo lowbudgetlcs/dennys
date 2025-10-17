@@ -3,7 +3,7 @@ APP_NAME = dennys
 TAG = local
 CONTAINER_NAME = $(APP_NAME)-container
 
-.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev
+.PHONY: all clean stop build debug-build run db swagger refresh jooq test dev seed hook format check
 
 # Build and run by default
 all: build run
@@ -21,17 +21,23 @@ stop:
 
 # Build the application
 build:
-	docker build -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile .
+	docker build -t $(APP_NAME):$(TAG) --target localapp -f ./docker/Dockerfile .
 
 # Build without caching and readable output
 debug-build:
-	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target app -f ./docker/Dockerfile . 
+	docker build --no-cache --progress=plain -t $(APP_NAME):$(TAG) --target localapp -f ./docker/Dockerfile .
 
 # Run all containers
 run: 
 	docker compose up dennys db --attach dennys
 
-# Start database tools
+seed:
+	./scripts/seed_local.sh
+
+drop:
+	docker volume rm main_dennys-data
+
+# Start database
 db:
 	docker compose up db 
 
@@ -48,3 +54,15 @@ jooq:
 # Run tests
 test:
 	./gradlew test itest
+
+# Run to install pre-commit hooks (Recommended to do first)
+hook:
+	./gradlew installGitHooks
+
+# Manual format (this is done automatically by the pre-commit hook if installed)
+format:
+	./gradlew ktlintFormat
+
+# Checks lints from detekt and ktlint (we should be doing this passively to fix lints)
+check:
+	./gradlew ktlintCheck detekt

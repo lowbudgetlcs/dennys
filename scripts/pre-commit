@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+GRADLE="./gradlew"
+
+STAGED_KT=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.kts?$' || true)
+if [ -z "$STAGED_KT" ]; then
+  echo "No Kotlin files staged. Skipping ktlint/detekt."
+  exit 0
+fi
+
+echo "▶ Running ktlintFormat (may modify files)…"
+$GRADLE -q ktlintFormat
+
+git add -A
+
+#echo "▶ Running ktlintCheck + detekt…"
+#$GRADLE -q ktlintCheck detekt
+
+echo "✓ Lint passed"

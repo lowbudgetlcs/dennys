@@ -1,17 +1,24 @@
 package com.lowbudgetlcs.domain.models.events
 
 import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
 import java.time.Instant
 
 @JvmInline
-value class EventId(val value: Int)
+value class EventId(
+    val value: Int,
+)
 
 fun Int.toEventId(): EventId = EventId(this)
 
 enum class EventStatus {
-    CANCELED, PAUSED, COMPLETED, ACTIVE, NOT_STARTED
+    CANCELED,
+    PAUSED,
+    COMPLETED,
+    ACTIVE,
+    NOT_STARTED,
 }
 
 data class Event(
@@ -23,7 +30,7 @@ data class Event(
     val createdAt: Instant,
     val startDate: Instant,
     val endDate: Instant,
-    val status: EventStatus
+    val status: EventStatus,
 )
 
 data class EventWithTeams(
@@ -36,7 +43,7 @@ data class EventWithTeams(
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus,
-    val teams: List<Team>
+    val teams: List<Team>,
 )
 
 data class EventWithSeries(
@@ -49,5 +56,5 @@ data class EventWithSeries(
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus,
-    val series: List<Series>
+    val series: List<Series>,
 )

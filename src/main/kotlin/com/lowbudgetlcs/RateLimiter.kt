@@ -1,6 +1,6 @@
 package com.lowbudgetlcs
 
-import io.ktor.client.statement.*
+import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
@@ -16,7 +16,10 @@ class RateLimiter {
         }
     }
 
-    suspend fun updateLimits(response: HttpResponse, endpoint: String) {
+    suspend fun updateLimits(
+        response: HttpResponse,
+        endpoint: String,
+    ) {
         mutex.withLock {
             val methodLimits = response.headers["X-Method-Rate-Limit"]
             val appLimits = response.headers["X-App-Rate-Limit"]
@@ -27,7 +30,8 @@ class RateLimiter {
     }
 
     private fun parseRateLimit(headerValue: String?): Int? {
-        return headerValue?.split(",")
+        return headerValue
+            ?.split(",")
             ?.mapNotNull { it.split(":").firstOrNull()?.toIntOrNull() }
             ?.minOrNull() // Use the most restrictive limit
     }

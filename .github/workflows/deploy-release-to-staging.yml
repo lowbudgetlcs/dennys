@@ -71,6 +71,7 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: lblcs/dennys:${{ env.VERSION }}
+          target: ciapp
             
   deploy-release:
     needs: build
