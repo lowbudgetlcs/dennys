@@ -1,36 +1,69 @@
-name: Run tests on PRs
+name: Run unit and integration tests on every push to dev/** branches
 
 on:
-  pull_request:
-    types: 
-      - opened
-    branches: 
-      - 'main'
   push:
     branches:
       - 'dev/**'
 
 jobs:
-  unit:
+  build:
+    name: Build and upload JAR
     runs-on: ubuntu-latest
+    outputs:
+      jar_path: ${{ steps.jar.outputs.jar_path }}
     steps:
       - uses: actions/checkout@v4
 
-      # Utilizes Gradle cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Build JAR
+        run: ./gradlew clean assemble --no-daemon
+
+      - name: Export artifact path
+        id: jar
+        run: |
+          JAR_PATH=$(find build/libs -type f -name "*.jar" | head -n 1)
+          echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: build/libs/*.jar
+
+  unit:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Download JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+          path: build/libs
+
       - name: Test project
-        run: ./gradlew test
+        run: ./gradlew test -x assemble
 
   integration:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      # Utilizes Gradle cache
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Download JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+          path: build/libs
+
       - name: Test project
-        run: ./gradlew itest
+        run: ./gradlew itest -x assemble
