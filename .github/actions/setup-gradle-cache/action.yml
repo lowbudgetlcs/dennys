@@ -7,4 +7,5 @@ runs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
+          ~/.gradle/build-cache
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}

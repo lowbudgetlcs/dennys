@@ -9,15 +9,13 @@ jobs:
   build:
     name: Build and upload JAR
     runs-on: ubuntu-latest
-    outputs:
-      jar_path: ${{ steps.jar.outputs.jar_path }}
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/setup-gradle@v4
       - uses: ./.github/actions/setup-gradle-cache
 
       - name: Build project
-        run: gradle clean assemble --no-daemon
+        run: ./gradlew clean assemble --no-daemon
 
   unit:
     runs-on: ubuntu-latest
@@ -28,7 +26,7 @@ jobs:
       - uses: ./.github/actions/setup-gradle-cache
 
       - name: Test project
-        run: gradle test --no-daemon
+        run: ./gradlew test --no-daemon
 
   integration:
     runs-on: ubuntu-latest
@@ -39,4 +37,4 @@ jobs:
       - uses: ./.github/actions/setup-gradle-cache
 
       - name: Test project
-        run: gradle itest --no-daemon
+        run: ./gradlew itest --no-daemon
