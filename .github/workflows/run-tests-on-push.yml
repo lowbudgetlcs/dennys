@@ -18,7 +18,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build JAR
-        run: ./gradlew clean assemble --no-daemon
+        run: gradle clean assemble --no-daemon
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -42,7 +42,7 @@ jobs:
           path: build/libs
 
       - name: Test project
-        run: ./gradlew test -x assemble -x compileKotlin
+        run: gradle test -x assemble -x compileKotlin
 
   integration:
     runs-on: ubuntu-latest
@@ -60,4 +60,4 @@ jobs:
           path: build/libs
 
       - name: Test project
-        run: ./gradlew itest -x assemble -x compileKotlin
+        run: gradle itest -x assemble -x compileKotlin
