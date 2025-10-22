@@ -10,6 +10,7 @@ runs:
 
     - name: Extract version number
       id: version
+      shell: bash
       run: |
         VERSION=$(./gradlew properties | awk '/^version:/ {print $2}')
         echo "version=$VERSION" >> "$GITHUB_OUTPUT"

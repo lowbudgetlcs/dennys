@@ -67,24 +67,6 @@ jobs:
 
   build-push-image:
     runs-on: ubuntu-24.04-arm
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Download JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: app
-          path: build/libs
-
-      - name: Test project
-        run: ./gradlew itest -x assemble
-
-  build-push-image:
-    runs-on: ubuntu-24.04-arm
     needs: 
       - unit
       - integration
