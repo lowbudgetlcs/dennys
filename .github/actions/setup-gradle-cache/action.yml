@@ -1,6 +1,6 @@
 name: Cache Gradle
-using: composite
 runs:
+  using: composite
   steps:
     - uses: actions/cache@v4
       with:
