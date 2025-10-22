@@ -2,8 +2,20 @@ name: Run unit and integration tests on every push to dev/** branches
 
 on:
   push:
+    paths-ignore:
+      - 'docker/**'
+      - '.gitignore'
+      - '*.md'
+      - '*.txt'
+      - 'shell.nix'
+      - 'Makefile'
+      - 'compose.yml'
+      - 'gradlew'
+      - 'gradlew.bat'
+
     branches:
       - 'dev/**'
+      - 'hotfix/**'
 
 jobs:
   build:
