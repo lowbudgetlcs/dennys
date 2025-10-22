@@ -52,7 +52,7 @@ class SeriesRepository(
                         .insertInto(
                             SERIES,
                         ).set(SERIES.EVENT_ID, newSeries.eventId.value)
-                        .set(SERIES.GAMES_TO_WIN, newSeries.gamesToWin)
+                        .set(SERIES.TOTAL_GAMES, newSeries.totalGames)
                         .returning(SERIES.ID)
                         .fetchOne()
                         ?.get(SERIES.ID)
@@ -85,7 +85,7 @@ class SeriesRepository(
         dsl
             .select(
                 SERIES.ID,
-                SERIES.GAMES_TO_WIN,
+                SERIES.TOTAL_GAMES,
                 SERIES.EVENT_ID,
                 participants,
                 SERIES_RESULTS.WINNER_TEAM_ID,
@@ -98,7 +98,7 @@ class SeriesRepository(
         // NOT NULL data
         val seriesId = row[SERIES.ID]?.toSeriesId() ?: return null
         val eventId = row[SERIES.EVENT_ID]?.toEventId() ?: return null
-        val gamesToWin = row[SERIES.GAMES_TO_WIN] ?: return null
+        val totalGames = row[SERIES.TOTAL_GAMES] ?: return null
         val participants = row[participants].map { it.value1()?.toTeamId() }
         // potentially null data
         val winner = row[SERIES_RESULTS.WINNER_TEAM_ID]?.toTeamId()
@@ -108,7 +108,7 @@ class SeriesRepository(
             Series(
                 id = seriesId,
                 eventId = eventId,
-                gamesToWin = gamesToWin,
+                totalGames = totalGames,
                 participants = participants,
                 result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,
             )

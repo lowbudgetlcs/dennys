@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/lowbudgetlcs/dennys/blob/main/LICENSE.txt
-  version: 1.0.0
+  version: 1.2.0
 externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
@@ -678,7 +678,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  
+
   # Team Endpoints
   /v1/team:
     get:
@@ -1182,7 +1182,7 @@ components:
         shortcode:
           type: string
           example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
-        blueTeamId: 
+        blueTeamId:
           type: integer
           example: 2
         redTeamId:
@@ -1194,7 +1194,7 @@ components:
         number:
           type: integer
           example: 1
-          
+
     CreateGameDto:
       type: object
       required:
@@ -1219,9 +1219,9 @@ components:
           type: array
           items:
             type: integer
-            example: 123
           nullable: true
-            
+          example: []
+
     EventGroupDto:
       type: object
       required:
@@ -1234,7 +1234,7 @@ components:
         name:
           type: string
           example: Season 14 Regular Season
-          
+
     EventGroupWithEventsDto:
       type: object
       required:
@@ -1251,7 +1251,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/EventDto"
-            
+
     PatchEventGroupDto:
       type: object
       description: Fields to update on an event group
@@ -1259,7 +1259,7 @@ components:
         name:
           type: string
           example: Season 14 But New
-          
+
     EventGroupAddEventDto:
       type: object
       required:
@@ -1277,7 +1277,6 @@ components:
         - startDate
         - endDate
         - status
-        - eventGroupId
       properties:
         name:
           type: string
@@ -1299,11 +1298,7 @@ components:
             - description: The intended starting status of the event.
             - example: NOT_STARTED
             - $ref: "#/components/schemas/EventStatus"
-        eventGroupId:
-          type: integer
-          example: 1
-          nullable: true
-            
+
     EventDto:
       type: object
       required:
@@ -1348,7 +1343,7 @@ components:
           type: integer
           example: 1
           nullable: true
-          
+
     EventWithTeamsDto:
       type: object
       required:
@@ -1396,7 +1391,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TeamDto"
-            
+
     EventWithSeriesDto:
       type: object
       required:
@@ -1444,7 +1439,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SeriesDto"
-            
+
     PatchEventDto:
       type: object
       properties:
@@ -1468,7 +1463,7 @@ components:
             - description: The new event status.
             - example: CANCELED
             - $ref: "#/components/schemas/EventStatus"
-            
+
     EventAddTeamDto:
       type: object
       required:
@@ -1483,7 +1478,7 @@ components:
       required:
         - team1Id
         - team2Id
-        - gamesToWin
+        - totalGames
       properties:
         team1Id:
           type: integer
@@ -1491,7 +1486,7 @@ components:
         team2Id:
           type: integer
           example: 456
-        gamesToWin:
+        totalGames:
           type: integer
           example: 3
 
@@ -1535,7 +1530,7 @@ components:
           type: string
           description: New player name (not necessarily a Riot ID)
           example: newname
-    
+
     # Riot Account Schemas
     NewRiotAccountDto:
       type: object
@@ -1604,7 +1599,7 @@ components:
         eventId:
           type: integer
           nullable: true
-    
+
     TeamWithPlayersDto:
       type: object
       required:
@@ -1642,6 +1637,7 @@ components:
         - id
         - eventId
         - teams
+        - totalGames
       properties:
         id:
           type: integer
@@ -1651,6 +1647,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TeamDto"
+        totalGames:
+          type: integer
 
     Error:
       type: object
@@ -1662,3 +1660,4 @@ components:
       required:
         - code
         - message
+

@@ -26,7 +26,7 @@ class SeriesService(
             throw IllegalArgumentException("Series must have at least two participants")
         }
 
-        if (series.gamesToWin < 1) throw IllegalArgumentException("Games to win must be at least 1")
+        if (series.totalGames < 1) throw IllegalArgumentException("A series must contain at least 1 game.")
 
         series.participantIds.forEach { id ->
             logger.debug("Validating team '$id' exists and is participating in event '${series.eventId}'...")

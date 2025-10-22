@@ -9,7 +9,7 @@ import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
-import com.lowbudgetlcs.appConfig
+import com.lowbudgetlcs.config.appConfig
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.domain.services.event.group.EventGroupService
@@ -25,7 +25,6 @@ import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.event.group.EventGroupRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
-import com.lowbudgetlcs.repositories.metadata.MetadataRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -81,13 +80,12 @@ fun Route.apiRoutes() {
     val seriesRepository: ISeriesRepository = SeriesRepository(Database.dslContext)
     val seriesService = SeriesService(seriesRepository, teamRepository)
 
-    val metadataRepository = MetadataRepository(Database.dslContext)
     val riotTournamentGateway =
         RiotTournamentGateway(
-            metadataRepo = metadataRepository,
             client = riotHttpClient,
             apiKey = appConfig.riot.key,
             useStubs = appConfig.riot.usestubs,
+            providerId = appConfig.riot.providerid,
         )
 
     val eventRepository = EventRepository(Database.dslContext)

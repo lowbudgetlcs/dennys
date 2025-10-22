@@ -67,7 +67,7 @@ class SeriesRepositoryTest :
             newSeries =
                 NewSeries(
                     eventId = event.id,
-                    gamesToWin = 10,
+                    totalGames = 10,
                     participantIds = listOf(team1.id, team2.id),
                 )
         }
@@ -76,7 +76,7 @@ class SeriesRepositoryTest :
 
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            created.gamesToWin shouldBe newSeries.gamesToWin
+            created.totalGames shouldBe newSeries.totalGames
 
             val fetched = repo.getById(created.id)
             fetched shouldBe created
