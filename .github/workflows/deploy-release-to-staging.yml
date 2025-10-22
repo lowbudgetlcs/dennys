@@ -98,7 +98,7 @@ jobs:
           tags: lblcs/dennys:${{ steps.setup.outputs.version }}
           target: deploy
           build-args: |
-            JAR_FILE=build/libs/$(basename $(find build/libs -name "*.jar" | head -n 1))
+            JAR_FILE=build/libs/app.jar
             
   deploy:
     needs: build-push-image
