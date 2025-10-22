@@ -1478,7 +1478,7 @@ components:
       required:
         - team1Id
         - team2Id
-        - gamesToWin
+        - totalGames
       properties:
         team1Id:
           type: integer
@@ -1486,7 +1486,7 @@ components:
         team2Id:
           type: integer
           example: 456
-        gamesToWin:
+        totalGames:
           type: integer
           example: 3
 
@@ -1637,6 +1637,7 @@ components:
         - id
         - eventId
         - teams
+        - totalGames
       properties:
         id:
           type: integer
@@ -1646,6 +1647,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TeamDto"
+        totalGames:
+          type: integer
 
     Error:
       type: object
@@ -1657,3 +1660,4 @@ components:
       required:
         - code
         - message
+
