@@ -62,7 +62,7 @@ class SeriesServiceTest :
         val expectedSeries =
             Series(
                 id = SeriesId(1),
-                gamesToWin = 3,
+                totalGames = 3,
                 eventId = event.id,
                 participants = participatingTeams.map { it.id },
                 result = null,
@@ -72,7 +72,7 @@ class SeriesServiceTest :
             NewSeries(
                 eventId = event.id,
                 participantIds = participatingTeams.map { it.id },
-                gamesToWin = 3,
+                totalGames = 3,
             )
         "createSeries succeeds for valid input" {
 
@@ -88,7 +88,7 @@ class SeriesServiceTest :
         "createSeries fails for 0 games to win" {
             shouldThrow<IllegalArgumentException> {
                 service.createSeries(
-                    newSeries.copy(gamesToWin = 0),
+                    newSeries.copy(totalGames = 0),
                 )
             }
             // repo.insert should never be called

@@ -7,4 +7,5 @@ data class SeriesDto(
     val id: Int,
     val eventId: Int?,
     val teamIds: List<Int>,
+    val totalGames: Int,
 )
