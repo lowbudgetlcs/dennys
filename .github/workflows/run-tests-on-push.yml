@@ -20,12 +20,6 @@ jobs:
       - name: Build JAR
         run: ./gradlew clean assemble --no-daemon
 
-      - name: Export artifact path
-        id: jar
-        run: |
-          JAR_PATH=$(find build/libs -type f -name "*.jar" | head -n 1)
-          echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -48,7 +42,7 @@ jobs:
           path: build/libs
 
       - name: Test project
-        run: ./gradlew test -x assemble
+        run: ./gradlew test -x assemble -x compileKotlin
 
   integration:
     runs-on: ubuntu-latest
@@ -66,4 +60,4 @@ jobs:
           path: build/libs
 
       - name: Test project
-        run: ./gradlew itest -x assemble
+        run: ./gradlew itest -x assemble -x compileKotlin
