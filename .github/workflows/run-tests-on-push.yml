@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/setup-gradle@v4
-      - uses: ./.github/actions/setup-gradle-cache.yml
+      - uses: ./.github/actions/setup-gradle-cache
 
       - name: Build project
         run: gradle clean assemble --no-daemon
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/setup-gradle@v4
-      - uses: ./.github/actions/setup-gradle-cache.yml
+      - uses: ./.github/actions/setup-gradle-cache
 
       - name: Test project
         run: gradle test --no-daemon
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/setup-gradle@v4
-      - uses: ./.github/actions/setup-gradle-cache.yml
+      - uses: ./.github/actions/setup-gradle-cache
 
       - name: Test project
         run: gradle itest --no-daemon

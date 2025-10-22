@@ -46,7 +46,7 @@ jobs:
           path: build/libs/*.jar
 
       - id: setup
-        uses: ./.github/actions/extract-version.yml
+        uses: ./.github/actions/extract-version
 
   unit:
     runs-on: ubuntu-latest
