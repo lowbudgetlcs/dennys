@@ -23,8 +23,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app
-          path: build/libs/*.jar
+          name: build
+          path: build/
 
   unit:
     runs-on: ubuntu-latest
@@ -38,11 +38,11 @@ jobs:
       - name: Download JAR
         uses: actions/download-artifact@v4
         with:
-          name: app
-          path: build/libs
+          name: build
+          path: build/
 
       - name: Test project
-        run: gradle test -x assemble -x compileKotlin
+        run: gradle test --no-daemon
 
   integration:
     runs-on: ubuntu-latest
@@ -56,8 +56,8 @@ jobs:
       - name: Download JAR
         uses: actions/download-artifact@v4
         with:
-          name: app
-          path: build/libs
+          name: build
+          path: build/
 
       - name: Test project
-        run: gradle itest -x assemble -x compileKotlin
+        run: gradle itest --no-daemon
