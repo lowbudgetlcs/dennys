@@ -13,33 +13,19 @@ jobs:
       jar_path: ${{ steps.jar.outputs.jar_path }}
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: ./.github/actions/setup-gradle-cache.yml
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Build JAR
+      - name: Build project
         run: gradle clean assemble --no-daemon
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: build/
 
   unit:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Download JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: build/
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: ./.github/actions/setup-gradle-cache.yml
 
       - name: Test project
         run: gradle test --no-daemon
@@ -49,15 +35,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Download JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: build/
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: ./.github/actions/setup-gradle-cache.yml
 
       - name: Test project
         run: gradle itest --no-daemon
