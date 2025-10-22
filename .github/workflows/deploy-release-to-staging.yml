@@ -47,34 +47,6 @@ jobs:
 
   unit:
     runs-on: ubuntu-latest
-    outputs:
-      jar_path: ${{ steps.jar.outputs.jar_path }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gradle/actions/setup-gradle@v5
-        with:
-          cache-write-only: true
-
-      - name: Build JAR
-        run: ./gradlew clean assemble --no-daemon
-
-      - name: Export artifact path
-        id: jar
-        run: |
-          JAR_PATH=$(find build/libs -type f -name "*.jar" | head -n 1)
-          echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app
-          path: build/libs/*.jar
-
-      - id: setup
-        uses: ./.github/actions/extract-version
-
-  unit:
-    runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v4
