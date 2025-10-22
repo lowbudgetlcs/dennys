@@ -1,6 +1,7 @@
 name: Setup Gradle and extract project version
 outputs:
-  version: ${{ steps.version.outputs.version }}
+  version: 
+    value: ${{ steps.version.outputs.version }}
 runs:
   using: composite
   steps:
