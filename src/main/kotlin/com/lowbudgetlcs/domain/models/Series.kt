@@ -18,13 +18,13 @@ data class SeriesResult(
 data class Series(
     val id: SeriesId,
     val eventId: EventId,
-    val gamesToWin: Int,
+    val totalGames: Int,
     val participants: List<TeamId>,
     val result: SeriesResult?,
 )
 
 data class NewSeries(
     val eventId: EventId,
-    val gamesToWin: Int,
+    val totalGames: Int,
     val participantIds: List<TeamId>,
 )

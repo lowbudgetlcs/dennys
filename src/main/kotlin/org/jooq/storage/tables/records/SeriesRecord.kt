@@ -23,7 +23,7 @@ open class SeriesRecord() : UpdatableRecordImpl<SeriesRecord>(Series.SERIES) {
         set(value): Unit = set(1, value)
         get(): Int? = get(1) as Int?
 
-    open var gamesToWin: Int?
+    open var totalGames: Int?
         set(value): Unit = set(2, value)
         get(): Int? = get(2) as Int?
 
@@ -36,10 +36,10 @@ open class SeriesRecord() : UpdatableRecordImpl<SeriesRecord>(Series.SERIES) {
     /**
      * Create a detached, initialised SeriesRecord
      */
-    constructor(id: Int? = null, eventId: Int? = null, gamesToWin: Int? = null): this() {
+    constructor(id: Int? = null, eventId: Int? = null, totalGames: Int? = null): this() {
         this.id = id
         this.eventId = eventId
-        this.gamesToWin = gamesToWin
+        this.totalGames = totalGames
         resetChangedOnNotNull()
     }
 }

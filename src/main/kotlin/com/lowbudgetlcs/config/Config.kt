@@ -1,6 +1,5 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.config
 
-import com.lowbudgetlcs.config.AppConfig
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.addEnvironmentSource
 import com.sksamuel.hoplite.addResourceSource

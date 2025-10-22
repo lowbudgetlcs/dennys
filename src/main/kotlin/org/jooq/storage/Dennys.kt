@@ -13,7 +13,6 @@ import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
-import org.jooq.storage.tables.Metadata
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -63,11 +62,6 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      * The table <code>dennys.games</code>.
      */
     val GAMES: Games get() = Games.GAMES
-
-    /**
-     * The table <code>dennys.metadata</code>.
-     */
-    val METADATA: Metadata get() = Metadata.METADATA
 
     /**
      * The table <code>dennys.player_champ_selects</code>.
@@ -151,7 +145,6 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         Events.EVENTS,
         GameResults.GAME_RESULTS,
         Games.GAMES,
-        Metadata.METADATA,
         PlayerChampSelects.PLAYER_CHAMP_SELECTS,
         PlayerCombats.PLAYER_COMBATS,
         PlayerFarming.PLAYER_FARMING,

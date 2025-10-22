@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class NewSeriesDto(
     val team1Id: Int,
     val team2Id: Int,
-    val gamesToWin: Int,
+    val totalGames: Int,
 )

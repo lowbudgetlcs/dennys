@@ -10,9 +10,11 @@ data class AppConfig(
 data class RiotConfig(
     val key: String,
     val usestubs: Boolean,
+    val providerid: Int,
 )
 
 data class DatabaseConfig(
     val url: Masked,
     val password: Masked,
+    val logobucketname: String,
 )
