@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.models.events
 
+import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import java.time.Instant
 
 data class NewEvent(
@@ -8,4 +9,5 @@ data class NewEvent(
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus,
+    val eventGroupId: EventGroupId? = null,
 )
