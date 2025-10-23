@@ -31,19 +31,13 @@ jobs:
           cache-write-only: true
 
       - name: Build JAR
-        run: ./gradlew clean assemble --no-daemon
-
-      - name: Export artifact path
-        id: jar
-        run: |
-          JAR_PATH=$(find build/libs -type f -name "*.jar" | head -n 1)
-          echo "jar_path=$JAR_PATH" >> "$GITHUB_OUTPUT"
+        run: ./gradlew clean installDist --no-daemon
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: build/libs/*.jar
+          path: build/install/dennys
 
   unit:
     runs-on: ubuntu-latest
@@ -53,7 +47,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Test project
-        run: ./gradlew test -x assemble
+        run: ./gradlew test
 
   integration:
     runs-on: ubuntu-latest
@@ -63,7 +57,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Test project
-        run: ./gradlew itest -x assemble
+        run: ./gradlew itest
 
   build-push-image:
     runs-on: ubuntu-24.04-arm
@@ -78,8 +72,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: app 
-          path: build/libs
+          name: app
+          path: build/install/dennys
                 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -103,7 +97,7 @@ jobs:
           tags: lblcs/dennys:${{ steps.setup.outputs.version }}
           target: deploy
           build-args: |
-            JAR_FILE=./build/libs/dennys-${{ steps.setup.outputs.version }}.jar
+            DIST_PATH=./build/install/dennys
             
   deploy:
     needs: build-push-image

@@ -13,6 +13,5 @@ ENTRYPOINT ["./bin/dennys"]
 
 FROM eclipse-temurin:21-jre-alpine AS deploy
 WORKDIR /app
-ARG JAR_FILE
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY ${DIST_DIR} ./
+ENTRYPOINT ["./bin/dennys"]
