@@ -84,10 +84,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Debug logging
-        run: |
-          ls -lrt build/libs
-
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
