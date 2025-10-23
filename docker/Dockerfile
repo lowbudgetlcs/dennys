@@ -18,4 +18,7 @@ RUN pwd
 ARG DIST_PATH 
 RUN echo ${DIST_PATH}
 COPY ${DIST_PATH}/ ./
-ENTRYPOINT ["./bin/dennys"]
+RUN ls -lrt
+RUN find .
+RUN find . -type f -name dennys
+ENTRYPOINT ["./${DIST_PATH}/bin/dennys"]
