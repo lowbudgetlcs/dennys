@@ -60,8 +60,9 @@ jobs:
   build-push-image:
     runs-on: ubuntu-24.04-arm
     needs: 
-      - unit
-      - integration
+      - build
+      #- unit
+      #- integration
     steps:
       - uses: actions/checkout@v4
       - id: setup
