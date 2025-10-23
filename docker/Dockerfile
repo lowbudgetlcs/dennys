@@ -14,5 +14,5 @@ ENTRYPOINT ["./bin/dennys"]
 FROM amazoncorretto:21-alpine AS deploy
 WORKDIR /app
 ARG DIST_PATH 
-COPY ${DIST_PATH}/ ./
+COPY --chmod 755 ${DIST_PATH}/ ./
 ENTRYPOINT ["./bin/dennys"]
