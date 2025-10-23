@@ -77,7 +77,7 @@ jobs:
       - name: Debug logging
         run: |
           ls -lrt
-          find -type f ./ -iname 'dennys'
+          find ./ -type f -iname 'dennys'
 
                 
       - name: Login to Docker Hub
