@@ -92,8 +92,7 @@ jobs:
 
       - name: Debug logging
         run: |
-          ls -lrt
-          pwd
+          ls -lrt build/libs
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -104,7 +103,7 @@ jobs:
           tags: lblcs/dennys:${{ steps.setup.outputs.version }}
           target: deploy
           build-args: |
-            JAR_FILE=./build/libs/app.jar
+            JAR_FILE=./build/libs/dennys-${{ steps.setup.outputs.version }}.jar
             
   deploy:
     needs: build-push-image
