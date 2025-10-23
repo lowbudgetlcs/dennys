@@ -13,6 +13,9 @@ ENTRYPOINT ["./bin/dennys"]
 
 FROM eclipse-temurin:21-jre-alpine AS deploy
 WORKDIR /app
+RUN ls -lrt
+RUN pwd
 ARG DIST_PATH 
-COPY ${DIST_PATH} ./
+RUN echo ${DIST_PATH}
+COPY ${DIST_PATH}/ ./
 ENTRYPOINT ["./bin/dennys"]
