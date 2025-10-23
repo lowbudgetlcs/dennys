@@ -13,5 +13,6 @@ ENTRYPOINT ["./bin/dennys"]
 
 FROM eclipse-temurin:21-jre-alpine AS deploy
 WORKDIR /app
+ARG DIST_DIR
 COPY ${DIST_DIR} ./
 ENTRYPOINT ["./bin/dennys"]
