@@ -125,3 +125,4 @@ jobs:
           script: |
             cd /lblcs/scripts/dennys
             ./release.sh -v ${{ steps.setup.outputs.version }} -z ${{ secrets.ZONE_ID }} -c ${{ secrets.CLOUDFLARE_DNS_TOKEN }} ${{ secrets.RIOT_API_TOKEN }}
+
