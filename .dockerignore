@@ -1,4 +1,5 @@
 build/
+!build/libs/
 .git
 .github
 .gradle/
