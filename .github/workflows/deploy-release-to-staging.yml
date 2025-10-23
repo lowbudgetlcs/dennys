@@ -1,6 +1,5 @@
 name: Deploy a release branch to a staging environment.
 
-
 on:
   push:
     paths-ignore:
