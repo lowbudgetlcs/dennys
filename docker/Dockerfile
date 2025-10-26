@@ -11,11 +11,8 @@ WORKDIR /app
 COPY --from=builder /builder/build/install/dennys/ ./
 ENTRYPOINT ["./bin/dennys"]
 
-FROM eclipse-temurin:21-jre-alpine AS deploy
+FROM amazoncorretto:21-alpine AS deploy
 WORKDIR /app
-RUN ls -lrt
-RUN pwd
 ARG DIST_PATH 
-RUN echo ${DIST_PATH}
-COPY ${DIST_PATH}/ ./
+COPY --chmod=755 ${DIST_PATH}/ ./
 ENTRYPOINT ["./bin/dennys"]
