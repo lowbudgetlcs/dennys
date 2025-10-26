@@ -91,9 +91,9 @@ open class Series(
     val EVENT_ID: TableField<SeriesRecord, Int?> = createField(DSL.name("event_id"), SQLDataType.INTEGER, this, "")
 
     /**
-     * The column <code>dennys.series.games_to_win</code>.
+     * The column <code>dennys.series.total_games</code>.
      */
-    val GAMES_TO_WIN: TableField<SeriesRecord, Int?> = createField(DSL.name("games_to_win"), SQLDataType.INTEGER.nullable(false), this, "")
+    val TOTAL_GAMES: TableField<SeriesRecord, Int?> = createField(DSL.name("total_games"), SQLDataType.INTEGER.nullable(false), this, "")
 
     private constructor(alias: Name, aliased: Table<SeriesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<SeriesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

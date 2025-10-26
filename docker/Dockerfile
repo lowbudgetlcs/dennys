@@ -1,4 +1,4 @@
-FROM gradle:8.9-jdk21 AS localbuilder
+FROM gradle:8.9-jdk21 AS builder 
 WORKDIR /builder
 COPY build.gradle.kts settings.gradle.kts gradle.properties .
 COPY gradle ./gradle
@@ -6,19 +6,13 @@ RUN gradle build --no-daemon || return 0
 COPY . .
 RUN gradle --no-daemon installDist
 
-FROM amazoncorretto:21-alpine AS localapp
+FROM amazoncorretto:21-alpine AS local
 WORKDIR /app
-COPY --from=localbuilder /builder/build/install/dennys/ ./
+COPY --from=builder /builder/build/install/dennys/ ./
 ENTRYPOINT ["./bin/dennys"]
 
-FROM gradle:8.9-jdk21 AS cibuilder
-WORKDIR /builder
-COPY gradle ./gradle
-RUN gradle build --no-daemon || return 0
-COPY . .
-RUN gradle --no-daemon installDist
-
-FROM amazoncorretto:21-alpine AS ciapp
+FROM amazoncorretto:21-alpine AS deploy
 WORKDIR /app
-COPY --from=cibuilder /builder/build/install/dennys/ ./
+ARG DIST_PATH 
+COPY --chmod=755 ${DIST_PATH}/ ./
 ENTRYPOINT ["./bin/dennys"]

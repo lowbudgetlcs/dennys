@@ -8,8 +8,6 @@ import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
 import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.metadata.IMetadataRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -23,10 +21,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class RiotTournamentGateway(
-    private val metadataRepo: IMetadataRepository,
     private val client: HttpClient,
     private val apiKey: String,
     private val useStubs: Boolean,
+    private val providerId: Int,
     private val baseUrl: String = "https://americas.api.riotgames.com",
 ) : IRiotTournamentGateway {
     private val url: String by lazy {
@@ -36,7 +34,6 @@ class RiotTournamentGateway(
 
     override suspend fun create(tournamentName: String): RiotTournament {
         logger.debug("Creating tournament named '$tournamentName'...")
-        val providerId = metadataRepo.getProviderId() ?: throw DatabaseException("Cannot find riot provider id.")
         val res =
             client.post("$url/tournaments") {
                 headers {

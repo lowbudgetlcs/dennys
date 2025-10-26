@@ -6,10 +6,10 @@ import com.lowbudgetlcs.api.dto.events.PatchEventDto
 import com.lowbudgetlcs.api.dto.events.toDto
 import com.lowbudgetlcs.api.dto.events.toEventUpdate
 import com.lowbudgetlcs.api.dto.events.toNewEvent
-import com.lowbudgetlcs.api.dto.events.toNewSeries
 import com.lowbudgetlcs.api.dto.events.toTeamId
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto
+import com.lowbudgetlcs.api.dto.series.toNewSeries
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.toTeamId

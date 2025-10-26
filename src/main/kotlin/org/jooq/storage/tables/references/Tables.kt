@@ -8,7 +8,6 @@ import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
-import org.jooq.storage.tables.Metadata
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -46,11 +45,6 @@ val GAME_RESULTS: GameResults = GameResults.GAME_RESULTS
  * The table <code>dennys.games</code>.
  */
 val GAMES: Games = Games.GAMES
-
-/**
- * The table <code>dennys.metadata</code>.
- */
-val METADATA: Metadata = Metadata.METADATA
 
 /**
  * The table <code>dennys.player_champ_selects</code>.

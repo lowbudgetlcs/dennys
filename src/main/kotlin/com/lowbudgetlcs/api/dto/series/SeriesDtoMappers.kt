@@ -1,6 +1,16 @@
 package com.lowbudgetlcs.api.dto.series
 
+import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.team.toTeamId
 
 fun Series.toDto(): SeriesDto =
-    SeriesDto(id = id.value, eventId = eventId.value, teamIds = participants.map { it.value })
+    SeriesDto(id = id.value, eventId = eventId.value, teamIds = participants.map { it.value }, totalGames = totalGames)
+
+fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
+    NewSeries(
+        eventId = eventId.toEventId(),
+        totalGames = totalGames,
+        participantIds = listOf(team1Id.toTeamId(), team2Id.toTeamId()),
+    )
