@@ -71,7 +71,6 @@ jobs:
       - integration
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-version
 
       - name: Download artifact
         uses: actions/download-artifact@v4
