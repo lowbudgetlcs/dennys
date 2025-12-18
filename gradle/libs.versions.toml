@@ -13,6 +13,7 @@ kotlinx-coroutines = "1.10.2"
 slf4j = "2.0.17"
 detekt = "1.23.8"
 ktlint = "13.0.0"
+argon2 = "2.12"
 
 [libraries]
 # kotlin
@@ -63,6 +64,9 @@ testcontainers-core = { group = "org.testcontainers", name = "testcontainers", v
 testcontainers-postgres = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
 # mockk
 mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+# argon2
+argon2-nolibs = { group = "de.mkammerer", name = "argon2-jvm-nolibs", version.ref = "argon2" }
+argon2-impl = { group = "de.mkammerer", name = "argon2-jvm", version.ref = "argon2" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

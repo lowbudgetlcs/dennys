@@ -1,15 +1,18 @@
 package com.lowbudgetlcs.domain.services.auth
 
+import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.User
-import com.lowbudgetlcs.domain.models.auth.UserSession
+import com.sksamuel.hoplite.Masked
 
 interface IAuthService {
     fun authenticate(
         username: String,
-        password: String,
+        password: Masked,
     ): User
 
-    fun createSession(user: User): UserSession
+    fun createSession(user: User): Session
 
-    fun validateSession(session: UserSession): Boolean
+    fun clearSession(session: Session)
+
+    fun validateSession(session: Session): Boolean
 }

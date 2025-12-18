@@ -7,8 +7,9 @@ pkgs.mkShell {
       docker
       ruff basedpyright
       (python3.withPackages(p: with p; [
-        requests
+        requests psycopg argon2-cffi
       ]))
+      libargon2
     ];
     env = {
       TEST="Hello there...";

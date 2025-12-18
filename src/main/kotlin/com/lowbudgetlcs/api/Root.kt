@@ -1,14 +1,21 @@
 package com.lowbudgetlcs.api
 
+import com.lowbudgetlcs.Database
+import com.lowbudgetlcs.api.auth.PasswordHasher
 import com.lowbudgetlcs.api.auth.UserPrincipal
+import com.lowbudgetlcs.api.auth.UserSession
+import com.lowbudgetlcs.api.auth.toSession
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.api.routes.apiRoutes
-import com.lowbudgetlcs.api.routes.auth.authEndpoints
-import com.lowbudgetlcs.domain.models.auth.UserSession
+import com.lowbudgetlcs.api.routes.authEndpoints
 import com.lowbudgetlcs.domain.services.auth.AuthService
+import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.services.user.UserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.repositories.session.SessionRepository
+import com.lowbudgetlcs.repositories.user.UserRepostitory
+import com.sksamuel.hoplite.Masked
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -40,13 +47,18 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
+// Generic endpoint log function.
 fun logCall(call: RoutingCall) {
     logger.info("📩 Received ${call.request.httpMethod} on ${call.request.path()}")
 }
 
 fun Application.routes() {
-    val authService = AuthService()
-    val userService = UserService()
+    val userRepository = UserRepostitory(Database.dslContext)
+    val sessionRepository = SessionRepository()
+    // The hasher initialization takes nearly 20 seconds...
+    val hasher = PasswordHasher()
+    val authService = AuthService(sessionRepository, userRepository, hasher)
+    val userService = UserService(userRepository)
 
     routing {
         install(StatusPages) {
@@ -98,6 +110,12 @@ fun Application.routes() {
                 val e = Error(code = code.value, message = cause.message ?: "Internal server error")
                 call.respond(code, e)
             }
+            exception<UnauthorizedException> { call, cause ->
+                logger.error("⚠️ Unauthorized: $call", cause)
+                val code = HttpStatusCode.Forbidden
+                val e = Error(code = code.value, message = cause.message ?: "Not authorized.")
+                call.respond(code, e)
+            }
             exception<Throwable> { call, cause ->
                 logger.error("⚠️ Internal server error: $call", cause)
                 val code = HttpStatusCode.InternalServerError
@@ -120,7 +138,8 @@ fun Application.routes() {
                 userParamName = "username"
                 passwordParamName = "password"
                 validate { credentials ->
-                    UserPrincipal(authService.authenticate(credentials.name, credentials.password).id)
+                    val user = authService.authenticate(credentials.name, Masked(credentials.password))
+                    UserPrincipal(user.id.value, user.username, user.roles)
                 }
                 challenge {
                     call.respond(HttpStatusCode.Unauthorized, "Invalid credentials passed.")
@@ -128,7 +147,7 @@ fun Application.routes() {
             }
             session<UserSession>("auth-session") {
                 validate { session ->
-                    if (authService.validateSession(session)) {
+                    if (authService.validateSession(session.toSession())) {
                         session
                     } else {
                         null

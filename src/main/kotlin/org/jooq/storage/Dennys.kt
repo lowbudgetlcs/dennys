@@ -13,6 +13,7 @@ import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
+import org.jooq.storage.tables.PersonalAccessTokens
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -26,8 +27,10 @@ import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
+import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
 
 
 /**
@@ -62,6 +65,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      * The table <code>dennys.games</code>.
      */
     val GAMES: Games get() = Games.GAMES
+
+    /**
+     * The table <code>dennys.personal_access_tokens</code>.
+     */
+    val PERSONAL_ACCESS_TOKENS: PersonalAccessTokens get() = PersonalAccessTokens.PERSONAL_ACCESS_TOKENS
 
     /**
      * The table <code>dennys.player_champ_selects</code>.
@@ -129,6 +137,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val SERIES_RESULTS: SeriesResults get() = SeriesResults.SERIES_RESULTS
 
     /**
+     * The table <code>dennys.sessions</code>.
+     */
+    val SESSIONS: Sessions get() = Sessions.SESSIONS
+
+    /**
      * The table <code>dennys.team_to_series</code>.
      */
     val TEAM_TO_SERIES: TeamToSeries get() = TeamToSeries.TEAM_TO_SERIES
@@ -138,6 +151,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      */
     val TEAMS: Teams get() = Teams.TEAMS
 
+    /**
+     * The table <code>dennys.users</code>.
+     */
+    val USERS: Users get() = Users.USERS
+
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
@@ -145,6 +163,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         Events.EVENTS,
         GameResults.GAME_RESULTS,
         Games.GAMES,
+        PersonalAccessTokens.PERSONAL_ACCESS_TOKENS,
         PlayerChampSelects.PLAYER_CHAMP_SELECTS,
         PlayerCombats.PLAYER_COMBATS,
         PlayerFarming.PLAYER_FARMING,
@@ -158,7 +177,9 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         RiotAccounts.RIOT_ACCOUNTS,
         Series.SERIES,
         SeriesResults.SERIES_RESULTS,
+        Sessions.SESSIONS,
         TeamToSeries.TEAM_TO_SERIES,
-        Teams.TEAMS
+        Teams.TEAMS,
+        Users.USERS
     )
 }

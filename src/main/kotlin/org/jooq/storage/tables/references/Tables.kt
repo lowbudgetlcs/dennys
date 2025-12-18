@@ -8,6 +8,7 @@ import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
+import org.jooq.storage.tables.PersonalAccessTokens
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -21,8 +22,10 @@ import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
+import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
 
 
 
@@ -45,6 +48,11 @@ val GAME_RESULTS: GameResults = GameResults.GAME_RESULTS
  * The table <code>dennys.games</code>.
  */
 val GAMES: Games = Games.GAMES
+
+/**
+ * The table <code>dennys.personal_access_tokens</code>.
+ */
+val PERSONAL_ACCESS_TOKENS: PersonalAccessTokens = PersonalAccessTokens.PERSONAL_ACCESS_TOKENS
 
 /**
  * The table <code>dennys.player_champ_selects</code>.
@@ -112,6 +120,11 @@ val SERIES: Series = Series.SERIES
 val SERIES_RESULTS: SeriesResults = SeriesResults.SERIES_RESULTS
 
 /**
+ * The table <code>dennys.sessions</code>.
+ */
+val SESSIONS: Sessions = Sessions.SESSIONS
+
+/**
  * The table <code>dennys.team_to_series</code>.
  */
 val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
@@ -120,3 +133,8 @@ val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
  * The table <code>dennys.teams</code>.
  */
 val TEAMS: Teams = Teams.TEAMS
+
+/**
+ * The table <code>dennys.users</code>.
+ */
+val USERS: Users = Users.USERS
