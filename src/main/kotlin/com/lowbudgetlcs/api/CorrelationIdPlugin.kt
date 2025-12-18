@@ -1,11 +1,12 @@
 package com.lowbudgetlcs.api
 
-import io.ktor.server.application.*
-import io.ktor.util.*
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.createApplicationPlugin
+import io.ktor.util.AttributeKey
 import kotlinx.coroutines.slf4j.MDCContext
 import kotlinx.coroutines.withContext
 import org.slf4j.MDC
-import java.util.*
+import java.util.UUID
 
 val CorrelationIdPlugin =
     createApplicationPlugin(name = "CorrelationIdPlugin") {

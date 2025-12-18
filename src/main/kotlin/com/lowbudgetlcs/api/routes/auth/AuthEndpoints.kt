@@ -5,13 +5,19 @@ import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.user.IUserService
-import io.ktor.http.*
-import io.ktor.server.auth.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.principal
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
+import io.ktor.server.sessions.sessions
+import io.ktor.server.sessions.set
 
-fun Route.authEndpoints(authService: IAuthService, userService: IUserService) {
+fun Route.authEndpoints(
+    authService: IAuthService,
+    userService: IUserService,
+) {
     authenticate("auth-form") {
         post("/login") {
             call.setCidContext {

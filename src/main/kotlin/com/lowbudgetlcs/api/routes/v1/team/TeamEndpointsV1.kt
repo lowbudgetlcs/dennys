@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api.routes.v1.team
 import com.lowbudgetlcs.api.dto.teams.NewTeamDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.api.dto.teams.toNewTeam
+import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.services.team.TeamService
@@ -21,7 +22,7 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.teamEndpointsV1(teamService: TeamService) {
     post<TeamResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received POST /v1/team")
+            logCall(call)
             val dto = call.receive<NewTeamDto>()
             logger.debug(dto.toString())
             val created = teamService.createTeam(dto.toNewTeam())
@@ -30,14 +31,14 @@ fun Route.teamEndpointsV1(teamService: TeamService) {
     }
     get<TeamResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received GET /v1/team")
+            logCall(call)
             val teams = teamService.getAllTeams()
             call.respond(teams.map { it.toDto() })
         }
     }
     get<TeamResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET /v1/team/${route.teamId}")
+            logCall(call)
             val team = teamService.getTeam(route.teamId.toTeamId())
             call.respond(team.toDto())
         }

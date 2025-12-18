@@ -9,20 +9,32 @@ import com.lowbudgetlcs.domain.services.auth.AuthService
 import com.lowbudgetlcs.domain.services.user.UserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
-import io.ktor.http.*
-import io.ktor.serialization.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.plugins.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.plugins.swagger.*
-import io.ktor.server.request.*
-import io.ktor.server.resources.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.JsonConvertException
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.form
+import io.ktor.server.auth.session
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.plugins.swagger.swaggerUI
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.path
+import io.ktor.server.resources.Resources
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingCall
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import io.ktor.server.sessions.Sessions
+import io.ktor.server.sessions.cookie
+import io.ktor.server.sessions.sameSite
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -113,7 +125,6 @@ fun Application.routes() {
                 challenge {
                     call.respond(HttpStatusCode.Unauthorized, "Invalid credentials passed.")
                 }
-
             }
             session<UserSession>("auth-session") {
                 validate { session ->
@@ -132,12 +143,11 @@ fun Application.routes() {
             cookie<UserSession>("user-session") {
                 cookie.path = "/"
                 // TODO: Put this value in default.properties
-                cookie.maxAgeInSeconds = 60*60*3
+                cookie.maxAgeInSeconds = 60 * 60 * 3
                 cookie.httpOnly = true
                 cookie.sameSite = "strict"
                 cookie.secure = true
             }
-
         }
         route("/") {
             get {
