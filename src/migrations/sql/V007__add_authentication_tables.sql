@@ -19,7 +19,7 @@ create table personal_access_tokens (
 );
 
 create table sessions (
-  id INTEGER PRIMARY KEY,
+  id UUID PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
   expires_at TIMESTAMPTZ NOT NULL
 );

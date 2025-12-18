@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 from argon2 import PasswordHasher
 import psycopg

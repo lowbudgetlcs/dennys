@@ -5,6 +5,7 @@ package org.jooq.storage.tables
 
 
 import java.time.Instant
+import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
@@ -77,7 +78,7 @@ open class Sessions(
     /**
      * The column <code>dennys.sessions.id</code>.
      */
-    val ID: TableField<SessionsRecord, Int?> = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false), this, "")
+    val ID: TableField<SessionsRecord, UUID?> = createField(DSL.name("id"), SQLDataType.UUID.nullable(false), this, "")
 
     /**
      * The column <code>dennys.sessions.user_id</code>.

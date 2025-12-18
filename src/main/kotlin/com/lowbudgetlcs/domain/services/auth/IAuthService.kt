@@ -14,5 +14,5 @@ interface IAuthService {
 
     fun clearSession(session: Session)
 
-    fun validateSession(session: Session): Boolean
+    fun validateSession(session: Session)
 }

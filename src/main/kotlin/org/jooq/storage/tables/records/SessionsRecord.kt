@@ -5,6 +5,7 @@ package org.jooq.storage.tables.records
 
 
 import java.time.Instant
+import java.util.UUID
 
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
@@ -17,9 +18,9 @@ import org.jooq.storage.tables.Sessions
 @Suppress("UNCHECKED_CAST")
 open class SessionsRecord() : UpdatableRecordImpl<SessionsRecord>(Sessions.SESSIONS) {
 
-    open var id: Int?
+    open var id: UUID?
         set(value): Unit = set(0, value)
-        get(): Int? = get(0) as Int?
+        get(): UUID? = get(0) as UUID?
 
     open var userId: Int?
         set(value): Unit = set(1, value)
@@ -33,12 +34,12 @@ open class SessionsRecord() : UpdatableRecordImpl<SessionsRecord>(Sessions.SESSI
     // Primary key information
     // -------------------------------------------------------------------------
 
-    override fun key(): Record1<Int?> = super.key() as Record1<Int?>
+    override fun key(): Record1<UUID?> = super.key() as Record1<UUID?>
 
     /**
      * Create a detached, initialised SessionsRecord
      */
-    constructor(id: Int? = null, userId: Int? = null, expiresAt: Instant? = null): this() {
+    constructor(id: UUID? = null, userId: Int? = null, expiresAt: Instant? = null): this() {
         this.id = id
         this.userId = userId
         this.expiresAt = expiresAt

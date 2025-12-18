@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.services.auth
 
 import com.lowbudgetlcs.api.auth.IPasswordHasher
+import com.lowbudgetlcs.domain.models.auth.NewSession
 import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.User
 import com.lowbudgetlcs.repositories.DatabaseException
@@ -9,6 +10,7 @@ import com.lowbudgetlcs.repositories.user.IUserRepository
 import com.sksamuel.hoplite.Masked
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Instant
 
 class AuthService(
     private val sessionRepo: ISessionRepository,
@@ -42,7 +44,9 @@ class AuthService(
 
     override fun createSession(user: User): Session {
         logger.debug("Starting session for '${user.username}'...")
-        if (user.isActive) return sessionRepo.insertSession(user) ?: throw DatabaseException("An unkown error occured.")
+        // TODO: Add default session timeout to default.properties
+        val newSession = NewSession(user, Instant.now().plusSeconds(3600))
+        if (user.isActive) return sessionRepo.insert(newSession) ?: throw DatabaseException("An unkown error occured.")
         throw UnauthorizedException("This user is locked.")
     }
 
@@ -50,9 +54,14 @@ class AuthService(
         sessionRepo.delete(session.id)
     }
 
-    override fun validateSession(session: Session): Boolean {
-        logger.debug("Validating session ${session.id}...")
-        val saved = sessionRepo.getById(session.id) ?: throw UnauthorizedException("Invalid session id.")
-        return saved.userId == session.userId
+    override fun validateSession(session: Session) {
+        logger.debug("Validating session {}...", session.id)
+        val saved = sessionRepo.getById(session.id) ?: throw NoSuchElementException("Session not found.")
+        if (saved.expiresAt.isBefore(Instant.now())) {
+            clearSession(session)
+            throw UnauthorizedException("Session has expired.")
+        } else if (saved.userId != session.userId) {
+            throw UnauthorizedException("Invalid session.")
+        }
     }
 }

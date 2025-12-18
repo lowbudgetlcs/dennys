@@ -1,7 +1,6 @@
 package com.lowbudgetlcs.api.routes
 
 import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
@@ -31,6 +30,7 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
+import com.lowbudgetlcs.serializers.InstantSerializer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

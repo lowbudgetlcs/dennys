@@ -2,7 +2,7 @@
 
 package com.lowbudgetlcs.api.dto.riot.match
 
-import com.lowbudgetlcs.api.dto.InstantSerializer
+import com.lowbudgetlcs.serializers.InstantSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.time.Instant

@@ -54,7 +54,7 @@ fun logCall(call: RoutingCall) {
 
 fun Application.routes() {
     val userRepository = UserRepostitory(Database.dslContext)
-    val sessionRepository = SessionRepository()
+    val sessionRepository = SessionRepository(Database.dslContext)
     // The hasher initialization takes nearly 20 seconds...
     val hasher = PasswordHasher()
     val authService = AuthService(sessionRepository, userRepository, hasher)
@@ -111,8 +111,8 @@ fun Application.routes() {
                 call.respond(code, e)
             }
             exception<UnauthorizedException> { call, cause ->
-                logger.error("⚠️ Unauthorized: $call", cause)
-                val code = HttpStatusCode.Forbidden
+                logger.error("⚠️ Unauthorized")
+                val code = HttpStatusCode.Unauthorized
                 val e = Error(code = code.value, message = cause.message ?: "Not authorized.")
                 call.respond(code, e)
             }
@@ -128,6 +128,7 @@ fun Application.routes() {
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
             allowHeader("X-Dennys-Token")
+            allowHeader("api_key")
             allowMethod(HttpMethod.Patch)
             allowMethod(HttpMethod.Delete)
         }
@@ -147,11 +148,8 @@ fun Application.routes() {
             }
             session<UserSession>("auth-session") {
                 validate { session ->
-                    if (authService.validateSession(session.toSession())) {
-                        session
-                    } else {
-                        null
-                    }
+                    authService.validateSession(session.toSession())
+                    session
                 }
                 challenge {
                     call.respond(HttpStatusCode.Unauthorized)

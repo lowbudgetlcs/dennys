@@ -1,7 +1,8 @@
 package com.lowbudgetlcs
 
-import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.routes
+import com.lowbudgetlcs.serializers.InstantSerializer
+import com.lowbudgetlcs.serializers.UUIDSerializer
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -11,6 +12,7 @@ import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
+import java.util.UUID
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
@@ -26,6 +28,7 @@ fun Application.module() {
                 serializersModule =
                     SerializersModule {
                         contextual(Instant::class, InstantSerializer)
+                        contextual(UUID::class, UUIDSerializer)
                     }
                 encodeDefaults = true
             },

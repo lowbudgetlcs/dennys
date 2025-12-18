@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api.routes
 import com.lowbudgetlcs.api.auth.UserPrincipal
 import com.lowbudgetlcs.api.auth.UserSession
 import com.lowbudgetlcs.api.auth.toSession
+import com.lowbudgetlcs.api.auth.toUserSession
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.auth.toUserId
@@ -32,7 +33,7 @@ fun Route.authEndpoints(
                 val userId = call.principal<UserPrincipal>()!!.userId
                 val user = userService.getUser(userId.toUserId())
                 val session = authService.createSession(user)
-                call.sessions.set(session)
+                call.sessions.set<UserSession>(session.toUserSession())
                 call.respond(HttpStatusCode.OK)
             }
         }
