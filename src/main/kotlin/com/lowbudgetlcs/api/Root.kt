@@ -1,32 +1,41 @@
 package com.lowbudgetlcs.api
 
+import com.lowbudgetlcs.api.auth.UserPrincipal
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.api.routes.apiRoutes
+import com.lowbudgetlcs.api.routes.auth.authEndpoints
+import com.lowbudgetlcs.domain.models.auth.UserSession
+import com.lowbudgetlcs.domain.services.auth.AuthService
+import com.lowbudgetlcs.domain.services.user.UserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.JsonConvertException
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.cors.routing.CORS
-import io.ktor.server.plugins.requestvalidation.RequestValidationException
-import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.plugins.swagger.swaggerUI
-import io.ktor.server.resources.Resources
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.serialization.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.plugins.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.requestvalidation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.plugins.swagger.*
+import io.ktor.server.request.*
+import io.ktor.server.resources.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
+fun logCall(call: RoutingCall) {
+    logger.info("📩 Received ${call.request.httpMethod} on ${call.request.path()}")
+}
+
 fun Application.routes() {
+    val authService = AuthService()
+    val userService = UserService()
+
     routing {
         install(StatusPages) {
             exception<RequestValidationException> { call, cause ->
@@ -88,20 +97,58 @@ fun Application.routes() {
             anyHost()
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
-            allowHeader("api_key")
+            allowHeader("X-Dennys-Token")
             allowMethod(HttpMethod.Patch)
             allowMethod(HttpMethod.Delete)
         }
         install(CorrelationIdPlugin)
         install(Resources)
+        install(Authentication) {
+            form("auth-form") {
+                userParamName = "username"
+                passwordParamName = "password"
+                validate { credentials ->
+                    UserPrincipal(authService.authenticate(credentials.name, credentials.password).id)
+                }
+                challenge {
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid credentials passed.")
+                }
+
+            }
+            session<UserSession>("auth-session") {
+                validate { session ->
+                    if (authService.validateSession(session)) {
+                        session
+                    } else {
+                        null
+                    }
+                }
+                challenge {
+                    call.respond(HttpStatusCode.Unauthorized)
+                }
+            }
+        }
+        install(Sessions) {
+            cookie<UserSession>("user-session") {
+                cookie.path = "/"
+                // TODO: Put this value in default.properties
+                cookie.maxAgeInSeconds = 60*60*3
+                cookie.httpOnly = true
+                cookie.sameSite = "strict"
+                cookie.secure = true
+            }
+
+        }
         route("/") {
             get {
+                logCall(call)
                 call.respondText("WHAT THE FUCK IS UP DENNYS????")
             }
         }
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
             version = "5.26.1"
         }
+        authEndpoints(authService, userService)
         apiRoutes()
     }
 }
