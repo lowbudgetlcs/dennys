@@ -5,7 +5,7 @@ import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.api.dto.teams.toNewTeam
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.services.team.TeamService
+import com.lowbudgetlcs.domain.services.team.ITeamService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.teamEndpointsV1(teamService: TeamService) {
+fun Route.teamEndpointsV1(teamService: ITeamService) {
     post<TeamResourcesV1> {
         call.setCidContext {
             logger.info("📩 Received POST /v1/team")

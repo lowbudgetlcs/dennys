@@ -3,13 +3,13 @@ package com.lowbudgetlcs.api.routes.v1.player
 import com.lowbudgetlcs.api.dto.players.AccountLinkRequestDto
 import com.lowbudgetlcs.api.dto.players.NewPlayerDto
 import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
-import com.lowbudgetlcs.domain.services.player.PlayerService
+import com.lowbudgetlcs.domain.services.player.IPlayerService
 import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
-fun Route.playerRoutesV1(playerService: PlayerService) {
+fun Route.playerRoutesV1(playerService: IPlayerService) {
     route("/player") {
         install(RequestValidation) {
             validate<NewPlayerDto> { dto ->

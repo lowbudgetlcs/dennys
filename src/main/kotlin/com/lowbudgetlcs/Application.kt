@@ -2,12 +2,20 @@ package com.lowbudgetlcs
 
 import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.routes
+import com.lowbudgetlcs.modules.configModule
+import com.lowbudgetlcs.modules.databaseModule
+import com.lowbudgetlcs.modules.gatewayModule
+import com.lowbudgetlcs.modules.httpClientModule
+import com.lowbudgetlcs.modules.repositoryModule
+import com.lowbudgetlcs.modules.serviceModule
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -20,6 +28,19 @@ fun main(args: Array<String>) =
 
 fun Application.module() {
     logger.info("🔧 Performing opening duties...")
+
+    install(Koin) {
+        slf4jLogger()
+        modules(
+            configModule,
+            databaseModule,
+            serviceModule,
+            repositoryModule,
+            gatewayModule,
+            httpClientModule,
+        )
+    }
+
     install(ContentNegotiation) {
         json(
             Json {
