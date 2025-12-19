@@ -2,15 +2,16 @@ package com.lowbudgetlcs
 
 import com.lowbudgetlcs.api.dto.InstantSerializer
 import com.lowbudgetlcs.api.routes
-import com.lowbudgetlcs.di.configModule
-import com.lowbudgetlcs.di.dataModule
-import com.lowbudgetlcs.di.databaseModule
-import com.lowbudgetlcs.di.gatewayModule
-import com.lowbudgetlcs.di.httpClientModule
-import com.lowbudgetlcs.di.serviceModule
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
+import com.lowbudgetlcs.modules.configModule
+import com.lowbudgetlcs.modules.databaseModule
+import com.lowbudgetlcs.modules.gatewayModule
+import com.lowbudgetlcs.modules.httpClientModule
+import com.lowbudgetlcs.modules.repositoryModule
+import com.lowbudgetlcs.modules.serviceModule
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.koin.ktor.plugin.Koin
@@ -34,9 +35,9 @@ fun Application.module() {
             configModule,
             databaseModule,
             serviceModule,
-            dataModule,
+            repositoryModule,
             gatewayModule,
-            httpClientModule
+            httpClientModule,
         )
     }
 

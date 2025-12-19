@@ -6,12 +6,12 @@ import com.lowbudgetlcs.api.dto.teams.toNewTeam
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.services.team.ITeamService
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.request.*
-import io.ktor.server.resources.*
+import io.ktor.server.request.receive
+import io.ktor.server.resources.get
 import io.ktor.server.resources.post
-import io.ktor.server.response.*
+import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
