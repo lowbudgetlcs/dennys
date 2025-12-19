@@ -5,20 +5,20 @@ import com.lowbudgetlcs.api.dto.accounts.toDto
 import com.lowbudgetlcs.api.dto.accounts.toNewRiotAccount
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
-import com.lowbudgetlcs.domain.services.account.AccountService
-import io.ktor.http.HttpStatusCode
+import com.lowbudgetlcs.domain.services.account.IAccountService
+import io.ktor.http.*
 import io.ktor.server.application.Application
-import io.ktor.server.request.receive
-import io.ktor.server.resources.get
+import io.ktor.server.request.*
+import io.ktor.server.resources.*
 import io.ktor.server.resources.post
-import io.ktor.server.response.respond
+import io.ktor.server.response.*
 import io.ktor.server.routing.Route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.accountEndpointsV1(accountService: AccountService) {
+fun Route.accountEndpointsV1(accountService: IAccountService) {
     post<AccountResourcesV1> {
         call.setCidContext {
             logger.info("📩 Received POST /v1/account")

@@ -1,29 +1,24 @@
 package com.lowbudgetlcs.api.routes.v1.player
 
-import com.lowbudgetlcs.api.dto.players.AccountLinkRequestDto
-import com.lowbudgetlcs.api.dto.players.NewPlayerDto
-import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
-import com.lowbudgetlcs.api.dto.players.toDto
-import com.lowbudgetlcs.api.dto.players.toNewPlayer
+import com.lowbudgetlcs.api.dto.players.*
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.player.toPlayerId
 import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
-import com.lowbudgetlcs.domain.services.player.PlayerService
-import io.ktor.http.HttpStatusCode
+import com.lowbudgetlcs.domain.services.player.IPlayerService
+import io.ktor.http.*
 import io.ktor.server.application.Application
-import io.ktor.server.request.receive
-import io.ktor.server.resources.delete
-import io.ktor.server.resources.get
+import io.ktor.server.request.*
+import io.ktor.server.resources.*
 import io.ktor.server.resources.patch
 import io.ktor.server.resources.post
-import io.ktor.server.response.respond
+import io.ktor.server.response.*
 import io.ktor.server.routing.Route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.playerEndpointsV1(playerService: PlayerService) {
+fun Route.playerEndpointsV1(playerService: IPlayerService) {
     get<PlayerResourcesV1> {
         call.setCidContext {
             logger.info("📩 Received GET /v1/player")
