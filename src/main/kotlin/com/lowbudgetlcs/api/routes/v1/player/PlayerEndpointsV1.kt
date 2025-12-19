@@ -9,7 +9,7 @@ import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.player.toPlayerId
 import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
-import com.lowbudgetlcs.domain.services.player.PlayerService
+import com.lowbudgetlcs.domain.services.player.IPlayerService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.playerEndpointsV1(playerService: PlayerService) {
+fun Route.playerEndpointsV1(playerService: IPlayerService) {
     get<PlayerResourcesV1> {
         call.setCidContext {
             logCall(call)

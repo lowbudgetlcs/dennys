@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.services.auth
 
-import com.lowbudgetlcs.api.auth.IPasswordHasher
+import com.lowbudgetlcs.api.auth.IHasher
 import com.lowbudgetlcs.domain.models.auth.NewSession
 import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.User
@@ -15,7 +15,7 @@ import java.time.Instant
 class AuthService(
     private val sessionRepo: ISessionRepository,
     private val userRepo: IUserRepository,
-    private val hasher: IPasswordHasher,
+    private val hasher: IHasher,
 ) : IAuthService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 

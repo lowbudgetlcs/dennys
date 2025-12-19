@@ -1,4 +1,4 @@
-import com.lowbudgetlcs.api.auth.PasswordHasher
+import com.lowbudgetlcs.api.auth.Argon2Hasher
 import com.lowbudgetlcs.domain.models.auth.NewUser
 import com.lowbudgetlcs.domain.models.auth.User
 import com.lowbudgetlcs.domain.models.auth.toUser
@@ -29,10 +29,10 @@ class UserRepositoryTest :
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = UserRepostitory(dslContext)
 
-        val hasher = PasswordHasher()
+        val argon2Hasher = Argon2Hasher()
         val username = "ruuffian"
         val password = "ABCD1**"
-        val passwordHash = hasher.hash(password)
+        val passwordHash = argon2Hasher.hash(password)
         val username2 = "zain"
 
         // Data

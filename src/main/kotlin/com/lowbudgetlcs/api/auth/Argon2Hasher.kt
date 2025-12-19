@@ -3,7 +3,7 @@ package com.lowbudgetlcs.api.auth
 import de.mkammerer.argon2.Argon2Factory
 import de.mkammerer.argon2.Argon2Helper
 
-class PasswordHasher : IPasswordHasher {
+class Argon2Hasher : IHasher {
     companion object {
         private val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
 

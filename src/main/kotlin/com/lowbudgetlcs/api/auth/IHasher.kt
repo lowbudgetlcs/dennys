@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.auth
 
-interface IPasswordHasher {
+interface IHasher {
     fun hash(input: String): String
 
     fun verify(

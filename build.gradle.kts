@@ -114,6 +114,8 @@ dependencies {
     implementation(libs.bundles.ktor.server.plugins)
     implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.ktor.client.plugins)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j)
     implementation(libs.bundles.database)
     implementation(libs.bundles.server.logging)
     implementation(libs.hikari.core)

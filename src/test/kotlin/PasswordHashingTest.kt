@@ -1,4 +1,4 @@
-import com.lowbudgetlcs.api.auth.PasswordHasher
+import com.lowbudgetlcs.api.auth.Argon2Hasher
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -6,24 +6,24 @@ import io.kotest.matchers.shouldBe
 
 class PasswordHashingTest :
     StringSpec({
-        val hasher = PasswordHasher()
+        val argon2Hasher = Argon2Hasher()
 
         "Create a hash given string input" {
             val input = "ABCD"
-            val a = hasher.hash(input)
+            val a = argon2Hasher.hash(input)
             a.shouldNotBeNull()
             a shouldNotBeEqual ""
         }
 
         "verify() returns true when passed original string" {
             val input = "ABCD"
-            val hash = hasher.hash(input)
-            hasher.verify(input, hash) shouldBe true
+            val hash = argon2Hasher.hash(input)
+            argon2Hasher.verify(input, hash) shouldBe true
         }
 
         "verify() returns false when passed different string" {
             val input = "ABCD"
-            val hash = hasher.hash(input)
-            hasher.verify("1234", hash) shouldBe false
+            val hash = argon2Hasher.hash(input)
+            argon2Hasher.verify("1234", hash) shouldBe false
         }
     })

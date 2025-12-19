@@ -1,20 +1,17 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.Database
-import com.lowbudgetlcs.api.auth.PasswordHasher
+import com.lowbudgetlcs.api.auth.IHasher
 import com.lowbudgetlcs.api.auth.UserPrincipal
 import com.lowbudgetlcs.api.auth.UserSession
 import com.lowbudgetlcs.api.auth.toSession
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authEndpoints
-import com.lowbudgetlcs.domain.services.auth.AuthService
+import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
-import com.lowbudgetlcs.domain.services.user.UserService
+import com.lowbudgetlcs.domain.services.user.IUserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.session.SessionRepository
-import com.lowbudgetlcs.repositories.user.UserRepostitory
 import com.sksamuel.hoplite.Masked
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -42,6 +39,7 @@ import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
 import io.ktor.server.sessions.sameSite
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -53,12 +51,10 @@ fun logCall(call: RoutingCall) {
 }
 
 fun Application.routes() {
-    val userRepository = UserRepostitory(Database.dslContext)
-    val sessionRepository = SessionRepository(Database.dslContext)
     // The hasher initialization takes nearly 20 seconds...
-    val hasher = PasswordHasher()
-    val authService = AuthService(sessionRepository, userRepository, hasher)
-    val userService = UserService(userRepository)
+    val hasher by inject<IHasher>()
+    val authService by inject<IAuthService>()
+    val userService by inject<IUserService>()
 
     routing {
         install(StatusPages) {
