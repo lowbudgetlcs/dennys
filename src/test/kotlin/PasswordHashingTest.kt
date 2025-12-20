@@ -1,4 +1,4 @@
-import com.lowbudgetlcs.api.auth.Argon2Hasher
+import com.lowbudgetlcs.hashing.Argon2Hasher
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.nulls.shouldNotBeNull

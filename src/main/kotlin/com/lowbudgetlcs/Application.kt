@@ -4,6 +4,7 @@ import com.lowbudgetlcs.api.routes
 import com.lowbudgetlcs.modules.configModule
 import com.lowbudgetlcs.modules.databaseModule
 import com.lowbudgetlcs.modules.gatewayModule
+import com.lowbudgetlcs.modules.hashingModule
 import com.lowbudgetlcs.modules.httpClientModule
 import com.lowbudgetlcs.modules.repositoryModule
 import com.lowbudgetlcs.modules.serviceModule
@@ -40,6 +41,7 @@ fun Application.module() {
             repositoryModule,
             gatewayModule,
             httpClientModule,
+            hashingModule,
         )
     }
 

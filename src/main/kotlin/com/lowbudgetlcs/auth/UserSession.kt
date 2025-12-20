@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.auth
+package com.lowbudgetlcs.auth
 
 import com.lowbudgetlcs.serializers.InstantSerializer
 import com.lowbudgetlcs.serializers.UUIDSerializer

@@ -1,17 +1,20 @@
 package com.lowbudgetlcs.api.routes
 
-import com.lowbudgetlcs.api.auth.UserPrincipal
-import com.lowbudgetlcs.api.auth.UserSession
-import com.lowbudgetlcs.api.auth.toSession
-import com.lowbudgetlcs.api.auth.toUserSession
+import com.lowbudgetlcs.api.dto.NewTokenDto
+import com.lowbudgetlcs.api.dto.toNewAccessToken
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
+import com.lowbudgetlcs.auth.UserPrincipal
+import com.lowbudgetlcs.auth.UserSession
+import com.lowbudgetlcs.auth.toSession
+import com.lowbudgetlcs.auth.toUserSession
 import com.lowbudgetlcs.domain.models.auth.toUserId
 import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.user.IUserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
@@ -34,7 +37,20 @@ fun Route.authEndpoints(
                 val user = userService.getUser(userId.toUserId())
                 val session = authService.createSession(user)
                 call.sessions.set<UserSession>(session.toUserSession())
-                call.respond(HttpStatusCode.OK)
+                call.respond(HttpStatusCode.Created)
+            }
+        }
+    }
+
+    authenticate("auth-session") {
+        post("/createToken") {
+            call.setCidContext {
+                logCall(call)
+                // We have passed the session auth guard.
+                val session = call.sessions.get<UserSession>()!!
+                val newTokenData = call.receive<NewTokenDto>()
+                val fresh = authService.createAccessToken(newTokenData.toNewAccessToken(session.userId.toUserId()))
+                call.respond(HttpStatusCode.Created, fresh.token)
             }
         }
     }

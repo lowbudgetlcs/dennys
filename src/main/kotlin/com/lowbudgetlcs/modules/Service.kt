@@ -1,7 +1,5 @@
 package com.lowbudgetlcs.modules
 
-import com.lowbudgetlcs.api.auth.Argon2Hasher
-import com.lowbudgetlcs.api.auth.IHasher
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.domain.services.account.IAccountService
 import com.lowbudgetlcs.domain.services.auth.AuthService
@@ -20,6 +18,7 @@ import com.lowbudgetlcs.domain.services.team.ITeamService
 import com.lowbudgetlcs.domain.services.team.TeamService
 import com.lowbudgetlcs.domain.services.user.IUserService
 import com.lowbudgetlcs.domain.services.user.UserService
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val serviceModule =
@@ -31,7 +30,14 @@ val serviceModule =
         single<IPlayerService> { PlayerService(get(), get()) }
         single<ISeriesService> { SeriesService(get(), get()) }
         single<IAccountService> { AccountService(get(), get()) }
-        single<IAuthService> { AuthService(get(), get(), get()) }
+        single<IAuthService> {
+            AuthService(
+                get(),
+                get(),
+                get(),
+                passwordHasher = get(named("argon2")),
+                tokenHasher = get(named("sha256")),
+            )
+        }
         single<IUserService> { UserService(get()) }
-        single<IHasher> { Argon2Hasher() }
     }

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.auth
+package com.lowbudgetlcs.hashing
 
 import de.mkammerer.argon2.Argon2Factory
 import de.mkammerer.argon2.Argon2Helper

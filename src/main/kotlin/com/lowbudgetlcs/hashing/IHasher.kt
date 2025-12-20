@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.auth
+package com.lowbudgetlcs.hashing
 
 interface IHasher {
     fun hash(input: String): String

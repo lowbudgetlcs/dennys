@@ -1,21 +1,27 @@
 package com.lowbudgetlcs.domain.services.auth
 
-import com.lowbudgetlcs.api.auth.IHasher
+import com.lowbudgetlcs.domain.models.auth.FreshAccessToken
+import com.lowbudgetlcs.domain.models.auth.NewAccessToken
 import com.lowbudgetlcs.domain.models.auth.NewSession
 import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.User
+import com.lowbudgetlcs.hashing.IHasher
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.session.ISessionRepository
+import com.lowbudgetlcs.repositories.tokens.IAccessTokenRepository
 import com.lowbudgetlcs.repositories.user.IUserRepository
 import com.sksamuel.hoplite.Masked
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
+import java.util.UUID
 
 class AuthService(
     private val sessionRepo: ISessionRepository,
     private val userRepo: IUserRepository,
-    private val hasher: IHasher,
+    private val tokenRepo: IAccessTokenRepository,
+    private val passwordHasher: IHasher,
+    private val tokenHasher: IHasher,
 ) : IAuthService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -26,7 +32,7 @@ class AuthService(
         logger.debug("Authenticating $username...")
         val user = userRepo.getByUsername(username) ?: throw UnauthorizedException("Invalid credentials.")
         logger.debug("Found user {}.", user)
-        if (hasher.verify(
+        if (passwordHasher.verify(
                 password.value,
                 user.passwordHash,
             )
@@ -39,6 +45,23 @@ class AuthService(
             }
         } else {
             throw UnauthorizedException("Invalid credentials.")
+        }
+    }
+
+    override fun authenticate(token: String): User {
+        val tokenHash = tokenHasher.hash(token)
+        logger.debug("Authenticating $tokenHash...")
+        val pat = tokenRepo.getByTokenHash(tokenHash) ?: throw UnauthorizedException("Invalid token.")
+        if (tokenHasher.verify(token, pat.tokenHash)) {
+            logger.debug("Checking if token is expired...")
+            if (pat.expiresAt.isAfter(Instant.now())) {
+                val user = userRepo.getById(pat.userId) ?: throw UnauthorizedException("Invalid token.")
+                return user
+            } else {
+                throw UnauthorizedException("Token has expired.")
+            }
+        } else {
+            throw UnauthorizedException("Invalid token.")
         }
     }
 
@@ -63,5 +86,12 @@ class AuthService(
         } else if (saved.userId != session.userId) {
             throw UnauthorizedException("Invalid session.")
         }
+    }
+
+    override fun createAccessToken(newToken: NewAccessToken): FreshAccessToken {
+        val token = UUID.randomUUID().toString()
+        val tokenHash = tokenHasher.hash(token)
+        tokenRepo.insert(newToken, tokenHash) ?: DatabaseException("An unknown error occured.")
+        return FreshAccessToken(token)
     }
 }

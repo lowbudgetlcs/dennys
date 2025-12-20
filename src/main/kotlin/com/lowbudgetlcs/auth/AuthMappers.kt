@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.auth
+package com.lowbudgetlcs.auth
 
 import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.toSessionId

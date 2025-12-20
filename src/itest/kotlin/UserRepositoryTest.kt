@@ -1,8 +1,8 @@
-import com.lowbudgetlcs.api.auth.Argon2Hasher
 import com.lowbudgetlcs.domain.models.auth.NewUser
 import com.lowbudgetlcs.domain.models.auth.User
 import com.lowbudgetlcs.domain.models.auth.toUser
 import com.lowbudgetlcs.domain.models.auth.toUserId
+import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.repositories.user.UserRepostitory
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.extensions.install

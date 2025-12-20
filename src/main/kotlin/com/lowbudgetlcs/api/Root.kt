@@ -1,12 +1,11 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.api.auth.IHasher
-import com.lowbudgetlcs.api.auth.UserPrincipal
-import com.lowbudgetlcs.api.auth.UserSession
-import com.lowbudgetlcs.api.auth.toSession
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authEndpoints
+import com.lowbudgetlcs.auth.UserPrincipal
+import com.lowbudgetlcs.auth.UserSession
+import com.lowbudgetlcs.auth.toSession
 import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.services.user.IUserService
@@ -20,6 +19,7 @@ import io.ktor.serialization.JsonConvertException
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.bearer
 import io.ktor.server.auth.form
 import io.ktor.server.auth.session
 import io.ktor.server.plugins.BadRequestException
@@ -51,8 +51,6 @@ fun logCall(call: RoutingCall) {
 }
 
 fun Application.routes() {
-    // The hasher initialization takes nearly 20 seconds...
-    val hasher by inject<IHasher>()
     val authService by inject<IAuthService>()
     val userService by inject<IUserService>()
 
@@ -151,6 +149,13 @@ fun Application.routes() {
                     call.respond(HttpStatusCode.Unauthorized)
                 }
             }
+            bearer("auth-token") {
+                realm = "/"
+                authenticate { bearer ->
+                    val user = authService.authenticate(bearer.token)
+                    UserPrincipal(user.id.value, user.username, user.roles)
+                }
+            }
         }
         install(Sessions) {
             cookie<UserSession>("user-session") {
@@ -173,5 +178,6 @@ fun Application.routes() {
         }
         authEndpoints(authService, userService)
         apiRoutes()
+        // TODO: Add a fancy schmancy healthcheck route.
     }
 }

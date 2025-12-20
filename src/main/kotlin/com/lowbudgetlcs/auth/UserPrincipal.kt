@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.auth
+package com.lowbudgetlcs.auth
 
 data class UserPrincipal(
     val userId: Int,

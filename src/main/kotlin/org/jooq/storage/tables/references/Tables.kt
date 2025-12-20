@@ -4,11 +4,11 @@
 package org.jooq.storage.tables.references
 
 
+import org.jooq.storage.tables.AccessTokens
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
-import org.jooq.storage.tables.PersonalAccessTokens
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -30,6 +30,11 @@ import org.jooq.storage.tables.Users
 
 
 /**
+ * The table <code>dennys.access_tokens</code>.
+ */
+val ACCESS_TOKENS: AccessTokens = AccessTokens.ACCESS_TOKENS
+
+/**
  * The table <code>dennys.event_groups</code>.
  */
 val EVENT_GROUPS: EventGroups = EventGroups.EVENT_GROUPS
@@ -48,11 +53,6 @@ val GAME_RESULTS: GameResults = GameResults.GAME_RESULTS
  * The table <code>dennys.games</code>.
  */
 val GAMES: Games = Games.GAMES
-
-/**
- * The table <code>dennys.personal_access_tokens</code>.
- */
-val PERSONAL_ACCESS_TOKENS: PersonalAccessTokens = PersonalAccessTokens.PERSONAL_ACCESS_TOKENS
 
 /**
  * The table <code>dennys.player_champ_selects</code>.

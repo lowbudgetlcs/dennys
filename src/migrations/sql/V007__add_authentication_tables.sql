@@ -9,8 +9,8 @@ create table users (
   is_active BOOLEAN DEFAULT TRUE NOT NULL
 );
 
-create table personal_access_tokens (
-  token TEXT PRIMARY KEY,
+create table access_tokens (
+  token_hash TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   user_id INTEGER REFERENCES users(id),
   scopes TEXT NOT NULL,

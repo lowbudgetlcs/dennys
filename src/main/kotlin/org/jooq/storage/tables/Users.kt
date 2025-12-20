@@ -30,11 +30,11 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.PERSONAL_ACCESS_TOKENS__PERSONAL_ACCESS_TOKENS_USER_ID_FKEY
+import org.jooq.storage.keys.ACCESS_TOKENS__ACCESS_TOKENS_USER_ID_FKEY
 import org.jooq.storage.keys.SESSIONS__SESSIONS_USER_ID_FKEY
 import org.jooq.storage.keys.USERS_PKEY
 import org.jooq.storage.keys.USERS_USERNAME_KEY
-import org.jooq.storage.tables.PersonalAccessTokens.PersonalAccessTokensPath
+import org.jooq.storage.tables.AccessTokens.AccessTokensPath
 import org.jooq.storage.tables.Sessions.SessionsPath
 import org.jooq.storage.tables.records.UsersRecord
 
@@ -137,21 +137,21 @@ open class Users(
     override fun getPrimaryKey(): UniqueKey<UsersRecord> = USERS_PKEY
     override fun getUniqueKeys(): List<UniqueKey<UsersRecord>> = listOf(USERS_USERNAME_KEY)
 
-    private lateinit var _personalAccessTokens: PersonalAccessTokensPath
+    private lateinit var _accessTokens: AccessTokensPath
 
     /**
      * Get the implicit to-many join path to the
-     * <code>dennys.personal_access_tokens</code> table
+     * <code>dennys.access_tokens</code> table
      */
-    fun personalAccessTokens(): PersonalAccessTokensPath {
-        if (!this::_personalAccessTokens.isInitialized)
-            _personalAccessTokens = PersonalAccessTokensPath(this, null, PERSONAL_ACCESS_TOKENS__PERSONAL_ACCESS_TOKENS_USER_ID_FKEY.inverseKey)
+    fun accessTokens(): AccessTokensPath {
+        if (!this::_accessTokens.isInitialized)
+            _accessTokens = AccessTokensPath(this, null, ACCESS_TOKENS__ACCESS_TOKENS_USER_ID_FKEY.inverseKey)
 
-        return _personalAccessTokens;
+        return _accessTokens;
     }
 
-    val personalAccessTokens: PersonalAccessTokensPath
-        get(): PersonalAccessTokensPath = personalAccessTokens()
+    val accessTokens: AccessTokensPath
+        get(): AccessTokensPath = accessTokens()
 
     private lateinit var _sessions: SessionsPath
 

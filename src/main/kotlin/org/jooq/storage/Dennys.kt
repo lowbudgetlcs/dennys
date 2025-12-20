@@ -9,11 +9,11 @@ import kotlin.collections.List
 import org.jooq.Catalog
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
+import org.jooq.storage.tables.AccessTokens
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
-import org.jooq.storage.tables.PersonalAccessTokens
 import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
@@ -47,6 +47,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     }
 
     /**
+     * The table <code>dennys.access_tokens</code>.
+     */
+    val ACCESS_TOKENS: AccessTokens get() = AccessTokens.ACCESS_TOKENS
+
+    /**
      * The table <code>dennys.event_groups</code>.
      */
     val EVENT_GROUPS: EventGroups get() = EventGroups.EVENT_GROUPS
@@ -65,11 +70,6 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      * The table <code>dennys.games</code>.
      */
     val GAMES: Games get() = Games.GAMES
-
-    /**
-     * The table <code>dennys.personal_access_tokens</code>.
-     */
-    val PERSONAL_ACCESS_TOKENS: PersonalAccessTokens get() = PersonalAccessTokens.PERSONAL_ACCESS_TOKENS
 
     /**
      * The table <code>dennys.player_champ_selects</code>.
@@ -159,11 +159,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
+        AccessTokens.ACCESS_TOKENS,
         EventGroups.EVENT_GROUPS,
         Events.EVENTS,
         GameResults.GAME_RESULTS,
         Games.GAMES,
-        PersonalAccessTokens.PERSONAL_ACCESS_TOKENS,
         PlayerChampSelects.PLAYER_CHAMP_SELECTS,
         PlayerCombats.PLAYER_COMBATS,
         PlayerFarming.PLAYER_FARMING,

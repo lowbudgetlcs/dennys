@@ -50,7 +50,7 @@ fun Route.apiRoutes() {
                 }
             }
         }
-        authenticate("auth-session") {
+        authenticate("auth-session", "auth-token") {
             eventRoutesV1(eventService = eventService, seriesService = seriesService)
             teamRoutesV1(teamService = teamService)
             playerRoutesV1(playerService = playerService)
