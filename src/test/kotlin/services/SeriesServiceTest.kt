@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
@@ -43,6 +44,7 @@ class SeriesServiceTest :
                 endDate = Instant.now().plusSeconds(6L),
                 status = EventStatus.ACTIVE,
                 eventGroupId = null,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
         val participatingTeams =
             listOf(
@@ -66,6 +68,7 @@ class SeriesServiceTest :
                 eventId = event.id,
                 participants = participatingTeams.map { it.id },
                 result = null,
+                stage = Stage.REGULAR_SEASON,
             )
 
         val newSeries =
@@ -73,6 +76,7 @@ class SeriesServiceTest :
                 eventId = event.id,
                 participantIds = participatingTeams.map { it.id },
                 totalGames = 3,
+                stage = Stage.REGULAR_SEASON,
             )
         "createSeries succeeds for valid input" {
 
@@ -98,13 +102,21 @@ class SeriesServiceTest :
         "getAllTeams returns repo data" {
             val series =
                 listOf(
-                    Series(SeriesId(1), EventId(1), 3, participatingTeams.map { it.id }, null),
                     Series(
-                        SeriesId(2),
-                        EventId(1),
-                        3,
-                        participatingTeams.map { it.id },
-                        null,
+                        id = SeriesId(1),
+                        eventId = EventId(1),
+                        totalGames = 3,
+                        participants = participatingTeams.map { it.id },
+                        result = null,
+                        stage = Stage.REGULAR_SEASON,
+                    ),
+                    Series(
+                        id = SeriesId(2),
+                        eventId = EventId(1),
+                        totalGames = 3,
+                        participants = participatingTeams.map { it.id },
+                        result = null,
+                        stage = Stage.REGULAR_SEASON,
                     ),
                 )
 

@@ -3,6 +3,7 @@ package services.events
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.EventUpdate
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.patch
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
@@ -44,6 +45,7 @@ class PatchEventTest :
                 startDate = start,
                 endDate = end,
                 status = EventStatus.NOT_STARTED,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
 
         beforeTest { every { eventRepo.getById(testEvent.id) } returns testEvent }

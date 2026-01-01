@@ -1,6 +1,7 @@
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroup
@@ -44,6 +45,7 @@ class EventGroupAndEventRepositoryTest :
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
         val expectedEvent =
             newEvent.toEvent(

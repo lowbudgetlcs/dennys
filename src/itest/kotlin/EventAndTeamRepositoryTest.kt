@@ -1,6 +1,7 @@
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
@@ -44,6 +45,7 @@ class EventAndTeamRepositoryTest :
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
         val expectedEvent =
             newEvent.toEvent(
