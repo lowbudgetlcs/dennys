@@ -19,6 +19,9 @@ ktlint = "13.0.0"
 # kotlin
 reflect-core = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 junit-core = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+#koin
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 # logback
 logback-core = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 slf4j-core = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}
