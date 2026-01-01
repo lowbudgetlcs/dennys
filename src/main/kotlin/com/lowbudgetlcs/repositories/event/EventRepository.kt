@@ -42,6 +42,7 @@ class EventRepository(
                 .set(EVENTS.START_DATE, newEvent.startDate)
                 .set(EVENTS.END_DATE, newEvent.endDate)
                 .set(EVENTS.STATUS, newEvent.status.name)
+                .set(EVENTS.STAGES, newEvent.stages.map { it.name }.toTypedArray())
                 .returning(EVENTS.ID)
                 .fetchOne()
                 ?.get(EVENTS.ID)

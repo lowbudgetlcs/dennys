@@ -318,6 +318,17 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateEventDto"
+            examples:
+              "New Event":
+                value:
+                  name: "Season 15 Regular Season"
+                  description: "The regular season for Season 15"
+                  startDate: "2025-11-01T00:00:00Z"
+                  endDate: "2025-12-01T00:00:00Z"
+                  status: "NOT_STARTED"
+                  stages:
+                    - "REGULAR_SEASON"
+                    - "PLAYOFFS"
         required: true
       responses:
         "200":
@@ -585,6 +596,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/EventCreateSeriesDto"
+            examples:
+              "New Series":
+                value:
+                  team1Id: 1
+                  team2Id: 2
+                  totalGames: 3
+                  stage: "REGULAR_SEASON"
       responses:
         "200":
           description: Team added to event
