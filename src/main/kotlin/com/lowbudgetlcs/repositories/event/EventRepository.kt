@@ -92,17 +92,13 @@ class EventRepository(
         val status = row[EVENTS.STATUS]?.let { EventStatus.valueOf(it) } ?: return null
         val eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.toEventGroupId()
         val stages =
-            row[EVENTS.STAGES]?.mapNotNull { stage ->
-                if (stage == null) {
-                    null
-                } else {
-                    try {
-                        Stage.valueOf(stage)
-                    } catch (_: Exception) {
-                        null
-                    }
+            row[EVENTS.STAGES]
+                ?.filterNotNull()
+                ?.mapNotNull { stageName ->
+                    runCatching { Stage.valueOf(stageName) }.getOrNull()
                 }
-            }?.toSet() ?: emptySet()
+                ?.toSet()
+                ?: emptySet()
         return Event(
             id = eventId,
             name = name,
