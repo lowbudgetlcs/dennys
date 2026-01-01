@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.lowbudgetlcs"
-version = "1.2.0"
+version = "1.3.0"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -114,6 +114,8 @@ dependencies {
     implementation(libs.bundles.ktor.server.plugins)
     implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.ktor.client.plugins)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j)
     implementation(libs.bundles.database)
     implementation(libs.bundles.server.logging)
     implementation(libs.hikari.core)
