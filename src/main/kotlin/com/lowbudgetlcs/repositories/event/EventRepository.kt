@@ -58,7 +58,7 @@ class EventRepository(
                 .set(EVENTS.END_DATE, event.endDate)
                 .set(EVENTS.EVENT_GROUP_ID, event.eventGroupId?.value)
                 .set(EVENTS.STATUS, event.status.name)
-                .set(EVENTS.STAGES, event.stages.joinToString { it.name })
+                .set(EVENTS.STAGES, event.stages.map { it.name }.toTypedArray())
                 .where(EVENTS.ID.eq(event.id.value))
                 .returning(EVENTS.ID)
                 .fetchOne()
@@ -92,11 +92,15 @@ class EventRepository(
         val status = row[EVENTS.STATUS]?.let { EventStatus.valueOf(it) } ?: return null
         val eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.toEventGroupId()
         val stages =
-            row[EVENTS.STAGES]?.split(", ")?.mapNotNull {
-                try {
-                    Stage.valueOf(it)
-                } catch (_: Exception) {
+            row[EVENTS.STAGES]?.mapNotNull { stage ->
+                if (stage == null) {
                     null
+                } else {
+                    try {
+                        Stage.valueOf(stage)
+                    } catch (_: Exception) {
+                        null
+                    }
                 }
             }?.toSet() ?: emptySet()
         return Event(
