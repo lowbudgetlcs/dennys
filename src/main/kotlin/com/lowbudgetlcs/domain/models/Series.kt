@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.models
 
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.team.TeamId
 
 @JvmInline
@@ -18,6 +19,7 @@ data class SeriesResult(
 data class Series(
     val id: SeriesId,
     val eventId: EventId,
+    val stage: Stage,
     val totalGames: Int,
     val participants: List<TeamId>,
     val result: SeriesResult?,
@@ -25,6 +27,7 @@ data class Series(
 
 data class NewSeries(
     val eventId: EventId,
+    val stage: Stage,
     val totalGames: Int,
     val participantIds: List<TeamId>,
 )

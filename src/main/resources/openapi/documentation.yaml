@@ -1165,6 +1165,12 @@ components:
         - CANCELED
         - PAUSED
         - COMPLETED
+    Stage:
+      type: string
+      enum:
+        - REGULAR_SEASON
+        - PLAYOFFS
+        - PROMOTION_RELEGATION
 
     # Game Schemas
     GameDto:
@@ -1310,6 +1316,7 @@ components:
         - endDate
         - status
         - eventGroupId
+        - stages
       properties:
         id:
           type: integer
@@ -1343,6 +1350,10 @@ components:
           type: integer
           example: 1
           nullable: true
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stage"
 
     EventWithTeamsDto:
       type: object
@@ -1356,6 +1367,7 @@ components:
         - status
         - eventGroupId
         - teams
+        - stages
       properties:
         id:
           type: integer
@@ -1391,6 +1403,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TeamDto"
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stage"
 
     EventWithSeriesDto:
       type: object
@@ -1404,6 +1420,7 @@ components:
         - status
         - eventGroupId
         - series
+        - stages
       properties:
         id:
           type: integer
@@ -1439,6 +1456,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SeriesDto"
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stage"
 
     PatchEventDto:
       type: object
@@ -1660,4 +1681,3 @@ components:
       required:
         - code
         - message
-
