@@ -7,12 +7,12 @@ import com.lowbudgetlcs.domain.models.auth.User
 import com.sksamuel.hoplite.Masked
 
 interface IAuthService {
-    fun authenticate(
+    suspend fun authenticate(
         username: String,
         password: Masked,
     ): User
 
-    fun authenticate(token: String): User
+    suspend fun authenticate(token: String): User
 
     fun createSession(user: User): Session
 
@@ -20,5 +20,5 @@ interface IAuthService {
 
     fun validateSession(session: Session)
 
-    fun createAccessToken(newToken: NewAccessToken): FreshAccessToken
+    suspend fun createAccessToken(newToken: NewAccessToken): FreshAccessToken
 }
