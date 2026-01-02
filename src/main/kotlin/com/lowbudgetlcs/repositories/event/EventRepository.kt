@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.toEventId
@@ -41,6 +42,7 @@ class EventRepository(
                 .set(EVENTS.START_DATE, newEvent.startDate)
                 .set(EVENTS.END_DATE, newEvent.endDate)
                 .set(EVENTS.STATUS, newEvent.status.name)
+                .set(EVENTS.STAGES, newEvent.stages.map { it.name }.toTypedArray())
                 .returning(EVENTS.ID)
                 .fetchOne()
                 ?.get(EVENTS.ID)
@@ -57,6 +59,7 @@ class EventRepository(
                 .set(EVENTS.END_DATE, event.endDate)
                 .set(EVENTS.EVENT_GROUP_ID, event.eventGroupId?.value)
                 .set(EVENTS.STATUS, event.status.name)
+                .set(EVENTS.STAGES, event.stages.map { it.name }.toTypedArray())
                 .where(EVENTS.ID.eq(event.id.value))
                 .returning(EVENTS.ID)
                 .fetchOne()
@@ -76,6 +79,7 @@ class EventRepository(
                 EVENTS.END_DATE,
                 EVENTS.STATUS,
                 EVENTS.EVENT_GROUP_ID,
+                EVENTS.STAGES,
             ).from(EVENTS)
 
     fun rowToEvent(row: Record): Event? {
@@ -88,6 +92,13 @@ class EventRepository(
         val endDate = row[EVENTS.END_DATE] ?: return null
         val status = row[EVENTS.STATUS]?.let { EventStatus.valueOf(it) } ?: return null
         val eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.toEventGroupId()
+        val stages =
+            row[EVENTS.STAGES]
+                ?.filterNotNull()
+                ?.mapNotNull { stageName ->
+                    runCatching { Stage.valueOf(stageName) }.getOrNull()
+                }?.toSet()
+                ?: emptySet()
         return Event(
             id = eventId,
             name = name,
@@ -98,6 +109,7 @@ class EventRepository(
             endDate = endDate,
             eventGroupId = eventGroupId,
             status = status,
+            stages = stages,
         )
     }
 }

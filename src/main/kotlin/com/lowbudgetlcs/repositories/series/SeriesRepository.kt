@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.SeriesResult
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
@@ -53,6 +54,7 @@ class SeriesRepository(
                             SERIES,
                         ).set(SERIES.EVENT_ID, newSeries.eventId.value)
                         .set(SERIES.TOTAL_GAMES, newSeries.totalGames)
+                        .set(SERIES.STAGE, newSeries.stage.name)
                         .returning(SERIES.ID)
                         .fetchOne()
                         ?.get(SERIES.ID)
@@ -87,6 +89,7 @@ class SeriesRepository(
                 SERIES.ID,
                 SERIES.TOTAL_GAMES,
                 SERIES.EVENT_ID,
+                SERIES.STAGE,
                 participants,
                 SERIES_RESULTS.WINNER_TEAM_ID,
                 SERIES_RESULTS.LOSER_TEAM_ID,
@@ -98,8 +101,9 @@ class SeriesRepository(
         // NOT NULL data
         val seriesId = row[SERIES.ID]?.toSeriesId() ?: return null
         val eventId = row[SERIES.EVENT_ID]?.toEventId() ?: return null
+        val stage = row[SERIES.STAGE]?.let { Stage.valueOf(it) } ?: return null
         val totalGames = row[SERIES.TOTAL_GAMES] ?: return null
-        val participants = row[participants].map { it.value1()?.toTeamId() }
+        val participants = row[participants].mapNotNull { it.value1()?.toTeamId() }
         // potentially null data
         val winner = row[SERIES_RESULTS.WINNER_TEAM_ID]?.toTeamId()
         val loser = row[SERIES_RESULTS.LOSER_TEAM_ID]?.toTeamId()
@@ -108,6 +112,7 @@ class SeriesRepository(
             Series(
                 id = seriesId,
                 eventId = eventId,
+                stage = stage,
                 totalGames = totalGames,
                 participants = participants,
                 result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,

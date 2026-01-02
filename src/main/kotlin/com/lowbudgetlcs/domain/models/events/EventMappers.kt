@@ -20,6 +20,7 @@ fun NewEvent.toEvent(
         endDate = endDate,
         eventGroupId = null,
         status = status,
+        stages = stages,
     )
 
 fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams =
@@ -34,6 +35,7 @@ fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams =
         endDate = endDate,
         status = status,
         teams = teams,
+        stages = stages,
     )
 
 fun Event.toEventWithSeries(series: List<Series>): EventWithSeries =
@@ -48,4 +50,5 @@ fun Event.toEventWithSeries(series: List<Series>): EventWithSeries =
         endDate = endDate,
         status = status,
         series = series,
+        stages = stages,
     )

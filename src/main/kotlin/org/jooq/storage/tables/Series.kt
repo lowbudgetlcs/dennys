@@ -95,6 +95,11 @@ open class Series(
      */
     val TOTAL_GAMES: TableField<SeriesRecord, Int?> = createField(DSL.name("total_games"), SQLDataType.INTEGER.nullable(false), this, "")
 
+    /**
+     * The column <code>dennys.series.stage</code>.
+     */
+    val STAGE: TableField<SeriesRecord, String?> = createField(DSL.name("stage"), SQLDataType.CLOB.nullable(false).defaultValue(DSL.field(DSL.raw("'REGULAR_SEASON'::text"), SQLDataType.CLOB)), this, "")
+
     private constructor(alias: Name, aliased: Table<SeriesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<SeriesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<SeriesRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)

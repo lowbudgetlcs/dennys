@@ -2,6 +2,7 @@ package com.lowbudgetlcs.api.dto.events
 
 import com.lowbudgetlcs.api.dto.series.SeriesDto
 import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.Stage
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.Instant
@@ -17,4 +18,5 @@ data class EventWithSeriesDto(
     val status: EventStatus,
     val eventGroupId: Int? = null,
     val series: List<SeriesDto>,
+    val stages: Set<Stage>,
 )

@@ -2,6 +2,7 @@ package services.events
 
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toEventWithTeams
@@ -38,6 +39,7 @@ class AddRemoveTeamTest :
                 startDate = start,
                 endDate = end,
                 status = EventStatus.ACTIVE,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
         val expectedEvent =
             newEvent.toEvent(

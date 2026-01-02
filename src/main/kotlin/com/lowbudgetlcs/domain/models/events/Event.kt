@@ -31,6 +31,7 @@ data class Event(
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus,
+    val stages: Set<Stage>,
 )
 
 data class EventWithTeams(
@@ -44,6 +45,7 @@ data class EventWithTeams(
     val endDate: Instant,
     val status: EventStatus,
     val teams: List<Team>,
+    val stages: Set<Stage>,
 )
 
 data class EventWithSeries(
@@ -57,4 +59,5 @@ data class EventWithSeries(
     val endDate: Instant,
     val status: EventStatus,
     val series: List<Series>,
+    val stages: Set<Stage>,
 )
