@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 
 class Argon2Hasher : IHasher {
-    // TODO: Add these params to default.properties
     private val iterations: Deferred<Int> =
         CoroutineScope(Dispatchers.IO).async {
             Argon2Helper.findIterations(argon2, 1000, 65550, 1)

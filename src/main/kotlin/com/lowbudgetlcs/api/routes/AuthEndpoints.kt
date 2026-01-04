@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes
 
-import com.lowbudgetlcs.api.dto.NewTokenDto
+import com.lowbudgetlcs.api.dto.CreateTokenDto
 import com.lowbudgetlcs.api.dto.toNewAccessToken
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
@@ -48,7 +48,7 @@ fun Route.authEndpoints(
                 logCall(call)
                 // We have passed the session auth guard.
                 val session = call.sessions.get<UserSession>()!!
-                val newTokenData = call.receive<NewTokenDto>()
+                val newTokenData = call.receive<CreateTokenDto>()
                 val fresh = authService.createAccessToken(newTokenData.toNewAccessToken(session.userId.toUserId()))
                 call.respond(HttpStatusCode.Created, fresh.token)
             }

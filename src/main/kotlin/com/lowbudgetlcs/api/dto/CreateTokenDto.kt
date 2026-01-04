@@ -7,13 +7,13 @@ import kotlinx.serialization.Serializable
 import java.time.Instant
 
 @Serializable
-data class NewTokenDto(
+data class CreateTokenDto(
     val name: String,
     @Serializable(with = InstantSerializer::class) val expiresAt: Instant,
     val scopes: String,
 )
 
-fun NewTokenDto.toNewAccessToken(userId: UserId): NewAccessToken =
+fun CreateTokenDto.toNewAccessToken(userId: UserId): NewAccessToken =
     NewAccessToken(
         name = name,
         expiresAt = expiresAt,

@@ -146,7 +146,7 @@ fun Application.routes() {
                     session
                 }
                 challenge {
-                    call.respond(HttpStatusCode.Unauthorized)
+                    throw UnauthorizedException("Invalid session.")
                 }
             }
             bearer("auth-token") {

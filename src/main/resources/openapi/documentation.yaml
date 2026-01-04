@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/lowbudgetlcs/dennys/blob/main/LICENSE.txt
-  version: 1.2.0
+  version: 1.3.0
 externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
@@ -16,37 +16,107 @@ servers:
   - url: /api
 
 tags:
-  - name: v1/eventGroup
+  - name: Authentication
+  - name: Event Groups (v1)
     description: Manage event groups
-  - name: v1/eventGroup/events
-    description: Add/remove events to event groups
-  - name: v1/event
+  - name: Events (v1)
     description: Manage Event
-  - name: v1/event/teams
-    description: Assign/remove teams from events
-  - name: v1/event/series
-    description: Create and get series from an event
-  - name: v1/series/games
+  - name: Series (v1)
     description: Create games inside of a series
-  - name: v1/team
-    description: Manage Teams (create/edit/delete)
-  - name: v1/team/players
-    description: Add/remove players from teams
-  - name: v1/player
-    description: Player basic operations
-  - name: v1/player/accounts
-    description: Riot account linking/removal
-  - name: v1/account
-    description: Create and inspect Riot accounts
+  - name: Teams (v1)
+    description: Manage teams
+  - name: Players (v1)
+    description: Manage players
+  - name: Accounts (v1)
+    description: Manage riot accounts
 
 paths:
+  /login:
+    post:
+      summary: Start a session with username/password.
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        description: Valid credentials
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: >
+            Successfully authenticated.
+            The session identifier is returned in a cookie named `user-session`.
+            This cookie must be included in subsequent requests.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "user-session=%7B%22id%22%3A%226c61476b-da90-4cae-82e3-cf009e628f3e%22%2C%22userId%22%3A1%2C%22expiresAt%22%3A%222026-01-04T04%3A55%3A06.154275Z%22%7D; Max-Age=10800; Expires=Sun, 04 Jan 2026 06:55:06 GMT; Path=/; Secure; HttpOnly; SameSite=strict; $x-enc=URI_ENCODING"
+        "401":
+          description: Failed to authenticate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+      security: []
+  /logout:
+    post:
+      security:
+        - cookieAuth: []
+      description: Removes the currently active session.
+      operationId: logout
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: Successfully deleted active session.
+        "401":
+          description: Failed to authenticate, no active session found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /createToken:
+    post:
+      security:
+        - cookieAuth: []
+      description: Create an API token for the currently logged-in user.
+      operationId: createToken
+      tags:
+        - Authentication
+      requestBody:
+        description: Token parameters.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTokenDto"
+      responses:
+        "201":
+          description: Successfully created token.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ABCDEFG123456
+        "401":
+          description: Failed to authenticate.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
   # Event Group Endpoints
   /v1/eventGroup:
     get:
       summary: Get all event groups
       operationId: getEventGroups
       tags:
-        - v1/eventGroup
+        - Event Groups (v1)
       responses:
         "200":
           description: Successful operation
@@ -66,7 +136,7 @@ paths:
       summary: Create a new event group
       operationId: createEventGroup
       tags:
-        - v1/eventGroup
+        - Event Groups (v1)
       requestBody:
         description: Event group specification
         content:
@@ -114,7 +184,7 @@ paths:
       summary: Get an event group by ID
       operationId: getEventGroupById
       tags:
-        - v1/eventGroup
+        - Event Groups (v1)
       parameters:
         - name: eventGroupId
           in: path
@@ -145,7 +215,7 @@ paths:
       summary: Patch an event group's data
       operationId: patchEventGroup
       tags:
-        - v1/eventGroup
+        - Event Groups (v1)
       parameters:
         - name: eventGroupId
           in: path
@@ -190,7 +260,7 @@ paths:
       summary: Get an event group with all events included
       operationId: getEventsInEventGroup
       tags:
-        - v1/eventGroup/events
+        - Event Groups (v1)
       parameters:
         - name: eventGroupId
           in: path
@@ -219,7 +289,7 @@ paths:
       summary: Add an event to an event group
       operationId: addEventToEventGroup
       tags:
-        - v1/eventGroup/events
+        - Event Groups (v1)
       parameters:
         - name: eventGroupId
           in: path
@@ -256,7 +326,7 @@ paths:
       summary: Remove an event from an event group
       operationId: removeEventFromEventGroup
       tags:
-        - v1/eventGroup/events
+        - Event Groups (v1)
       parameters:
         - name: eventGroupId
           in: path
@@ -286,7 +356,7 @@ paths:
   /v1/event:
     get:
       tags:
-        - v1/event
+        - Events (v1)
       summary: Get all events
       description: Fetch a list of all events.
       operationId: getEvents
@@ -307,7 +377,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       tags:
-        - v1/event
+        - Events (v1)
       summary: Create a new event.
       description: |
         Registers an event with Dennys, and optionally assign it to an event group
@@ -347,7 +417,7 @@ paths:
   /v1/event/{eventId}:
     get:
       tags:
-        - v1/event
+        - Events (v1)
       summary: Get an event by ID.
       description: Returns a single event with the associated teams.
       operationId: getEventById
@@ -386,7 +456,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     patch:
       tags:
-        - v1/event
+        - Events (v1)
       summary: Patch an event's data
       parameters:
         - name: eventId
@@ -434,7 +504,7 @@ paths:
       summary: Get an event with all teams included
       operationId: getTeamsInEvent
       tags:
-        - v1/event/teams
+        - Events (v1)
       parameters:
         - name: eventId
           in: path
@@ -467,7 +537,7 @@ paths:
       summary: Link a team to an event
       operationId: addTeamToEvent
       tags:
-        - v1/event/teams
+        - Events (v1)
       parameters:
         - name: eventId
           in: path
@@ -509,7 +579,7 @@ paths:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
       tags:
-        - v1/event/teams
+        - Events (v1)
       parameters:
         - name: eventId
           in: path
@@ -539,7 +609,7 @@ paths:
       summary: Get all the series of an event
       operationId: getSeriesInEvent
       tags:
-        - v1/event/series
+        - Events (v1)
       parameters:
         - name: eventId
           in: path
@@ -572,7 +642,7 @@ paths:
       summary: Create a series for an event.
       operationId: addSeriesToEvent
       tags:
-        - v1/event/series
+        - Events (v1)
       parameters:
         - name: eventId
           in: path
@@ -620,7 +690,7 @@ paths:
       summary: Remove a series from an event
       operationId: removeSeriesFromEvent
       tags:
-        - v1/event/series
+        - Events (v1)
       parameters:
         - name: eventId
           in: path
@@ -652,7 +722,7 @@ paths:
       summary: Create a game in a series
       operationId: createGame
       tags:
-        - v1/series/games
+        - Series (v1)
       requestBody:
         required: true
         content:
@@ -685,7 +755,7 @@ paths:
       summary: Get all teams
       operationId: getTeams
       tags:
-        - v1/team
+        - Teams (v1)
       responses:
         "200":
           description: List of teams
@@ -705,7 +775,7 @@ paths:
       summary: Create a new team
       operationId: addTeam
       tags:
-        - v1/team
+        - Teams (v1)
       requestBody:
         required: true
         description: New team details
@@ -737,7 +807,7 @@ paths:
       summary: Get a team by ID
       operationId: getTeamById
       tags:
-        - v1/team
+        - Teams (v1)
       parameters:
         - name: teamId
           in: path
@@ -764,7 +834,7 @@ paths:
       summary: Patch a team's data.
       operationId: patchTeam
       tags:
-        - v1/team
+        - Teams (v1)
       parameters:
         - name: teamId
           in: path
@@ -805,7 +875,7 @@ paths:
       summary: Get a team with all the players included
       operationId: getPlayersOnTeam
       tags:
-        - v1/team/players
+        - Teams (v1)
       parameters:
         - name: teamId
           in: path
@@ -834,7 +904,7 @@ paths:
       summary: Add a player to a team
       operationId: addPlayerToTeam
       tags:
-        - v1/team/players
+        - Teams (v1)
       parameters:
         - name: teamId
           in: path
@@ -872,7 +942,7 @@ paths:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
       tags:
-        - v1/team/players
+        - Teams (v1)
       parameters:
         - name: teamId
           in: path
@@ -900,7 +970,7 @@ paths:
       summary: Get all players
       operationId: getPlayers
       tags:
-        - v1/player
+        - Players (v1)
       responses:
         "200":
           description: List of all players
@@ -920,7 +990,7 @@ paths:
       summary: Create a new player
       operationId: addPlayer
       tags:
-        - v1/player
+        - Players (v1)
       requestBody:
         required: true
         content:
@@ -951,7 +1021,7 @@ paths:
       summary: Get player by ID
       operationId: getPlayerById
       tags:
-        - v1/player
+        - Players (v1)
       parameters:
         - name: playerId
           in: path
@@ -974,12 +1044,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
     patch:
       summary: Patch a player's data
       operationId: patchPlayer
       tags:
-        - v1/player
+        - Players (v1)
       parameters:
         - name: playerId
           in: path
@@ -1020,7 +1089,7 @@ paths:
       summary: Link a Riot account to a player
       operationId: linkAccountToPlayer
       tags:
-        - v1/player/accounts
+        - Players (v1)
       parameters:
         - name: playerId
           in: path
@@ -1054,7 +1123,7 @@ paths:
       summary: Remove a Riot account from a player
       operationId: removeAccountFromPlayer
       tags:
-        - v1/player/accounts
+        - Players (v1)
       parameters:
         - name: playerId
           in: path
@@ -1090,7 +1159,7 @@ paths:
       summary: Get all Riot accounts
       operationId: getAllRiotAccounts
       tags:
-        - v1/account
+        - Accounts (v1)
       responses:
         "200":
           description: List of all Riot accounts
@@ -1102,12 +1171,11 @@ paths:
                   $ref: "#/components/schemas/RiotAccountDto"
         default:
           description: Unexpected error
-
     post:
       summary: Create a new Riot account
       operationId: createRiotAccountDto
       tags:
-        - v1/account
+        - Accounts (v1)
       requestBody:
         required: true
         content:
@@ -1134,7 +1202,7 @@ paths:
       summary: Get Riot account by ID
       operationId: getRiotAccountDtoById
       tags:
-        - v1/account
+        - Accounts (v1)
       parameters:
         - name: accountId
           in: path
@@ -1155,6 +1223,14 @@ paths:
           description: Unexpected error
 
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: user-session
+    bearerAuth:
+      type: http
+      scheme: bearer
   schemas:
     # Enums
     EventStatus:
@@ -1165,6 +1241,39 @@ components:
         - CANCELED
         - PAUSED
         - COMPLETED
+
+    # Auth Schemas
+    LoginDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: ruuffian
+        password:
+          type: string
+          example: changeit
+
+    CreateTokenDto:
+      type: object
+      required:
+        - name
+        - expiresAt
+        - scopes
+      properties:
+        name:
+          type: string
+          example: Test token
+        expiresAt:
+          type: string
+          format: date-time
+          example: "2025-08-22T15:34:23.105Z"
+        scopes:
+          type: string
+          example: 'user,admin'
+
 
     # Game Schemas
     GameDto:
@@ -1661,3 +1770,6 @@ components:
         - code
         - message
 
+security:
+  - cookieAuth: []
+  - bearerAuth: []
