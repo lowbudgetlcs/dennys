@@ -14,6 +14,7 @@ import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.runBlocking
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
@@ -32,7 +33,7 @@ class UserRepositoryTest :
         val argon2Hasher = Argon2Hasher()
         val username = "ruuffian"
         val password = "ABCD1**"
-        val passwordHash = argon2Hasher.hash(password)
+        val passwordHash = runBlocking { argon2Hasher.hash(password) }
         val username2 = "zain"
 
         // Data
