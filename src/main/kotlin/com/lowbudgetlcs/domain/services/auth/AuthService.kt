@@ -25,7 +25,7 @@ class AuthService(
 ) : IAuthService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun authenticate(
+    override suspend fun authenticate(
         username: String,
         password: Masked,
     ): User {
@@ -48,7 +48,7 @@ class AuthService(
         }
     }
 
-    override fun authenticate(token: String): User {
+    override suspend fun authenticate(token: String): User {
         val tokenHash = tokenHasher.hash(token)
         logger.debug("Authenticating $tokenHash...")
         val pat = tokenRepo.getByTokenHash(tokenHash) ?: throw UnauthorizedException("Invalid token.")
@@ -88,7 +88,7 @@ class AuthService(
         }
     }
 
-    override fun createAccessToken(newToken: NewAccessToken): FreshAccessToken {
+    override suspend fun createAccessToken(newToken: NewAccessToken): FreshAccessToken {
         val token = UUID.randomUUID().toString()
         val tokenHash = tokenHasher.hash(token)
         tokenRepo.insert(newToken, tokenHash) ?: DatabaseException("An unknown error occured.")

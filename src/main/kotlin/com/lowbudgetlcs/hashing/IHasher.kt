@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.hashing
 
 interface IHasher {
-    fun hash(input: String): String
+    suspend fun hash(input: String): String
 
-    fun verify(
+    suspend fun verify(
         input: String,
         expectedHash: String,
     ): Boolean
