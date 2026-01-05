@@ -6,6 +6,7 @@ import com.lowbudgetlcs.api.routes.authEndpoints
 import com.lowbudgetlcs.auth.UserPrincipal
 import com.lowbudgetlcs.auth.UserSession
 import com.lowbudgetlcs.auth.toSession
+import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.services.user.IUserService
@@ -53,6 +54,7 @@ fun logCall(call: RoutingCall) {
 fun Application.routes() {
     val authService by inject<IAuthService>()
     val userService by inject<IUserService>()
+    val cookieConfig by inject<CookieConfig>()
 
     routing {
         install(StatusPages) {
@@ -161,10 +163,10 @@ fun Application.routes() {
             cookie<UserSession>("user-session") {
                 cookie.path = "/"
                 // TODO: Put this value in default.properties
-                cookie.maxAgeInSeconds = 60 * 60 * 3
+                cookie.maxAgeInSeconds = cookieConfig.expiration
                 cookie.httpOnly = true
                 cookie.sameSite = "strict"
-                cookie.secure = true
+                cookie.secure = cookieConfig.secure
             }
         }
         route("/") {
