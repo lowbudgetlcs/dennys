@@ -25,13 +25,13 @@ jobs:
   set-version:
     name: Extracts app version from Gradle
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.setup.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - name: Extract app version
         id: setup
         uses: ./.github/actions/extract-version
+    outputs:
+      version: ${{ steps.setup.outputs.version }}
     
   build-jvm:
     name: Build and upload JVM application
@@ -179,7 +179,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY_NAME }}
           tags: |
-            ${{ needs.set_version.outputs.version }}
+            ${{ needs.set-version.outputs.version }}
 
       - name: Create and push manifest list
         working-directory: ${{ runner.temp }}/digests
@@ -203,7 +203,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           source: src/migrations/sql/*
-          target: /releases/dennys-${{ needs.set_version.outputs.version }}/migrations
+          target: /releases/dennys-${{ needs.set-version.outputs.version }}/migrations
           overwrite: true
           strip_components: 3 
 
@@ -229,5 +229,5 @@ jobs:
             export RIOT_TOKEN
             export DENNYS_ADMIN_USERNAME
             export DENNYS_ADMIN_PASSWORD
-            ./release.sh -csn ${{ needs.set_version.outputs.version }} 
+            ./release.sh -csn ${{ needs.set-version.outputs.version }} 
             )

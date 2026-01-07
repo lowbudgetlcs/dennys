@@ -24,6 +24,7 @@ import io.ktor.server.auth.bearer
 import io.ktor.server.auth.form
 import io.ktor.server.auth.session
 import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.statuspages.StatusPages
@@ -169,6 +170,7 @@ fun Application.routes() {
                 cookie.secure = cookieConfig.secure
             }
         }
+        install(AutoHeadResponse)
         route("/") {
             get {
                 logCall(call)
