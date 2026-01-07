@@ -13,7 +13,7 @@ externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
 servers:
-  - url: /api
+  - url: /
 
 tags:
   - name: Authentication
@@ -111,7 +111,7 @@ paths:
 
 
   # Event Group Endpoints
-  /v1/eventGroup:
+  /api/v1/eventGroup:
     get:
       summary: Get all event groups
       operationId: getEventGroups
@@ -179,7 +179,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/eventGroup/{eventGroupId}:
+  /api/v1/eventGroup/{eventGroupId}:
     get:
       summary: Get an event group by ID
       operationId: getEventGroupById
@@ -255,7 +255,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/eventGroup/{eventGroupId}/events:
+  /api/v1/eventGroup/{eventGroupId}/events:
     get:
       summary: Get an event group with all events included
       operationId: getEventsInEventGroup
@@ -321,7 +321,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/eventGroup/{eventGroupId}/events/{eventId}:
+  /api/v1/eventGroup/{eventGroupId}/events/{eventId}:
     delete:
       summary: Remove an event from an event group
       operationId: removeEventFromEventGroup
@@ -353,7 +353,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   # Event Endpoints
-  /v1/event:
+  /api/v1/event:
     get:
       tags:
         - Events (v1)
@@ -425,7 +425,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/event/{eventId}:
+  /api/v1/event/{eventId}:
     get:
       tags:
         - Events (v1)
@@ -510,7 +510,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/event/{eventId}/teams:
+  /api/v1/event/{eventId}/teams:
     get:
       summary: Get an event with all teams included
       operationId: getTeamsInEvent
@@ -585,7 +585,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/event/{eventId}/teams/{teamId}:
+  /api/v1/event/{eventId}/teams/{teamId}:
     delete:
       summary: Remove a team from an event
       operationId: removeTeamFromEvent
@@ -615,7 +615,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/event/{eventId}/series:
+  /api/v1/event/{eventId}/series:
     get:
       summary: Get all the series of an event
       operationId: getSeriesInEvent
@@ -703,7 +703,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/event/{eventId}/series/{seriesId}:
+  /api/v1/event/{eventId}/series/{seriesId}:
     delete:
       summary: Remove a series from an event
       operationId: removeSeriesFromEvent
@@ -735,7 +735,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   # Series Endpoints
-  /v1/series/game:
+  /api/v1/series/game:
     post:
       summary: Create a game in a series
       operationId: createGame
@@ -768,7 +768,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   # Team Endpoints
-  /v1/team:
+  /api/v1/team:
     get:
       summary: Get all teams
       operationId: getTeams
@@ -820,7 +820,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/team/{teamId}:
+  /api/v1/team/{teamId}:
     get:
       summary: Get a team by ID
       operationId: getTeamById
@@ -888,7 +888,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/team/{teamId}/players:
+  /api/v1/team/{teamId}/players:
     get:
       summary: Get a team with all the players included
       operationId: getPlayersOnTeam
@@ -955,7 +955,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/team/{teamId}/players/{playerId}:
+  /api/v1/team/{teamId}/players/{playerId}:
     delete:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
@@ -983,7 +983,7 @@ paths:
           description: Team or player not found
 
   # Player Endpoints
-  /v1/player:
+  /api/v1/player:
     get:
       summary: Get all players
       operationId: getPlayers
@@ -1034,7 +1034,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/player/{playerId}:
+  /api/v1/player/{playerId}:
     get:
       summary: Get player by ID
       operationId: getPlayerById
@@ -1102,7 +1102,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /v1/player/{playerId}/accounts:
+  /api/v1/player/{playerId}/accounts:
     post:
       summary: Link a Riot account to a player
       operationId: linkAccountToPlayer
@@ -1136,7 +1136,7 @@ paths:
           description: Riot account already assigned to another player
         default:
           description: Unexpected error
-  /v1/player/{playerId}/accounts/{accountId}:
+  /api/v1/player/{playerId}/accounts/{accountId}:
     delete:
       summary: Remove a Riot account from a player
       operationId: removeAccountFromPlayer
@@ -1172,7 +1172,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   # Account Endpoints
-  /v1/account:
+  /api/v1/account:
     get:
       summary: Get all Riot accounts
       operationId: getAllRiotAccounts
@@ -1215,7 +1215,7 @@ paths:
           description: Riot account already exists
         default:
           description: Unexpected error
-  /v1/account/{accountId}:
+  /api/v1/account/{accountId}:
     get:
       summary: Get Riot account by ID
       operationId: getRiotAccountDtoById
