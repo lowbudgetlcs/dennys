@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.modules
 
-import com.lowbudgetlcs.api.dto.InstantSerializer
+import com.lowbudgetlcs.serializers.InstantSerializer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

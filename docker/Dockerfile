@@ -8,11 +8,13 @@ RUN gradle --no-daemon installDist
 
 FROM amazoncorretto:21-alpine AS local
 WORKDIR /app
+RUN apk upgrade --no-cache && apk add argon2-dev
 COPY --from=builder /builder/build/install/dennys/ ./
 ENTRYPOINT ["./bin/dennys"]
 
 FROM amazoncorretto:21-alpine AS deploy
 WORKDIR /app
+RUN apk upgrade --no-cache && apk add argon2-dev
 ARG DIST_PATH 
 COPY --chmod=755 ${DIST_PATH}/ ./
 ENTRYPOINT ["./bin/dennys"]

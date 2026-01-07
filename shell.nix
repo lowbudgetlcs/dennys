@@ -5,10 +5,7 @@ pkgs.mkShell {
       jdk21 gnumake
       yaml-language-server
       docker
-      ruff basedpyright
-      (python3.withPackages(p: with p; [
-        requests
-      ]))
+      libargon2
     ];
     env = {
       TEST="Hello there...";

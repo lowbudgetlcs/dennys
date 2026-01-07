@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api.routes.v1.series
 import com.lowbudgetlcs.api.dto.games.CreateGameDto
 import com.lowbudgetlcs.api.dto.games.toDto
 import com.lowbudgetlcs.api.dto.games.toNewGame
+import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.services.game.IGameService
 import io.ktor.http.HttpStatusCode
@@ -19,7 +20,7 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.seriesEndpointsV1(gameService: IGameService) {
     post<SeriesResourcesV1.Game> {
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/series/game")
+            logCall(call)
             val dto = call.receive<CreateGameDto>()
             logger.debug(dto.toString())
             val created = gameService.createGame(dto.toNewGame())

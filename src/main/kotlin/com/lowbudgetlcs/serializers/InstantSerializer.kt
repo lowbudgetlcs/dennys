@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.dto
+package com.lowbudgetlcs.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

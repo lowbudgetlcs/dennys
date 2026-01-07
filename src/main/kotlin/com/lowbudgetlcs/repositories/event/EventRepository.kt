@@ -22,8 +22,7 @@ class EventRepository(
     override fun getAllByGroupId(groupId: EventGroupId): List<Event> =
         selectEvents().where(EVENTS.EVENT_GROUP_ID.eq(groupId.value)).fetch().mapNotNull(::rowToEvent)
 
-    override fun getById(id: EventId): Event? =
-        selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne()?.let(::rowToEvent)
+    override fun getById(id: EventId): Event? = selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne(::rowToEvent)
 
     override fun getByName(name: String): Event? =
         selectEvents().where(EVENTS.NAME.eq(name)).fetchOne()?.let(::rowToEvent)

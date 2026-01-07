@@ -2,31 +2,60 @@ package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.api.routes.apiRoutes
+import com.lowbudgetlcs.api.routes.authEndpoints
+import com.lowbudgetlcs.auth.UserPrincipal
+import com.lowbudgetlcs.auth.UserSession
+import com.lowbudgetlcs.auth.toSession
+import com.lowbudgetlcs.config.CookieConfig
+import com.lowbudgetlcs.domain.services.auth.IAuthService
+import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
+import com.lowbudgetlcs.domain.services.user.IUserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
+import com.sksamuel.hoplite.Masked
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.JsonConvertException
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.bearer
+import io.ktor.server.auth.form
+import io.ktor.server.auth.session
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.path
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sessions.Sessions
+import io.ktor.server.sessions.cookie
+import io.ktor.server.sessions.sameSite
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
+// Generic endpoint log function.
+fun logCall(call: RoutingCall) {
+    logger.info("📩 Received ${call.request.httpMethod} on ${call.request.path()}")
+}
+
 fun Application.routes() {
+    val authService by inject<IAuthService>()
+    val userService by inject<IUserService>()
+    val cookieConfig by inject<CookieConfig>()
+
     routing {
         install(StatusPages) {
             exception<RequestValidationException> { call, cause ->
@@ -77,6 +106,12 @@ fun Application.routes() {
                 val e = Error(code = code.value, message = cause.message ?: "Internal server error")
                 call.respond(code, e)
             }
+            exception<UnauthorizedException> { call, cause ->
+                logger.error("⚠️ Unauthorized")
+                val code = HttpStatusCode.Unauthorized
+                val e = Error(code = code.value, message = cause.message ?: "Not authorized.")
+                call.respond(code, e)
+            }
             exception<Throwable> { call, cause ->
                 logger.error("⚠️ Internal server error: $call", cause)
                 val code = HttpStatusCode.InternalServerError
@@ -88,20 +123,63 @@ fun Application.routes() {
             anyHost()
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
+            allowHeader("X-Dennys-Token")
             allowHeader("api_key")
             allowMethod(HttpMethod.Patch)
             allowMethod(HttpMethod.Delete)
         }
         install(CorrelationIdPlugin)
         install(Resources)
+        install(Authentication) {
+            form("auth-form") {
+                userParamName = "username"
+                passwordParamName = "password"
+                validate { credentials ->
+                    val user = authService.authenticate(credentials.name, Masked(credentials.password))
+                    UserPrincipal(user.id.value, user.username, user.roles)
+                }
+                challenge {
+                    call.respond(HttpStatusCode.Unauthorized, "Invalid credentials passed.")
+                }
+            }
+            session<UserSession>("auth-session") {
+                validate { session ->
+                    authService.validateSession(session.toSession())
+                    session
+                }
+                challenge {
+                    throw UnauthorizedException("Invalid session.")
+                }
+            }
+            bearer("auth-token") {
+                realm = "/"
+                authenticate { bearer ->
+                    val user = authService.authenticate(bearer.token)
+                    UserPrincipal(user.id.value, user.username, user.roles)
+                }
+            }
+        }
+        install(Sessions) {
+            cookie<UserSession>("user-session") {
+                cookie.path = "/"
+                // TODO: Put this value in default.properties
+                cookie.maxAgeInSeconds = cookieConfig.expiration
+                cookie.httpOnly = true
+                cookie.sameSite = "strict"
+                cookie.secure = cookieConfig.secure
+            }
+        }
         route("/") {
             get {
+                logCall(call)
                 call.respondText("WHAT THE FUCK IS UP DENNYS????")
             }
         }
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
             version = "5.26.1"
         }
+        authEndpoints(authService, userService)
         apiRoutes()
+        // TODO: Add a fancy schmancy healthcheck route.
     }
 }

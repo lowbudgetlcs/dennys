@@ -120,6 +120,7 @@ dependencies {
     implementation(libs.bundles.server.logging)
     implementation(libs.hikari.core)
     implementation(libs.hoplite.core)
+    implementation(libs.argon2.nolibs)
 
     // Jooq Code Generation
     "jooqImplementation"(libs.bundles.jooq.codegen)
@@ -135,8 +136,10 @@ dependencies {
     "itestImplementation"(libs.bundles.database)
     "itestImplementation"(libs.logback.core)
     "itestImplementation"(libs.hoplite.core)
+    "itestImplementation"(libs.argon2.impl)
 
     // Unit Testing
     testImplementation(libs.bundles.kotest.unit)
     testImplementation(libs.reflect.core)
+    testImplementation(libs.argon2.impl)
 }
