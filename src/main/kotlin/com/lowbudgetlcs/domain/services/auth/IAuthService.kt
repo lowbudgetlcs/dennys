@@ -21,4 +21,6 @@ interface IAuthService {
     fun validateSession(session: Session)
 
     suspend fun createAccessToken(newToken: NewAccessToken): FreshAccessToken
+
+    fun cleanupExpiredSessions()
 }

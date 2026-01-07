@@ -37,6 +37,7 @@ val serviceModule =
                 get(),
                 passwordHasher = get(named("argon2")),
                 tokenHasher = get(named("sha256")),
+                get(),
             )
         }
         single<IUserService> { UserService(get()) }

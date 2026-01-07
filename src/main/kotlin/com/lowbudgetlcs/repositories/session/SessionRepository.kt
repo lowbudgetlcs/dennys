@@ -13,6 +13,8 @@ import java.util.UUID
 class SessionRepository(
     private val dsl: DSLContext,
 ) : ISessionRepository {
+    override fun getAll(): List<Session> = selectSessions().fetch(::rowToSession)
+
     override fun getById(id: SessionId): Session? =
         selectSessions().where(SESSIONS.ID.eq(id.value)).fetchOne(::rowToSession)
 

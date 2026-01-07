@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.services.auth
 
+import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.models.auth.FreshAccessToken
 import com.lowbudgetlcs.domain.models.auth.NewAccessToken
 import com.lowbudgetlcs.domain.models.auth.NewSession
@@ -22,6 +23,7 @@ class AuthService(
     private val tokenRepo: IAccessTokenRepository,
     private val passwordHasher: IHasher,
     private val tokenHasher: IHasher,
+    private val cookieConfig: CookieConfig,
 ) : IAuthService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -65,10 +67,10 @@ class AuthService(
         }
     }
 
+    // TODO: Pass in the actual session created by KTOR instead of creating it ourself...
     override fun createSession(user: User): Session {
         logger.debug("Starting session for '${user.username}'...")
-        // TODO: Add default session timeout to default.properties
-        val newSession = NewSession(user, Instant.now().plusSeconds(3600))
+        val newSession = NewSession(user, Instant.now().plusSeconds(cookieConfig.expiration))
         if (user.isActive) return sessionRepo.insert(newSession) ?: throw DatabaseException("An unkown error occured.")
         throw UnauthorizedException("This user is locked.")
     }
@@ -93,5 +95,15 @@ class AuthService(
         val tokenHash = tokenHasher.hash(token)
         tokenRepo.insert(newToken, tokenHash) ?: DatabaseException("An unknown error occured.")
         return FreshAccessToken(token)
+    }
+
+    override fun cleanupExpiredSessions() {
+        logger.info("Cleaning up expired sessions...")
+        val expiredSessions = sessionRepo.getAll().filter { it.expiresAt < Instant.now() }
+        logger.info("Found ${expiredSessions.size} expired sessions...")
+        for (expiredSession in expiredSessions) {
+            clearSession(expiredSession)
+        }
+        logger.info("Session cleanup complete!")
     }
 }
