@@ -5,10 +5,6 @@ pkgs.mkShell {
       jdk21 gnumake
       yaml-language-server
       docker
-      ruff basedpyright
-      (python3.withPackages(p: with p; [
-        requests psycopg argon2-cffi
-      ]))
       libargon2
     ];
     env = {
