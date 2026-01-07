@@ -81,6 +81,7 @@ jobs:
       - unit-tests
       - integration-tests
     steps:
+      - uses: actions/checkout@v4
       - id: platform
         run: |
           platform=${{ matrix.platform }}
