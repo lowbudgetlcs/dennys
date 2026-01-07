@@ -2,6 +2,7 @@ import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
@@ -50,6 +51,7 @@ class SeriesRepositoryTest :
                     startDate = Instant.now(),
                     endDate = Instant.now().plusSeconds(3_600L),
                     status = EventStatus.ACTIVE,
+                    stages = setOf(Stage.REGULAR_SEASON),
                 ),
                 riotTournamentId = 1.toRiotTournamentId(),
             ) ?: throw Exception("Failed to insert initial event.")
@@ -69,6 +71,7 @@ class SeriesRepositoryTest :
                     eventId = event.id,
                     totalGames = 10,
                     participantIds = listOf(team1.id, team2.id),
+                    stage = Stage.REGULAR_SEASON,
                 )
         }
 

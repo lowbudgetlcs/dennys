@@ -17,6 +17,7 @@ fun CreateEventDto.toNewEvent(): NewEvent =
         startDate = startDate,
         endDate = endDate,
         status = status,
+        stages = stages,
     )
 
 fun PatchEventDto.toEventUpdate(): EventUpdate =
@@ -40,6 +41,7 @@ fun Event.toDto(): EventDto =
         description = description,
         status = status,
         eventGroupId = eventGroupId?.value,
+        stages = stages,
     )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto =
@@ -52,6 +54,7 @@ fun EventWithTeams.toDto(): EventWithTeamsDto =
         description = description,
         status = status,
         teams = teams.map { t -> t.toDto() },
+        stages = stages,
     )
 
 fun EventWithSeries.toDto(): EventWithSeriesDto =
@@ -64,4 +67,5 @@ fun EventWithSeries.toDto(): EventWithSeriesDto =
         description = description,
         status = status,
         series = series.map { s -> s.toDto() },
+        stages = stages,
     )

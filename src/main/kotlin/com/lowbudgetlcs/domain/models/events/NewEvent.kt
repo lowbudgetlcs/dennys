@@ -10,4 +10,5 @@ data class NewEvent(
     val endDate: Instant,
     val status: EventStatus,
     val eventGroupId: EventGroupId? = null,
+    val stages: Set<Stage>,
 )

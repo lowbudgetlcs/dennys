@@ -27,6 +27,10 @@ open class SeriesRecord() : UpdatableRecordImpl<SeriesRecord>(Series.SERIES) {
         set(value): Unit = set(2, value)
         get(): Int? = get(2) as Int?
 
+    open var stage: String?
+        set(value): Unit = set(3, value)
+        get(): String? = get(3) as String?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -36,10 +40,11 @@ open class SeriesRecord() : UpdatableRecordImpl<SeriesRecord>(Series.SERIES) {
     /**
      * Create a detached, initialised SeriesRecord
      */
-    constructor(id: Int? = null, eventId: Int? = null, totalGames: Int? = null): this() {
+    constructor(id: Int? = null, eventId: Int? = null, totalGames: Int? = null, stage: String? = null): this() {
         this.id = id
         this.eventId = eventId
         this.totalGames = totalGames
+        this.stage = stage
         resetChangedOnNotNull()
     }
 }

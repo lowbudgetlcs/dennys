@@ -2,6 +2,7 @@ package services.events.groups
 
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
@@ -73,6 +74,7 @@ class EventGroupServiceTest :
                 startDate = now,
                 endDate = now.plusSeconds(1L),
                 status = EventStatus.ACTIVE,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
         val expectedEvent2 =
             Event(
@@ -85,6 +87,7 @@ class EventGroupServiceTest :
                 startDate = now,
                 endDate = now.plusSeconds(1L),
                 status = EventStatus.ACTIVE,
+                stages = setOf(Stage.REGULAR_SEASON),
             )
         val addEvents = listOf(expectedEvent1.id, expectedEvent2.id)
         val newGroup2 =

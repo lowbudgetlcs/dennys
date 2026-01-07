@@ -128,6 +128,11 @@ open class Events(
      */
     val STATUS: TableField<EventsRecord, String?> = createField(DSL.name("status"), SQLDataType.CLOB.nullable(false), this, "")
 
+    /**
+     * The column <code>dennys.events.stages</code>.
+     */
+    val STAGES: TableField<EventsRecord, Array<String?>?> = createField(DSL.name("stages"), SQLDataType.CLOB.array().nullable(false).defaultValue(DSL.field(DSL.raw("ARRAY['REGULAR_SEASON'::text]"), SQLDataType.CLOB.array())), this, "")
+
     private constructor(alias: Name, aliased: Table<EventsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<EventsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<EventsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
