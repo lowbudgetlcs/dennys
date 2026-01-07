@@ -81,7 +81,7 @@ jobs:
       - unit-tests
       - integration-tests
     steps:
-      - id: Fetch platform
+      - id: platform
         run: |
           platform=${{ matrix.platform }}
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
@@ -220,4 +220,4 @@ jobs:
             export RIOT_TOKEN
             export DENNYS_ADMIN_USERNAME
             export DENNYS_ADMIN_PASSWORD
-            ./release.sh ${{ steps.setup.outputs.version }} 
+            ./release.sh -csn ${{ steps.setup.outputs.version }} 
