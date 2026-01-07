@@ -36,6 +36,16 @@ fun main(args: Array<String>) =
     io.ktor.server.netty.EngineMain
         .main(args)
 
+fun Application.startSessionCleanup() =
+    CoroutineScope(Dispatchers.Default).launch {
+        logger.info("Starting session cleanup...")
+        val authService by inject<IAuthService>()
+        repeat(Int.MAX_VALUE) {
+            authService.cleanupExpiredSessions()
+            delay(60000.milliseconds)
+        }
+    }
+
 fun Application.module() {
     logger.info("🔧 Performing opening duties...")
 
@@ -52,15 +62,6 @@ fun Application.module() {
         )
     }
 
-    CoroutineScope(Dispatchers.Default).launch {
-        logger.info("Starting session cleanup...")
-        val authService by inject<IAuthService>()
-        repeat(Int.MAX_VALUE) {
-            authService.cleanupExpiredSessions()
-            delay(60000.milliseconds)
-        }
-    }
-
     install(ContentNegotiation) {
         json(
             Json {
@@ -74,6 +75,6 @@ fun Application.module() {
         )
     }
     routes()
-
+    startSessionCleanup()
     logger.info("🍽️ Denny's is open! Ready to serve requests. 🚀")
 }
