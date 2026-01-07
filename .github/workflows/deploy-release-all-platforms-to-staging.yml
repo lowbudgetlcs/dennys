@@ -1,7 +1,7 @@
 name: Deploy a release branch to a staging environment.
 
 env:
-  REGISTRY_IMAGE: lblcs/dennys
+  REGISTRY_NAME: lblcs/dennys
 
 on:
   push:
