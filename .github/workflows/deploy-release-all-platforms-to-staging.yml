@@ -214,11 +214,14 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          envs: CLOUDFLARE_TOKEN,CLOUDFLARE_ZONE_ID,RIOT_TOKEN,DENNYS_ADMIN_USERNAME,DENNYS_ADMIN_PASSWORD
           script: |
             cd /lblcs/scripts/dennys
+            (
             export CLOUDFLARE_TOKEN
             export CLOUDFLARE_ZONE_ID
             export RIOT_TOKEN
             export DENNYS_ADMIN_USERNAME
             export DENNYS_ADMIN_PASSWORD
             ./release.sh -csn ${{ steps.setup.outputs.version }} 
+            )
