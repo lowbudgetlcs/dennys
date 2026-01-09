@@ -3,4 +3,4 @@ ktor:
     modules:
       - com.lowbudgetlcs.ApplicationKt.module
   deployment:
-    port: ${port}
+    port: 9292
