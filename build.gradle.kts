@@ -4,6 +4,12 @@ import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
+val migrationsDir = project.properties["migrationsDir"] as String
+val jooqMigrationsDir = layout.buildDirectory.dir("jooq/migrations")
+val jooqPackage = project.properties["jooq.package"] as String
+val jooqOutputDir = project.properties["jooq.outputDir"] as String
+val sqlMigrationsDir = project.properties["sql.migrations.dir"] as String
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.application)
@@ -12,8 +18,8 @@ plugins {
     alias(libs.plugins.ktlint)
 }
 
-group = "com.lowbudgetlcs"
-version = "1.3.0"
+group = project.properties["group"] as String
+version = project.properties["version"] as String
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -40,11 +46,26 @@ ktlint {
     }
 }
 
-tasks.register<Test>("generateJooq") {
+tasks.register<JavaExec>("generateJooq") {
     group = "codegen"
     description = "Generates Jooq data classes from Dennys database schema"
-    testClassesDirs = sourceSets["jooq"].output.classesDirs
+
+    inputs.dir(migrationsDir)
+    outputs.dir(jooqOutputDir)
+
+    dependsOn(tasks.named("compileJooqKotlin"))
+    jvmArgs =
+        listOf(
+            "-Djooq.package=$jooqPackage",
+            "-Djooq.directory=$jooqOutputDir",
+            "-Dsql.migrations.dir=$sqlMigrationsDir",
+        )
     classpath = sourceSets["jooq"].runtimeClasspath
+    mainClass.set("com.example.jooq.JooqGeneratorKt")
+}
+
+tasks.named("compileKotlin") {
+    dependsOn("generateJooq")
 }
 
 tasks.register<Test>("itest") {
@@ -96,12 +117,11 @@ tasks.register("installGitHooks") {
 }
 
 sourceSets {
-    val migrationsDir = "src/migrations"
-    main {}
-    test {}
-    create("jooq") {
-        resources.srcDir(migrationsDir)
+    main {
+        kotlin.srcDir(jooqOutputDir)
     }
+    test {}
+    create("jooq") {}
     create("itest") {
         resources.srcDir(migrationsDir)
         compileClasspath += sourceSets["main"].output
@@ -124,8 +144,6 @@ dependencies {
 
     // Jooq Code Generation
     "jooqImplementation"(libs.bundles.jooq.codegen)
-    "jooqImplementation"(libs.bundles.kotest.integration)
-    "jooqImplementation"(libs.postgresql.core)
     "jooqImplementation"(libs.logback.core)
 
     // Integration Testing

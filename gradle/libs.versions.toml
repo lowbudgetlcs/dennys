@@ -51,6 +51,7 @@ ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-conte
 # jooq
 jooq-core = { group = "org.jooq", name = "jooq", version.ref = "jooq" }
 jooq-meta = { group = "org.jooq", name = "jooq-meta", version.ref = "jooq" }
+jooq-extensions = { group = "org.jooq", name = "jooq-meta-extensions", version.ref = "jooq" }
 jooq-codegen = { group = "org.jooq", name = "jooq-codegen", version.ref = "jooq" }
 # hikari
 hikari-core = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikaricp" }
@@ -86,7 +87,7 @@ ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-s
 server-logging = ["logback-core", "slf4j-core", "slf4j-coroutines"]
 ktor-client = ["ktor-client-core", "ktor-client-cio"]
 ktor-client-plugins = ["ktor-client-content-negotiation", "ktor-client-logging"]
-jooq-codegen = ["jooq-meta", "jooq-codegen"]
+jooq-codegen = ["jooq-meta", "jooq-extensions", "jooq-codegen"]
 database = ["jooq-core", "postgresql-core"]
 kotest-unit = ["junit-core", "kotest-runner", "kotest-assertions", "mockk-core"]
 kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "mockk-core", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]

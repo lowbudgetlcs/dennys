@@ -1,3 +1,4 @@
+-- [jooq ignore start]
 START TRANSACTION;
 SET search_path = dennys;
 
@@ -21,3 +22,4 @@ FOR EACH ROW
 EXECUTE FUNCTION assign_game_number();
 
 COMMIT;
+-- [jooq ignore stop]

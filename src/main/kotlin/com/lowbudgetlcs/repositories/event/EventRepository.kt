@@ -96,8 +96,7 @@ class EventRepository(
                 ?.filterNotNull()
                 ?.mapNotNull { stageName ->
                     runCatching { Stage.valueOf(stageName) }.getOrNull()
-                }?.toSet()
-                ?: emptySet()
+                }?.toSet() ?: emptySet()
         return Event(
             id = eventId,
             name = name,
