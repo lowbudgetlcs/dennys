@@ -2,7 +2,7 @@ package com.lowbudgetlcs.domain.services.game
 
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.NewGame
-import com.lowbudgetlcs.domain.models.events.NewShortcode
+import com.lowbudgetlcs.domain.models.events.ShortcodeOptions
 import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.TeamId
@@ -42,7 +42,7 @@ class GameService(
             eventRepo.getById(series.eventId)
                 ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
         val response =
-            gate.getCode(event.riotTournamentId, NewShortcode())
+            gate.getCode(event.riotTournamentId, ShortcodeOptions())
                 ?: throw GatewayException("Failed to create shortcode.")
         val shortcode = response.codes.first()
         return gameRepo.insert(newGame, shortcode.toShortcode(), series.id)

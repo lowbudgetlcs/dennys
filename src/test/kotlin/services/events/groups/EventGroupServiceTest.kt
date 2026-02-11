@@ -13,7 +13,7 @@ import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.domain.services.event.group.EventGroupService
 import com.lowbudgetlcs.repositories.event.IEventRepository
-import com.lowbudgetlcs.repositories.event.group.IEventGroupRepository
+import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FunSpec

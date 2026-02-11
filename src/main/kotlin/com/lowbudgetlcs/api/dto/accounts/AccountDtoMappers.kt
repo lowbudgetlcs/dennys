@@ -1,17 +1,18 @@
 package com.lowbudgetlcs.api.dto.accounts
 
-import com.lowbudgetlcs.domain.models.player.account.NewRiotAccount
-import com.lowbudgetlcs.domain.models.player.account.RiotAccount
-import com.lowbudgetlcs.domain.models.player.account.RiotPuuid
+import com.lowbudgetlcs.domain.models.player.account.Account
+import com.lowbudgetlcs.domain.models.player.account.NewAccount
+import com.lowbudgetlcs.domain.models.player.account.toPuuid
 
-fun NewAccountDto.toNewRiotAccount(): NewRiotAccount =
-    NewRiotAccount(
-        riotPuuid = RiotPuuid(riotPuuid),
+fun NewAccountDto.toNewAccount() =
+    NewAccount(
+        puuid = riotPuuid.toPuuid(),
+        playerId = null,
     )
 
-fun RiotAccount.toDto(): AcountDto =
-    AcountDto(
+fun Account.toDto() =
+    AccountDto(
         id = id.value,
-        riotPuuid = riotPuuid.value,
+        riotPuuid = puuid.value,
         playerId = playerId?.value,
     )

@@ -13,7 +13,7 @@ import com.lowbudgetlcs.domain.models.events.group.patch
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupWithEvents
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
-import com.lowbudgetlcs.repositories.event.group.IEventGroupRepository
+import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

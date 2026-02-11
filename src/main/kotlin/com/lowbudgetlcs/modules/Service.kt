@@ -29,7 +29,7 @@ val serviceModule =
         single<IEventGroupService> { EventGroupService(get(), get()) }
         single<IPlayerService> { PlayerService(get(), get()) }
         single<ISeriesService> { SeriesService(get(), get()) }
-        single<IAccountService> { AccountService(get(), get()) }
+        single<IAccountService> { AccountService(get(), get(), get()) }
         single<IAuthService> {
             AuthService(
                 get(),

@@ -4,8 +4,8 @@ import com.lowbudgetlcs.repositories.account.AccountRepository
 import com.lowbudgetlcs.repositories.account.IAccountRepository
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.event.IEventRepository
-import com.lowbudgetlcs.repositories.event.group.EventGroupRepository
-import com.lowbudgetlcs.repositories.event.group.IEventGroupRepository
+import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
+import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository

@@ -1,9 +1,11 @@
+package event
+
 import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupName
-import com.lowbudgetlcs.repositories.event.group.EventGroupRepository
+import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
