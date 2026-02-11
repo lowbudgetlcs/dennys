@@ -5,7 +5,7 @@ import com.lowbudgetlcs.api.dto.accounts.toDto
 import com.lowbudgetlcs.api.dto.accounts.toNewRiotAccount
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
+import com.lowbudgetlcs.domain.models.player.account.toRiotAccountId
 import com.lowbudgetlcs.domain.services.account.IAccountService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application

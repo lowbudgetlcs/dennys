@@ -1,12 +1,14 @@
+import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
+import com.lowbudgetlcs.domain.models.team.TeamUpdate
 import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
@@ -91,7 +93,7 @@ class EventAndTeamRepositoryTest :
             val teams = teamRepo.getAll()
             teams.shouldNotBeEmpty()
             val team = teams.first()
-            val t = teamRepo.updateEventId(team.id, event.id)
+            val t = teamRepo.update(team, TeamUpdate(eventId = Zeroable(event.id)))
             t.shouldNotBeNull()
             checkTeam(t)
             t.eventId shouldBe event.id

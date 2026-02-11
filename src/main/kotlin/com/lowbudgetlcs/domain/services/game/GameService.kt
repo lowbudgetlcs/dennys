@@ -2,8 +2,8 @@ package com.lowbudgetlcs.domain.services.game
 
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.NewGame
-import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
-import com.lowbudgetlcs.domain.models.riot.tournament.toShortcode
+import com.lowbudgetlcs.domain.models.events.NewShortcode
+import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.gateways.GatewayException

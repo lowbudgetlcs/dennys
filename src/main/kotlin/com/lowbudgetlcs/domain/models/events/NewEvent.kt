@@ -12,3 +12,21 @@ data class NewEvent(
     val eventGroupId: EventGroupId? = null,
     val stages: Set<Stage>,
 )
+
+fun NewEvent.toEvent(
+    id: EventId,
+    createdAt: Instant,
+    riotTournamentId: RiotTournamentId,
+): Event =
+    Event(
+        id = id,
+        name = name,
+        description = description,
+        riotTournamentId = riotTournamentId,
+        createdAt = createdAt,
+        startDate = startDate,
+        endDate = endDate,
+        eventGroupId = null,
+        status = status,
+        stages = stages,
+    )

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.dto.riot.tournament
+package com.lowbudgetlcs.gateways.riot.tournament
 
 import kotlinx.serialization.Serializable
 

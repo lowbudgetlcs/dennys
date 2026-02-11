@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toEventWithTeams
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
@@ -58,12 +58,9 @@ class AddRemoveTeamTest :
             every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
             every { teamRepo.getById(expectedTeam.id) } returns expectedTeam
             every {
-                teamRepo.updateEventId(
-                    expectedTeam.id,
-                    expectedEvent.id,
-                )
+                teamRepo.update(any(), any())
             } returns expectedTeam
-            every { teamRepo.getAll() } returns listOf(expectedTeam)
+            every { teamRepo.getByEventId(expectedEvent.id) } returns listOf(expectedTeam)
             val event = service.addTeam(expectedEvent.id, expectedTeam.id)
             event.shouldNotBeNull()
             event shouldBe expectedEventWithTeams
@@ -73,12 +70,12 @@ class AddRemoveTeamTest :
             every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
             every { teamRepo.getById(expectedTeam.id) } returns expectedTeam
             every {
-                teamRepo.updateEventId(
-                    expectedTeam.id,
-                    null,
+                teamRepo.update(
+                    any(),
+                    any(),
                 )
             } returns expectedTeam.copy(eventId = null)
-            every { teamRepo.getAll() } returns listOf(expectedTeam)
+            every { teamRepo.getByEventId(expectedEvent.id) } returns listOf(expectedTeam)
             val event = service.addTeam(expectedEvent.id, expectedTeam.id)
             event.shouldNotBeNull()
             event shouldBe expectedEventWithTeams

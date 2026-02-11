@@ -1,14 +1,16 @@
 package services.events.groups
 
+import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroup
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupName
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.domain.services.event.group.EventGroupService
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.event.group.IEventGroupRepository
@@ -103,11 +105,11 @@ class EventGroupServiceTest :
             every { groupRepo.getById(expectedGroup2.id) } returns expectedGroup2
             every { eventRepo.getById(expectedEvent1.id) } returns expectedEvent1
             every { eventRepo.getById(expectedEvent2.id) } returns expectedEvent2
-            every { eventRepo.update(expectedEvent1.copy(eventGroupId = expectedGroup2.id)) } returns
+            every { eventRepo.update(expectedEvent1, EventUpdate(eventGroupId = Zeroable(expectedGroup2.id))) } returns
                 expectedEvent1.copy(
                     eventGroupId = expectedGroup2.id,
                 )
-            every { eventRepo.update(expectedEvent2.copy(eventGroupId = expectedGroup2.id)) } returns
+            every { eventRepo.update(expectedEvent2, EventUpdate(eventGroupId = Zeroable(expectedGroup2.id))) } returns
                 expectedEvent2.copy(
                     eventGroupId = expectedGroup2.id,
                 )

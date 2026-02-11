@@ -3,13 +3,15 @@ package com.lowbudgetlcs.repositories.event
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.RiotTournamentId
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
+import com.lowbudgetlcs.domain.models.events.patch
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENTS
@@ -48,22 +50,25 @@ class EventRepository(
         return insertedId?.toEventId()?.let(::getById)
     }
 
-    override fun update(event: Event): Event? {
-        val insertedId =
+    override fun update(
+        event: Event,
+        update: EventUpdate,
+    ): Event? {
+        val patch = event.patch(update)
+        val updatedId =
             dsl
                 .update(EVENTS)
-                .set(EVENTS.NAME, event.name)
-                .set(EVENTS.DESCRIPTION, event.description)
-                .set(EVENTS.START_DATE, event.startDate)
-                .set(EVENTS.END_DATE, event.endDate)
-                .set(EVENTS.EVENT_GROUP_ID, event.eventGroupId?.value)
-                .set(EVENTS.STATUS, event.status.name)
-                .set(EVENTS.STAGES, event.stages.map { it.name }.toTypedArray())
+                .set(EVENTS.NAME, patch.name)
+                .set(EVENTS.DESCRIPTION, patch.description)
+                .set(EVENTS.START_DATE, patch.startDate)
+                .set(EVENTS.END_DATE, patch.endDate)
+                .set(EVENTS.STATUS, patch.status.name)
+                .set(EVENTS.EVENT_GROUP_ID, patch.eventGroupId?.value)
                 .where(EVENTS.ID.eq(event.id.value))
                 .returning(EVENTS.ID)
                 .fetchOne()
                 ?.get(EVENTS.ID)
-        return insertedId?.toEventId()?.let(::getById)
+        return updatedId?.toEventId()?.let(::getById)
     }
 
     private fun selectEvents() =

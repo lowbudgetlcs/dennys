@@ -1,6 +1,8 @@
 package com.lowbudgetlcs.domain.services.event.group
 
+import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.events.group.EventGroupName
@@ -44,8 +46,12 @@ class EventGroupService(
         logger.debug("Creating new event group...")
         logger.debug(group.toString())
         if (isNameTaken(group.name)) throw IllegalArgumentException("Event group '${group.name}' already exists.")
+        val errors = mutableListOf<String>()
+        group.events?.forEach { eventId ->
+            eventRepo.getById(eventId) ?: errors.add("Event with id '${eventId.value}' not found.")
+        }
+        if (errors.isNotEmpty()) throw IllegalArgumentException(errors.joinToString(","))
         val created = eventGroupRepo.insert(group) ?: throw DatabaseException("Failed to create event group.")
-        // TODO: How do we report errors from the following step? What if 1 event doesnt exist and 10 do? Hard problem...
         group.events?.forEach { eventId -> addEvent(created.id, eventId) }
         return created
     }
@@ -73,7 +79,7 @@ class EventGroupService(
                 ?: throw NoSuchElementException("Event group with id '${eventGroupId.value}' not found.")
         val event =
             eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
-        eventRepo.update(event.copy(eventGroupId = group.id))
+        eventRepo.update(event, EventUpdate(eventGroupId = Zeroable(group.id)))
             ?: throw DatabaseException("Failed to add event to event group.")
         return getEventGroupWithEvents(eventGroupId)
     }
@@ -85,7 +91,10 @@ class EventGroupService(
         logger.info("Removing '$eventId' from event group '$eventGroupId'...")
         val event =
             eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
-        eventRepo.update(event.copy(eventGroupId = null))
+        eventRepo.update(
+            event,
+            EventUpdate(eventGroupId = Zeroable(null)),
+        )
             ?: throw DatabaseException("Failed to remove event from event group.")
         return getEventGroupWithEvents(eventGroupId)
     }

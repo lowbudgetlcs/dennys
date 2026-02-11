@@ -4,7 +4,7 @@ import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

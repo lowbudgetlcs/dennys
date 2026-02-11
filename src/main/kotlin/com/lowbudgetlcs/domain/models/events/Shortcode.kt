@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models.riot.tournament
+package com.lowbudgetlcs.domain.models.events
 
 data class Shortcode(
     val value: String,
@@ -6,7 +6,7 @@ data class Shortcode(
 
 fun String.toShortcode(): Shortcode = Shortcode(this)
 
-data class NewShortcode(
+data class ShortcodeOptions(
     val metadata: String = "",
     val pickType: PickType = PickType.TOURNAMENT_DRAFT,
     val mapType: MapType = MapType.SUMMONERS_RIFT,

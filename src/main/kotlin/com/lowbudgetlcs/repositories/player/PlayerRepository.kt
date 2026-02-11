@@ -1,22 +1,34 @@
 package com.lowbudgetlcs.repositories.player
 
 import com.lowbudgetlcs.domain.models.player.NewPlayer
+import com.lowbudgetlcs.domain.models.player.Player
 import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.player.PlayerName
-import com.lowbudgetlcs.domain.models.player.PlayerWithAccounts
+import com.lowbudgetlcs.domain.models.player.account.AccountId
 import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
-import com.lowbudgetlcs.domain.models.riot.account.RiotPuuid
+import com.lowbudgetlcs.domain.models.team.TeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS
+import org.jooq.storage.tables.references.PLAYERS_TO_TEAM
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
 class PlayerRepository(
     private val dsl: DSLContext,
 ) : IPlayerRepository {
-    override fun insert(newPlayer: NewPlayer): PlayerWithAccounts? {
+    override fun getAll(): List<Player> = selectPlayers().fetch().mapNotNull(::rowToPlayer)
+
+    override fun getById(id: PlayerId): Player? = selectPlayers().where(PLAYERS.ID.eq(id.value)).fetchOne(::rowToPlayer)
+
+    override fun getByTeamId(teamId: TeamId): List<Player> =
+        dsl
+            .select(PLAYERS.ID, PLAYERS.NAME)
+            .from(PLAYERS.innerJoin(PLAYERS_TO_TEAM).on(PLAYERS.ID.eq(PLAYERS_TO_TEAM.PLAYER_ID)))
+            .where(PLAYERS_TO_TEAM.TEAM_ID.eq(teamId.value))
+            .fetch()
+            .mapNotNull(::rowToPlayer)
+
+    override fun insert(newPlayer: NewPlayer): Player? {
         val insertedId =
             dsl
                 .insertInto(PLAYERS)
@@ -28,14 +40,10 @@ class PlayerRepository(
         return insertedId?.toPlayerId()?.let(::getById)
     }
 
-    override fun getAll(): List<PlayerWithAccounts> = fetchPlayerRows().mapNotNull(::rowToPlayerWithAccounts)
-
-    override fun getById(id: PlayerId): PlayerWithAccounts? = getPlayerRowById(id)?.let(::rowToPlayerWithAccounts)
-
     override fun renamePlayer(
         id: PlayerId,
         newName: PlayerName,
-    ): PlayerWithAccounts? {
+    ): Player? {
         val updated =
             dsl
                 .update(PLAYERS)
@@ -48,8 +56,8 @@ class PlayerRepository(
 
     override fun insertAccountToPlayer(
         playerId: PlayerId,
-        accountId: RiotAccountId,
-    ): PlayerWithAccounts? {
+        accountId: AccountId,
+    ): Player? {
         val updated =
             dsl
                 .update(RIOT_ACCOUNTS)
@@ -62,8 +70,8 @@ class PlayerRepository(
 
     override fun removeAccount(
         playerId: PlayerId,
-        accountId: RiotAccountId,
-    ): PlayerWithAccounts? {
+        accountId: AccountId,
+    ): Player? {
         val updated =
             dsl
                 .update(RIOT_ACCOUNTS)
@@ -75,44 +83,15 @@ class PlayerRepository(
         return if (updated > 0) getById(playerId) else null
     }
 
-    // Helper functions
+    private fun selectPlayers() = dsl.select(PLAYERS.ID, PLAYERS.NAME).from(PLAYERS)
 
-    private fun fetchPlayerRows() =
-        dsl
-            .select(PLAYERS.ID, PLAYERS.NAME)
-            .from(PLAYERS)
-            .fetch()
-
-    private fun getPlayerRowById(id: PlayerId) =
-        dsl
-            .select(PLAYERS.ID, PLAYERS.NAME)
-            .from(PLAYERS)
-            .where(PLAYERS.ID.eq(id.value))
-            .fetchOne()
-
-    private fun rowToPlayerWithAccounts(row: Record): PlayerWithAccounts? {
+    private fun rowToPlayer(row: Record): Player? {
         val playerId = row[PLAYERS.ID]?.toPlayerId() ?: return null
         val name = row[PLAYERS.NAME]?.let { PlayerName(it) } ?: return null
-        val accounts = getAccountsForPlayer(playerId)
 
-        return PlayerWithAccounts(
+        return Player(
             id = playerId,
             name = name,
-            accounts = accounts,
         )
     }
-
-    private fun getAccountsForPlayer(playerId: PlayerId): List<RiotAccount> =
-        dsl
-            .select(RIOT_ACCOUNTS.ID, RIOT_ACCOUNTS.RIOT_PUUID)
-            .from(RIOT_ACCOUNTS)
-            .where(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
-            .fetch()
-            .map {
-                RiotAccount(
-                    id = RiotAccountId(it[RIOT_ACCOUNTS.ID]!!),
-                    riotPuuid = RiotPuuid(it[RIOT_ACCOUNTS.RIOT_PUUID]!!),
-                    playerId = playerId,
-                )
-            }
 }

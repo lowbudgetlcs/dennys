@@ -2,9 +2,10 @@ package com.lowbudgetlcs.repositories.event
 
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.RiotTournamentId
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 
 interface IEventRepository {
     fun getAll(): List<Event>
@@ -20,5 +21,8 @@ interface IEventRepository {
         riotTournamentId: RiotTournamentId,
     ): Event?
 
-    fun update(event: Event): Event?
+    fun update(
+        event: Event,
+        update: EventUpdate,
+    ): Event?
 }

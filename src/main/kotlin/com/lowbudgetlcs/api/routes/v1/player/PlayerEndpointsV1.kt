@@ -7,8 +7,8 @@ import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.api.dto.players.toNewPlayer
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
+import com.lowbudgetlcs.domain.models.player.account.toRiotAccountId
 import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
 import com.lowbudgetlcs.domain.services.player.IPlayerService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application

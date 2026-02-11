@@ -4,8 +4,8 @@ import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.GameId
 import com.lowbudgetlcs.domain.models.NewGame
 import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.riot.tournament.Shortcode
-import com.lowbudgetlcs.domain.models.riot.tournament.toShortcode
+import com.lowbudgetlcs.domain.models.events.Shortcode
+import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toGameId
 import com.lowbudgetlcs.domain.models.toSeriesId

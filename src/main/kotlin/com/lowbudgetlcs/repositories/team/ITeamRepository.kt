@@ -5,9 +5,7 @@ import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.team.TeamLogoName
-import com.lowbudgetlcs.domain.models.team.TeamName
-import com.lowbudgetlcs.domain.models.team.TeamWithPlayers
+import com.lowbudgetlcs.domain.models.team.TeamUpdate
 
 interface ITeamRepository {
     fun insert(newTeam: NewTeam): Team?
@@ -16,28 +14,20 @@ interface ITeamRepository {
 
     fun getById(id: TeamId): Team?
 
-    fun updateTeamName(
-        id: TeamId,
-        newName: TeamName,
+    fun getByEventId(id: EventId): List<Team>
+
+    fun update(
+        team: Team,
+        update: TeamUpdate,
     ): Team?
 
-    fun updateTeamLogoName(
-        id: TeamId,
-        newLogoName: TeamLogoName,
-    ): Team?
-
-    fun updateEventId(
-        id: TeamId,
-        eventId: EventId?,
-    ): Team?
-
-    fun insertPlayerToTeam(
+    fun insertPlayerTeamLink(
         teamId: TeamId,
         playerId: PlayerId,
-    ): TeamWithPlayers?
+    ): Team?
 
-    fun removePlayer(
+    fun deletePlayerTeamLink(
         teamId: TeamId,
         playerId: PlayerId,
-    ): TeamWithPlayers?
+    ): Team?
 }

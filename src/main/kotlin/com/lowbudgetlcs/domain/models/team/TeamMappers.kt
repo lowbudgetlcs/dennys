@@ -1,13 +1,12 @@
 package com.lowbudgetlcs.domain.models.team
 
-import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.player.Player
 
-fun NewTeam.toTeam(
-    id: TeamId,
-    eventId: EventId? = null,
-) = Team(
-    id = id,
-    logoName = logoName,
-    name = name,
-    eventId = eventId,
-)
+fun Team.toTeamWithPlayers(players: List<Player>): TeamWithPlayers =
+    TeamWithPlayers(
+        id = this.id,
+        name = this.name,
+        logoName = this.logoName,
+        eventId = this.eventId,
+        players = players,
+    )

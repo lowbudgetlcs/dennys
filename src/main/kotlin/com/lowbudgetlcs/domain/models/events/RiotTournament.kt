@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models.riot.tournament
+package com.lowbudgetlcs.domain.models.events
 
 @JvmInline
 value class RiotTournamentId(

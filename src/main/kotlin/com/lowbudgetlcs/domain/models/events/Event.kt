@@ -2,7 +2,6 @@ package com.lowbudgetlcs.domain.models.events
 
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
 import java.time.Instant
 
@@ -19,6 +18,11 @@ enum class EventStatus {
     COMPLETED,
     ACTIVE,
     NOT_STARTED,
+}
+
+enum class Stage {
+    REGULAR_SEASON,
+    PLAYOFFS,
 }
 
 data class Event(

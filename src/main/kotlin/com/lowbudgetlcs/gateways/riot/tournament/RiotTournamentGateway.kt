@@ -1,13 +1,10 @@
 package com.lowbudgetlcs.gateways.riot.tournament
 
-import com.lowbudgetlcs.api.dto.riot.tournament.RiotShortcodeDto
-import com.lowbudgetlcs.api.dto.riot.tournament.RiotTournamentParametersDto
-import com.lowbudgetlcs.api.dto.riot.tournament.toShortcodeParametersDto
-import com.lowbudgetlcs.domain.models.riot.RiotApiException
-import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournament
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.RiotTournament
+import com.lowbudgetlcs.domain.models.events.RiotTournamentId
+import com.lowbudgetlcs.domain.models.events.ShortcodeOptions
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
+import com.lowbudgetlcs.gateways.riot.RiotApiException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -56,10 +53,10 @@ class RiotTournamentGateway(
 
     override suspend fun getCode(
         riotTournamentId: RiotTournamentId,
-        newShortcode: NewShortcode,
+        options: ShortcodeOptions,
     ): RiotShortcodeDto {
         logger.debug("Fetching tournament code for tournament '$riotTournamentId'...")
-        val body = newShortcode.toShortcodeParametersDto()
+        val body = options.toShortcodeParametersDto()
         logger.debug(body.toString())
         val res: HttpResponse =
             client.post("$url/codes") {

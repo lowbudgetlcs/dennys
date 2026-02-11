@@ -1,5 +1,7 @@
+import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
+import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.EventGroup
@@ -9,7 +11,7 @@ import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.group.toEventGroupName
 import com.lowbudgetlcs.domain.models.events.toEvent
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.event.group.EventGroupRepository
 import io.kotest.core.extensions.install
@@ -96,7 +98,7 @@ class EventGroupAndEventRepositoryTest :
             val events = eventRepo.getAll()
             events.shouldNotBeEmpty()
             val event = events.first()
-            val updated = eventRepo.update(event.copy(eventGroupId = group.id))
+            val updated = eventRepo.update(event, EventUpdate(eventGroupId = Zeroable(group.id)))
             updated.shouldNotBeNull()
             checkEvent(updated)
             updated.eventGroupId shouldBe group.id

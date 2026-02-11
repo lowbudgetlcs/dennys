@@ -24,7 +24,7 @@ import org.koin.dsl.module
 val serviceModule =
     module {
         single<IGameService> { GameService(get(), get(), get(), get(), get()) }
-        single<ITeamService> { TeamService(get()) }
+        single<ITeamService> { TeamService(get(), get()) }
         single<IEventService> { EventService(get(), get(), get(), get()) }
         single<IEventGroupService> { EventGroupService(get(), get()) }
         single<IPlayerService> { PlayerService(get(), get()) }

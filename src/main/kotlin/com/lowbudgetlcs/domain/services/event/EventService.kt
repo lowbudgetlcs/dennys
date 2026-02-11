@@ -1,15 +1,16 @@
 package com.lowbudgetlcs.domain.services.event
 
+import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.EventWithSeries
 import com.lowbudgetlcs.domain.models.events.EventWithTeams
 import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.patch
 import com.lowbudgetlcs.domain.models.events.toEventWithSeries
 import com.lowbudgetlcs.domain.models.events.toEventWithTeams
 import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.models.team.TeamUpdate
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
@@ -40,8 +41,7 @@ class EventService(
     override fun getEventWithTeams(id: EventId): EventWithTeams {
         logger.debug("Getting event by '$id' (with teams)...")
         val event = getEvent(id)
-        // TODO: getAllByEventId()
-        val teams = teamRepo.getAll().filter { it.eventId == id }
+        val teams = teamRepo.getByEventId(id)
         return event.toEventWithTeams(teams)
     }
 
@@ -82,7 +82,7 @@ class EventService(
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
         if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
-        return eventRepo.update(event.patch(update))
+        return eventRepo.update(event, update)
             ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
     }
 
@@ -93,7 +93,9 @@ class EventService(
         logger.debug("Adding team '$teamId' to event '$eventId'...")
         doesEventExist(eventId)
         doesTeamExist(teamId)
-        teamRepo.updateEventId(teamId, eventId) ?: throw DatabaseException("Failed to add team to event.")
+        val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
+        val teamPatch = TeamUpdate(eventId = Zeroable(eventId))
+        teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
         return getEventWithTeams(eventId)
     }
 
@@ -104,7 +106,9 @@ class EventService(
         logger.debug("Removing team '$teamId' from event '$eventId'...")
         doesEventExist(eventId)
         doesTeamExist(teamId)
-        teamRepo.updateEventId(teamId, null) ?: throw DatabaseException("Failed to remove team from event.")
+        val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
+        val teamPatch = TeamUpdate(eventId = Zeroable(null))
+        teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
         return getEventWithTeams(eventId)
     }
 

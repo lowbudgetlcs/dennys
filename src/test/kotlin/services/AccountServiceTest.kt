@@ -1,15 +1,15 @@
 package services
 
-import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
+import com.lowbudgetlcs.domain.models.player.account.NewRiotAccount
+import com.lowbudgetlcs.domain.models.player.account.RiotAccount
+import com.lowbudgetlcs.domain.models.player.account.RiotPuuid
+import com.lowbudgetlcs.domain.models.player.account.toRiotAccount
+import com.lowbudgetlcs.domain.models.player.account.toRiotAccountId
 import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.riot.RiotApiException
-import com.lowbudgetlcs.domain.models.riot.account.NewRiotAccount
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
-import com.lowbudgetlcs.domain.models.riot.account.RiotPuuid
-import com.lowbudgetlcs.domain.models.riot.account.toRiotAccount
-import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
 import com.lowbudgetlcs.domain.services.account.AccountService
+import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
+import com.lowbudgetlcs.gateways.riot.account.RiotAccountDto
 import com.lowbudgetlcs.repositories.account.IAccountRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

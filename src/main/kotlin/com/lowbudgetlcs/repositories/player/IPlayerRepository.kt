@@ -1,30 +1,33 @@
 package com.lowbudgetlcs.repositories.player
 
 import com.lowbudgetlcs.domain.models.player.NewPlayer
+import com.lowbudgetlcs.domain.models.player.Player
 import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.player.PlayerName
-import com.lowbudgetlcs.domain.models.player.PlayerWithAccounts
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
+import com.lowbudgetlcs.domain.models.player.account.AccountId
+import com.lowbudgetlcs.domain.models.team.TeamId
 
 interface IPlayerRepository {
-    fun insert(newPlayer: NewPlayer): PlayerWithAccounts?
+    fun getAll(): List<Player>
 
-    fun getAll(): List<PlayerWithAccounts>
+    fun getById(id: PlayerId): Player?
 
-    fun getById(id: PlayerId): PlayerWithAccounts?
+    fun getByTeamId(teamId: TeamId): List<Player>
+
+    fun insert(newPlayer: NewPlayer): Player?
 
     fun renamePlayer(
         id: PlayerId,
         newName: PlayerName,
-    ): PlayerWithAccounts?
+    ): Player?
 
     fun insertAccountToPlayer(
         playerId: PlayerId,
-        accountId: RiotAccountId,
-    ): PlayerWithAccounts?
+        accountId: AccountId,
+    ): Player?
 
     fun removeAccount(
         playerId: PlayerId,
-        accountId: RiotAccountId,
-    ): PlayerWithAccounts?
+        accountId: AccountId,
+    ): Player?
 }

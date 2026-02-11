@@ -1,17 +1,22 @@
 package com.lowbudgetlcs.domain.services.team
 
+import com.lowbudgetlcs.domain.models.player.Player
+import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.team.TeamLogoName
-import com.lowbudgetlcs.domain.models.team.TeamName
+import com.lowbudgetlcs.domain.models.team.TeamUpdate
+import com.lowbudgetlcs.domain.models.team.TeamWithPlayers
+import com.lowbudgetlcs.domain.models.team.toTeamWithPlayers
 import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class TeamService(
     private val teamRepository: ITeamRepository,
+    private val playerRepository: IPlayerRepository,
 ) : ITeamService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -25,6 +30,38 @@ class TeamService(
         return teamRepository.getById(id) ?: throw NoSuchElementException("Team not found")
     }
 
+    override fun getTeamWithPlayers(id: TeamId): TeamWithPlayers {
+        logger.debug("Getting team by '$id' (with players)...")
+        val team = getTeam(id)
+        val players = playerRepository.getByTeamId(id)
+        return team.toTeamWithPlayers(players)
+    }
+
+    override fun addPlayerToTeam(
+        playerId: PlayerId,
+        teamId: TeamId,
+    ): TeamWithPlayers {
+        logger.debug("Adding player '$playerId' to team '$teamId'...")
+        // TODO: Is this addition legal?
+        getTeam(teamId)
+        getPlayer(playerId)
+        teamRepository.insertPlayerTeamLink(teamId, playerId)
+            ?: throw DatabaseException("Failed to add player '${playerId.value}' to team '${teamId.value}'.")
+        return getTeamWithPlayers(teamId)
+    }
+
+    override fun removePlayerFromTeam(
+        playerId: PlayerId,
+        teamId: TeamId,
+    ): TeamWithPlayers {
+        logger.debug("Removing player '$playerId' from team '$teamId'...")
+        getTeam(teamId)
+        getPlayer(playerId)
+        teamRepository.deletePlayerTeamLink(teamId, playerId)
+            ?: throw DatabaseException("Failed to remove player '${playerId.value}' from team '${teamId.value}'.")
+        return getTeamWithPlayers(teamId)
+    }
+
     override fun createTeam(team: NewTeam): Team {
         logger.debug("Creating new team...")
         logger.debug(team.toString())
@@ -35,24 +72,19 @@ class TeamService(
             ?: throw DatabaseException("Failed to create team")
     }
 
-    override fun renameTeam(
-        id: TeamId,
-        newName: String,
+    override fun patchTeam(
+        teamId: TeamId,
+        patch: TeamUpdate,
     ): Team {
-        logger.debug("Renaming team '$id' to '$newName'...")
-        if (newName.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
-
-        return teamRepository.updateTeamName(id, TeamName(newName))
-            ?: throw DatabaseException("Failed to rename team")
+        logger.debug("Patching team '$teamId'...")
+        logger.debug(patch.toString())
+        val team = getTeam(teamId)
+        return teamRepository.update(team, patch) ?: throw DatabaseException("Failed to patch team.")
     }
 
-    override fun updateLogoName(
-        id: TeamId,
-        newLogoName: String?,
-    ): Team {
-        logger.debug("Changing team '$id' logoName to '$newLogoName'...")
-        val value = newLogoName ?: throw IllegalArgumentException("Logo name cannot be null")
-        return teamRepository.updateTeamLogoName(id, TeamLogoName(value))
-            ?: throw DatabaseException("Failed to update team logo")
+    private fun getPlayer(id: PlayerId): Player {
+        logger.debug("Fetching player '$id'...")
+        val player = playerRepository.getById(id) ?: throw NoSuchElementException("Player '${id.value}' not found.")
+        return player
     }
 }

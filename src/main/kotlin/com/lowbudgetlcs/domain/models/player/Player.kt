@@ -1,7 +1,5 @@
 package com.lowbudgetlcs.domain.models.player
 
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
-
 @JvmInline
 value class PlayerId(
     val value: Int,
@@ -27,10 +25,4 @@ data class Player(
 
 data class NewPlayer(
     val name: PlayerName,
-)
-
-data class PlayerWithAccounts(
-    val id: PlayerId,
-    val name: PlayerName,
-    val accounts: List<RiotAccount>,
 )

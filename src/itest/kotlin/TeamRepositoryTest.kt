@@ -1,10 +1,13 @@
 import com.lowbudgetlcs.domain.models.team.NewTeam
-import com.lowbudgetlcs.domain.models.team.TeamLogoName
 import com.lowbudgetlcs.domain.models.team.TeamName
+import com.lowbudgetlcs.domain.models.team.TeamUpdate
+import com.lowbudgetlcs.domain.models.team.toTeamLogoName
+import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
@@ -22,13 +25,18 @@ class TeamRepositoryTest :
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = TeamRepository(dsl)
 
-        test("insert and fetch team by id") {
-            val newTeam =
-                NewTeam(
-                    name = TeamName("Golden Guardians"),
-                    logoName = null,
-                )
+        val newTeam =
+            NewTeam(
+                name = "Golden Guardians".toTeamName(),
+                logoName = null,
+            )
 
+        test("getAll returns 0 teams") {
+            val teams = repo.getAll()
+            teams.shouldHaveSize(0)
+        }
+
+        test("insert and fetch team by id") {
             val created = repo.insert(newTeam)
             created.shouldNotBeNull()
             created.name shouldBe newTeam.name
@@ -39,8 +47,8 @@ class TeamRepositoryTest :
         }
 
         test("update team name") {
-            val created = repo.insert(NewTeam(TeamName("Old Name"), null))!!
-            val updated = repo.updateTeamName(created.id, TeamName("New Name"))
+            val created = repo.insert(NewTeam("Old Name".toTeamName(), null))!!
+            val updated = repo.update(created, TeamUpdate(name = "New Name".toTeamName()))
 
             updated.shouldNotBeNull()
             updated.id shouldBe created.id
@@ -49,9 +57,18 @@ class TeamRepositoryTest :
 
         test("update team logo") {
             val created = repo.insert(NewTeam(TeamName("Logo Team"), null))!!
-            val updated = repo.updateTeamLogoName(created.id, TeamLogoName("ggs.png"))
+            val updated =
+                repo.update(
+                    created,
+                    TeamUpdate(logoName = "ggs.png".toTeamLogoName()),
+                )
 
             updated.shouldNotBeNull()
             updated.logoName?.value shouldBe "ggs.png"
+        }
+
+        test("getAll returns 3 teams") {
+            val teams = repo.getAll()
+            teams.shouldHaveSize(3)
         }
     })

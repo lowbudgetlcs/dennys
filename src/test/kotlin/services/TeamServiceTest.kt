@@ -5,6 +5,9 @@ import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.TeamLogoName
 import com.lowbudgetlcs.domain.models.team.TeamName
+import com.lowbudgetlcs.domain.models.team.TeamUpdate
+import com.lowbudgetlcs.domain.models.team.toTeamLogoName
+import com.lowbudgetlcs.domain.models.team.toTeamName
 import com.lowbudgetlcs.domain.services.team.TeamService
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -78,40 +81,29 @@ class TeamServiceTest :
             verify(exactly = 1) { repo.getById(id) }
         }
 
-        "renameTeam updates name" {
+        "update() correctly updates name" {
             val id = TeamId(5)
-            val updated = Team(id, TeamName("New"), null, null)
+            val original = Team(id, TeamName("Original"), null, null)
+            val updated = original.copy(name = "New".toTeamName())
 
-            every { repo.updateTeamName(id, TeamName("New")) } returns updated
+            every { repo.getById(id) } returns original
+            every { repo.update(any(), any()) } returns updated
 
-            service.renameTeam(id, "New") shouldBe updated
+            service.patchTeam(id, TeamUpdate(name = "New".toTeamName())) shouldBe updated
 
-            verify(exactly = 1) { repo.updateTeamName(id, TeamName("New")) }
+            verify(exactly = 1) { repo.update(any(), any()) }
         }
 
-        "renameTeam rejects blank and overlong names" {
-            val id = TeamId(3)
-
-            shouldThrow<IllegalArgumentException> { service.renameTeam(id, "") }
-            shouldThrow<IllegalArgumentException> { service.renameTeam(id, "x".repeat(81)) }
-
-            verify(exactly = 0) { repo.updateTeamName(any(), any()) }
-        }
-
-        "updateLogoName sets logo when non-null" {
+        "update correctly sets logo name" {
             val id = TeamId(7)
-            val updated = Team(id, TeamName("Logo Team"), TeamLogoName("logo.png"), null)
+            val original = Team(id, "Original".toTeamName(), null, null)
+            val updated = original.copy(logoName = "Logo".toTeamLogoName())
 
-            every { repo.updateTeamLogoName(id, TeamLogoName("logo.png")) } returns updated
+            every { repo.getById(id) } returns original
+            every { repo.update(any(), any()) } returns updated
 
-            service.updateLogoName(id, "logo.png") shouldBe updated
+            service.patchTeam(id, TeamUpdate(logoName = "logo.png".toTeamLogoName())) shouldBe updated
 
-            verify(exactly = 1) { repo.updateTeamLogoName(id, TeamLogoName("logo.png")) }
-        }
-
-        "updateLogoName rejects null" {
-            val id = TeamId(8)
-            shouldThrow<IllegalArgumentException> { service.updateLogoName(id, null) }
-            verify(exactly = 0) { repo.updateTeamLogoName(any(), any()) }
+            verify(exactly = 1) { repo.update(any(), any()) }
         }
     })

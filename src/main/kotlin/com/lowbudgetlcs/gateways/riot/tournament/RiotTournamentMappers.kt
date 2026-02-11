@@ -1,8 +1,8 @@
-package com.lowbudgetlcs.api.dto.riot.tournament
+package com.lowbudgetlcs.gateways.riot.tournament
 
-import com.lowbudgetlcs.domain.models.riot.tournament.NewShortcode
+import com.lowbudgetlcs.domain.models.events.ShortcodeOptions
 
-fun NewShortcode.toShortcodeParametersDto(): RiotShortcodeParametersDto =
+fun ShortcodeOptions.toShortcodeParametersDto(): RiotShortcodeParametersDto =
     RiotShortcodeParametersDto(
         mapType = mapType.name,
         pickType = pickType.name,
