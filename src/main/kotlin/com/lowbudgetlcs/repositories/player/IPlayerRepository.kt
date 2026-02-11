@@ -4,7 +4,6 @@ import com.lowbudgetlcs.domain.models.player.NewPlayer
 import com.lowbudgetlcs.domain.models.player.Player
 import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.player.PlayerName
-import com.lowbudgetlcs.domain.models.player.account.AccountId
 import com.lowbudgetlcs.domain.models.team.TeamId
 
 interface IPlayerRepository {
@@ -19,15 +18,5 @@ interface IPlayerRepository {
     fun renamePlayer(
         id: PlayerId,
         newName: PlayerName,
-    ): Player?
-
-    fun insertAccountToPlayer(
-        playerId: PlayerId,
-        accountId: AccountId,
-    ): Player?
-
-    fun removeAccount(
-        playerId: PlayerId,
-        accountId: AccountId,
     ): Player?
 }

@@ -4,14 +4,12 @@ import com.lowbudgetlcs.domain.models.player.NewPlayer
 import com.lowbudgetlcs.domain.models.player.Player
 import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.player.PlayerName
-import com.lowbudgetlcs.domain.models.player.account.AccountId
 import com.lowbudgetlcs.domain.models.player.toPlayerId
 import com.lowbudgetlcs.domain.models.team.TeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.PLAYERS_TO_TEAM
-import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 
 class PlayerRepository(
     private val dsl: DSLContext,
@@ -52,35 +50,6 @@ class PlayerRepository(
                 .execute()
 
         return if (updated > 0) getById(id) else null
-    }
-
-    override fun insertAccountToPlayer(
-        playerId: PlayerId,
-        accountId: AccountId,
-    ): Player? {
-        val updated =
-            dsl
-                .update(RIOT_ACCOUNTS)
-                .set(RIOT_ACCOUNTS.PLAYER_ID, playerId.value)
-                .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
-                .execute()
-
-        return if (updated > 0) getById(playerId) else null
-    }
-
-    override fun removeAccount(
-        playerId: PlayerId,
-        accountId: AccountId,
-    ): Player? {
-        val updated =
-            dsl
-                .update(RIOT_ACCOUNTS)
-                .set(RIOT_ACCOUNTS.PLAYER_ID, null as Int?)
-                .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
-                .and(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
-                .execute()
-
-        return if (updated > 0) getById(playerId) else null
     }
 
     private fun selectPlayers() = dsl.select(PLAYERS.ID, PLAYERS.NAME).from(PLAYERS)
