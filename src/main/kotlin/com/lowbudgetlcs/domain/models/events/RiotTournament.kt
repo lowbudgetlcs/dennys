@@ -12,10 +12,6 @@ data class RiotTournament(
     val name: String,
 )
 
-data class NewRiotTournament(
-    val name: String,
-)
-
 enum class PickType {
     TOURNAMENT_DRAFT,
     BLIND_PICK,

@@ -615,12 +615,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  # Series Endpoints
   /api/v1/event/{eventId}/series:
     get:
       summary: Get all the series of an event
       operationId: getSeriesInEvent
       tags:
-        - Events (v1)
+        - Series (v1)
       parameters:
         - name: eventId
           in: path
@@ -628,6 +630,21 @@ paths:
           description: ID of the event
           schema:
             type: integer
+        - in: query
+          name: teamIds
+          schema:
+            type: array
+            items:
+              type: integer
+              maxItems: 2
+              uniqueItems: true
+          description: Filter only series with these teamIds (max 2).
+        - in: query
+          name: stage
+          schema:
+            type: string
+            example: REGULAR_SEASON
+          description: Filter only series in this event stage.
       responses:
         "200":
           description: List of series in the event
@@ -653,7 +670,7 @@ paths:
       summary: Create a series for an event.
       operationId: addSeriesToEvent
       tags:
-        - Events (v1)
+        - Series (v1)
       parameters:
         - name: eventId
           in: path
@@ -665,14 +682,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EventCreateSeriesDto"
-            examples:
-              "New Series":
-                value:
-                  team1Id: 1
-                  team2Id: 2
-                  totalGames: 3
-                  stage: "REGULAR_SEASON"
+              $ref: "#/components/schemas/CreateSeriesDto"
       responses:
         "200":
           description: Team added to event
@@ -708,7 +718,7 @@ paths:
       summary: Remove a series from an event
       operationId: removeSeriesFromEvent
       tags:
-        - Events (v1)
+        - Series (v1)
       parameters:
         - name: eventId
           in: path
@@ -734,8 +744,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  # Series Endpoints
-  /api/v1/series/game:
+  /api/v1/series/{seriesId}/game:
     post:
       summary: Create a game in a series
       operationId: createGame
@@ -1621,22 +1630,26 @@ components:
           type: integer
           example: 3
 
-    EventCreateSeriesDto:
+    CreateSeriesDto:
       type: object
       required:
-        - team1Id
-        - team2Id
+        - teamIds
         - totalGames
+        - stage
       properties:
-        team1Id:
-          type: integer
-          example: 123
-        team2Id:
-          type: integer
-          example: 456
+        teamIds:
+          type: array
+          items:
+            type: integer
+          minItems: 2
+          maxItems: 2
+          uniqueItems: true
         totalGames:
           type: integer
           example: 3
+        stage:
+          type: string
+          example: REGULAR_SEASON
 
     # Player Schemas
     NewPlayerDto:
