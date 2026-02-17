@@ -98,12 +98,12 @@ class AuthService(
     }
 
     override fun cleanupExpiredSessions() {
-        logger.info("Cleaning up expired sessions...")
+        logger.debug("Cleaning up expired sessions...")
         val expiredSessions = sessionRepo.getAll().filter { it.expiresAt < Instant.now() }
-        logger.info("Found ${expiredSessions.size} expired sessions...")
+        logger.debug("Found ${expiredSessions.size} expired sessions...")
         for (expiredSession in expiredSessions) {
             clearSession(expiredSession)
         }
-        logger.info("Session cleanup complete!")
+        logger.debug("Session cleanup complete!")
     }
 }

@@ -44,7 +44,7 @@ paths:
             schema:
               $ref: "#/components/schemas/LoginDto"
       responses:
-        "200":
+        "201":
           description: >
             Successfully authenticated.
             The session identifier is returned in a cookie named `user-session`.
@@ -630,21 +630,6 @@ paths:
           description: ID of the event
           schema:
             type: integer
-        - in: query
-          name: teamIds
-          schema:
-            type: array
-            items:
-              type: integer
-              maxItems: 2
-              uniqueItems: true
-          description: Filter only series with these teamIds (max 2).
-        - in: query
-          name: stage
-          schema:
-            type: string
-            example: REGULAR_SEASON
-          description: Filter only series in this event stage.
       responses:
         "200":
           description: List of series in the event
@@ -656,6 +641,58 @@ paths:
                   $ref: "#/components/schemas/EventWithSeriesDto"
         "404":
           description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/event/{eventId}/findSeries:
+    get:
+      summary: Get all the series of an event
+      operationId: getSeriesByFilter
+      tags:
+        - Series (v1)
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID of the event
+          schema:
+            type: integer
+        - in: query
+          name: teamIds
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              minItems: 2
+              maxItems: 2
+              uniqueItems: true
+          description: Filter only series with these teamIds (max 2).
+        - in: query
+          name: stage
+          required: true
+          schema:
+            type: string
+            example: REGULAR_SEASON
+          description: Filter only series in this event stage.
+      responses:
+        "200":
+          description: A series matching the passed filter.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventWithSeriesDto"
+        "404":
+          description: Series not found
           content:
             application/json:
               schema:
@@ -750,6 +787,12 @@ paths:
       operationId: createGame
       tags:
         - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -757,7 +800,7 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateGameDto"
       responses:
-        "200":
+        "201":
           description: Game created
           content:
             application/json:
@@ -1025,7 +1068,7 @@ paths:
             schema:
               $ref: "#/components/schemas/NewPlayerDto"
       responses:
-        "200":
+        "201":
           description: Player created
           content:
             application/json:

@@ -2,8 +2,8 @@ package com.lowbudgetlcs.api.dto.series
 
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
-import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.events.toStage
 import com.lowbudgetlcs.domain.models.team.toTeamId
 
 fun Series.toDto(): SeriesDto =
@@ -22,10 +22,3 @@ fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
         participantIds = listOf(team1Id.toTeamId(), team2Id.toTeamId()),
         stage = stage.toStage(),
     )
-
-fun String.toStage(): Stage =
-    try {
-        enumValueOf<Stage>(this)
-    } catch (_: IllegalArgumentException) {
-        throw IllegalArgumentException("Invalid stage.")
-    }

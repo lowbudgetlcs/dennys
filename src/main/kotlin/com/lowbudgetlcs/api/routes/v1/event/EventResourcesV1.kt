@@ -29,6 +29,14 @@ class EventResourcesV1 {
         val eventId: Int,
     )
 
+    @Resource("{eventId}/findSeries")
+    data class ByIdFindSeries(
+        val parent: EventResourcesV1 = EventResourcesV1(),
+        val eventId: Int,
+        val teamIds: List<Int>,
+        val stage: String,
+    )
+
     @Resource("{eventId}/series/{seriesId}")
     data class ByIdSeriesId(
         val parent: EventResourcesV1 = EventResourcesV1(),

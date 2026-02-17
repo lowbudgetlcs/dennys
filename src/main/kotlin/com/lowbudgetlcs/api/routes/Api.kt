@@ -12,7 +12,6 @@ import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.services.account.IAccountService
 import com.lowbudgetlcs.domain.services.event.IEventService
 import com.lowbudgetlcs.domain.services.event.group.IEventGroupService
-import com.lowbudgetlcs.domain.services.game.IGameService
 import com.lowbudgetlcs.domain.services.player.IPlayerService
 import com.lowbudgetlcs.domain.services.series.ISeriesService
 import com.lowbudgetlcs.domain.services.team.ITeamService
@@ -36,7 +35,6 @@ fun Route.apiRoutes() {
     val playerService by inject<IPlayerService>()
     val accountService by inject<IAccountService>()
     val seriesService by inject<ISeriesService>()
-    val gameService by inject<IGameService>()
     val eventGroupService by inject<IEventGroupService>()
 
     route("/api/v1") {
@@ -56,7 +54,7 @@ fun Route.apiRoutes() {
             playerRoutesV1(playerService = playerService)
             accountRoutesV1(accountService = accountService)
             seriesRoutesV1(
-                gameService = gameService,
+                seriesService = seriesService,
             )
             eventGroupRoutesV1(eventGroupService)
         }

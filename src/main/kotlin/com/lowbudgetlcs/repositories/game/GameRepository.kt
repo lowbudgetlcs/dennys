@@ -3,7 +3,6 @@ package com.lowbudgetlcs.repositories.game
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.GameId
 import com.lowbudgetlcs.domain.models.NewGame
-import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.Shortcode
 import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.toTeamId
@@ -21,13 +20,12 @@ class GameRepository(
     override fun insert(
         newGame: NewGame,
         shortcode: Shortcode,
-        seriesId: SeriesId,
     ): Game? {
         val insertedId =
             dsl
                 .insertInto(GAMES)
                 .set(GAMES.SHORTCODE, shortcode.value)
-                .set(GAMES.SERIES_ID, seriesId.value)
+                .set(GAMES.SERIES_ID, newGame.seriesId.value)
                 .set(GAMES.BLUE_TEAM_ID, newGame.blueTeamId.value)
                 .set(GAMES.RED_TEAM_ID, newGame.redTeamId.value)
                 .returning(GAMES.ID)

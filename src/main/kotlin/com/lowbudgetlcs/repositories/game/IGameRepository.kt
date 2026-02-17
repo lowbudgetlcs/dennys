@@ -3,7 +3,6 @@ package com.lowbudgetlcs.repositories.game
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.GameId
 import com.lowbudgetlcs.domain.models.NewGame
-import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.Shortcode
 
 interface IGameRepository {
@@ -12,6 +11,5 @@ interface IGameRepository {
     fun insert(
         newGame: NewGame,
         shortcode: Shortcode,
-        seriesId: SeriesId,
     ): Game?
 }

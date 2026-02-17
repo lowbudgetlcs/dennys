@@ -32,3 +32,10 @@ fun Event.toEventWithSeries(series: List<Series>): EventWithSeries =
         series = series,
         stages = stages,
     )
+
+fun String.toStage(): Stage =
+    try {
+        enumValueOf<Stage>(this)
+    } catch (_: IllegalArgumentException) {
+        throw IllegalArgumentException("Invalid stage.")
+    }

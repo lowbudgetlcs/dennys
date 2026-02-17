@@ -38,7 +38,7 @@ fun main(args: Array<String>) =
 
 fun Application.startSessionCleanup() =
     CoroutineScope(Dispatchers.Default).launch {
-        logger.info("Starting session cleanup...")
+        logger.debug("Starting session cleanup...")
         val authService by inject<IAuthService>()
         repeat(Int.MAX_VALUE) {
             authService.cleanupExpiredSessions()

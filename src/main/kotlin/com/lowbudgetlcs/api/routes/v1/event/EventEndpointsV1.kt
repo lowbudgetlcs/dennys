@@ -13,6 +13,7 @@ import com.lowbudgetlcs.api.dto.series.toNewSeries
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.models.events.toStage
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toSeriesId
 import com.lowbudgetlcs.domain.services.event.IEventService
@@ -86,8 +87,19 @@ fun Route.eventEndpointsV1(
     get<EventResourcesV1.ByIdSeries> { route ->
         call.setCidContext {
             logCall(call)
+            // TODO: Use series service filter?
             val event = eventService.getEventWithSeries(route.eventId.toEventId())
             call.respond(event.toDto())
+        }
+    }
+    get<EventResourcesV1.ByIdFindSeries> { route ->
+        call.setCidContext {
+            logCall(call)
+            val teamIds = route.teamIds.map { it.toTeamId() }
+            if (teamIds.size != 2) throw IllegalArgumentException("Team IDs must have exactly 2 teams.")
+            val stage = route.stage.toStage()
+            val series = seriesService.findSeries(route.eventId.toEventId(), teamIds[0], teamIds[1], stage)
+            call.respond(series.toDto())
         }
     }
     post<EventResourcesV1.ByIdSeries> { route ->

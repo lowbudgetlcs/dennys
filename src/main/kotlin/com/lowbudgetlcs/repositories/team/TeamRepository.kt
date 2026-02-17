@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.repositories.team
 
+import com.lowbudgetlcs.domain.models.SeriesId
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.player.PlayerId
 import com.lowbudgetlcs.domain.models.team.NewTeam
@@ -13,6 +14,7 @@ import com.lowbudgetlcs.domain.models.team.toTeamName
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.TEAMS
+import org.jooq.storage.tables.references.TEAM_TO_SERIES
 
 class TeamRepository(
     private val dsl: DSLContext,
@@ -23,6 +25,14 @@ class TeamRepository(
 
     override fun getByEventId(id: EventId): List<Team> =
         selectTeams().where(TEAMS.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToTeam)
+
+    override fun getBySeriesId(seriesId: SeriesId): List<Team> =
+        dsl
+            .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_NAME, TEAMS.EVENT_ID)
+            .from(TEAMS.innerJoin(TEAM_TO_SERIES).on(TEAMS.ID.eq(TEAM_TO_SERIES.TEAM_ID)))
+            .where(TEAM_TO_SERIES.SERIES_ID.eq(seriesId.value))
+            .fetch()
+            .mapNotNull(::rowToTeam)
 
     override fun insert(newTeam: NewTeam): Team? {
         val insertedId =

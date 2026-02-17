@@ -26,6 +26,7 @@ data class Game(
 )
 
 data class NewGame(
+    val seriesId: SeriesId,
     val blueTeamId: TeamId,
     val redTeamId: TeamId,
 )
