@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.repositories.event
 
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.RiotTournamentId
 
 interface IEventRepository {
     fun getAll(): List<Event>

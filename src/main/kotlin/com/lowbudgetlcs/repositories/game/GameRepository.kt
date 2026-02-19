@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.repositories.game
 
+import com.lowbudgetlcs.domain.event.models.Shortcode
+import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.GameId
 import com.lowbudgetlcs.domain.models.NewGame
-import com.lowbudgetlcs.domain.models.events.Shortcode
-import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toGameId
 import com.lowbudgetlcs.domain.models.toSeriesId

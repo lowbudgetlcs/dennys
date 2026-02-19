@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.gateways.riot.tournament
 
-import com.lowbudgetlcs.domain.models.events.RiotTournament
-import com.lowbudgetlcs.domain.models.events.RiotTournamentId
-import com.lowbudgetlcs.domain.models.events.ShortcodeOptions
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.RiotTournament
+import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

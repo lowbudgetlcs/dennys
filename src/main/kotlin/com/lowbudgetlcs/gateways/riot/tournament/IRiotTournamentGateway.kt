@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.gateways.riot.tournament
 
-import com.lowbudgetlcs.domain.models.events.RiotTournament
-import com.lowbudgetlcs.domain.models.events.RiotTournamentId
-import com.lowbudgetlcs.domain.models.events.ShortcodeOptions
+import com.lowbudgetlcs.domain.event.models.RiotTournament
+import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
+import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 
 interface IRiotTournamentGateway {
     suspend fun create(tournamentName: String): RiotTournament?

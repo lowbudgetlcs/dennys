@@ -1,17 +1,17 @@
 package com.lowbudgetlcs.repositories.event
 
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.patch
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.RiotTournamentId
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.patch
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENTS
@@ -43,7 +43,7 @@ class EventRepository(
                 .set(EVENTS.START_DATE, newEvent.startDate)
                 .set(EVENTS.END_DATE, newEvent.endDate)
                 .set(EVENTS.STATUS, newEvent.status.name)
-                .set(EVENTS.STAGES, newEvent.stages.map { it.name }.toTypedArray())
+                .set(EVENTS.STAGES, newEvent.eventStages.map { it.name }.toTypedArray())
                 .returning(EVENTS.ID)
                 .fetchOne()
                 ?.get(EVENTS.ID)
@@ -96,11 +96,11 @@ class EventRepository(
         val endDate = row[EVENTS.END_DATE] ?: return null
         val status = row[EVENTS.STATUS]?.let { EventStatus.valueOf(it) } ?: return null
         val eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.toEventGroupId()
-        val stages =
+        val eventStages =
             row[EVENTS.STAGES]
                 ?.filterNotNull()
                 ?.mapNotNull { stageName ->
-                    runCatching { Stage.valueOf(stageName) }.getOrNull()
+                    runCatching { EventStage.valueOf(stageName) }.getOrNull()
                 }?.toSet()
                 ?: emptySet()
         return Event(
@@ -113,7 +113,7 @@ class EventRepository(
             endDate = endDate,
             eventGroupId = eventGroupId,
             status = status,
-            stages = stages,
+            eventStages = eventStages,
         )
     }
 }

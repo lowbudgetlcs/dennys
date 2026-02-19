@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.models
 
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.Stage
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 
@@ -20,7 +20,7 @@ data class SeriesResult(
 data class Series(
     val id: SeriesId,
     val eventId: EventId,
-    val stage: Stage,
+    val eventStage: EventStage,
     val totalGames: Int,
     val participants: List<TeamId>,
     val result: SeriesResult?,
@@ -28,18 +28,18 @@ data class Series(
 
 data class SeriesQuery(
     val teamIds: List<TeamId>?,
-    val stage: Stage?,
+    val eventStage: EventStage?,
 )
 
 data class NewSeries(
     val eventId: EventId,
-    val stage: Stage,
+    val eventStage: EventStage,
     val totalGames: Int,
     val participantIds: List<TeamId>,
 )
 
 fun List<Series>.filterByStage(query: SeriesQuery?): List<Series> =
-    this.filter { if (query?.stage == null) true else it.stage == query.stage }
+    this.filter { if (query?.eventStage == null) true else it.eventStage == query.eventStage }
 
 fun List<Series>.filterByParticipants(query: SeriesQuery?): List<Series> {
     val participants = query?.teamIds

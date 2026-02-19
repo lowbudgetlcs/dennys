@@ -1,12 +1,12 @@
 package event
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.repositories.event.EventRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -43,7 +43,7 @@ class EventRepositoryTest :
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
-                stages = setOf(Stage.REGULAR_SEASON),
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
         val newEvent2 =
             NewEvent(
@@ -52,7 +52,7 @@ class EventRepositoryTest :
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
-                stages = setOf(Stage.REGULAR_SEASON),
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
 
         "getAll() starts empty" {

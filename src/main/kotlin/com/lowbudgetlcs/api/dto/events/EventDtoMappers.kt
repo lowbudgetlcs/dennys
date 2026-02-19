@@ -2,12 +2,12 @@ package com.lowbudgetlcs.api.dto.events
 
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.teams.toDto
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventQuery
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.EventWithSeries
-import com.lowbudgetlcs.domain.models.events.EventWithTeams
-import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventQuery
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.EventWithSeries
+import com.lowbudgetlcs.domain.event.models.EventWithTeams
+import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 
@@ -18,7 +18,7 @@ fun CreateEventDto.toNewEvent(): NewEvent =
         startDate = startDate,
         endDate = endDate,
         status = status,
-        stages = stages,
+        eventStages = eventStages,
     )
 
 fun PatchEventDto.toEventUpdate(): EventUpdate =
@@ -42,7 +42,7 @@ fun Event.toDto(): EventDto =
         description = description,
         status = status,
         eventGroupId = eventGroupId?.value,
-        stages = stages,
+        eventStages = eventStages,
     )
 
 fun EventWithTeams.toDto(): EventWithTeamsDto =
@@ -55,7 +55,7 @@ fun EventWithTeams.toDto(): EventWithTeamsDto =
         description = description,
         status = status,
         teams = teams.map { t -> t.toDto() },
-        stages = stages,
+        eventStages = eventStages,
     )
 
 fun EventWithSeries.toDto(): EventWithSeriesDto =
@@ -68,7 +68,7 @@ fun EventWithSeries.toDto(): EventWithSeriesDto =
         description = description,
         status = status,
         series = series.map { s -> s.toDto() },
-        stages = stages,
+        eventStages = eventStages,
     )
 
 fun EventFilterParams.toQuery(): EventQuery =

@@ -1,19 +1,19 @@
 package event
 
 import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
 import io.kotest.core.extensions.install
@@ -49,7 +49,7 @@ class EventGroupAndEventRepositoryTest :
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
-                stages = setOf(Stage.REGULAR_SEASON),
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
         val expectedEvent =
             newEvent.toEvent(

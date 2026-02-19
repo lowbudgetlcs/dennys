@@ -1,12 +1,12 @@
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.toShortcode
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.models.NewGame
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
-import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.toTeamName
@@ -51,7 +51,7 @@ class GameRepositoryTest :
                     startDate = Instant.now(),
                     endDate = Instant.now().plusSeconds(3_600L),
                     status = EventStatus.ACTIVE,
-                    stages = setOf(Stage.REGULAR_SEASON),
+                    eventStages = setOf(EventStage.REGULAR_SEASON),
                 ),
                 riotTournamentId = 1.toRiotTournamentId(),
             ) ?: throw Exception("Failed to insert initial event.")
@@ -71,7 +71,7 @@ class GameRepositoryTest :
                     eventId = event.id,
                     totalGames = 5,
                     participantIds = listOf(team1.id, team2.id),
-                    stage = Stage.REGULAR_SEASON,
+                    eventStage = EventStage.REGULAR_SEASON,
                 )
             val seriesRepository = SeriesRepository(dsl)
             series = seriesRepository.insert(newSeries) ?: throw Exception("Failed to insert initial series.")

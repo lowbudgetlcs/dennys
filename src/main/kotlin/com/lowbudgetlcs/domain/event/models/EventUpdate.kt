@@ -1,17 +1,15 @@
-package com.lowbudgetlcs.api.dto.events
+package com.lowbudgetlcs.domain.event.models
 
+import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import java.time.Instant
 
-@Serializable
-data class PatchEventDto(
+data class EventUpdate(
     val name: String? = null,
     val description: String? = null,
-    @Contextual
     val startDate: Instant? = null,
-    @Contextual
     val endDate: Instant? = null,
     val status: EventStatus? = null,
+    val eventGroupId: Zeroable<EventGroupId> = Zeroable(null, true),
 )

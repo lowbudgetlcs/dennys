@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.game
 
+import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.GameId
 import com.lowbudgetlcs.domain.models.NewGame
-import com.lowbudgetlcs.domain.models.events.Shortcode
 
 interface IGameRepository {
     fun getById(id: GameId): Game?

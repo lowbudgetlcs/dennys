@@ -1290,7 +1290,7 @@ components:
         - CANCELED
         - PAUSED
         - COMPLETED
-    Stage:
+    EventStage:
       type: string
       enum:
         - REGULAR_SEASON
@@ -1511,7 +1511,7 @@ components:
         stages:
           type: array
           items:
-            $ref: "#/components/schemas/Stage"
+            $ref: "#/components/schemas/EventStage"
 
     EventWithTeamsDto:
       type: object

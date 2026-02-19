@@ -1,17 +1,17 @@
 package services.events
 
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toEventWithTeams
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.EventService
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventWithTeams
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.models.team.NewTeam
 import com.lowbudgetlcs.domain.models.team.toTeam
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
-import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -39,7 +39,7 @@ class AddRemoveTeamTest :
                 startDate = start,
                 endDate = end,
                 status = EventStatus.ACTIVE,
-                stages = setOf(Stage.REGULAR_SEASON),
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
         val expectedEvent =
             newEvent.toEvent(

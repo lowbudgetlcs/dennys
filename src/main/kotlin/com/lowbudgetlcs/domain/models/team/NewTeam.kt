@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.team
 
-import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventId
 
 data class NewTeam(
     val name: TeamName,

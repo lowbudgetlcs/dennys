@@ -1,14 +1,14 @@
 package services
 
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
 import com.lowbudgetlcs.domain.models.team.Team
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.team.toTeamName
@@ -50,7 +50,7 @@ class SeriesServiceTest :
                 endDate = Instant.now().plusSeconds(6L),
                 status = EventStatus.ACTIVE,
                 eventGroupId = null,
-                stages = setOf(Stage.REGULAR_SEASON),
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
         val participatingTeams =
             listOf(
@@ -74,7 +74,7 @@ class SeriesServiceTest :
                 eventId = event.id,
                 participants = participatingTeams.map { it.id },
                 result = null,
-                stage = Stage.REGULAR_SEASON,
+                eventStage = EventStage.REGULAR_SEASON,
             )
 
         val newSeries =
@@ -82,7 +82,7 @@ class SeriesServiceTest :
                 eventId = event.id,
                 participantIds = participatingTeams.map { it.id },
                 totalGames = 3,
-                stage = Stage.REGULAR_SEASON,
+                eventStage = EventStage.REGULAR_SEASON,
             )
         "createSeries succeeds for valid input" {
 
@@ -114,7 +114,7 @@ class SeriesServiceTest :
                         totalGames = 3,
                         participants = participatingTeams.map { it.id },
                         result = null,
-                        stage = Stage.REGULAR_SEASON,
+                        eventStage = EventStage.REGULAR_SEASON,
                     ),
                     Series(
                         id = SeriesId(2),
@@ -122,7 +122,7 @@ class SeriesServiceTest :
                         totalGames = 3,
                         participants = participatingTeams.map { it.id },
                         result = null,
-                        stage = Stage.REGULAR_SEASON,
+                        eventStage = EventStage.REGULAR_SEASON,
                     ),
                 )
 

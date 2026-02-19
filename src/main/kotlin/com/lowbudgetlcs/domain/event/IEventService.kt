@@ -1,13 +1,13 @@
-package com.lowbudgetlcs.domain.services.event
+package com.lowbudgetlcs.domain.event
 
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventQuery
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.EventWithSeries
+import com.lowbudgetlcs.domain.event.models.EventWithTeams
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.models.SeriesQuery
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.EventQuery
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.EventWithSeries
-import com.lowbudgetlcs.domain.models.events.EventWithTeams
-import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.repositories.DatabaseException
 
@@ -37,7 +37,7 @@ interface IEventService {
      * @return the newly created event.
      *
      * @throws IllegalArgumentException if the event cannot be created.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException if the underlying repositories fail.
+     * @throws DatabaseException if the underlying repositories fail.
      */
     suspend fun createEvent(event: NewEvent): Event
 
@@ -45,11 +45,11 @@ interface IEventService {
      * Updates event details.
      *
      * @param Event the event to update.
-     * @param com.lowbudgetlcs.domain.models.events.EventUpdate the new event information.
+     * @param EventUpdate the new event information.
      * @return the updated event.
      *
      * @throws IllegalArgumentException if the new details are invalid
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories
+     * @throws DatabaseException when the underlying repositories
      * fail.
      */
     fun patchEvent(
@@ -84,7 +84,7 @@ interface IEventService {
      * Associate a team with an event
      *
      * @param EventId the target event.
-     * @param com.lowbudgetlcs.domain.models.team.TeamId the team to add.
+     * @param TeamId the team to add.
      * @return the event with all registered teams.
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist

@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.repositories.series
 
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.events.EventId
 
 interface ISeriesRepository {
     fun insert(newSeries: NewSeries): Series?

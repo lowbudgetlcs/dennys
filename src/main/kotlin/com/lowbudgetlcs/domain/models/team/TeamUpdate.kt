@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.models.team
 
 import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventId
 
 data class TeamUpdate(
     val name: TeamName? = null,

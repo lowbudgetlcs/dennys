@@ -1,23 +1,16 @@
-package com.lowbudgetlcs.api.dto.events
+package com.lowbudgetlcs.domain.event.models
 
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import java.time.Instant
 
-@Serializable
-data class EventDto(
-    val id: Int,
+data class NewEvent(
     val name: String,
     val description: String,
-    @Contextual
-    val createdAt: Instant,
-    @Contextual
     val startDate: Instant,
-    @Contextual
     val endDate: Instant,
     val status: EventStatus,
-    val eventGroupId: Int? = null,
+    val eventGroupId: EventGroupId? = null,
     val eventStages: Set<EventStage>,
 )

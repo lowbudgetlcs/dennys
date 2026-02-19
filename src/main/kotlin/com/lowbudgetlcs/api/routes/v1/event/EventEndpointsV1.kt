@@ -16,10 +16,10 @@ import com.lowbudgetlcs.api.dto.series.toNewSeries
 import com.lowbudgetlcs.api.dto.series.toQuery
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.event.IEventService
+import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.services.event.IEventService
 import com.lowbudgetlcs.domain.services.series.ISeriesService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application

@@ -1,14 +1,14 @@
 package com.lowbudgetlcs.domain.services.series
 
+import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
+import com.lowbudgetlcs.domain.event.models.toShortcode
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.NewGame
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.ShortcodeOptions
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toShortcode
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
@@ -68,9 +68,9 @@ class SeriesService(
         eventId: EventId,
         teamId1: TeamId,
         teamId2: TeamId,
-        stage: Stage,
+        eventStage: EventStage,
     ): Series {
-        logger.debug("Fetching series containing ('$teamId1', '$teamId2') in stage '$stage'...")
+        logger.debug("Fetching series containing ('$teamId1', '$teamId2') in stage '$eventStage'...")
         eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id ${eventId.value} not found")
         val t1 =
             teamRepo.getById(teamId1) ?: throw NoSuchElementException("Team with id '${teamId1.value}' not found")
@@ -86,7 +86,7 @@ class SeriesService(
         val series =
             seriesRepo
                 .getAllByEventId(eventId)
-                .filter { it.stage == stage }
+                .filter { it.eventStage == eventStage }
                 .filter { it.participants == listOf(teamId1, teamId2) }
 
         if (series.size > 1) {

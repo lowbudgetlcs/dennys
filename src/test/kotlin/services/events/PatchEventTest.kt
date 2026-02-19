@@ -1,15 +1,15 @@
 package services.events
 
 import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.event.EventService
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.patch
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.patch
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
-import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -47,7 +47,7 @@ class PatchEventTest :
                 startDate = start,
                 endDate = end,
                 status = EventStatus.NOT_STARTED,
-                stages = setOf(Stage.REGULAR_SEASON),
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
 
         beforeEach {

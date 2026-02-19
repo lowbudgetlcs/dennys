@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.domain.services.series
 
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.models.Game
 import com.lowbudgetlcs.domain.models.NewGame
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.team.TeamId
 
 interface ISeriesService {
@@ -41,7 +41,7 @@ interface ISeriesService {
      * @param eventId the event to search.
      * @param teamId1 the first teamId to filter by.
      * @param teamId2 the second teamId to filter by.
-     * @param stage the event stage to filter by.
+     * @param eventStage the event stage to filter by.
      * @return a series containing both team ids inside the specified event stage.
      *
      * @throws NoSuchElementException when no series is found.
@@ -52,7 +52,7 @@ interface ISeriesService {
         eventId: EventId,
         teamId1: TeamId,
         teamId2: TeamId,
-        stage: Stage,
+        eventStage: EventStage,
     ): Series
 
     /**

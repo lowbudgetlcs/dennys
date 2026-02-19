@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto.events
 
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.Stage
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.Instant
@@ -15,5 +15,5 @@ data class CreateEventDto(
     @Contextual
     val endDate: Instant,
     val status: EventStatus,
-    val stages: Set<Stage>,
+    val eventStages: Set<EventStage>,
 )
