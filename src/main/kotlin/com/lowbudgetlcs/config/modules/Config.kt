@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.modules
+package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.config.AppConfig
 import com.lowbudgetlcs.config.CookieConfig

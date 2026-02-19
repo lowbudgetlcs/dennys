@@ -1,6 +1,6 @@
-package com.lowbudgetlcs.modules
+package com.lowbudgetlcs.config.modules
 
-import com.lowbudgetlcs.createDslContext
+import com.lowbudgetlcs.config.createDslContext
 import org.jooq.DSLContext
 import org.koin.dsl.module
 

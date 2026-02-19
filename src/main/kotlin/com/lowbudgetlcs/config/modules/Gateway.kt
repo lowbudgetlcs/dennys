@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.modules
+package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.config.RiotConfig
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway

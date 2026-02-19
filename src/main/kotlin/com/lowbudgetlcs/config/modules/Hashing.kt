@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.modules
+package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.hashing.IHasher

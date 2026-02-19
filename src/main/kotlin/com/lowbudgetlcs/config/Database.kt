@@ -1,6 +1,5 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.config
 
-import com.lowbudgetlcs.config.DatabaseConfig
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jooq.DSLContext
