@@ -8,6 +8,23 @@ import com.lowbudgetlcs.domain.models.Series
 import com.lowbudgetlcs.domain.models.team.Team
 import java.time.Instant
 
+// Type Extensions
+fun Int.toEventId(): EventId = EventId(this)
+
+fun Int.toRiotTournamentId(): RiotTournamentId = RiotTournamentId(this)
+
+fun String.toShortcode(): Shortcode = Shortcode(this)
+
+fun String.toEventName(): EventName = EventName(this)
+
+fun String.toStage(): EventStage =
+    try {
+        enumValueOf<EventStage>(this)
+    } catch (_: IllegalArgumentException) {
+        throw IllegalArgumentException("Invalid stage.")
+    }
+
+// Class Extensions
 fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams =
     EventWithTeams(
         id = id,
@@ -38,21 +55,6 @@ fun Event.toEventWithSeries(series: List<Series>): EventWithSeries =
         eventStages = eventStages,
     )
 
-fun String.toStage(): EventStage =
-    try {
-        enumValueOf<EventStage>(this)
-    } catch (_: IllegalArgumentException) {
-        throw IllegalArgumentException("Invalid stage.")
-    }
-
-fun Int.toEventId(): EventId = EventId(this)
-
-fun Int.toRiotTournamentId(): RiotTournamentId = RiotTournamentId(this)
-
-fun String.toShortcode(): Shortcode = Shortcode(this)
-
-fun String.toEventName(): EventName = EventName(this)
-
 fun NewEvent.toEvent(
     id: EventId,
     createdAt: Instant,
@@ -81,6 +83,7 @@ fun Event.patch(update: EventUpdate): Event =
         eventGroupId = if (update.eventGroupId.isZero) this.eventGroupId else update.eventGroupId.value,
     )
 
+// Filters
 fun List<Event>.filterByName(query: EventQuery?): List<Event> =
     this.filter { if (query?.name == null) true else it.name.contains(query.name) }
 

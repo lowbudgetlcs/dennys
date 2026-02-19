@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.auth.models.types.Username
 import com.sksamuel.hoplite.Masked
 import java.util.UUID
 
+// Type Extensions
 fun String.toUsername(): Username = Username(this)
 
 fun String.toMasked(): Masked = Masked(this)
