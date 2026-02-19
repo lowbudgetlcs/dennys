@@ -2,6 +2,7 @@ package com.lowbudgetlcs.api.dto.series
 
 import com.lowbudgetlcs.domain.models.NewSeries
 import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.models.SeriesFilter
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toStage
 import com.lowbudgetlcs.domain.models.team.toTeamId
@@ -21,4 +22,10 @@ fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
         totalGames = totalGames,
         participantIds = listOf(team1Id.toTeamId(), team2Id.toTeamId()),
         stage = stage.toStage(),
+    )
+
+fun SeriesFilterParams.toQuery(): SeriesFilter =
+    SeriesFilter(
+        teamIds = teamIds?.map { it.toTeamId() },
+        stage = stage?.toStage(),
     )

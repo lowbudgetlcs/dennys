@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.services.event
 
 import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.models.SeriesFilter
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventUpdate
@@ -9,6 +10,8 @@ import com.lowbudgetlcs.domain.models.events.EventWithTeams
 import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.toEventWithSeries
 import com.lowbudgetlcs.domain.models.events.toEventWithTeams
+import com.lowbudgetlcs.domain.models.filterByParticipants
+import com.lowbudgetlcs.domain.models.filterByStage
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.TeamUpdate
 import com.lowbudgetlcs.gateways.GatewayException
@@ -45,10 +48,15 @@ class EventService(
         return event.toEventWithTeams(teams)
     }
 
-    override fun getEventWithSeries(id: EventId): EventWithSeries {
+    override fun getEventWithSeries(
+        id: EventId,
+        filter: SeriesFilter?,
+    ): EventWithSeries {
         logger.debug("Getting event by '$id' (with series)...")
+        filter?.run { logger.debug("Series filter: '$filter'.") }
         val event = getEvent(id)
-        val series = seriesRepo.getAllByEventId(id).filter { it.eventId == id }
+        val series = seriesRepo.getAllByEventId(id).filterByStage(filter?.stage).filterByParticipants(filter?.teamIds)
+
         return event.toEventWithSeries(series)
     }
 

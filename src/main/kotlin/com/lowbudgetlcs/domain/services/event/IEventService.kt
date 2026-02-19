@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.services.event
 
+import com.lowbudgetlcs.domain.models.SeriesFilter
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventUpdate
@@ -73,7 +74,10 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event cannot be found
      */
-    fun getEventWithSeries(id: EventId): EventWithSeries
+    fun getEventWithSeries(
+        id: EventId,
+        filter: SeriesFilter? = null,
+    ): EventWithSeries
 
     /**
      * Associate a team with an event
