@@ -1,11 +1,11 @@
 package services.events
 
 import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.patch
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toRiotTournamentId

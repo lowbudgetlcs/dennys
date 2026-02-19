@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.domain.services.event.group
 
+import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
+import com.lowbudgetlcs.domain.models.eventgroup.EventGroupUpdate
+import com.lowbudgetlcs.domain.models.eventgroup.EventGroupWithEvents
+import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
 import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.events.group.EventGroupUpdate
-import com.lowbudgetlcs.domain.models.events.group.EventGroupWithEvents
-import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
 import com.lowbudgetlcs.repositories.DatabaseException
 
 interface IEventGroupService {

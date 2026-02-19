@@ -1,16 +1,16 @@
 package com.lowbudgetlcs.domain.services.event.group
 
 import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
+import com.lowbudgetlcs.domain.models.eventgroup.EventGroupUpdate
+import com.lowbudgetlcs.domain.models.eventgroup.EventGroupWithEvents
+import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
+import com.lowbudgetlcs.domain.models.eventgroup.patch
+import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupWithEvents
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.group.EventGroup
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
 import com.lowbudgetlcs.domain.models.events.group.EventGroupName
-import com.lowbudgetlcs.domain.models.events.group.EventGroupUpdate
-import com.lowbudgetlcs.domain.models.events.group.EventGroupWithEvents
-import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
-import com.lowbudgetlcs.domain.models.events.group.patch
-import com.lowbudgetlcs.domain.models.events.group.toEventGroupWithEvents
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository

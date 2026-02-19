@@ -8,7 +8,7 @@ import com.lowbudgetlcs.api.dto.events.groups.toEventGroupUpdate
 import com.lowbudgetlcs.api.dto.events.groups.toNewEventGroup
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
+import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.services.event.group.IEventGroupService
 import io.ktor.http.HttpStatusCode

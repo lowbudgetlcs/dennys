@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.repositories.event
 
+import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventStatus
@@ -8,7 +9,6 @@ import com.lowbudgetlcs.domain.models.events.NewEvent
 import com.lowbudgetlcs.domain.models.events.RiotTournamentId
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.patch
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
