@@ -5,7 +5,7 @@ import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
 import com.lowbudgetlcs.domain.models.eventgroup.EventGroupUpdate
 import com.lowbudgetlcs.domain.models.eventgroup.EventGroupWithEvents
 import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
-import com.lowbudgetlcs.domain.models.events.group.EventGroupName
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupName
 import com.lowbudgetlcs.domain.models.events.toEventId
 
 fun EventGroup.toDto(): EventGroupDto =

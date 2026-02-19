@@ -10,7 +10,7 @@ import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.services.event.group.IEventGroupService
+import com.lowbudgetlcs.domain.services.eventgroup.IEventGroupService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive

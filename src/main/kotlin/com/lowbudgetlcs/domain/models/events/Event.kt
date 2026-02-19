@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.models.events
 
 import com.lowbudgetlcs.domain.models.Series
-import com.lowbudgetlcs.domain.models.events.group.EventGroupId
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupId
 import com.lowbudgetlcs.domain.models.team.Team
 import java.time.Instant
 

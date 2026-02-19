@@ -6,8 +6,8 @@ import com.lowbudgetlcs.domain.services.auth.AuthService
 import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.domain.services.event.IEventService
-import com.lowbudgetlcs.domain.services.event.group.EventGroupService
-import com.lowbudgetlcs.domain.services.event.group.IEventGroupService
+import com.lowbudgetlcs.domain.services.eventgroup.EventGroupService
+import com.lowbudgetlcs.domain.services.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.services.player.IPlayerService
 import com.lowbudgetlcs.domain.services.player.PlayerService
 import com.lowbudgetlcs.domain.services.series.ISeriesService

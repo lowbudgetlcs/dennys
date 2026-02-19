@@ -11,7 +11,7 @@ import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.services.account.IAccountService
 import com.lowbudgetlcs.domain.services.event.IEventService
-import com.lowbudgetlcs.domain.services.event.group.IEventGroupService
+import com.lowbudgetlcs.domain.services.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.services.player.IPlayerService
 import com.lowbudgetlcs.domain.services.series.ISeriesService
 import com.lowbudgetlcs.domain.services.team.ITeamService

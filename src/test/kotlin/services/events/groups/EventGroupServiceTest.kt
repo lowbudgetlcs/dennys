@@ -11,7 +11,7 @@ import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
-import com.lowbudgetlcs.domain.services.event.group.EventGroupService
+import com.lowbudgetlcs.domain.services.eventgroup.EventGroupService
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow

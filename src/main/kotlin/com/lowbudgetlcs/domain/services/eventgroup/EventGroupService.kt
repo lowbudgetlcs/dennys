@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.services.event.group
+package com.lowbudgetlcs.domain.services.eventgroup
 
 import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
@@ -7,10 +7,10 @@ import com.lowbudgetlcs.domain.models.eventgroup.EventGroupWithEvents
 import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
 import com.lowbudgetlcs.domain.models.eventgroup.patch
 import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupWithEvents
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupId
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupName
 import com.lowbudgetlcs.domain.models.events.EventId
 import com.lowbudgetlcs.domain.models.events.EventUpdate
-import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.events.group.EventGroupName
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository

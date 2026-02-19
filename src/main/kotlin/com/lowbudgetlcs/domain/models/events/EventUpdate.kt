@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.models.events
 
 import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.models.events.group.EventGroupId
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupId
 import java.time.Instant
 
 data class EventUpdate(

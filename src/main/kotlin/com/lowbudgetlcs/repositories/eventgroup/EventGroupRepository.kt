@@ -4,8 +4,8 @@ import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
 import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
 import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
 import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupName
-import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.events.group.EventGroupName
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupId
+import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupName
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENT_GROUPS
