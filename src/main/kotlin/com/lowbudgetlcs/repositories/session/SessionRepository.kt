@@ -3,8 +3,8 @@ package com.lowbudgetlcs.repositories.session
 import com.lowbudgetlcs.domain.auth.models.NewSession
 import com.lowbudgetlcs.domain.auth.models.Session
 import com.lowbudgetlcs.domain.auth.models.toSessionId
-import com.lowbudgetlcs.domain.auth.models.toUserId
 import com.lowbudgetlcs.domain.auth.models.types.SessionId
+import com.lowbudgetlcs.domain.user.models.toUserId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.SESSIONS

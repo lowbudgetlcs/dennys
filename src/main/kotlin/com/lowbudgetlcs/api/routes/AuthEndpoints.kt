@@ -9,8 +9,8 @@ import com.lowbudgetlcs.api.dto.toNewAccessToken
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.auth.IAuthService
-import com.lowbudgetlcs.domain.auth.models.toUserId
 import com.lowbudgetlcs.domain.user.IUserService
+import com.lowbudgetlcs.domain.user.models.toUserId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal

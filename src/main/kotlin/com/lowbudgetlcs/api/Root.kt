@@ -10,8 +10,8 @@ import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.auth.models.toMasked
-import com.lowbudgetlcs.domain.auth.models.toUsername
 import com.lowbudgetlcs.domain.user.IUserService
+import com.lowbudgetlcs.domain.user.models.toUsername
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
 import io.ktor.http.HttpHeaders
