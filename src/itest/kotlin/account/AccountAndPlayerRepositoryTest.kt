@@ -4,13 +4,15 @@ import com.lowbudgetlcs.domain.account.models.Account
 import com.lowbudgetlcs.domain.account.models.NewAccount
 import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.player.models.NewPlayer
+import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.repositories.account.AccountRepository
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -22,7 +24,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
 class AccountAndPlayerRepositoryTest :
-    FunSpec({
+    StringSpec({
         val postgres =
             PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
                 withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
@@ -31,49 +33,63 @@ class AccountAndPlayerRepositoryTest :
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
         val accountRepo = AccountRepository(dsl)
         val playerRepo = PlayerRepository(dsl)
+        lateinit var account: Account
+        lateinit var player: Player
+        lateinit var player2: Player
 
-        test("Inserting an account with a valid playerId succeeds.") {
-            val p =
-                playerRepo.insert(
-                    NewPlayer(
-                        name = "ruuffian".toPlayerName(),
+        beforeSpec {
+            player = playerRepo.insert(
+                NewPlayer(
+                    name = "ruuffian".toPlayerName(),
+                ),
+            ) ?: throw Exception("Failed to insert initial player.")
+            player2 = playerRepo.insert(
+                NewPlayer(
+                    name = "zain".toPlayerName(),
+                ),
+            ) ?: throw Exception("Failed to insert initial player2.")
+            account =
+                accountRepo.insert(
+                    NewAccount(
+                        puuid = Puuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC794"),
                     ),
                 )
-            p.shouldNotBeNull()
+                    ?: throw Exception("Failed to insert initial account.")
+        }
 
+        "Updating an account with a valid playerId succeeds." {
+            val a = accountRepo.updatePlayerId(account.id, player.id)
+            a.shouldNotBeNull()
+            a.shouldBeEqualToIgnoringFields(account, Account::playerId)
+            a.playerId.shouldNotBeNull()
+            a.playerId shouldBe player.id
+        }
+
+        "Updating an account with an invalid playerId fails." {
+            shouldThrow<IntegrityConstraintViolationException> {
+                accountRepo.updatePlayerId(account.id, (-1).toPlayerId())
+            }
+        }
+
+        "Inserting an account with a valid playerId succeeds." {
             val puuid = Puuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC791")
             val a =
                 accountRepo.insert(
                     NewAccount(
                         puuid = puuid,
-                        playerId = p.id,
+                        playerId = player2.id,
                     ),
                 )
             a.shouldNotBeNull()
             a.playerId.shouldNotBeNull()
-            a.playerId shouldBe p.id
+            a.playerId shouldBe player2.id
         }
 
-        test("Inserting an account with an invalid playerId fails.") {
+        "Inserting an account with an invalid playerId fails." {
             val puuid = Puuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC792")
             val id = PlayerId(-1)
             shouldThrow<IntegrityConstraintViolationException> {
                 accountRepo.insert(NewAccount(puuid, id))
             }
-        }
-
-        test("Updating an account with a valid playerId succeeds.") {
-            val p = playerRepo.insert(NewPlayer("zain".toPlayerName()))
-            p.shouldNotBeNull()
-            val puuid = Puuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC793")
-            val a = accountRepo.insert(NewAccount(puuid))
-
-            a.shouldNotBeNull()
-
-            val b = accountRepo.updatePlayerId(a.id, p.id)
-            b.shouldNotBeNull()
-            b.shouldBeEqualToIgnoringFields(a, Account::playerId)
-            b.playerId.shouldNotBeNull()
-            b.playerId shouldBe p.id
         }
     })

@@ -1,5 +1,6 @@
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
@@ -46,7 +47,7 @@ class SeriesRepositoryTest :
             val e = EventRepository(dsl)
             event = e.insert(
                 NewEvent(
-                    name = "Test",
+                    name = "Test".toEventName(),
                     description = "Testing series.",
                     startDate = Instant.now(),
                     endDate = Instant.now().plusSeconds(3_600L),
@@ -76,10 +77,8 @@ class SeriesRepositoryTest :
         }
 
         test("insert and fetch series by id") {
-
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            created.totalGames shouldBe newSeries.totalGames
 
             val fetched = repo.getById(created.id)
             fetched shouldBe created

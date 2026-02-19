@@ -5,7 +5,7 @@ import com.lowbudgetlcs.domain.user.models.toUserId
 import com.lowbudgetlcs.domain.user.models.toUsername
 import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.repositories.user.UserRepostitory
-import io.kotest.assertions.throwables.shouldThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
@@ -17,6 +17,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.runBlocking
 import org.jooq.SQLDialect
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
@@ -69,14 +70,14 @@ class UserRepositoryTest :
             user shouldBe created
         }
 
-        "getAll() returns all events" {
+        "getAll() returns all users" {
             val users = repo.getAll()
             users.shouldBeInstanceOf<List<User>>()
             users.shouldHaveSize(2)
         }
 
         "usernames must be unique" {
-            shouldThrowAny {
+            shouldThrow<IntegrityConstraintViolationException> {
                 repo.insert(newUser)
             }
         }

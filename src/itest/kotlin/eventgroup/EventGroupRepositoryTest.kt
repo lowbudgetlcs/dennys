@@ -1,4 +1,4 @@
-package event
+package eventgroup
 
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup

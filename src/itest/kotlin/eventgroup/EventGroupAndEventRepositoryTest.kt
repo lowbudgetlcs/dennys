@@ -1,30 +1,28 @@
-package event
+package eventgroup
 
 import com.lowbudgetlcs.domain.Zeroable
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.toEvent
-import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
-import com.lowbudgetlcs.domain.eventgroup.models.toEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
-import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.impl.DSL
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
@@ -43,67 +41,55 @@ class EventGroupAndEventRepositoryTest :
         val eventRepo = EventRepository(dslContext)
         // Data
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        lateinit var group: EventGroup
+        lateinit var event: Event
         val newEvent =
             NewEvent(
-                name = "Season 1".toEventName(),
-                description = "The first season",
+                "Test Event".toEventName(),
+                description = "Hello World!",
                 startDate = now,
-                endDate = now.plusSeconds(604_800L),
+                endDate = now.plus(1, ChronoUnit.HOURS),
                 status = EventStatus.ACTIVE,
                 eventStages = setOf(EventStage.REGULAR_SEASON),
             )
-        val expectedEvent =
-            newEvent.toEvent(
-                id = 1.toEventId(),
-                createdAt = Instant.now(),
-                riotTournamentId = 1245.toRiotTournamentId(),
-            )
-        val newGroup =
-            NewEventGroup(
-                name = "Test Group".toEventGroupName(),
-            )
-        val expectedGroup =
-            newGroup.toEventGroup(
-                0.toEventGroupId(),
-            )
-
-        fun checkEvent(event: Event) {
-            event.shouldBeEqualToIgnoringFields(
-                expectedEvent,
-                Event::id,
-                Event::createdAt,
-                Event::riotTournamentId,
-                Event::eventGroupId,
-            )
+        beforeSpec {
+            event = eventRepo.insert(
+                newEvent,
+                12345.toRiotTournamentId(),
+            ) ?: throw Exception("Failed to insert initial event.")
+            group = eventGroupRepo.insert(NewEventGroup("Test Group".toEventGroupName()))
+                ?: throw Exception("Failed to insert initial event group.")
         }
 
-        fun checkEventGroup(eventGroup: EventGroup) {
-            eventGroup.shouldBeEqualToIgnoringFields(expectedGroup, EventGroup::id)
-        }
-
-        "insert a new event group" {
-            val created = eventGroupRepo.insert(newGroup)
-            created.shouldNotBeNull()
-            checkEventGroup(created)
-        }
-
-        "insert a new event" {
-            val created = eventRepo.insert(newEvent, 1234.toRiotTournamentId())
-            created.shouldNotBeNull()
-            checkEvent(created)
-            created.eventGroupId shouldBe null
-        }
-
-        "add event to event group" {
-            val groups = eventGroupRepo.getAll()
-            groups.shouldNotBeEmpty()
-            val group = groups.first()
-            val events = eventRepo.getAll()
-            events.shouldNotBeEmpty()
-            val event = events.first()
+        "Adding event to valid event group succeeds." {
             val updated = eventRepo.update(event, EventUpdate(eventGroupId = Zeroable(group.id)))
             updated.shouldNotBeNull()
-            checkEvent(updated)
+            updated.shouldBeEqualToIgnoringFields(event, Event::eventGroupId)
             updated.eventGroupId shouldBe group.id
+        }
+
+        "Adding event to invalid event group fails." {
+            shouldThrow<IntegrityConstraintViolationException> {
+                eventRepo.update(event, EventUpdate(eventGroupId = Zeroable((-1).toEventGroupId())))
+            }
+        }
+
+        "Creating event with valid event group succeeds." {
+            val event =
+                eventRepo.insert(
+                    newEvent.copy(name = "NEW NEW".toEventName(), eventGroupId = group.id),
+                    54321.toRiotTournamentId(),
+                )
+            event.shouldNotBeNull()
+            event.eventGroupId shouldBe group.id
+        }
+
+        "Creating event with invalid event group fails." {
+            shouldThrow<IntegrityConstraintViolationException> {
+                eventRepo.insert(
+                    newEvent.copy(name = "NEW NEW".toEventName(), eventGroupId = (-1).toEventGroupId()),
+                    432.toRiotTournamentId(),
+                )
+            }
         }
     })

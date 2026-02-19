@@ -4,7 +4,7 @@ import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import io.kotest.core.extensions.install
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -16,7 +16,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
 class PlayerRepositoryTest :
-    FunSpec({
+    StringSpec({
         val postgres =
             PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
                 withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
@@ -25,19 +25,19 @@ class PlayerRepositoryTest :
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = PlayerRepository(dsl)
 
-        test("getAll returns empty list.") {
+        "getAll returns empty list." {
             repo.getAll().shouldHaveSize(0)
         }
 
-        test("getById returns null.") {
+        "getById returns null." {
             repo.getById((-1).toPlayerId()) shouldBe null
         }
 
-        test("getByTeamId returns empty list.") {
+        "getByTeamId returns empty list." {
             repo.getByTeamId((-1).toTeamId()).shouldHaveSize(0)
         }
 
-        test("insert succeeds and getById fetches the same player.") {
+        "insert succeeds and getById fetches the same player." {
             val newPlayer = NewPlayer("ruuffian".toPlayerName())
             val created = repo.insert(newPlayer)
 
@@ -48,7 +48,7 @@ class PlayerRepositoryTest :
             fetched shouldBe created
         }
 
-        test("rename player updates name") {
+        "rename player updates name" {
             val newPlayer = NewPlayer("zain".toPlayerName())
             val created = repo.insert(newPlayer)
             created.shouldNotBeNull()

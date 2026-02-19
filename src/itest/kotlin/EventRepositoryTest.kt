@@ -1,5 +1,3 @@
-package event
-
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEvent

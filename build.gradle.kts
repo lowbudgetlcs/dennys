@@ -103,9 +103,10 @@ sourceSets {
         resources.srcDir(migrationsDir)
     }
     create("itest") {
+        kotlin.srcDir("src/itest/kotlin")
         resources.srcDir(migrationsDir)
         compileClasspath += sourceSets["main"].output
-        runtimeClasspath += sourceSets["main"].output
+        runtimeClasspath += output + compileClasspath
     }
 }
 
