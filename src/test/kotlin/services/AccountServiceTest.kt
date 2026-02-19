@@ -1,12 +1,12 @@
 package services
 
-import com.lowbudgetlcs.domain.models.player.account.NewRiotAccount
-import com.lowbudgetlcs.domain.models.player.account.RiotAccount
-import com.lowbudgetlcs.domain.models.player.account.RiotPuuid
-import com.lowbudgetlcs.domain.models.player.account.toRiotAccount
-import com.lowbudgetlcs.domain.models.player.account.toRiotAccountId
-import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.services.account.AccountService
+import com.lowbudgetlcs.domain.account.AccountService
+import com.lowbudgetlcs.domain.account.models.RiotAccount
+import com.lowbudgetlcs.domain.game.player.account.NewRiotAccount
+import com.lowbudgetlcs.domain.game.player.account.RiotPuuid
+import com.lowbudgetlcs.domain.game.player.account.toRiotAccount
+import com.lowbudgetlcs.domain.game.player.account.toRiotAccountId
+import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.gateways.riot.account.RiotAccountDto

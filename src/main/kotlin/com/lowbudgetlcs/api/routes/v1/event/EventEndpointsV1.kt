@@ -18,9 +18,9 @@ import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.event.models.toEventId
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.services.series.ISeriesService
+import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.models.toSeriesId
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive

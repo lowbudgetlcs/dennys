@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
-import com.lowbudgetlcs.domain.models.Series
+import com.lowbudgetlcs.domain.series.models.Series
 import java.time.Instant
 
 data class EventWithSeries(

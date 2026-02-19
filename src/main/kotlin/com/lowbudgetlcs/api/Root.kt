@@ -1,17 +1,17 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
+import com.lowbudgetlcs.api.dto.auth.UserPrincipal
+import com.lowbudgetlcs.api.dto.auth.UserSession
+import com.lowbudgetlcs.api.dto.auth.toSession
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authEndpoints
-import com.lowbudgetlcs.auth.UserPrincipal
-import com.lowbudgetlcs.auth.UserSession
-import com.lowbudgetlcs.auth.toSession
 import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.auth.models.toMasked
 import com.lowbudgetlcs.domain.auth.models.toUsername
-import com.lowbudgetlcs.domain.services.user.IUserService
+import com.lowbudgetlcs.domain.user.IUserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
 import io.ktor.http.HttpHeaders

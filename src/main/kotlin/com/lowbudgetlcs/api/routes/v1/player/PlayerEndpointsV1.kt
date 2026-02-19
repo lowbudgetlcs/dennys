@@ -7,10 +7,10 @@ import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.api.dto.players.toNewPlayer
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.player.account.toAccountId
-import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.player.toPlayerName
-import com.lowbudgetlcs.domain.services.player.IPlayerService
+import com.lowbudgetlcs.domain.account.models.toAccountId
+import com.lowbudgetlcs.domain.player.IPlayerService
+import com.lowbudgetlcs.domain.player.models.toPlayerId
+import com.lowbudgetlcs.domain.player.models.toPlayerName
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive

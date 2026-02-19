@@ -1,16 +1,16 @@
 package com.lowbudgetlcs.api.routes
 
 import com.lowbudgetlcs.api.dto.CreateTokenDto
+import com.lowbudgetlcs.api.dto.auth.UserPrincipal
+import com.lowbudgetlcs.api.dto.auth.UserSession
+import com.lowbudgetlcs.api.dto.auth.toSession
+import com.lowbudgetlcs.api.dto.auth.toUserSession
 import com.lowbudgetlcs.api.dto.toNewAccessToken
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.auth.UserPrincipal
-import com.lowbudgetlcs.auth.UserSession
-import com.lowbudgetlcs.auth.toSession
-import com.lowbudgetlcs.auth.toUserSession
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.auth.models.toUserId
-import com.lowbudgetlcs.domain.services.user.IUserService
+import com.lowbudgetlcs.domain.user.IUserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal

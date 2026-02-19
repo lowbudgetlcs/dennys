@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.repositories.user
 
-import com.lowbudgetlcs.domain.auth.models.NewUser
-import com.lowbudgetlcs.domain.auth.models.User
 import com.lowbudgetlcs.domain.auth.models.toUserId
 import com.lowbudgetlcs.domain.auth.models.toUsername
-import com.lowbudgetlcs.domain.auth.models.types.UserId
-import com.lowbudgetlcs.domain.auth.models.types.Username
+import com.lowbudgetlcs.domain.user.models.NewUser
+import com.lowbudgetlcs.domain.user.models.User
+import com.lowbudgetlcs.domain.user.models.types.UserId
+import com.lowbudgetlcs.domain.user.models.types.Username
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.USERS

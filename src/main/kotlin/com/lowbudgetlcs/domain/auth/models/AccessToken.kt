@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.auth.models
 
-import com.lowbudgetlcs.domain.auth.models.types.UserId
+import com.lowbudgetlcs.domain.user.models.types.UserId
 import java.time.Instant
 
 data class AccessToken(

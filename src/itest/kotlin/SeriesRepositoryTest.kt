@@ -3,11 +3,11 @@ import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.team.NewTeam
-import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.team.toTeamName
+import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.models.toTeamName
+import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository

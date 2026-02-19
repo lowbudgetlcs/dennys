@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.api.dto.teams
 
-import com.lowbudgetlcs.domain.models.team.NewTeam
-import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.team.toTeamLogoName
-import com.lowbudgetlcs.domain.models.team.toTeamName
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.models.toTeamLogoName
+import com.lowbudgetlcs.domain.team.models.toTeamName
 
 fun NewTeamDto.toNewTeam(): NewTeam =
     NewTeam(

@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.repositories.player
 
-import com.lowbudgetlcs.domain.models.player.NewPlayer
-import com.lowbudgetlcs.domain.models.player.Player
-import com.lowbudgetlcs.domain.models.player.PlayerId
-import com.lowbudgetlcs.domain.models.player.PlayerName
-import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.player.models.NewPlayer
+import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.models.types.PlayerId
+import com.lowbudgetlcs.domain.player.models.types.PlayerName
+import com.lowbudgetlcs.domain.team.models.types.TeamId
 
 interface IPlayerRepository {
     fun getAll(): List<Player>

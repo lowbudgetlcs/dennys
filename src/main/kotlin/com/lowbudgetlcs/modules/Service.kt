@@ -1,21 +1,21 @@
 package com.lowbudgetlcs.modules
 
+import com.lowbudgetlcs.domain.account.AccountService
+import com.lowbudgetlcs.domain.account.IAccountService
 import com.lowbudgetlcs.domain.auth.AuthService
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.event.EventService
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.eventgroup.EventGroupService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
-import com.lowbudgetlcs.domain.services.account.AccountService
-import com.lowbudgetlcs.domain.services.account.IAccountService
-import com.lowbudgetlcs.domain.services.player.IPlayerService
-import com.lowbudgetlcs.domain.services.player.PlayerService
-import com.lowbudgetlcs.domain.services.series.ISeriesService
-import com.lowbudgetlcs.domain.services.series.SeriesService
-import com.lowbudgetlcs.domain.services.team.ITeamService
-import com.lowbudgetlcs.domain.services.team.TeamService
-import com.lowbudgetlcs.domain.services.user.IUserService
-import com.lowbudgetlcs.domain.services.user.UserService
+import com.lowbudgetlcs.domain.player.IPlayerService
+import com.lowbudgetlcs.domain.player.PlayerService
+import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.SeriesService
+import com.lowbudgetlcs.domain.team.ITeamService
+import com.lowbudgetlcs.domain.team.TeamService
+import com.lowbudgetlcs.domain.user.IUserService
+import com.lowbudgetlcs.domain.user.UserService
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 

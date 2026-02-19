@@ -1,7 +1,7 @@
 package models
 
-import com.lowbudgetlcs.domain.models.team.toTeamLogoName
-import com.lowbudgetlcs.domain.models.team.toTeamName
+import com.lowbudgetlcs.domain.team.models.toTeamLogoName
+import com.lowbudgetlcs.domain.team.models.toTeamName
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 

@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.api.dto.players
 
-import com.lowbudgetlcs.domain.models.player.NewPlayer
-import com.lowbudgetlcs.domain.models.player.Player
-import com.lowbudgetlcs.domain.models.player.PlayerName
+import com.lowbudgetlcs.domain.player.models.NewPlayer
+import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.models.types.PlayerName
 
 fun NewPlayerDto.toNewPlayer(): NewPlayer =
     NewPlayer(

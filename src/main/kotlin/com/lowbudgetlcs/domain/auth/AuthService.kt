@@ -5,8 +5,8 @@ import com.lowbudgetlcs.domain.auth.models.FreshAccessToken
 import com.lowbudgetlcs.domain.auth.models.NewAccessToken
 import com.lowbudgetlcs.domain.auth.models.NewSession
 import com.lowbudgetlcs.domain.auth.models.Session
-import com.lowbudgetlcs.domain.auth.models.User
-import com.lowbudgetlcs.domain.auth.models.types.Username
+import com.lowbudgetlcs.domain.user.models.User
+import com.lowbudgetlcs.domain.user.models.types.Username
 import com.lowbudgetlcs.hashing.IHasher
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.session.ISessionRepository

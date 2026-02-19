@@ -1,7 +1,7 @@
-import com.lowbudgetlcs.domain.models.player.NewPlayer
-import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.player.toPlayerName
-import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.player.models.NewPlayer
+import com.lowbudgetlcs.domain.player.models.toPlayerId
+import com.lowbudgetlcs.domain.player.models.toPlayerName
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec

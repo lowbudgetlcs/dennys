@@ -1,8 +1,8 @@
 package account
 
-import com.lowbudgetlcs.domain.models.player.account.AccountId
-import com.lowbudgetlcs.domain.models.player.account.NewAccount
-import com.lowbudgetlcs.domain.models.player.account.Puuid
+import com.lowbudgetlcs.domain.account.models.NewAccount
+import com.lowbudgetlcs.domain.account.models.types.AccountId
+import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.repositories.account.AccountRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
