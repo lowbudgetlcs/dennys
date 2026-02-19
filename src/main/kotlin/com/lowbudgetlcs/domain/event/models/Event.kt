@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.event.models
 
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
@@ -9,7 +10,7 @@ import java.time.Instant
 
 data class Event(
     val id: EventId,
-    val name: String,
+    val name: EventName,
     val description: String,
     val eventGroupId: EventGroupId?,
     val riotTournamentId: RiotTournamentId,

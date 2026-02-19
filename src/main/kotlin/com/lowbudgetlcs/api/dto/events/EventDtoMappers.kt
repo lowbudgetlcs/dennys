@@ -8,12 +8,13 @@ import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.EventWithSeries
 import com.lowbudgetlcs.domain.event.models.EventWithTeams
 import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.models.team.TeamId
 import com.lowbudgetlcs.domain.models.team.toTeamId
 
 fun CreateEventDto.toNewEvent(): NewEvent =
     NewEvent(
-        name = name,
+        name = name.toEventName(),
         description = description,
         startDate = startDate,
         endDate = endDate,
@@ -23,7 +24,7 @@ fun CreateEventDto.toNewEvent(): NewEvent =
 
 fun PatchEventDto.toEventUpdate(): EventUpdate =
     EventUpdate(
-        name = name,
+        name = name?.toEventName(),
         description = description,
         startDate = startDate,
         endDate = endDate,
@@ -32,10 +33,16 @@ fun PatchEventDto.toEventUpdate(): EventUpdate =
 
 fun EventTeamLinkDto.toTeamId(): TeamId = teamId.toTeamId()
 
+fun EventFilterParams.toQuery(): EventQuery =
+    EventQuery(
+        name = name?.toEventName(),
+        status = status,
+    )
+
 fun Event.toDto(): EventDto =
     EventDto(
         id = id.value,
-        name = name,
+        name = name.value,
         startDate = startDate,
         endDate = endDate,
         createdAt = createdAt,
@@ -48,7 +55,7 @@ fun Event.toDto(): EventDto =
 fun EventWithTeams.toDto(): EventWithTeamsDto =
     EventWithTeamsDto(
         id = id.value,
-        name = name,
+        name = name.value,
         startDate = startDate,
         endDate = endDate,
         createdAt = createdAt,
@@ -61,7 +68,7 @@ fun EventWithTeams.toDto(): EventWithTeamsDto =
 fun EventWithSeries.toDto(): EventWithSeriesDto =
     EventWithSeriesDto(
         id = id.value,
-        name = name,
+        name = name.value,
         startDate = startDate,
         endDate = endDate,
         createdAt = createdAt,
@@ -69,10 +76,4 @@ fun EventWithSeries.toDto(): EventWithSeriesDto =
         status = status,
         series = series.map { s -> s.toDto() },
         eventStages = eventStages,
-    )
-
-fun EventFilterParams.toQuery(): EventQuery =
-    EventQuery(
-        name = name,
-        status = status,
     )

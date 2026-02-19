@@ -12,6 +12,7 @@ import com.lowbudgetlcs.domain.event.models.filterByStatus
 import com.lowbudgetlcs.domain.event.models.toEventWithSeries
 import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.models.SeriesQuery
 import com.lowbudgetlcs.domain.models.filterByParticipants
 import com.lowbudgetlcs.domain.models.filterByStage
@@ -67,7 +68,6 @@ class EventService(
     override suspend fun createEvent(event: NewEvent): Event {
         logger.debug("Creating new event...")
         logger.debug(event.toString())
-        if (event.name.isBlank()) throw IllegalArgumentException("Event name cannot be blank.")
         if (!event.startDate.isBefore(
                 event.endDate,
             )
@@ -129,7 +129,7 @@ class EventService(
      * @return false if name is not taken.
      * @throws IllegalArgumentException when name already exists.
      */
-    private fun isNameTaken(name: String): Boolean {
+    private fun isNameTaken(name: EventName): Boolean {
         logger.debug("Checking if '$name' is available...")
         return if (eventRepo.getByName(name) != null) {
             throw IllegalArgumentException("Event '$name' already exists.")

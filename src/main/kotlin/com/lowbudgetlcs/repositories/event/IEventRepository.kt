@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 
@@ -12,7 +13,7 @@ interface IEventRepository {
 
     fun getById(id: EventId): Event?
 
-    fun getByName(name: String): Event?
+    fun getByName(name: EventName): Event?
 
     fun getAllByGroupId(groupId: EventGroupId): List<Event>
 

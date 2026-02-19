@@ -3,6 +3,7 @@ package com.lowbudgetlcs.gateways.riot.tournament
 import com.lowbudgetlcs.domain.event.models.RiotTournament
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import io.ktor.client.HttpClient
@@ -29,7 +30,7 @@ class RiotTournamentGateway(
     }
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override suspend fun create(tournamentName: String): RiotTournament {
+    override suspend fun create(tournamentName: EventName): RiotTournament {
         logger.debug("Creating tournament named '$tournamentName'...")
         val res =
             client.post("$url/tournaments") {
@@ -37,7 +38,7 @@ class RiotTournamentGateway(
                     append("X-Riot-Token", apiKey)
                 }
                 contentType(ContentType.Application.Json)
-                setBody(RiotTournamentParametersDto(tournamentName, providerId))
+                setBody(RiotTournamentParametersDto(tournamentName.value, providerId))
             }
         when (res.status) {
             HttpStatusCode.OK -> return RiotTournament(

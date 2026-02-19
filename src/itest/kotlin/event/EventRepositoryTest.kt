@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEvent
 import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
@@ -38,7 +39,7 @@ class EventRepositoryTest :
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)
         val newEvent =
             NewEvent(
-                name = "Season 1",
+                name = "Season 1".toEventName(),
                 description = "The first season",
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
@@ -47,7 +48,7 @@ class EventRepositoryTest :
             )
         val newEvent2 =
             NewEvent(
-                name = "Season 2",
+                name = "Season 2".toEventName(),
                 description = "The second season",
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),

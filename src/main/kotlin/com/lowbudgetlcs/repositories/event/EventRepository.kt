@@ -5,8 +5,10 @@ import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.patch
 import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
@@ -26,8 +28,8 @@ class EventRepository(
 
     override fun getById(id: EventId): Event? = selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne(::rowToEvent)
 
-    override fun getByName(name: String): Event? =
-        selectEvents().where(EVENTS.NAME.eq(name)).fetchOne()?.let(::rowToEvent)
+    override fun getByName(name: EventName): Event? =
+        selectEvents().where(EVENTS.NAME.eq(name.value)).fetchOne()?.let(::rowToEvent)
 
     override fun insert(
         newEvent: NewEvent,
@@ -37,7 +39,7 @@ class EventRepository(
             dsl
                 .insertInto(
                     EVENTS,
-                ).set(EVENTS.NAME, newEvent.name)
+                ).set(EVENTS.NAME, newEvent.name.value)
                 .set(EVENTS.DESCRIPTION, newEvent.description)
                 .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
                 .set(EVENTS.START_DATE, newEvent.startDate)
@@ -58,7 +60,7 @@ class EventRepository(
         val updatedId =
             dsl
                 .update(EVENTS)
-                .set(EVENTS.NAME, patch.name)
+                .set(EVENTS.NAME, patch.name.value)
                 .set(EVENTS.DESCRIPTION, patch.description)
                 .set(EVENTS.START_DATE, patch.startDate)
                 .set(EVENTS.END_DATE, patch.endDate)
@@ -105,7 +107,7 @@ class EventRepository(
                 ?: emptySet()
         return Event(
             id = eventId,
-            name = name,
+            name = name.toEventName(),
             description = description,
             riotTournamentId = tournamentId,
             createdAt = createdAt,

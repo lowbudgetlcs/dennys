@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.event.models
 
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.models.Series
@@ -49,6 +50,8 @@ fun Int.toEventId(): EventId = EventId(this)
 fun Int.toRiotTournamentId(): RiotTournamentId = RiotTournamentId(this)
 
 fun String.toShortcode(): Shortcode = Shortcode(this)
+
+fun String.toEventName(): EventName = EventName(this)
 
 fun NewEvent.toEvent(
     id: EventId,
