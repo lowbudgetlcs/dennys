@@ -74,7 +74,7 @@ class EventService(
         ) {
             throw IllegalArgumentException("Events cannot start after they end.")
         }
-        isNameTaken(event.name)
+        checkName(event.name)
         val t =
             tournamentGateway.create(event.name)
                 ?: throw GatewayException("Failed to register tournament with Riot Games.")
@@ -89,7 +89,7 @@ class EventService(
         logger.debug(update.toString())
         val event = getEvent(id)
         update.name?.let {
-            isNameTaken(it)
+            checkName(it)
         }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
@@ -103,8 +103,8 @@ class EventService(
         teamId: TeamId,
     ): EventWithTeams {
         logger.debug("Adding team '$teamId' to event '$eventId'...")
-        doesEventExist(eventId)
-        doesTeamExist(teamId)
+        checkEvent(eventId)
+        checkTeam(teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
         val teamPatch = TeamUpdate(eventId = Zeroable(eventId))
         teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
@@ -116,8 +116,8 @@ class EventService(
         teamId: TeamId,
     ): EventWithTeams {
         logger.debug("Removing team '$teamId' from event '$eventId'...")
-        doesEventExist(eventId)
-        doesTeamExist(teamId)
+        checkEvent(eventId)
+        checkTeam(teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
         val teamPatch = TeamUpdate(eventId = Zeroable(null))
         teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
@@ -126,47 +126,40 @@ class EventService(
 
     /**
      * Checks if an event name is taken.
-     * @return false if name is not taken.
-     * @throws IllegalArgumentException when name already exists.
+     * @return true if name is taken, false otherwise.
      */
-    private fun isNameTaken(name: EventName): Boolean {
+    fun isNameTaken(name: EventName): Boolean {
         logger.debug("Checking if '$name' is available...")
-        return if (eventRepo.getByName(name) != null) {
-            throw IllegalArgumentException("Event '$name' already exists.")
-        } else {
-            false
-        }
+        return eventRepo.getByName(name) != null
+    }
+
+    private fun checkName(name: EventName) {
+        if (isNameTaken(name)) throw IllegalArgumentException("Event '$name' already exists.")
     }
 
     /**
      * Checks if an event exists.
-     * @return true if event exists.
-     * @throws NoSuchElementException if event does not exist.
+     * @return true if event exists, false otherwise.
      */
-    private fun doesEventExist(eventId: EventId): Boolean {
+    fun doesEventExist(eventId: EventId): Boolean {
         logger.debug("Checking if event '$eventId' exists...")
-        return if (eventRepo.getById(eventId) ==
-            null
-        ) {
-            throw NoSuchElementException("Event with id '${eventId.value}' not found.")
-        } else {
-            true
-        }
+        return eventRepo.getById(eventId) == null
+    }
+
+    private fun checkEvent(id: EventId) {
+        if (!doesEventExist(id)) throw NoSuchElementException("Event with id '${id.value}' not found.")
     }
 
     /**
      * Checks if team exists
-     * @return true if team exists.
-     * @throws NoSuchElementException if team does not exist.
+     * @return true if team exists, false otherwise
      */
-    private fun doesTeamExist(teamId: TeamId): Boolean {
+    fun doesTeamExist(teamId: TeamId): Boolean {
         logger.debug("Checking if team '$teamId' exists...")
-        return if (teamRepo.getById(teamId) ==
-            null
-        ) {
-            throw NoSuchElementException("Team with id '${teamId.value}' not found.")
-        } else {
-            true
-        }
+        return teamRepo.getById(teamId) == null
+    }
+
+    private fun checkTeam(teamId: TeamId) {
+        if (!doesTeamExist(teamId)) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
     }
 }
