@@ -1,11 +1,11 @@
 package event
 
 import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupName
+import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.EventUpdate

@@ -1,17 +1,17 @@
 package services.events.groups
 
 import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupName
+import com.lowbudgetlcs.domain.eventgroup.EventGroupService
+import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.Stage
 import com.lowbudgetlcs.domain.models.events.toEventId
 import com.lowbudgetlcs.domain.models.events.toRiotTournamentId
-import com.lowbudgetlcs.domain.services.eventgroup.EventGroupService
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow

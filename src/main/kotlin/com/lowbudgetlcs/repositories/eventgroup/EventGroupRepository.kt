@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.repositories.eventgroup
 
-import com.lowbudgetlcs.domain.models.eventgroup.EventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.NewEventGroup
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupName
-import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupId
-import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupName
+import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupName
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENT_GROUPS

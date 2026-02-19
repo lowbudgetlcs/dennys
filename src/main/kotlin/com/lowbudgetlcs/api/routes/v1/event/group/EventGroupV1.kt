@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.routes.v1.event.group
 
-import com.lowbudgetlcs.domain.services.eventgroup.IEventGroupService
+import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 

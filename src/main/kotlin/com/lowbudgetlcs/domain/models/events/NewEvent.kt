@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.models.events
 
-import com.lowbudgetlcs.domain.models.eventgroup.types.EventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import java.time.Instant
 
 data class NewEvent(

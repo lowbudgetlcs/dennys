@@ -1,7 +1,7 @@
 package services.events
 
 import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.models.eventgroup.toEventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventStatus
 import com.lowbudgetlcs.domain.models.events.EventUpdate
