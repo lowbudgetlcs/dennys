@@ -2,6 +2,7 @@ import com.lowbudgetlcs.domain.models.auth.NewUser
 import com.lowbudgetlcs.domain.models.auth.User
 import com.lowbudgetlcs.domain.models.auth.toUser
 import com.lowbudgetlcs.domain.models.auth.toUserId
+import com.lowbudgetlcs.domain.models.auth.toUsername
 import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.repositories.user.UserRepostitory
 import io.kotest.assertions.throwables.shouldThrowAny
@@ -31,10 +32,10 @@ class UserRepositoryTest :
         val repo = UserRepostitory(dslContext)
 
         val argon2Hasher = Argon2Hasher()
-        val username = "ruuffian"
+        val username = "ruuffian".toUsername()
         val password = "ABCD1**"
         val passwordHash = runBlocking { argon2Hasher.hash(password) }
-        val username2 = "zain"
+        val username2 = "zain".toUsername()
 
         // Data
         val newUser =

@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.models.auth.NewAccessToken
 import com.lowbudgetlcs.domain.models.auth.NewSession
 import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.User
+import com.lowbudgetlcs.domain.models.auth.types.Username
 import com.lowbudgetlcs.hashing.IHasher
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.session.ISessionRepository
@@ -28,7 +29,7 @@ class AuthService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun authenticate(
-        username: String,
+        username: Username,
         password: Masked,
     ): User {
         logger.debug("Authenticating $username...")

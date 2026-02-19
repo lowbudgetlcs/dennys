@@ -4,11 +4,12 @@ import com.lowbudgetlcs.domain.models.auth.FreshAccessToken
 import com.lowbudgetlcs.domain.models.auth.NewAccessToken
 import com.lowbudgetlcs.domain.models.auth.Session
 import com.lowbudgetlcs.domain.models.auth.User
+import com.lowbudgetlcs.domain.models.auth.types.Username
 import com.sksamuel.hoplite.Masked
 
 interface IAuthService {
     suspend fun authenticate(
-        username: String,
+        username: Username,
         password: Masked,
     ): User
 

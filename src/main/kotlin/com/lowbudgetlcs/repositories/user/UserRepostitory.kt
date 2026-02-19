@@ -2,8 +2,10 @@ package com.lowbudgetlcs.repositories.user
 
 import com.lowbudgetlcs.domain.models.auth.NewUser
 import com.lowbudgetlcs.domain.models.auth.User
-import com.lowbudgetlcs.domain.models.auth.UserId
 import com.lowbudgetlcs.domain.models.auth.toUserId
+import com.lowbudgetlcs.domain.models.auth.toUsername
+import com.lowbudgetlcs.domain.models.auth.types.UserId
+import com.lowbudgetlcs.domain.models.auth.types.Username
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.USERS
@@ -15,15 +17,15 @@ class UserRepostitory(
 
     override fun getById(id: UserId): User? = selectUsers().where(USERS.ID.eq(id.value)).fetchOne(::rowToUser)
 
-    override fun getByUsername(username: String): User? =
-        selectUsers().where(USERS.USERNAME.eq(username)).fetchOne(::rowToUser)
+    override fun getByUsername(username: Username): User? =
+        selectUsers().where(USERS.USERNAME.eq(username.value)).fetchOne(::rowToUser)
 
     override fun insert(newUser: NewUser): User? {
         val insertedId =
             dsl
                 .insertInto(
                     USERS,
-                ).set(USERS.USERNAME, newUser.username)
+                ).set(USERS.USERNAME, newUser.username.value)
                 .set(USERS.PASSWORD_HASH, newUser.passwordHash)
                 .set(USERS.IS_ACTIVE, newUser.isActive)
                 .set(USERS.ROLES, newUser.roles.joinToString(":"))
@@ -51,7 +53,7 @@ class UserRepostitory(
         val roles = row[USERS.ROLES]?.split(":")?.toSet() ?: return null
         return User(
             id = userId,
-            username = username,
+            username = username.toUsername(),
             passwordHash = password,
             isActive = isActive,
             roles = roles,

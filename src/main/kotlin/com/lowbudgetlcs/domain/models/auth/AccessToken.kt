@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.models.auth
 
+import com.lowbudgetlcs.domain.models.auth.types.UserId
 import java.time.Instant
 
 data class AccessToken(
@@ -9,15 +10,4 @@ data class AccessToken(
     val scopes: Set<String>,
     val expiresAt: Instant,
     val createdAt: Instant,
-)
-
-data class NewAccessToken(
-    val name: String,
-    val userId: UserId,
-    val scopes: Set<String>,
-    val expiresAt: Instant,
-)
-
-data class FreshAccessToken(
-    val token: String,
 )
