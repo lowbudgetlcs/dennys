@@ -7,10 +7,10 @@ import com.lowbudgetlcs.auth.UserPrincipal
 import com.lowbudgetlcs.auth.UserSession
 import com.lowbudgetlcs.auth.toSession
 import com.lowbudgetlcs.config.CookieConfig
-import com.lowbudgetlcs.domain.models.auth.toMasked
-import com.lowbudgetlcs.domain.models.auth.toUsername
-import com.lowbudgetlcs.domain.services.auth.IAuthService
-import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
+import com.lowbudgetlcs.domain.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.UnauthorizedException
+import com.lowbudgetlcs.domain.auth.models.toMasked
+import com.lowbudgetlcs.domain.auth.models.toUsername
 import com.lowbudgetlcs.domain.services.user.IUserService
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException

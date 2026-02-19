@@ -1,10 +1,10 @@
-package com.lowbudgetlcs.domain.services.auth
+package com.lowbudgetlcs.domain.auth
 
-import com.lowbudgetlcs.domain.models.auth.FreshAccessToken
-import com.lowbudgetlcs.domain.models.auth.NewAccessToken
-import com.lowbudgetlcs.domain.models.auth.Session
-import com.lowbudgetlcs.domain.models.auth.User
-import com.lowbudgetlcs.domain.models.auth.types.Username
+import com.lowbudgetlcs.domain.auth.models.FreshAccessToken
+import com.lowbudgetlcs.domain.auth.models.NewAccessToken
+import com.lowbudgetlcs.domain.auth.models.Session
+import com.lowbudgetlcs.domain.auth.models.User
+import com.lowbudgetlcs.domain.auth.models.types.Username
 import com.sksamuel.hoplite.Masked
 
 interface IAuthService {

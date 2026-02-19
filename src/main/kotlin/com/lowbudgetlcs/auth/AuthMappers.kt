@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.auth
 
-import com.lowbudgetlcs.domain.models.auth.Session
-import com.lowbudgetlcs.domain.models.auth.toSessionId
-import com.lowbudgetlcs.domain.models.auth.toUserId
+import com.lowbudgetlcs.domain.auth.models.Session
+import com.lowbudgetlcs.domain.auth.models.toSessionId
+import com.lowbudgetlcs.domain.auth.models.toUserId
 
 fun UserSession.toSession(): Session = Session(id.toSessionId(), userId.toUserId(), expiresAt)
 

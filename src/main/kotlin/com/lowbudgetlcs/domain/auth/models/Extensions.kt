@@ -1,8 +1,8 @@
-package com.lowbudgetlcs.domain.models.auth
+package com.lowbudgetlcs.domain.auth.models
 
-import com.lowbudgetlcs.domain.models.auth.types.SessionId
-import com.lowbudgetlcs.domain.models.auth.types.UserId
-import com.lowbudgetlcs.domain.models.auth.types.Username
+import com.lowbudgetlcs.domain.auth.models.types.SessionId
+import com.lowbudgetlcs.domain.auth.models.types.UserId
+import com.lowbudgetlcs.domain.auth.models.types.Username
 import com.sksamuel.hoplite.Masked
 import java.util.UUID
 

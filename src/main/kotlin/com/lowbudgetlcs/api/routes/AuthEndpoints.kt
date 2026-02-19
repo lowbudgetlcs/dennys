@@ -8,8 +8,8 @@ import com.lowbudgetlcs.auth.UserPrincipal
 import com.lowbudgetlcs.auth.UserSession
 import com.lowbudgetlcs.auth.toSession
 import com.lowbudgetlcs.auth.toUserSession
-import com.lowbudgetlcs.domain.models.auth.toUserId
-import com.lowbudgetlcs.domain.services.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.models.toUserId
 import com.lowbudgetlcs.domain.services.user.IUserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate

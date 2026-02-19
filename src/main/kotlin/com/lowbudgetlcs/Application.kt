@@ -1,7 +1,7 @@
 package com.lowbudgetlcs
 
 import com.lowbudgetlcs.api.routes
-import com.lowbudgetlcs.domain.services.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.modules.configModule
 import com.lowbudgetlcs.modules.databaseModule
 import com.lowbudgetlcs.modules.gatewayModule

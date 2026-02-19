@@ -1,6 +1,6 @@
 package models
 
-import com.lowbudgetlcs.domain.models.auth.types.Username
+import com.lowbudgetlcs.domain.auth.models.types.Username
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 

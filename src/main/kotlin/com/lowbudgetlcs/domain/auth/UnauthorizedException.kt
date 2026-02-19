@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.services.auth
+package com.lowbudgetlcs.domain.auth
 
 class UnauthorizedException(
     message: String,

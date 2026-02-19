@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.modules
 
+import com.lowbudgetlcs.domain.auth.AuthService
+import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.eventgroup.EventGroupService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.services.account.AccountService
 import com.lowbudgetlcs.domain.services.account.IAccountService
-import com.lowbudgetlcs.domain.services.auth.AuthService
-import com.lowbudgetlcs.domain.services.auth.IAuthService
 import com.lowbudgetlcs.domain.services.event.EventService
 import com.lowbudgetlcs.domain.services.event.IEventService
 import com.lowbudgetlcs.domain.services.player.IPlayerService

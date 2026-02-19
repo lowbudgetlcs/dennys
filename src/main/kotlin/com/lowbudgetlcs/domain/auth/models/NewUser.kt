@@ -1,6 +1,6 @@
-package com.lowbudgetlcs.domain.models.auth
+package com.lowbudgetlcs.domain.auth.models
 
-import com.lowbudgetlcs.domain.models.auth.types.Username
+import com.lowbudgetlcs.domain.auth.models.types.Username
 
 data class NewUser(
     val username: Username,

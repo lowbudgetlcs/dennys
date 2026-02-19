@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.services.user
 
-import com.lowbudgetlcs.domain.models.auth.User
-import com.lowbudgetlcs.domain.models.auth.types.UserId
+import com.lowbudgetlcs.domain.auth.models.User
+import com.lowbudgetlcs.domain.auth.models.types.UserId
 import com.lowbudgetlcs.repositories.user.IUserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

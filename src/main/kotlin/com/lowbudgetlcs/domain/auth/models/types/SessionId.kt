@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.models.auth.types
+package com.lowbudgetlcs.domain.auth.models.types
 
 import java.util.UUID
 

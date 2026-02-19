@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories.session
 
-import com.lowbudgetlcs.domain.models.auth.NewSession
-import com.lowbudgetlcs.domain.models.auth.Session
-import com.lowbudgetlcs.domain.models.auth.types.SessionId
+import com.lowbudgetlcs.domain.auth.models.NewSession
+import com.lowbudgetlcs.domain.auth.models.Session
+import com.lowbudgetlcs.domain.auth.models.types.SessionId
 
 interface ISessionRepository {
     fun getAll(): List<Session>

@@ -1,8 +1,8 @@
-import com.lowbudgetlcs.domain.models.auth.NewUser
-import com.lowbudgetlcs.domain.models.auth.User
-import com.lowbudgetlcs.domain.models.auth.toUser
-import com.lowbudgetlcs.domain.models.auth.toUserId
-import com.lowbudgetlcs.domain.models.auth.toUsername
+import com.lowbudgetlcs.domain.auth.models.NewUser
+import com.lowbudgetlcs.domain.auth.models.User
+import com.lowbudgetlcs.domain.auth.models.toUser
+import com.lowbudgetlcs.domain.auth.models.toUserId
+import com.lowbudgetlcs.domain.auth.models.toUsername
 import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.repositories.user.UserRepostitory
 import io.kotest.assertions.throwables.shouldThrowAny
