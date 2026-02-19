@@ -360,6 +360,21 @@ paths:
       summary: Get all events
       description: Fetch a list of all events.
       operationId: getEvents
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter events matching this name. Partial completions are allowed.
+        - in: query
+          name: status
+          schema:
+            allOf:
+              - description: The intended starting status of the event.
+              - example: NOT_STARTED
+              - $ref: "#/components/schemas/EventStatus"
+          description: Filter only series in this event stage.
+
       responses:
         "200":
           description: Successful operation

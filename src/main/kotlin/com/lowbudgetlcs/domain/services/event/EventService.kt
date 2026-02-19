@@ -1,13 +1,16 @@
 package com.lowbudgetlcs.domain.services.event
 
 import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.models.SeriesFilter
+import com.lowbudgetlcs.domain.models.SeriesQuery
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventQuery
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.EventWithSeries
 import com.lowbudgetlcs.domain.models.events.EventWithTeams
 import com.lowbudgetlcs.domain.models.events.NewEvent
+import com.lowbudgetlcs.domain.models.events.filterByName
+import com.lowbudgetlcs.domain.models.events.filterByStatus
 import com.lowbudgetlcs.domain.models.events.toEventWithSeries
 import com.lowbudgetlcs.domain.models.events.toEventWithTeams
 import com.lowbudgetlcs.domain.models.filterByParticipants
@@ -31,9 +34,10 @@ class EventService(
 ) : IEventService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun getAllEvents(): List<Event> {
+    override fun getAllEvents(query: EventQuery?): List<Event> {
         logger.debug("Fetching all events...")
-        return eventRepo.getAll()
+        query?.run { logger.debug("(Query: '$query')") }
+        return eventRepo.getAll().filterByName(query).filterByStatus(query)
     }
 
     override fun getEvent(id: EventId): Event {
@@ -50,12 +54,12 @@ class EventService(
 
     override fun getEventWithSeries(
         id: EventId,
-        filter: SeriesFilter?,
+        query: SeriesQuery?,
     ): EventWithSeries {
         logger.debug("Getting event by '$id' (with series)...")
-        filter?.run { logger.debug("Series filter: '$filter'.") }
+        query?.run { logger.debug("(Query: '$query')") }
         val event = getEvent(id)
-        val series = seriesRepo.getAllByEventId(id).filterByStage(filter?.stage).filterByParticipants(filter?.teamIds)
+        val series = seriesRepo.getAllByEventId(id).filterByStage(query).filterByParticipants(query)
 
         return event.toEventWithSeries(series)
     }

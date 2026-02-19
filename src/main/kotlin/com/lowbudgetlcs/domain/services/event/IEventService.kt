@@ -1,8 +1,9 @@
 package com.lowbudgetlcs.domain.services.event
 
-import com.lowbudgetlcs.domain.models.SeriesFilter
+import com.lowbudgetlcs.domain.models.SeriesQuery
 import com.lowbudgetlcs.domain.models.events.Event
 import com.lowbudgetlcs.domain.models.events.EventId
+import com.lowbudgetlcs.domain.models.events.EventQuery
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.EventWithSeries
 import com.lowbudgetlcs.domain.models.events.EventWithTeams
@@ -16,7 +17,7 @@ interface IEventService {
      *
      * @return a list containing all events.
      */
-    fun getAllEvents(): List<Event>
+    fun getAllEvents(query: EventQuery? = null): List<Event>
 
     /**
      * Fetch an event by id.
@@ -76,7 +77,7 @@ interface IEventService {
      */
     fun getEventWithSeries(
         id: EventId,
-        filter: SeriesFilter? = null,
+        query: SeriesQuery? = null,
     ): EventWithSeries
 
     /**

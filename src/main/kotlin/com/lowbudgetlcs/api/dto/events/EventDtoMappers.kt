@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api.dto.events
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.domain.models.events.Event
+import com.lowbudgetlcs.domain.models.events.EventQuery
 import com.lowbudgetlcs.domain.models.events.EventUpdate
 import com.lowbudgetlcs.domain.models.events.EventWithSeries
 import com.lowbudgetlcs.domain.models.events.EventWithTeams
@@ -68,4 +69,10 @@ fun EventWithSeries.toDto(): EventWithSeriesDto =
         status = status,
         series = series.map { s -> s.toDto() },
         stages = stages,
+    )
+
+fun EventFilterParams.toQuery(): EventQuery =
+    EventQuery(
+        name = name,
+        status = status,
     )

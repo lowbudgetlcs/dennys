@@ -26,7 +26,7 @@ data class Series(
     val result: SeriesResult?,
 )
 
-data class SeriesFilter(
+data class SeriesQuery(
     val teamIds: List<TeamId>?,
     val stage: Stage?,
 )
@@ -38,13 +38,15 @@ data class NewSeries(
     val participantIds: List<TeamId>,
 )
 
-fun List<Series>.filterByStage(stage: Stage?): List<Series> =
-    this.filter { if (stage == null) true else it.stage == stage }
+fun List<Series>.filterByStage(query: SeriesQuery?): List<Series> =
+    this.filter { if (query?.stage == null) true else it.stage == query.stage }
 
-fun List<Series>.filterByParticipants(participants: List<TeamId>?): List<Series> =
-    when {
+fun List<Series>.filterByParticipants(query: SeriesQuery?): List<Series> {
+    val participants = query?.teamIds
+    return when {
         participants == null -> this
         participants.isEmpty() -> this
         participants.size == 1 -> this.filter { s -> s.participants.any { participants.contains(it) } }
         else -> this.filter { s -> s.participants.equalsIgnoreOrder(participants) }
     }
+}

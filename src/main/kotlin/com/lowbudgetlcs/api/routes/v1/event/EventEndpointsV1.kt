@@ -1,11 +1,13 @@
 package com.lowbudgetlcs.api.routes.v1.event
 
 import com.lowbudgetlcs.api.dto.events.CreateEventDto
+import com.lowbudgetlcs.api.dto.events.EventFilterParams
 import com.lowbudgetlcs.api.dto.events.EventTeamLinkDto
 import com.lowbudgetlcs.api.dto.events.PatchEventDto
 import com.lowbudgetlcs.api.dto.events.toDto
 import com.lowbudgetlcs.api.dto.events.toEventUpdate
 import com.lowbudgetlcs.api.dto.events.toNewEvent
+import com.lowbudgetlcs.api.dto.events.toQuery
 import com.lowbudgetlcs.api.dto.events.toTeamId
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.SeriesFilterParams
@@ -37,10 +39,15 @@ fun Route.eventEndpointsV1(
     eventService: IEventService,
     seriesService: ISeriesService,
 ) {
-    get<EventResourcesV1> {
+    get<EventResourcesV1> { route ->
         call.setCidContext {
             logCall(call)
-            val events = eventService.getAllEvents()
+            val filter =
+                EventFilterParams(
+                    name = route.name,
+                    status = route.status,
+                )
+            val events = eventService.getAllEvents(filter.toQuery())
             call.respond(events.map { it.toDto() })
         }
     }
