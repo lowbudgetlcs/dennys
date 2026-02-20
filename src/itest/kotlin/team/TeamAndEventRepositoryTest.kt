@@ -15,12 +15,12 @@ import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -28,10 +28,10 @@ import java.time.temporal.ChronoUnit
 class TeamAndEventRepositoryTest :
     StringSpec({
         val postgres =
-            PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+            PostgreSQLContainer("postgres:15-alpine").apply {
                 withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
             }
-        val ds = install(JdbcDatabaseContainerExtension(postgres))
+        val ds = install(JdbcDatabaseContainerSpecExtension(postgres))
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
         val eventRepo = EventRepository(dslContext)
         val teamRepo = TeamRepository(dslContext)
