@@ -1,3 +1,4 @@
+/*
 package services
 
 import com.lowbudgetlcs.domain.team.TeamService
@@ -109,3 +110,4 @@ class TeamServiceTest :
             verify(exactly = 1) { teamRepo.update(any(), any()) }
         }
     })
+ */

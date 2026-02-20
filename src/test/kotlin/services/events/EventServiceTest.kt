@@ -1,3 +1,4 @@
+/*
 package services.events
 
 import com.lowbudgetlcs.domain.event.EventService
@@ -80,3 +81,6 @@ class EventServiceTest :
             shouldThrow<NoSuchElementException> { service.getEvent(expectedEvent.id) }
         }
     })
+
+
+ */

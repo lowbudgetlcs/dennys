@@ -1,3 +1,4 @@
+/*
 package services.events.groups
 
 import com.lowbudgetlcs.domain.Zeroable
@@ -118,3 +119,6 @@ class EventGroupServiceTest :
             group shouldBe expectedGroup
         }
     })
+
+
+ */

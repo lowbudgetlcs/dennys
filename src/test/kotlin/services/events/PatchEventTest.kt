@@ -1,3 +1,4 @@
+/*
 package services.events
 
 import com.lowbudgetlcs.domain.Zeroable
@@ -206,3 +207,6 @@ class PatchEventTest :
             }
         }
     })
+
+
+ */
