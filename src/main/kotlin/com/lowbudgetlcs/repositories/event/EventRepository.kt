@@ -1,15 +1,19 @@
 package com.lowbudgetlcs.repositories.event
 
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.group.EventGroupId
-import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.RiotTournamentId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.patch
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENTS
@@ -24,8 +28,8 @@ class EventRepository(
 
     override fun getById(id: EventId): Event? = selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne(::rowToEvent)
 
-    override fun getByName(name: String): Event? =
-        selectEvents().where(EVENTS.NAME.eq(name)).fetchOne()?.let(::rowToEvent)
+    override fun getByName(name: EventName): Event? =
+        selectEvents().where(EVENTS.NAME.eq(name.value)).fetchOne()?.let(::rowToEvent)
 
     override fun insert(
         newEvent: NewEvent,
@@ -35,35 +39,39 @@ class EventRepository(
             dsl
                 .insertInto(
                     EVENTS,
-                ).set(EVENTS.NAME, newEvent.name)
+                ).set(EVENTS.NAME, newEvent.name.value)
                 .set(EVENTS.DESCRIPTION, newEvent.description)
                 .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
                 .set(EVENTS.START_DATE, newEvent.startDate)
                 .set(EVENTS.END_DATE, newEvent.endDate)
                 .set(EVENTS.STATUS, newEvent.status.name)
-                .set(EVENTS.STAGES, newEvent.stages.map { it.name }.toTypedArray())
+                .set(EVENTS.EVENT_GROUP_ID, newEvent.eventGroupId?.value)
+                .set(EVENTS.STAGES, newEvent.eventStages.map { it.name }.toTypedArray())
                 .returning(EVENTS.ID)
                 .fetchOne()
                 ?.get(EVENTS.ID)
         return insertedId?.toEventId()?.let(::getById)
     }
 
-    override fun update(event: Event): Event? {
-        val insertedId =
+    override fun update(
+        event: Event,
+        update: EventUpdate,
+    ): Event? {
+        val patch = event.patch(update)
+        val updatedId =
             dsl
                 .update(EVENTS)
-                .set(EVENTS.NAME, event.name)
-                .set(EVENTS.DESCRIPTION, event.description)
-                .set(EVENTS.START_DATE, event.startDate)
-                .set(EVENTS.END_DATE, event.endDate)
-                .set(EVENTS.EVENT_GROUP_ID, event.eventGroupId?.value)
-                .set(EVENTS.STATUS, event.status.name)
-                .set(EVENTS.STAGES, event.stages.map { it.name }.toTypedArray())
+                .set(EVENTS.NAME, patch.name.value)
+                .set(EVENTS.DESCRIPTION, patch.description)
+                .set(EVENTS.START_DATE, patch.startDate)
+                .set(EVENTS.END_DATE, patch.endDate)
+                .set(EVENTS.STATUS, patch.status.name)
+                .set(EVENTS.EVENT_GROUP_ID, patch.eventGroupId?.value)
                 .where(EVENTS.ID.eq(event.id.value))
                 .returning(EVENTS.ID)
                 .fetchOne()
                 ?.get(EVENTS.ID)
-        return insertedId?.toEventId()?.let(::getById)
+        return updatedId?.toEventId()?.let(::getById)
     }
 
     private fun selectEvents() =
@@ -91,16 +99,16 @@ class EventRepository(
         val endDate = row[EVENTS.END_DATE] ?: return null
         val status = row[EVENTS.STATUS]?.let { EventStatus.valueOf(it) } ?: return null
         val eventGroupId = row[EVENTS.EVENT_GROUP_ID]?.toEventGroupId()
-        val stages =
+        val eventStages =
             row[EVENTS.STAGES]
                 ?.filterNotNull()
                 ?.mapNotNull { stageName ->
-                    runCatching { Stage.valueOf(stageName) }.getOrNull()
+                    runCatching { EventStage.valueOf(stageName) }.getOrNull()
                 }?.toSet()
                 ?: emptySet()
         return Event(
             id = eventId,
-            name = name,
+            name = name.toEventName(),
             description = description,
             riotTournamentId = tournamentId,
             createdAt = createdAt,
@@ -108,7 +116,7 @@ class EventRepository(
             endDate = endDate,
             eventGroupId = eventGroupId,
             status = status,
-            stages = stages,
+            eventStages = eventStages,
         )
     }
 }

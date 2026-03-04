@@ -1,18 +1,19 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
+import com.lowbudgetlcs.api.dto.auth.UserPrincipal
+import com.lowbudgetlcs.api.dto.auth.UserSession
+import com.lowbudgetlcs.api.dto.auth.toSession
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authEndpoints
-import com.lowbudgetlcs.auth.UserPrincipal
-import com.lowbudgetlcs.auth.UserSession
-import com.lowbudgetlcs.auth.toSession
 import com.lowbudgetlcs.config.CookieConfig
-import com.lowbudgetlcs.domain.services.auth.IAuthService
-import com.lowbudgetlcs.domain.services.auth.UnauthorizedException
-import com.lowbudgetlcs.domain.services.user.IUserService
+import com.lowbudgetlcs.domain.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.UnauthorizedException
+import com.lowbudgetlcs.domain.auth.models.toMasked
+import com.lowbudgetlcs.domain.user.IUserService
+import com.lowbudgetlcs.domain.user.models.toUsername
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.sksamuel.hoplite.Masked
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -136,8 +137,8 @@ fun Application.routes() {
                 userParamName = "username"
                 passwordParamName = "password"
                 validate { credentials ->
-                    val user = authService.authenticate(credentials.name, Masked(credentials.password))
-                    UserPrincipal(user.id.value, user.username, user.roles)
+                    val user = authService.authenticate(credentials.name.toUsername(), credentials.password.toMasked())
+                    UserPrincipal(user.id.value, user.username.value, user.roles)
                 }
                 challenge {
                     call.respond(HttpStatusCode.Unauthorized, "Invalid credentials passed.")
@@ -156,7 +157,7 @@ fun Application.routes() {
                 realm = "/"
                 authenticate { bearer ->
                     val user = authService.authenticate(bearer.token)
-                    UserPrincipal(user.id.value, user.username, user.roles)
+                    UserPrincipal(user.id.value, user.username.value, user.roles)
                 }
             }
         }

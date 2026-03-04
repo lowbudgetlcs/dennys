@@ -1,0 +1,79 @@
+package team
+
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.TeamUpdate
+import com.lowbudgetlcs.domain.team.models.toTeamLogoName
+import com.lowbudgetlcs.domain.team.models.toTeamName
+import com.lowbudgetlcs.domain.team.models.types.TeamName
+import com.lowbudgetlcs.repositories.team.TeamRepository
+import io.kotest.core.extensions.install
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import org.jooq.SQLDialect
+import org.jooq.impl.DSL
+import org.testcontainers.postgresql.PostgreSQLContainer
+import org.testcontainers.utility.MountableFile
+
+class TeamRepositoryTest :
+    StringSpec({
+        val postgres =
+            PostgreSQLContainer("postgres:15-alpine").apply {
+                withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
+            }
+        val ds =
+            install(JdbcDatabaseContainerSpecExtension(postgres)) {
+                maximumPoolSize = 1
+            }
+        val dsl = DSL.using(ds, SQLDialect.POSTGRES)
+        val repo = TeamRepository(dsl)
+
+        val newTeam =
+            NewTeam(
+                name = "Golden Guardians".toTeamName(),
+                logoName = null,
+            )
+
+        "getAll returns 0 teams" {
+            val teams = repo.getAll()
+            teams.shouldHaveSize(0)
+        }
+
+        "insert and fetch team by id" {
+            val created = repo.insert(newTeam)
+            created.shouldNotBeNull()
+            created.name shouldBe newTeam.name
+            created.logoName shouldBe null
+
+            val fetched = repo.getById(created.id)
+            fetched shouldBe created
+        }
+
+        "update team name" {
+            val created = repo.insert(NewTeam("Old Name".toTeamName(), null))!!
+            val updated = repo.update(created, TeamUpdate(name = "New Name".toTeamName()))
+
+            updated.shouldNotBeNull()
+            updated.id shouldBe created.id
+            updated.name.value shouldBe "New Name"
+        }
+
+        "update team logo" {
+            val created = repo.insert(NewTeam(TeamName("Logo Team"), null))!!
+            val updated =
+                repo.update(
+                    created,
+                    TeamUpdate(logoName = "ggs.png".toTeamLogoName()),
+                )
+
+            updated.shouldNotBeNull()
+            updated.logoName?.value shouldBe "ggs.png"
+        }
+
+        "getAll returns 3 teams" {
+            val teams = repo.getAll()
+            teams.shouldHaveSize(3)
+        }
+    })

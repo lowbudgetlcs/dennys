@@ -1,10 +1,9 @@
 package com.lowbudgetlcs.repositories.series
 
-import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.Series
-import com.lowbudgetlcs.domain.models.SeriesId
-import com.lowbudgetlcs.domain.models.events.EventId
-import com.lowbudgetlcs.domain.models.team.TeamId
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.types.SeriesId
 
 interface ISeriesRepository {
     fun insert(newSeries: NewSeries): Series?
@@ -12,11 +11,6 @@ interface ISeriesRepository {
     fun getById(id: SeriesId): Series?
 
     fun getAllByEventId(id: EventId): List<Series>
-
-    fun getByParticipantIds(
-        team1Id: TeamId,
-        team2Id: TeamId,
-    ): Series?
 
     fun delete(id: SeriesId)
 }

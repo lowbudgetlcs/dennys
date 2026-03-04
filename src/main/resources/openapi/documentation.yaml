@@ -44,7 +44,7 @@ paths:
             schema:
               $ref: "#/components/schemas/LoginDto"
       responses:
-        "200":
+        "201":
           description: >
             Successfully authenticated.
             The session identifier is returned in a cookie named `user-session`.
@@ -360,6 +360,21 @@ paths:
       summary: Get all events
       description: Fetch a list of all events.
       operationId: getEvents
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter events matching this name. Partial completions are allowed.
+        - in: query
+          name: status
+          schema:
+            allOf:
+              - description: The intended starting status of the event.
+              - example: NOT_STARTED
+              - $ref: "#/components/schemas/EventStatus"
+          description: Filter only series in this event stage.
+
       responses:
         "200":
           description: Successful operation
@@ -615,12 +630,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  # Series Endpoints
   /api/v1/event/{eventId}/series:
     get:
       summary: Get all the series of an event
       operationId: getSeriesInEvent
       tags:
-        - Events (v1)
+        - Series (v1)
       parameters:
         - name: eventId
           in: path
@@ -628,6 +645,22 @@ paths:
           description: ID of the event
           schema:
             type: integer
+        - in: query
+          name: teamIds
+          schema:
+            type: array
+            items:
+              type: integer
+              uniqueItems: true
+          description: |
+            Filter only series with these teamIds (more than 2 
+            teams guaruntees an empty array).
+        - in: query
+          name: stage
+          schema:
+            type: string
+            example: REGULAR_SEASON
+          description: Filter only series in this event stage.
       responses:
         "200":
           description: List of series in the event
@@ -653,7 +686,7 @@ paths:
       summary: Create a series for an event.
       operationId: addSeriesToEvent
       tags:
-        - Events (v1)
+        - Series (v1)
       parameters:
         - name: eventId
           in: path
@@ -665,14 +698,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EventCreateSeriesDto"
-            examples:
-              "New Series":
-                value:
-                  team1Id: 1
-                  team2Id: 2
-                  totalGames: 3
-                  stage: "REGULAR_SEASON"
+              $ref: "#/components/schemas/CreateSeriesDto"
       responses:
         "200":
           description: Team added to event
@@ -708,7 +734,7 @@ paths:
       summary: Remove a series from an event
       operationId: removeSeriesFromEvent
       tags:
-        - Events (v1)
+        - Series (v1)
       parameters:
         - name: eventId
           in: path
@@ -734,13 +760,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  # Series Endpoints
-  /api/v1/series/game:
+  /api/v1/series/{seriesId}/game:
     post:
       summary: Create a game in a series
       operationId: createGame
       tags:
         - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -748,7 +779,7 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateGameDto"
       responses:
-        "200":
+        "201":
           description: Game created
           content:
             application/json:
@@ -1016,7 +1047,7 @@ paths:
             schema:
               $ref: "#/components/schemas/NewPlayerDto"
       responses:
-        "200":
+        "201":
           description: Player created
           content:
             application/json:
@@ -1259,7 +1290,7 @@ components:
         - CANCELED
         - PAUSED
         - COMPLETED
-    Stage:
+    EventStage:
       type: string
       enum:
         - REGULAR_SEASON
@@ -1480,7 +1511,7 @@ components:
         stages:
           type: array
           items:
-            $ref: "#/components/schemas/Stage"
+            $ref: "#/components/schemas/EventStage"
 
     EventWithTeamsDto:
       type: object
@@ -1621,22 +1652,26 @@ components:
           type: integer
           example: 3
 
-    EventCreateSeriesDto:
+    CreateSeriesDto:
       type: object
       required:
-        - team1Id
-        - team2Id
+        - teamIds
         - totalGames
+        - stage
       properties:
-        team1Id:
-          type: integer
-          example: 123
-        team2Id:
-          type: integer
-          example: 456
+        teamIds:
+          type: array
+          items:
+            type: integer
+          minItems: 2
+          maxItems: 2
+          uniqueItems: true
         totalGames:
           type: integer
           example: 3
+        stage:
+          type: string
+          example: REGULAR_SEASON
 
     # Player Schemas
     NewPlayerDto:

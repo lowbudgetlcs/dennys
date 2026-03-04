@@ -1,14 +1,14 @@
 package com.lowbudgetlcs
 
 import com.lowbudgetlcs.api.routes
-import com.lowbudgetlcs.domain.services.auth.IAuthService
-import com.lowbudgetlcs.modules.configModule
-import com.lowbudgetlcs.modules.databaseModule
-import com.lowbudgetlcs.modules.gatewayModule
-import com.lowbudgetlcs.modules.hashingModule
-import com.lowbudgetlcs.modules.httpClientModule
-import com.lowbudgetlcs.modules.repositoryModule
-import com.lowbudgetlcs.modules.serviceModule
+import com.lowbudgetlcs.config.modules.configModule
+import com.lowbudgetlcs.config.modules.databaseModule
+import com.lowbudgetlcs.config.modules.gatewayModule
+import com.lowbudgetlcs.config.modules.hashingModule
+import com.lowbudgetlcs.config.modules.httpClientModule
+import com.lowbudgetlcs.config.modules.repositoryModule
+import com.lowbudgetlcs.config.modules.serviceModule
+import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.serializers.InstantSerializer
 import com.lowbudgetlcs.serializers.UUIDSerializer
 import io.ktor.serialization.kotlinx.json.json
@@ -38,7 +38,7 @@ fun main(args: Array<String>) =
 
 fun Application.startSessionCleanup() =
     CoroutineScope(Dispatchers.Default).launch {
-        logger.info("Starting session cleanup...")
+        logger.debug("Starting session cleanup...")
         val authService by inject<IAuthService>()
         repeat(Int.MAX_VALUE) {
             authService.cleanupExpiredSessions()

@@ -5,8 +5,8 @@ import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.api.dto.teams.toNewTeam
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.services.team.ITeamService
+import com.lowbudgetlcs.domain.team.ITeamService
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive

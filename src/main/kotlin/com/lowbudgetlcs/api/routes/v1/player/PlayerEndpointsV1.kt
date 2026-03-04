@@ -7,9 +7,10 @@ import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.api.dto.players.toNewPlayer
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
-import com.lowbudgetlcs.domain.services.player.IPlayerService
+import com.lowbudgetlcs.domain.account.models.toAccountId
+import com.lowbudgetlcs.domain.player.IPlayerService
+import com.lowbudgetlcs.domain.player.models.toPlayerId
+import com.lowbudgetlcs.domain.player.models.toPlayerName
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -55,7 +56,7 @@ fun Route.playerEndpointsV1(playerService: IPlayerService) {
             logCall(call)
             val dto = call.receive<PatchPlayerDto>()
             logger.debug(dto.toString())
-            val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name)
+            val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name.toPlayerName())
             call.respond(updated.toDto())
         }
     }
@@ -68,7 +69,7 @@ fun Route.playerEndpointsV1(playerService: IPlayerService) {
             val updated =
                 playerService.linkAccountToPlayer(
                     route.playerId.toPlayerId(),
-                    dto.accountId.toRiotAccountId(),
+                    dto.accountId.toAccountId(),
                 )
             call.respond(updated.toDto())
         }
@@ -80,7 +81,7 @@ fun Route.playerEndpointsV1(playerService: IPlayerService) {
             val updated =
                 playerService.unlinkAccountFromPlayer(
                     route.playerId.toPlayerId(),
-                    route.accountId.toRiotAccountId(),
+                    route.accountId.toAccountId(),
                 )
             call.respond(updated.toDto())
         }

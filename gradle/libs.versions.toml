@@ -3,13 +3,13 @@ kotlin = "2.2.0"
 ktor = "3.2.3"
 logback = "1.5.18"
 jooq = "3.19.18"
-kotest = "5.9.0"
-testcontainers = "1.21.4"
+kotest = "6.1.0"
+testcontainers = "2.0.2"
 koin = "4.1.1"
 hikaricp = "5.1.0"
 postgres = "42.7.7"
 hoplite = "2.9.0"
-mockk = "1.14.5"
+mockk = "1.14.9"
 kotlinx-coroutines = "1.10.2"
 slf4j = "2.0.17"
 detekt = "1.23.8"
@@ -63,10 +63,10 @@ kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.re
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
 # kotest extensions
-kotest-testcontainers = { group = "io.kotest.extensions", name = "kotest-extensions-testcontainers", version = "2.0.2" }
+kotest-testcontainers = { group = "io.kotest", name = "kotest-extensions-testcontainers", version.ref = "kotest" }
 # testcontainers
 testcontainers-core = { group = "org.testcontainers", name = "testcontainers", version.ref = "testcontainers" }
-testcontainers-postgres = { group = "org.testcontainers", name = "postgresql", version.ref = "testcontainers" }
+testcontainers-postgres = { group = "org.testcontainers", name = "testcontainers-postgresql", version.ref = "testcontainers" }
 # mockk
 mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 # argon2
@@ -89,4 +89,4 @@ ktor-client-plugins = ["ktor-client-content-negotiation", "ktor-client-logging"]
 jooq-codegen = ["jooq-meta", "jooq-codegen"]
 database = ["jooq-core", "postgresql-core"]
 kotest-unit = ["junit-core", "kotest-runner", "kotest-assertions", "mockk-core"]
-kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "mockk-core", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres"]
+kotest-integration = ["junit-core", "kotest-runner", "kotest-assertions", "kotest-property", "mockk-core", "kotest-testcontainers", "testcontainers-core", "testcontainers-postgres", "hikari-core"]

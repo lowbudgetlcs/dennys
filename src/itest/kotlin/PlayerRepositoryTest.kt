@@ -1,28 +1,47 @@
-import com.lowbudgetlcs.domain.models.player.NewPlayer
-import com.lowbudgetlcs.domain.models.player.PlayerName
+import com.lowbudgetlcs.domain.player.models.NewPlayer
+import com.lowbudgetlcs.domain.player.models.toPlayerId
+import com.lowbudgetlcs.domain.player.models.toPlayerName
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import io.kotest.core.extensions.install
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
 class PlayerRepositoryTest :
-    FunSpec({
+    StringSpec({
         val postgres =
-            PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+            PostgreSQLContainer("postgres:15-alpine").apply {
                 withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
             }
-        val ds = install(JdbcDatabaseContainerExtension(postgres))
+        val ds =
+            install(JdbcDatabaseContainerSpecExtension(postgres)) {
+                maximumPoolSize = 1
+            }
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = PlayerRepository(dsl)
 
-        test("insert and fetch player by id") {
-            val newPlayer = NewPlayer(PlayerName("TestPlayer#123"))
+        "getAll returns empty list." {
+            repo.getAll().shouldHaveSize(0)
+        }
+
+        "getById returns null." {
+            repo.getById((-1).toPlayerId()) shouldBe null
+        }
+
+        "getByTeamId returns empty list." {
+            repo.getByTeamId((-1).toTeamId()).shouldHaveSize(0)
+        }
+
+        "insert succeeds and getById fetches the same player." {
+            val newPlayer = NewPlayer("ruuffian".toPlayerName())
             val created = repo.insert(newPlayer)
 
             created.shouldNotBeNull()
@@ -32,13 +51,15 @@ class PlayerRepositoryTest :
             fetched shouldBe created
         }
 
-        test("rename player updates name") {
-            val newPlayer = NewPlayer(PlayerName("OldName#XYZ"))
-            val created = repo.insert(newPlayer)!!
-            val renamed = repo.renamePlayer(created.id, PlayerName("NewName#XYZ"))
+        "rename player updates name" {
+            val newPlayer = NewPlayer("zain".toPlayerName())
+            val created = repo.insert(newPlayer)
+            created.shouldNotBeNull()
+            val renamed = repo.renamePlayer(created.id, "new Zain".toPlayerName())
 
             renamed.shouldNotBeNull()
             renamed.id shouldBe created.id
-            renamed.name.value shouldBe "NewName#XYZ"
+            renamed.name shouldNotBe newPlayer.name
+            renamed.name shouldBe "new Zain".toPlayerName()
         }
     })

@@ -1,13 +1,14 @@
-import com.lowbudgetlcs.domain.models.auth.NewUser
-import com.lowbudgetlcs.domain.models.auth.User
-import com.lowbudgetlcs.domain.models.auth.toUser
-import com.lowbudgetlcs.domain.models.auth.toUserId
+import com.lowbudgetlcs.domain.user.models.NewUser
+import com.lowbudgetlcs.domain.user.models.User
+import com.lowbudgetlcs.domain.user.models.toUser
+import com.lowbudgetlcs.domain.user.models.toUserId
+import com.lowbudgetlcs.domain.user.models.toUsername
 import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.repositories.user.UserRepostitory
-import io.kotest.assertions.throwables.shouldThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -16,25 +17,29 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.runBlocking
 import org.jooq.SQLDialect
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.impl.DSL
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
 class UserRepositoryTest :
     StringSpec({
         val postgres =
-            PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+            PostgreSQLContainer("postgres:15-alpine").apply {
                 withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
             }
-        val ds = install(JdbcDatabaseContainerExtension(postgres))
+        val ds =
+            install(JdbcDatabaseContainerSpecExtension(postgres)) {
+                maximumPoolSize = 1
+            }
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = UserRepostitory(dslContext)
 
         val argon2Hasher = Argon2Hasher()
-        val username = "ruuffian"
+        val username = "ruuffian".toUsername()
         val password = "ABCD1**"
         val passwordHash = runBlocking { argon2Hasher.hash(password) }
-        val username2 = "zain"
+        val username2 = "zain".toUsername()
 
         // Data
         val newUser =
@@ -68,14 +73,14 @@ class UserRepositoryTest :
             user shouldBe created
         }
 
-        "getAll() returns all events" {
+        "getAll() returns all users" {
             val users = repo.getAll()
             users.shouldBeInstanceOf<List<User>>()
             users.shouldHaveSize(2)
         }
 
         "usernames must be unique" {
-            shouldThrowAny {
+            shouldThrow<IntegrityConstraintViolationException> {
                 repo.insert(newUser)
             }
         }

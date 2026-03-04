@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.repositories.tokens
 
-import com.lowbudgetlcs.domain.models.auth.AccessToken
-import com.lowbudgetlcs.domain.models.auth.NewAccessToken
-import com.lowbudgetlcs.domain.models.auth.toUserId
+import com.lowbudgetlcs.domain.auth.models.AccessToken
+import com.lowbudgetlcs.domain.auth.models.NewAccessToken
+import com.lowbudgetlcs.domain.user.models.toUserId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.ACCESS_TOKENS

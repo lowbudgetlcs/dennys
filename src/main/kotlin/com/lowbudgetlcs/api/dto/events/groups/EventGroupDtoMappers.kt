@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.api.dto.events.groups
 
 import com.lowbudgetlcs.api.dto.events.toDto
-import com.lowbudgetlcs.domain.models.events.group.EventGroup
-import com.lowbudgetlcs.domain.models.events.group.EventGroupName
-import com.lowbudgetlcs.domain.models.events.group.EventGroupUpdate
-import com.lowbudgetlcs.domain.models.events.group.EventGroupWithEvents
-import com.lowbudgetlcs.domain.models.events.group.NewEventGroup
-import com.lowbudgetlcs.domain.models.events.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.EventGroupUpdate
+import com.lowbudgetlcs.domain.eventgroup.models.EventGroupWithEvents
+import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
+import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupName
 
 fun EventGroup.toDto(): EventGroupDto =
     EventGroupDto(

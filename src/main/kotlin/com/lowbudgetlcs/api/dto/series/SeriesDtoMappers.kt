@@ -1,10 +1,11 @@
 package com.lowbudgetlcs.api.dto.series
 
-import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.Series
-import com.lowbudgetlcs.domain.models.events.Stage
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.team.toTeamId
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toStage
+import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesQuery
+import com.lowbudgetlcs.domain.team.models.toTeamId
 
 fun Series.toDto(): SeriesDto =
     SeriesDto(
@@ -12,7 +13,7 @@ fun Series.toDto(): SeriesDto =
         eventId = eventId.value,
         teamIds = participants.map { it.value },
         totalGames = totalGames,
-        stage = stage,
+        eventStage = eventStage,
     )
 
 fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
@@ -20,12 +21,11 @@ fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
         eventId = eventId.toEventId(),
         totalGames = totalGames,
         participantIds = listOf(team1Id.toTeamId(), team2Id.toTeamId()),
-        stage = stage.toStage(),
+        eventStage = stage.toStage(),
     )
 
-fun String.toStage(): Stage =
-    try {
-        enumValueOf<Stage>(this)
-    } catch (_: IllegalArgumentException) {
-        throw IllegalArgumentException("Invalid stage.")
-    }
+fun SeriesFilterParams.toQuery(): SeriesQuery =
+    SeriesQuery(
+        teamIds = teamIds?.map { it.toTeamId() },
+        eventStage = stage,
+    )

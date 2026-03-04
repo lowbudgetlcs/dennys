@@ -1,15 +1,22 @@
 package com.lowbudgetlcs.repositories.account
 
-import com.lowbudgetlcs.domain.models.riot.account.NewRiotAccount
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccount
-import com.lowbudgetlcs.domain.models.riot.account.RiotAccountId
+import com.lowbudgetlcs.domain.account.models.Account
+import com.lowbudgetlcs.domain.account.models.NewAccount
+import com.lowbudgetlcs.domain.account.models.types.AccountId
+import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.player.models.types.PlayerId
 
 interface IAccountRepository {
-    fun insert(newAccount: NewRiotAccount): RiotAccount?
+    fun getAll(): List<Account>
 
-    fun getAll(): List<RiotAccount>
+    fun getById(accountId: AccountId): Account?
 
-    fun getById(accountId: RiotAccountId): RiotAccount?
+    fun getAccountByPuuid(puuid: Puuid): Account?
 
-    fun getAccountByPuuid(puuid: String): RiotAccount?
+    fun insert(newAccount: NewAccount): Account?
+
+    fun updatePlayerId(
+        accountId: AccountId,
+        playerId: PlayerId?,
+    ): Account?
 }

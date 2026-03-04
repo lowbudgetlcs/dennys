@@ -1,22 +1,26 @@
 package com.lowbudgetlcs.api.routes.v1.event
 
 import com.lowbudgetlcs.api.dto.events.CreateEventDto
+import com.lowbudgetlcs.api.dto.events.EventFilterParams
 import com.lowbudgetlcs.api.dto.events.EventTeamLinkDto
 import com.lowbudgetlcs.api.dto.events.PatchEventDto
 import com.lowbudgetlcs.api.dto.events.toDto
 import com.lowbudgetlcs.api.dto.events.toEventUpdate
 import com.lowbudgetlcs.api.dto.events.toNewEvent
+import com.lowbudgetlcs.api.dto.events.toQuery
 import com.lowbudgetlcs.api.dto.events.toTeamId
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
+import com.lowbudgetlcs.api.dto.series.SeriesFilterParams
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.series.toNewSeries
+import com.lowbudgetlcs.api.dto.series.toQuery
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.services.event.IEventService
-import com.lowbudgetlcs.domain.services.series.ISeriesService
+import com.lowbudgetlcs.domain.event.IEventService
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.models.toSeriesId
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -35,10 +39,15 @@ fun Route.eventEndpointsV1(
     eventService: IEventService,
     seriesService: ISeriesService,
 ) {
-    get<EventResourcesV1> {
+    get<EventResourcesV1> { route ->
         call.setCidContext {
             logCall(call)
-            val events = eventService.getAllEvents()
+            val filter =
+                EventFilterParams(
+                    name = route.name,
+                    status = route.status,
+                )
+            val events = eventService.getAllEvents(filter.toQuery())
             call.respond(events.map { it.toDto() })
         }
     }
@@ -86,7 +95,13 @@ fun Route.eventEndpointsV1(
     get<EventResourcesV1.ByIdSeries> { route ->
         call.setCidContext {
             logCall(call)
-            val event = eventService.getEventWithSeries(route.eventId.toEventId())
+            val filter =
+                SeriesFilterParams(
+                    teamIds = route.teamIds,
+                    stage = route.stage,
+                )
+            val event = eventService.getEventWithSeries(route.eventId.toEventId(), filter.toQuery())
+
             call.respond(event.toDto())
         }
     }

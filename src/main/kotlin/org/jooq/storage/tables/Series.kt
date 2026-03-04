@@ -88,7 +88,7 @@ open class Series(
     /**
      * The column <code>dennys.series.event_id</code>.
      */
-    val EVENT_ID: TableField<SeriesRecord, Int?> = createField(DSL.name("event_id"), SQLDataType.INTEGER, this, "")
+    val EVENT_ID: TableField<SeriesRecord, Int?> = createField(DSL.name("event_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>dennys.series.total_games</code>.

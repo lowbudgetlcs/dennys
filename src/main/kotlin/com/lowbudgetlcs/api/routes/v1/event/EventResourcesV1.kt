@@ -1,9 +1,14 @@
 package com.lowbudgetlcs.api.routes.v1.event
 
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import io.ktor.resources.Resource
 
 @Resource("/")
-class EventResourcesV1 {
+class EventResourcesV1(
+    val name: String? = null,
+    val status: EventStatus? = null,
+) {
     @Resource("{eventId}")
     data class ById(
         val parent: EventResourcesV1 = EventResourcesV1(),
@@ -27,6 +32,8 @@ class EventResourcesV1 {
     data class ByIdSeries(
         val parent: EventResourcesV1 = EventResourcesV1(),
         val eventId: Int,
+        val teamIds: List<Int>? = null,
+        val stage: EventStage? = null,
     )
 
     @Resource("{eventId}/series/{seriesId}")

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto
 
-import com.lowbudgetlcs.domain.models.auth.NewAccessToken
-import com.lowbudgetlcs.domain.models.auth.UserId
+import com.lowbudgetlcs.domain.auth.models.NewAccessToken
+import com.lowbudgetlcs.domain.user.models.types.UserId
 import com.lowbudgetlcs.serializers.InstantSerializer
 import kotlinx.serialization.Serializable
 import java.time.Instant
