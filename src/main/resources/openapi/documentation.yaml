@@ -403,17 +403,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateEventDto"
-            examples:
-              "New Event":
-                value:
-                  name: "Season 15 Regular Season"
-                  description: "The regular season for Season 15"
-                  startDate: "2025-11-01T00:00:00Z"
-                  endDate: "2025-12-01T00:00:00Z"
-                  status: "NOT_STARTED"
-                  stages:
-                    - "REGULAR_SEASON"
-                    - "PLAYOFFS"
         required: true
       responses:
         "200":
@@ -1441,6 +1430,7 @@ components:
         - startDate
         - endDate
         - status
+        - eventStages
       properties:
         name:
           type: string
@@ -1462,6 +1452,12 @@ components:
             - description: The intended starting status of the event.
             - example: NOT_STARTED
             - $ref: "#/components/schemas/EventStatus"
+        eventStages:
+          type: array
+          items:
+            allOf:
+              - description: The valid stages of the event.
+              - $ref: "#/components/schemas/EventStage"
 
     EventDto:
       type: object
@@ -1474,7 +1470,7 @@ components:
         - endDate
         - status
         - eventGroupId
-        - stages
+        - eventStages
       properties:
         id:
           type: integer
@@ -1508,7 +1504,7 @@ components:
           type: integer
           example: 1
           nullable: true
-        stages:
+        eventStages:
           type: array
           items:
             $ref: "#/components/schemas/EventStage"
@@ -1525,7 +1521,7 @@ components:
         - status
         - eventGroupId
         - teams
-        - stages
+        - eventStages
       properties:
         id:
           type: integer
@@ -1561,10 +1557,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TeamDto"
-        stages:
+        eventStages:
           type: array
           items:
-            $ref: "#/components/schemas/Stage"
+            $ref: "#/components/schemas/EventStage"
 
     EventWithSeriesDto:
       type: object
@@ -1578,7 +1574,7 @@ components:
         - status
         - eventGroupId
         - series
-        - stages
+        - eventStages
       properties:
         id:
           type: integer
@@ -1614,10 +1610,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SeriesDto"
-        stages:
+        eventStages:
           type: array
           items:
-            $ref: "#/components/schemas/Stage"
+            $ref: "#/components/schemas/EventStage"
 
     PatchEventDto:
       type: object
