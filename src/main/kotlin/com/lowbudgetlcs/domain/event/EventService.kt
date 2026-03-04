@@ -143,7 +143,7 @@ class EventService(
      */
     fun doesEventExist(eventId: EventId): Boolean {
         logger.debug("Checking if event '$eventId' exists...")
-        return eventRepo.getById(eventId) == null
+        return eventRepo.getById(eventId) != null
     }
 
     private fun checkEvent(id: EventId) {
@@ -156,7 +156,7 @@ class EventService(
      */
     fun doesTeamExist(teamId: TeamId): Boolean {
         logger.debug("Checking if team '$teamId' exists...")
-        return teamRepo.getById(teamId) == null
+        return teamRepo.getById(teamId) != null
     }
 
     private fun checkTeam(teamId: TeamId) {
