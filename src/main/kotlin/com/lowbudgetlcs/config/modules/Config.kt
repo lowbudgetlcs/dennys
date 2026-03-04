@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.config.AppConfig
+import com.lowbudgetlcs.config.ApiConfig
 import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.config.DatabaseConfig
 import com.lowbudgetlcs.config.RiotConfig
@@ -12,5 +13,6 @@ val configModule =
         single<RiotConfig> { appConfig.riot }
         single<DatabaseConfig> { appConfig.database }
         single<CookieConfig> { appConfig.cookie }
+        single<ApiConfig> { appConfig.api }
         single<AppConfig> { appConfig }
     }

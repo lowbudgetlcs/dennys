@@ -6,6 +6,7 @@ import com.lowbudgetlcs.api.dto.auth.UserSession
 import com.lowbudgetlcs.api.dto.auth.toSession
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authEndpoints
+import com.lowbudgetlcs.config.ApiConfig
 import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
@@ -57,6 +58,7 @@ fun Application.routes() {
     val authService by inject<IAuthService>()
     val userService by inject<IUserService>()
     val cookieConfig by inject<CookieConfig>()
+    val apiConfig by inject<ApiConfig>()
 
     routing {
         install(StatusPages) {
@@ -122,7 +124,8 @@ fun Application.routes() {
             }
         }
         install(CORS) {
-            anyHost()
+            allowHost(apiConfig.cors, schemes = listOf("https"))
+            allowHost("localhost:5173", schemes = listOf("http"))
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
             allowHeader("api_key")
@@ -167,7 +170,7 @@ fun Application.routes() {
                 // TODO: Put this value in default.properties
                 cookie.maxAgeInSeconds = cookieConfig.expiration
                 cookie.httpOnly = true
-                cookie.sameSite = "strict"
+                cookie.sameSite = "none"
                 cookie.secure = cookieConfig.secure
             }
         }
