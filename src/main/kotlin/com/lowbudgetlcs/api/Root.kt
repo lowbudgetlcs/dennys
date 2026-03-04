@@ -125,10 +125,10 @@ fun Application.routes() {
             anyHost()
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
-            allowHeader("X-Dennys-Token")
             allowHeader("api_key")
             allowMethod(HttpMethod.Patch)
             allowMethod(HttpMethod.Delete)
+            allowCredentials = true
         }
         install(CorrelationIdPlugin)
         install(Resources)
