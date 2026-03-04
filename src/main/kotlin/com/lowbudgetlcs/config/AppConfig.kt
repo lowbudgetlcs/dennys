@@ -27,5 +27,5 @@ data class DatabaseConfig(
 )
 
 data class ApiConfig(
-  val cors: String
+  val cors: String? = null
 )
