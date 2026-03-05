@@ -124,9 +124,7 @@ fun Application.routes() {
             }
         }
         install(CORS) {
-            if (corsConfig.url == null) {
-                anyHost()
-            } else allowHost(corsConfig.url!!, schemes = listOf(corsConfig.scheme!!))
+            anyHost()
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
             allowHeader("api_key")
@@ -171,7 +169,7 @@ fun Application.routes() {
                 // TODO: Put this value in default.properties
                 cookie.maxAgeInSeconds = cookieConfig.expiration
                 cookie.httpOnly = true
-                cookie.sameSite = "strict"
+                cookie.sameSite = "none"
                 cookie.secure = cookieConfig.secure
             }
         }
