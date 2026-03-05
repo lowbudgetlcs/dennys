@@ -6,8 +6,8 @@ import com.lowbudgetlcs.api.dto.auth.UserSession
 import com.lowbudgetlcs.api.dto.auth.toSession
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authEndpoints
-import com.lowbudgetlcs.config.ApiConfig
 import com.lowbudgetlcs.config.CookieConfig
+import com.lowbudgetlcs.config.CorsConfig
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.auth.models.toMasked
@@ -58,7 +58,7 @@ fun Application.routes() {
     val authService by inject<IAuthService>()
     val userService by inject<IUserService>()
     val cookieConfig by inject<CookieConfig>()
-    val apiConfig by inject<ApiConfig>()
+    val corsConfig by inject<CorsConfig>()
 
     routing {
         install(StatusPages) {
@@ -124,8 +124,9 @@ fun Application.routes() {
             }
         }
         install(CORS) {
-            if (apiConfig.cors == null) { anyHost() }
-            else allowHost(apiConfig.cors!!)
+            if (corsConfig.url == null) {
+                anyHost()
+            } else allowHost(corsConfig.url!!, schemes = listOf(corsConfig.scheme!!))
             allowHeader(HttpHeaders.ContentType)
             allowHeader(HttpHeaders.Authorization)
             allowHeader("api_key")

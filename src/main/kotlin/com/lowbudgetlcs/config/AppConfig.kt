@@ -6,7 +6,7 @@ data class AppConfig(
     val riot: RiotConfig,
     val database: DatabaseConfig,
     val cookie: CookieConfig,
-    val api: ApiConfig,
+    val cors: CorsConfig,
 )
 
 data class CookieConfig(
@@ -26,6 +26,7 @@ data class DatabaseConfig(
     val logobucketname: String,
 )
 
-data class ApiConfig(
-  val cors: String? = null
+data class CorsConfig(
+  val url: String? = null,
+    val scheme: String? = null,
 )
