@@ -1,21 +1,26 @@
 package com.lowbudgetlcs.api.routes.v1.event
 
 import com.lowbudgetlcs.api.dto.events.CreateEventDto
+import com.lowbudgetlcs.api.dto.events.EventFilterParams
 import com.lowbudgetlcs.api.dto.events.EventTeamLinkDto
 import com.lowbudgetlcs.api.dto.events.PatchEventDto
 import com.lowbudgetlcs.api.dto.events.toDto
 import com.lowbudgetlcs.api.dto.events.toEventUpdate
 import com.lowbudgetlcs.api.dto.events.toNewEvent
+import com.lowbudgetlcs.api.dto.events.toQuery
 import com.lowbudgetlcs.api.dto.events.toTeamId
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
+import com.lowbudgetlcs.api.dto.series.SeriesFilterParams
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.series.toNewSeries
+import com.lowbudgetlcs.api.dto.series.toQuery
+import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.team.toTeamId
-import com.lowbudgetlcs.domain.models.toSeriesId
-import com.lowbudgetlcs.domain.services.event.IEventService
-import com.lowbudgetlcs.domain.services.series.ISeriesService
+import com.lowbudgetlcs.domain.event.IEventService
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.models.toSeriesId
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -34,16 +39,21 @@ fun Route.eventEndpointsV1(
     eventService: IEventService,
     seriesService: ISeriesService,
 ) {
-    get<EventResourcesV1> {
+    get<EventResourcesV1> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event")
-            val events = eventService.getAllEvents()
+            logCall(call)
+            val filter =
+                EventFilterParams(
+                    name = route.name,
+                    status = route.status,
+                )
+            val events = eventService.getAllEvents(filter.toQuery())
             call.respond(events.map { it.toDto() })
         }
     }
     post<EventResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/event")
+            logCall(call)
             val dto = call.receive<CreateEventDto>()
             logger.debug(dto.toString())
             val created = eventService.createEvent(dto.toNewEvent())
@@ -52,14 +62,14 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event/${route.eventId}")
+            logCall(call)
             val event = eventService.getEvent(route.eventId.toEventId())
             call.respond(event.toDto())
         }
     }
     patch<EventResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received PATCH on /v1/event/${route.eventId}")
+            logCall(call)
             val dto = call.receive<PatchEventDto>()
             logger.debug("\uD83C\uDF81 Body: {}", dto)
             val updated = eventService.patchEvent(route.eventId.toEventId(), dto.toEventUpdate())
@@ -68,14 +78,14 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ByIdTeams> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event/${route.eventId}/teams")
+            logCall(call)
             val events = eventService.getEventWithTeams(route.eventId.toEventId())
             call.respond(events.toDto())
         }
     }
     post<EventResourcesV1.ByIdTeams> { route ->
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/event/${route.eventId}/teams")
+            logCall(call)
             val dto = call.receive<EventTeamLinkDto>()
             logger.debug(dto.toString())
             val event = eventService.addTeam(route.eventId.toEventId(), dto.toTeamId())
@@ -84,14 +94,20 @@ fun Route.eventEndpointsV1(
     }
     get<EventResourcesV1.ByIdSeries> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET on /v1/event/${route.eventId}/series")
-            val event = eventService.getEventWithSeries(route.eventId.toEventId())
+            logCall(call)
+            val filter =
+                SeriesFilterParams(
+                    teamIds = route.teamIds,
+                    stage = route.stage,
+                )
+            val event = eventService.getEventWithSeries(route.eventId.toEventId(), filter.toQuery())
+
             call.respond(event.toDto())
         }
     }
     post<EventResourcesV1.ByIdSeries> { route ->
         call.setCidContext {
-            logger.info("📩 Received POST on /v1/event/${route.eventId}/series")
+            logCall(call)
             val dto = call.receive<NewSeriesDto>()
             logger.debug(dto.toString())
             val series = seriesService.createSeries(dto.toNewSeries(route.eventId))
@@ -100,7 +116,7 @@ fun Route.eventEndpointsV1(
     }
     delete<EventResourcesV1.ByIdSeriesId> { route ->
         call.setCidContext {
-            logger.info("📩 Received DELETE on /v1/event/${route.eventId}/series/${route.seriesId}")
+            logCall(call)
             seriesService.removeSeries(route.seriesId.toSeriesId())
             val event = eventService.getEventWithSeries(route.eventId.toEventId())
             call.respond(event.toDto())
@@ -108,7 +124,7 @@ fun Route.eventEndpointsV1(
     }
     delete<EventResourcesV1.ByIdTeamsId> { route ->
         call.setCidContext {
-            logger.info("📩 Received DELETE on /v1/event/${route.eventId}/teams/${route.teamId}")
+            logCall(call)
             val event = eventService.removeTeam(route.eventId.toEventId(), route.teamId.toTeamId())
             call.respond(event.toDto())
         }

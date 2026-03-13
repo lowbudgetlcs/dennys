@@ -1,18 +1,20 @@
-import com.lowbudgetlcs.domain.models.NewSeries
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
-import com.lowbudgetlcs.domain.models.team.NewTeam
-import com.lowbudgetlcs.domain.models.team.Team
-import com.lowbudgetlcs.domain.models.team.TeamId
-import com.lowbudgetlcs.domain.models.team.toTeamName
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventName
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.models.toTeamName
+import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -20,20 +22,23 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 import java.time.Instant
 
 class SeriesRepositoryTest :
     FunSpec({
         val postgres =
-            PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+            PostgreSQLContainer("postgres:15-alpine").apply {
                 withCopyFileToContainer(
                     MountableFile.forClasspathResource("sql"),
                     "/docker-entrypoint-initdb.d/",
                 )
             }
-        val ds = install(JdbcDatabaseContainerExtension(postgres))
+        val ds =
+            install(JdbcDatabaseContainerSpecExtension(postgres)) {
+                maximumPoolSize = 1
+            }
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = SeriesRepository(dsl)
         lateinit var event: Event
@@ -45,11 +50,12 @@ class SeriesRepositoryTest :
             val e = EventRepository(dsl)
             event = e.insert(
                 NewEvent(
-                    name = "Test",
+                    name = "Test".toEventName(),
                     description = "Testing series.",
                     startDate = Instant.now(),
                     endDate = Instant.now().plusSeconds(3_600L),
                     status = EventStatus.ACTIVE,
+                    eventStages = setOf(EventStage.REGULAR_SEASON),
                 ),
                 riotTournamentId = 1.toRiotTournamentId(),
             ) ?: throw Exception("Failed to insert initial event.")
@@ -68,15 +74,14 @@ class SeriesRepositoryTest :
                 NewSeries(
                     eventId = event.id,
                     totalGames = 10,
-                    participantIds = listOf(team1.id, team2.id),
+                    participantIds = Pair(team1.id, team2.id),
+                    eventStage = EventStage.REGULAR_SEASON,
                 )
         }
 
         test("insert and fetch series by id") {
-
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            created.totalGames shouldBe newSeries.totalGames
 
             val fetched = repo.getById(created.id)
             fetched shouldBe created

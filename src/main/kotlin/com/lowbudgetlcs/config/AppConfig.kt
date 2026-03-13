@@ -5,6 +5,13 @@ import com.sksamuel.hoplite.Masked
 data class AppConfig(
     val riot: RiotConfig,
     val database: DatabaseConfig,
+    val cookie: CookieConfig,
+    val cors: CorsConfig,
+)
+
+data class CookieConfig(
+    val secure: Boolean,
+    val expiration: Long,
 )
 
 data class RiotConfig(
@@ -17,4 +24,9 @@ data class DatabaseConfig(
     val url: Masked,
     val password: Masked,
     val logobucketname: String,
+)
+
+data class CorsConfig(
+  val url: String? = null,
+    val scheme: String? = null,
 )

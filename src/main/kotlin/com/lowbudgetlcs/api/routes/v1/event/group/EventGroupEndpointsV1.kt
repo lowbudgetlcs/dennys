@@ -6,14 +6,13 @@ import com.lowbudgetlcs.api.dto.events.groups.PatchEventGroupDto
 import com.lowbudgetlcs.api.dto.events.groups.toDto
 import com.lowbudgetlcs.api.dto.events.groups.toEventGroupUpdate
 import com.lowbudgetlcs.api.dto.events.groups.toNewEventGroup
+import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.events.group.toEventGroupId
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.services.event.group.IEventGroupService
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
+import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.request.httpMethod
-import io.ktor.server.request.path
 import io.ktor.server.request.receive
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
@@ -21,15 +20,10 @@ import io.ktor.server.resources.patch
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.RoutingCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
-
-fun logCall(call: RoutingCall) {
-    logger.info("📩 Received ${call.request.httpMethod} on ${call.request.path()}")
-}
 
 fun Route.eventGroupEndpointsV1(eventGroupService: IEventGroupService) {
     get<EventGroupResourcesV1> {

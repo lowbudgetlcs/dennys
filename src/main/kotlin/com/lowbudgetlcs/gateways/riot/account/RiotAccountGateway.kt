@@ -1,7 +1,8 @@
 package com.lowbudgetlcs.gateways.riot.account
 
-import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
-import com.lowbudgetlcs.domain.models.riot.RiotApiException
+import com.lowbudgetlcs.domain.account.models.RiotAccount
+import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.gateways.riot.RiotApiException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -18,7 +19,7 @@ class RiotAccountGateway(
 ) : IRiotAccountGateway {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override suspend fun getAccountByPuuid(puuid: String): RiotAccountDto {
+    override suspend fun getAccountByPuuid(puuid: Puuid): RiotAccount {
         logger.debug("Fetching account for '$puuid'...")
         val response: HttpResponse =
             client.get("$baseUrl/riot/account/v1/accounts/by-puuid/$puuid") {
@@ -30,7 +31,7 @@ class RiotAccountGateway(
         return when (response.status) {
             HttpStatusCode.OK -> {
                 logger.debug("Successfully fetched account.")
-                response.body<RiotAccountDto>()
+                response.body<RiotAccountDto>().toRiotAccount()
             }
 
             HttpStatusCode.BadRequest -> throw IllegalArgumentException("Invalid Riot PUUID")

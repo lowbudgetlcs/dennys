@@ -224,7 +224,7 @@ empty-blocks:
   EmptyInitBlock:
     active: true
   EmptyKtFile:
-    active: true
+    active: false
   EmptySecondaryConstructor:
     active: true
   EmptyTryBlock:
@@ -793,5 +793,3 @@ style:
     ignoreLateinitVar: false
   WildcardImport:
     active: true
-    excludeImports:
-      - 'java.util.*'

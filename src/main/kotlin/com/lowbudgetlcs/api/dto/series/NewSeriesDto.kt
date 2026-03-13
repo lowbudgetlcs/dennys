@@ -7,4 +7,5 @@ data class NewSeriesDto(
     val team1Id: Int,
     val team2Id: Int,
     val totalGames: Int,
+    val stage: String,
 )

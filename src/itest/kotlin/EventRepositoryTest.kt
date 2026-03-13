@@ -1,13 +1,15 @@
-import com.lowbudgetlcs.domain.models.events.Event
-import com.lowbudgetlcs.domain.models.events.EventStatus
-import com.lowbudgetlcs.domain.models.events.NewEvent
-import com.lowbudgetlcs.domain.models.events.toEvent
-import com.lowbudgetlcs.domain.models.events.toEventId
-import com.lowbudgetlcs.domain.models.riot.tournament.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
+import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.repositories.event.EventRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
@@ -16,7 +18,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -24,10 +26,13 @@ import java.time.temporal.ChronoUnit
 class EventRepositoryTest :
     StringSpec({
         val postgres =
-            PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+            PostgreSQLContainer("postgres:15-alpine").apply {
                 withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
             }
-        val ds = install(JdbcDatabaseContainerExtension(postgres))
+        val ds =
+            install(JdbcDatabaseContainerSpecExtension(postgres)) {
+                maximumPoolSize = 1
+            }
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
         val repo = EventRepository(dslContext)
 
@@ -35,19 +40,21 @@ class EventRepositoryTest :
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)
         val newEvent =
             NewEvent(
-                name = "Season 1",
+                name = "Season 1".toEventName(),
                 description = "The first season",
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
         val newEvent2 =
             NewEvent(
-                name = "Season 2",
+                name = "Season 2".toEventName(),
                 description = "The second season",
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
+                eventStages = setOf(EventStage.REGULAR_SEASON),
             )
 
         "getAll() starts empty" {

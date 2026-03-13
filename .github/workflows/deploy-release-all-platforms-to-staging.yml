@@ -1,0 +1,233 @@
+name: Deploy a release branch to a staging environment.
+
+env:
+  REGISTRY_NAME: lblcs/dennys
+
+on:
+  push:
+    paths-ignore:
+      - 'docker/**'
+      - '.gitignore'
+      - '*.md'
+      - '*.txt'
+      - 'shell.nix'
+      - 'Makefile'
+      - 'compose.yml'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'src/itest/**'
+      - 'src/test/**'
+
+    branches: 
+      - 'release/*'
+
+jobs:
+  set-version:
+    name: Extracts app version from Gradle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract app version
+        id: setup
+        uses: ./.github/actions/extract-version
+    outputs:
+      version: ${{ steps.setup.outputs.version }}
+    
+  build-jvm:
+    name: Build and upload JVM application
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build distribution
+        run: ./gradlew clean installDist --no-daemon
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: build-jvm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build 
+          path: build
+
+      - name: Test project
+        run: ./gradlew test
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: build-jvm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build 
+          path: build
+
+      - name: Test project
+        run: ./gradlew itest
+
+  build-platforms:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    needs: 
+      - unit-tests
+      - integration-tests
+    steps:
+      - uses: actions/checkout@v4
+      - id: platform
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_NAME }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Download JVM build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          file: docker/Dockerfile
+          context: .
+          push: true
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.output.labels }}
+          tags: ${{ env.REGISTRY_NAME }}
+          target: deploy
+          build-args: |
+            DIST_PATH=./build/install/dennys
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+            
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge-platforms:
+    runs-on: ubuntu-latest
+    needs:
+      - set-version
+      - build-platforms
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3      
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_NAME }}
+          tags: |
+            ${{ needs.set-version.outputs.version }}
+
+      - name: Create and push manifest list
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<<"$DOCKER_METADATA_OUTPUT_JSON") \
+          $(printf '${{ env.REGISTRY_NAME }}@sha256:%s ' *)
+
+  deploy:
+    needs: 
+      - set-version
+      - merge-platforms
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy db migrations to Remote Server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST}}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: src/migrations/sql/*
+          target: /releases/dennys-${{ needs.set-version.outputs.version }}/migrations
+          overwrite: true
+          strip_components: 3 
+
+      - name: Deploy release in staging
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_DNS_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.ZONE_ID }}
+          RIOT_TOKEN: ${{ secrets.RIOT_API_TOKEN }}
+          DENNYS_ADMIN_USERNAME: ${{ secrets.DENNYS_ADMIN_USERNAME }} 
+          DENNYS_ADMIN_PASSWORD: ${{ secrets.DENNYS_ADMIN_PASSWORD }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          envs: CLOUDFLARE_TOKEN,CLOUDFLARE_ZONE_ID,RIOT_TOKEN,DENNYS_ADMIN_USERNAME,DENNYS_ADMIN_PASSWORD
+          script: |
+            cd /lblcs/scripts/dennys
+            (
+            export CLOUDFLARE_TOKEN
+            export CLOUDFLARE_ZONE_ID
+            export RIOT_TOKEN
+            export DENNYS_ADMIN_USERNAME
+            export DENNYS_ADMIN_PASSWORD
+            ./release.sh -csn ${{ needs.set-version.outputs.version }} 
+            )

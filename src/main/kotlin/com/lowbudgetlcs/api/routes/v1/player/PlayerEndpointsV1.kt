@@ -5,10 +5,12 @@ import com.lowbudgetlcs.api.dto.players.NewPlayerDto
 import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
 import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.api.dto.players.toNewPlayer
+import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.domain.models.player.toPlayerId
-import com.lowbudgetlcs.domain.models.riot.account.toRiotAccountId
-import com.lowbudgetlcs.domain.services.player.PlayerService
+import com.lowbudgetlcs.domain.account.models.toAccountId
+import com.lowbudgetlcs.domain.player.IPlayerService
+import com.lowbudgetlcs.domain.player.models.toPlayerId
+import com.lowbudgetlcs.domain.player.models.toPlayerName
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -23,10 +25,10 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.playerEndpointsV1(playerService: PlayerService) {
+fun Route.playerEndpointsV1(playerService: IPlayerService) {
     get<PlayerResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received GET /v1/player")
+            logCall(call)
             val players = playerService.getAllPlayers()
             call.respond(players.map { it.toDto() })
         }
@@ -34,7 +36,7 @@ fun Route.playerEndpointsV1(playerService: PlayerService) {
 
     post<PlayerResourcesV1> {
         call.setCidContext {
-            logger.info("📩 Received POST /v1/player")
+            logCall(call)
             val dto = call.receive<NewPlayerDto>()
             logger.debug(dto.toString())
             val created = playerService.createPlayer(dto.toNewPlayer())
@@ -43,7 +45,7 @@ fun Route.playerEndpointsV1(playerService: PlayerService) {
     }
     get<PlayerResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received GET /v1/player/${route.playerId}")
+            logCall(call)
             val player = playerService.getPlayer(route.playerId.toPlayerId())
             call.respond(player.toDto())
         }
@@ -51,23 +53,23 @@ fun Route.playerEndpointsV1(playerService: PlayerService) {
 
     patch<PlayerResourcesV1.ById> { route ->
         call.setCidContext {
-            logger.info("📩 Received PATCH /v1/player/${route.playerId}")
+            logCall(call)
             val dto = call.receive<PatchPlayerDto>()
             logger.debug(dto.toString())
-            val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name)
+            val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name.toPlayerName())
             call.respond(updated.toDto())
         }
     }
 
     post<PlayerResourcesV1.Accounts> { route ->
         call.setCidContext {
-            logger.info("📩 Received POST /v1/player/${route.playerId}/accounts")
+            logCall(call)
             val dto = call.receive<AccountLinkRequestDto>()
             logger.debug(dto.toString())
             val updated =
                 playerService.linkAccountToPlayer(
                     route.playerId.toPlayerId(),
-                    dto.accountId.toRiotAccountId(),
+                    dto.accountId.toAccountId(),
                 )
             call.respond(updated.toDto())
         }
@@ -75,11 +77,11 @@ fun Route.playerEndpointsV1(playerService: PlayerService) {
 
     delete<PlayerResourcesV1.AccountById> { route ->
         call.setCidContext {
-            logger.info("📩 Received DELETE /v1/player/${route.playerId}/accounts/${route.accountId}")
+            logCall(call)
             val updated =
                 playerService.unlinkAccountFromPlayer(
                     route.playerId.toPlayerId(),
-                    route.accountId.toRiotAccountId(),
+                    route.accountId.toAccountId(),
                 )
             call.respond(updated.toDto())
         }

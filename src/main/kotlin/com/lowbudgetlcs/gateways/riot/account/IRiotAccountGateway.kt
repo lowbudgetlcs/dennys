@@ -1,7 +1,8 @@
 package com.lowbudgetlcs.gateways.riot.account
 
-import com.lowbudgetlcs.api.dto.riot.account.RiotAccountDto
-import com.lowbudgetlcs.domain.models.riot.RiotApiException
+import com.lowbudgetlcs.domain.account.models.RiotAccount
+import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.gateways.riot.RiotApiException
 
 interface IRiotAccountGateway {
     /**
@@ -9,5 +10,5 @@ interface IRiotAccountGateway {
      * @throws NoSuchElementException if no Riot account is found (404)
      * @throws RiotApiException for other Riot API failures
      */
-    suspend fun getAccountByPuuid(puuid: String): RiotAccountDto
+    suspend fun getAccountByPuuid(puuid: Puuid): RiotAccount
 }

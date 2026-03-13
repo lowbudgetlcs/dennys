@@ -1,14 +1,11 @@
 package com.lowbudgetlcs.api.routes.v1.series
 
-import com.lowbudgetlcs.domain.services.game.IGameService
-import io.ktor.server.plugins.requestvalidation.RequestValidation
+import com.lowbudgetlcs.domain.series.ISeriesService
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
-fun Route.seriesRoutesV1(gameService: IGameService) {
+fun Route.seriesRoutesV1(seriesService: ISeriesService) {
     route("/series") {
-        install(RequestValidation) {
-        }
-        seriesEndpointsV1(gameService)
+        seriesEndpointsV1(seriesService)
     }
 }

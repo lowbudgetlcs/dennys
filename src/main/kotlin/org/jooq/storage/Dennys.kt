@@ -9,6 +9,7 @@ import kotlin.collections.List
 import org.jooq.Catalog
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
+import org.jooq.storage.tables.AccessTokens
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
@@ -26,8 +27,10 @@ import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
+import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
 
 
 /**
@@ -42,6 +45,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
          */
         val DENNYS: Dennys = Dennys()
     }
+
+    /**
+     * The table <code>dennys.access_tokens</code>.
+     */
+    val ACCESS_TOKENS: AccessTokens get() = AccessTokens.ACCESS_TOKENS
 
     /**
      * The table <code>dennys.event_groups</code>.
@@ -129,6 +137,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val SERIES_RESULTS: SeriesResults get() = SeriesResults.SERIES_RESULTS
 
     /**
+     * The table <code>dennys.sessions</code>.
+     */
+    val SESSIONS: Sessions get() = Sessions.SESSIONS
+
+    /**
      * The table <code>dennys.team_to_series</code>.
      */
     val TEAM_TO_SERIES: TeamToSeries get() = TeamToSeries.TEAM_TO_SERIES
@@ -138,9 +151,15 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
      */
     val TEAMS: Teams get() = Teams.TEAMS
 
+    /**
+     * The table <code>dennys.users</code>.
+     */
+    val USERS: Users get() = Users.USERS
+
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
+        AccessTokens.ACCESS_TOKENS,
         EventGroups.EVENT_GROUPS,
         Events.EVENTS,
         GameResults.GAME_RESULTS,
@@ -158,7 +177,9 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         RiotAccounts.RIOT_ACCOUNTS,
         Series.SERIES,
         SeriesResults.SERIES_RESULTS,
+        Sessions.SESSIONS,
         TeamToSeries.TEAM_TO_SERIES,
-        Teams.TEAMS
+        Teams.TEAMS,
+        Users.USERS
     )
 }

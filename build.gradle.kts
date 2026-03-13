@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.lowbudgetlcs"
-version = "1.2.0"
+version = "1.3.0"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -103,9 +103,10 @@ sourceSets {
         resources.srcDir(migrationsDir)
     }
     create("itest") {
+        kotlin.srcDir("src/itest/kotlin")
         resources.srcDir(migrationsDir)
         compileClasspath += sourceSets["main"].output
-        runtimeClasspath += sourceSets["main"].output
+        runtimeClasspath += output + compileClasspath
     }
 }
 
@@ -114,10 +115,13 @@ dependencies {
     implementation(libs.bundles.ktor.server.plugins)
     implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.ktor.client.plugins)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j)
     implementation(libs.bundles.database)
     implementation(libs.bundles.server.logging)
     implementation(libs.hikari.core)
     implementation(libs.hoplite.core)
+    implementation(libs.argon2.nolibs)
 
     // Jooq Code Generation
     "jooqImplementation"(libs.bundles.jooq.codegen)
@@ -133,8 +137,10 @@ dependencies {
     "itestImplementation"(libs.bundles.database)
     "itestImplementation"(libs.logback.core)
     "itestImplementation"(libs.hoplite.core)
+    "itestImplementation"(libs.argon2.impl)
 
     // Unit Testing
     testImplementation(libs.bundles.kotest.unit)
     testImplementation(libs.reflect.core)
+    testImplementation(libs.argon2.impl)
 }

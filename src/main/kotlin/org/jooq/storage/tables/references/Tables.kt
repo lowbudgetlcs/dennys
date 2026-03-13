@@ -4,6 +4,7 @@
 package org.jooq.storage.tables.references
 
 
+import org.jooq.storage.tables.AccessTokens
 import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
@@ -21,10 +22,17 @@ import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
+import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.Users
 
 
+
+/**
+ * The table <code>dennys.access_tokens</code>.
+ */
+val ACCESS_TOKENS: AccessTokens = AccessTokens.ACCESS_TOKENS
 
 /**
  * The table <code>dennys.event_groups</code>.
@@ -112,6 +120,11 @@ val SERIES: Series = Series.SERIES
 val SERIES_RESULTS: SeriesResults = SeriesResults.SERIES_RESULTS
 
 /**
+ * The table <code>dennys.sessions</code>.
+ */
+val SESSIONS: Sessions = Sessions.SESSIONS
+
+/**
  * The table <code>dennys.team_to_series</code>.
  */
 val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
@@ -120,3 +133,8 @@ val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
  * The table <code>dennys.teams</code>.
  */
 val TEAMS: Teams = Teams.TEAMS
+
+/**
+ * The table <code>dennys.users</code>.
+ */
+val USERS: Users = Users.USERS
