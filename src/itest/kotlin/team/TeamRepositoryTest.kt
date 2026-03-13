@@ -2,7 +2,6 @@ package team
 
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.models.toTeamLogoName
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.team.TeamRepository
@@ -65,11 +64,13 @@ class TeamRepositoryTest :
             val updated =
                 repo.update(
                     created,
-                    TeamUpdate(logoName = "ggs.png".toTeamLogoName()),
+                    TeamUpdate(
+                        logoName = "ggs.png"
+                    )
                 )
 
             updated.shouldNotBeNull()
-            updated.logoName?.value shouldBe "ggs.png"
+            updated.logoName shouldBe "ggs.png"
         }
 
         "getAll returns 3 teams" {
