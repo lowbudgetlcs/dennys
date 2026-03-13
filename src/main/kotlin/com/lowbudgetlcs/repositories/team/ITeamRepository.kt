@@ -7,6 +7,7 @@ import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.models.types.TeamName
 
 interface ITeamRepository {
     fun insert(newTeam: NewTeam): Team?
@@ -18,6 +19,8 @@ interface ITeamRepository {
     fun getByEventId(id: EventId): List<Team>
 
     fun getBySeriesId(seriesId: SeriesId): List<Team>
+
+    fun getByName(name: TeamName): List<Team>
 
     fun update(
         team: Team,

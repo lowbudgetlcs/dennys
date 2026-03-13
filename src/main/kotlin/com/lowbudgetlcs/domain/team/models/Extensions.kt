@@ -4,15 +4,12 @@ import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.team.models.types.TeamId
-import com.lowbudgetlcs.domain.team.models.types.TeamLogoName
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 
 // Type Extensions
 fun Int.toTeamId(): TeamId = TeamId(this)
 
 fun String.toTeamName(): TeamName = TeamName(this)
-
-fun String.toTeamLogoName(): TeamLogoName = TeamLogoName(this)
 
 // Class Extensions
 fun Team.toTeamWithPlayers(players: List<Player>): TeamWithPlayers =
