@@ -63,7 +63,7 @@ fun Application.routes() {
         apiRoutes()
         route("/health") {
             get {
-                call.respond(HttpStatusCode.OK)
+                call.respondText("OK")
             }
         }
     }
