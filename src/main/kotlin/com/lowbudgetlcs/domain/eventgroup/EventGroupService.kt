@@ -107,6 +107,6 @@ class EventGroupService(
      */
     fun isNameTaken(name: EventGroupName): Boolean {
         logger.debug("Checking if '$name' is available...")
-        return eventGroupRepo.getByName(name) == null
+        return eventGroupRepo.getByName(name) != null
     }
 }
