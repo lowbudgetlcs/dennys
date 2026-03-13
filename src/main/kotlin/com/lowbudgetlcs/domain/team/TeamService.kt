@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.team
 
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.team.models.NewTeam
@@ -8,6 +9,7 @@ import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.TeamWithPlayers
 import com.lowbudgetlcs.domain.team.models.toTeamWithPlayers
 import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
@@ -79,6 +81,14 @@ class TeamService(
         logger.debug("Patching team '$teamId'...")
         logger.debug(patch.toString())
         val team = getTeam(teamId)
+        // Check if name is taken
+        patch.name?.let { name ->
+            if (isNameTaken(
+                    name,
+                    team.eventId
+                )
+            ) throw IllegalArgumentException("Team with name '${name.value}' (in event ${team.eventId?.value}) already taken.")
+        }
         return teamRepository.update(team, patch) ?: throw DatabaseException("Failed to patch team.")
     }
 
@@ -86,5 +96,10 @@ class TeamService(
         logger.debug("Fetching player '$id'...")
         val player = playerRepository.getById(id) ?: throw NoSuchElementException("Player '${id.value}' not found.")
         return player
+    }
+
+    fun isNameTaken(name: TeamName, eventId: EventId?): Boolean {
+        logger.debug("Checking if $name is available...")
+        return teamRepository.getByName(name).any { it.eventId == eventId }
     }
 }

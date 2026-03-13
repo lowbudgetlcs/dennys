@@ -8,9 +8,9 @@ import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.patch
 import com.lowbudgetlcs.domain.team.models.toTeamId
-import com.lowbudgetlcs.domain.team.models.toTeamLogoName
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.models.types.TeamName
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.TEAMS
@@ -34,12 +34,15 @@ class TeamRepository(
             .fetch()
             .mapNotNull(::rowToTeam)
 
+    override fun getByName(name: TeamName): List<Team> =
+        selectTeams().where(TEAMS.NAME.eq(name.value)).fetch().mapNotNull(::rowToTeam)
+
     override fun insert(newTeam: NewTeam): Team? {
         val insertedId =
             dsl
                 .insertInto(TEAMS)
                 .set(TEAMS.NAME, newTeam.name.value)
-                .set(TEAMS.LOGO_NAME, newTeam.logoName?.value)
+                .set(TEAMS.LOGO_NAME, newTeam.logoName)
                 .returning(TEAMS.ID)
                 .fetchOne()
                 ?.get(TEAMS.ID)
@@ -56,7 +59,7 @@ class TeamRepository(
             dsl
                 .update(TEAMS)
                 .set(TEAMS.NAME, patch.name.value)
-                .set(TEAMS.LOGO_NAME, patch.logoName?.value)
+                .set(TEAMS.LOGO_NAME, patch.logoName)
                 .set(TEAMS.EVENT_ID, patch.eventId?.value)
                 .where(TEAMS.ID.eq(team.id.value))
                 .returning(TEAMS.ID)
@@ -101,7 +104,7 @@ class TeamRepository(
     private fun rowToTeam(row: Record): Team? {
         val teamId = row[TEAMS.ID]?.toTeamId() ?: return null
         val name = row[TEAMS.NAME]?.toTeamName() ?: return null
-        val logoName = row[TEAMS.LOGO_NAME]?.toTeamLogoName()
+        val logoName = row[TEAMS.LOGO_NAME]
         val eventId = row[TEAMS.EVENT_ID]?.let(::EventId)
 
         return Team(

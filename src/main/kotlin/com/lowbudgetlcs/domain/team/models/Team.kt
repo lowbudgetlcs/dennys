@@ -8,6 +8,6 @@ import com.lowbudgetlcs.domain.team.models.types.TeamName
 data class Team(
     val id: TeamId,
     val name: TeamName,
-    val logoName: TeamLogoName?,
+    val logoName: String?,
     val eventId: EventId?,
 )
