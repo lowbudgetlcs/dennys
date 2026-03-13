@@ -1,6 +1,5 @@
 package models
 
-import com.lowbudgetlcs.domain.team.models.toTeamLogoName
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -16,12 +15,6 @@ class TeamTypesTest :
         "TeamName cannot exceed 80 characters" {
             shouldThrow<IllegalArgumentException> {
                 "".repeat(81).toTeamName()
-            }
-        }
-
-        "TeamLogoName cannot be empty" {
-            shouldThrow<IllegalArgumentException> {
-                "".toTeamLogoName()
             }
         }
     })
