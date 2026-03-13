@@ -37,6 +37,7 @@ class EventGroupRepository(
             dsl
                 .update(EVENT_GROUPS)
                 .set(EVENT_GROUPS.NAME, update.name.value)
+                .where(EVENT_GROUPS.ID.eq(update.id.value))
                 .returning(EVENT_GROUPS.ID)
                 .fetchOne()
                 ?.get(EVENT_GROUPS.ID)
