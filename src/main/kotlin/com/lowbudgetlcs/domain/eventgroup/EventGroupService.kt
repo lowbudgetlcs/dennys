@@ -103,10 +103,10 @@ class EventGroupService(
      * Checks if an event name is taken.
      *
      * @param name the name of the event.
-     * @return false if name is not taken.
+     * @return True if name is taken.
      */
     fun isNameTaken(name: EventGroupName): Boolean {
         logger.debug("Checking if '$name' is available...")
-        return eventGroupRepo.getByName(name) != null
+        return eventGroupRepo.getByName(name) == null
     }
 }
