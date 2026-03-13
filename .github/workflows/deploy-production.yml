@@ -172,7 +172,7 @@ jobs:
           $(printf '${{ env.REGISTRY_NAME }}@sha256:%s ' *)
 
   deploy:
-    needs: build-push-image
+    needs: merge-platforms
     runs-on: ubuntu-latest
     steps:
       - name: Execute docker compose on prod server
