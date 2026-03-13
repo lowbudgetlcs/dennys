@@ -1,5 +1,8 @@
 name: Deploy production application.
 
+env:
+  REGISTRY_NAME: lblcs/dennys
+  
 on:
   push:
     paths-ignore:
