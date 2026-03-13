@@ -1,11 +1,6 @@
 package com.lowbudgetlcs.config.modules
 
-import com.lowbudgetlcs.config.AppConfig
-import com.lowbudgetlcs.config.CookieConfig
-import com.lowbudgetlcs.config.CorsConfig
-import com.lowbudgetlcs.config.DatabaseConfig
-import com.lowbudgetlcs.config.RiotConfig
-import com.lowbudgetlcs.config.appConfig
+import com.lowbudgetlcs.config.*
 import org.koin.dsl.module
 
 val configModule =
