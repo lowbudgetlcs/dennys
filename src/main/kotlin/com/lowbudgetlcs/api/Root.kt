@@ -169,7 +169,7 @@ fun Application.routes() {
                 // TODO: Put this value in default.properties
                 cookie.maxAgeInSeconds = cookieConfig.expiration
                 cookie.httpOnly = true
-                cookie.sameSite = "none"
+                cookie.sameSite = "strict"
                 cookie.secure = cookieConfig.secure
             }
         }

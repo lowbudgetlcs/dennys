@@ -1,6 +1,6 @@
 package eventgroup
 
-import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
@@ -65,7 +65,7 @@ class EventGroupAndEventRepositoryTest :
         }
 
         "Adding event to valid event group succeeds." {
-            val updated = eventRepo.update(event, EventUpdate(eventGroupId = Zeroable(group.id)))
+            val updated = eventRepo.update(event, EventUpdate(eventGroupId = PatchField.Value(group.id)))
             updated.shouldNotBeNull()
             updated.shouldBeEqualToIgnoringFields(event, Event::eventGroupId)
             updated.eventGroupId shouldBe group.id
@@ -73,7 +73,7 @@ class EventGroupAndEventRepositoryTest :
 
         "Adding event to invalid event group fails." {
             shouldThrow<IntegrityConstraintViolationException> {
-                eventRepo.update(event, EventUpdate(eventGroupId = Zeroable((-1).toEventGroupId())))
+                eventRepo.update(event, EventUpdate(eventGroupId = PatchField.Value((-1).toEventGroupId())))
             }
         }
 

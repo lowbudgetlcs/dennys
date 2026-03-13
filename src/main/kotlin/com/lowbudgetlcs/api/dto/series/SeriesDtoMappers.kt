@@ -20,7 +20,7 @@ fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
     NewSeries(
         eventId = eventId.toEventId(),
         totalGames = totalGames,
-        participantIds = listOf(team1Id.toTeamId(), team2Id.toTeamId()),
+        participantIds = Pair(team1Id.toTeamId(), team2Id.toTeamId()),
         eventStage = stage.toStage(),
     )
 

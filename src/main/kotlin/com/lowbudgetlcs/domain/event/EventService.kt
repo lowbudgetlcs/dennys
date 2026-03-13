@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.event
 
-import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventQuery
 import com.lowbudgetlcs.domain.event.models.EventUpdate
@@ -106,7 +106,7 @@ class EventService(
         checkEvent(eventId)
         checkTeam(teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
-        val teamPatch = TeamUpdate(eventId = Zeroable(eventId))
+        val teamPatch = TeamUpdate(eventId = PatchField.Value(eventId))
         teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
         return getEventWithTeams(eventId)
     }
@@ -119,7 +119,7 @@ class EventService(
         checkEvent(eventId)
         checkTeam(teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
-        val teamPatch = TeamUpdate(eventId = Zeroable(null))
+        val teamPatch = TeamUpdate(eventId = PatchField.Value(null))
         teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
         return getEventWithTeams(eventId)
     }

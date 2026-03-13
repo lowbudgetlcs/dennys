@@ -8,5 +8,5 @@ data class NewSeries(
     val eventId: EventId,
     val eventStage: EventStage,
     val totalGames: Int,
-    val participantIds: List<TeamId>,
+    val participantIds: Pair<TeamId, TeamId>,
 )

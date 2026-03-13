@@ -34,22 +34,17 @@ class SeriesService(
         logger.debug("Creating new series...")
         logger.debug(series.toString())
 
-        if (series.participantIds.count() <
-            2
-        ) {
-            throw IllegalArgumentException("Series must have at least two participants")
-        }
-
         if (series.totalGames < 1) throw IllegalArgumentException("A series must contain at least 1 game.")
 
-        series.participantIds.forEach { id ->
+        val validate = { id: TeamId ->
             logger.debug("Validating team '$id' exists and is participating in event '${series.eventId}'...")
             val team = teamRepo.getById(id) ?: throw NoSuchElementException("Team with id $id not found")
-
             if (team.eventId != series.eventId) {
                 throw IllegalArgumentException("Team with id $id is not part of the event")
             }
         }
+        validate(series.participantIds.first)
+        validate(series.participantIds.second)
 
         return seriesRepo.insert(series) ?: throw DatabaseException("Failed to create series")
     }

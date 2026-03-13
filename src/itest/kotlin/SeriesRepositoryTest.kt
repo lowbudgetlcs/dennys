@@ -74,7 +74,7 @@ class SeriesRepositoryTest :
                 NewSeries(
                     eventId = event.id,
                     totalGames = 10,
-                    participantIds = listOf(team1.id, team2.id),
+                    participantIds = Pair(team1.id, team2.id),
                     eventStage = EventStage.REGULAR_SEASON,
                 )
         }

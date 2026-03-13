@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.event.models
 
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -80,7 +81,10 @@ fun Event.patch(update: EventUpdate): Event =
         startDate = update.startDate ?: this.startDate,
         endDate = update.endDate ?: this.endDate,
         status = update.status ?: this.status,
-        eventGroupId = if (update.eventGroupId.isZero) this.eventGroupId else update.eventGroupId.value,
+        eventGroupId = when (update.eventGroupId) {
+            PatchField.Unset -> this.eventGroupId
+            is PatchField.Value -> update.eventGroupId.value
+        }
     )
 
 // Filters

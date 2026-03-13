@@ -1,6 +1,6 @@
 package team
 
-import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEventName
@@ -58,7 +58,7 @@ class TeamAndEventRepositoryTest :
         }
 
         "add team to event" {
-            val t = teamRepo.update(team, TeamUpdate(eventId = Zeroable(event.id)))
+            val t = teamRepo.update(team, TeamUpdate(eventId = PatchField.Value(event.id)))
             t.shouldNotBeNull()
             t.id shouldBe team.id
             t.eventId shouldBe event.id

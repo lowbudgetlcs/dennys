@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.event.models
 
-import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
@@ -12,5 +12,5 @@ data class EventUpdate(
     val startDate: Instant? = null,
     val endDate: Instant? = null,
     val status: EventStatus? = null,
-    val eventGroupId: Zeroable<EventGroupId> = Zeroable(null, true),
+    val eventGroupId: PatchField<EventGroupId?> = PatchField.Unset,
 )

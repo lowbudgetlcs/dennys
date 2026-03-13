@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
+import com.lowbudgetlcs.domain.team.models.types.TeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.impl.DSL.multiset
@@ -41,13 +42,15 @@ class SeriesRepository(
                         .fetchOne()
                         ?.get(SERIES.ID)
 
-                newSeries.participantIds.forEach { id ->
+                val insertChild = { id: TeamId ->
                     tx
                         .insertInto(TEAM_TO_SERIES)
                         .set(TEAM_TO_SERIES.SERIES_ID, insertedId)
                         .set(TEAM_TO_SERIES.TEAM_ID, id.value)
                         .execute()
                 }
+                insertChild(newSeries.participantIds.first)
+                insertChild(newSeries.participantIds.second)
                 insertedId
             }
         return id?.toSeriesId()?.let(::getById)

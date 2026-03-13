@@ -1651,17 +1651,17 @@ components:
     CreateSeriesDto:
       type: object
       required:
-        - teamIds
+        - team1Id
+        - team2Id
         - totalGames
         - stage
       properties:
-        teamIds:
-          type: array
-          items:
-            type: integer
-          minItems: 2
-          maxItems: 2
-          uniqueItems: true
+        team1Id:
+          type: integer
+          example: 1
+        team2Id:
+          type: integer
+          example: 1
         totalGames:
           type: integer
           example: 3

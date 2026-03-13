@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.team.models
 
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.team.models.types.TeamId
@@ -37,5 +38,8 @@ fun Team.patch(update: TeamUpdate): Team =
     copy(
         name = update.name ?: this.name,
         logoName = update.logoName ?: this.logoName,
-        eventId = if (update.eventId.isZero) this.eventId else update.eventId.value,
+        eventId = when (update.eventId) {
+            PatchField.Unset -> this.eventId
+            is PatchField.Value -> update.eventId.value
+        }
     )

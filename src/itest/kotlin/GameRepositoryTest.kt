@@ -78,7 +78,7 @@ class GameRepositoryTest :
                 NewSeries(
                     eventId = event.id,
                     totalGames = 5,
-                    participantIds = listOf(team1.id, team2.id),
+                    participantIds = Pair(team1.id, team2.id),
                     eventStage = EventStage.REGULAR_SEASON,
                 )
             val seriesRepository = SeriesRepository(dsl)

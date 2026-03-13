@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.eventgroup
 
-import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
@@ -79,7 +79,7 @@ class EventGroupService(
                 ?: throw NoSuchElementException("Event group with id '${eventGroupId.value}' not found.")
         val event =
             eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
-        eventRepo.update(event, EventUpdate(eventGroupId = Zeroable(group.id)))
+        eventRepo.update(event, EventUpdate(eventGroupId = PatchField.Value(group.id)))
             ?: throw DatabaseException("Failed to add event to event group.")
         return getEventGroupWithEvents(eventGroupId)
     }
@@ -93,7 +93,7 @@ class EventGroupService(
             eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
         eventRepo.update(
             event,
-            EventUpdate(eventGroupId = Zeroable(null)),
+            EventUpdate(eventGroupId = PatchField.Value(null)),
         )
             ?: throw DatabaseException("Failed to remove event from event group.")
         return getEventGroupWithEvents(eventGroupId)
