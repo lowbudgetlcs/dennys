@@ -2,10 +2,10 @@ package com.lowbudgetlcs.repositories.game
 
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.toShortcode
-import com.lowbudgetlcs.domain.game.models.Game
-import com.lowbudgetlcs.domain.game.models.NewGame
-import com.lowbudgetlcs.domain.game.models.toGameId
-import com.lowbudgetlcs.domain.game.models.types.GameId
+import com.lowbudgetlcs.domain.series.game.models.Game
+import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.toGameId
+import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import org.jooq.DSLContext

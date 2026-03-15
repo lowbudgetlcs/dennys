@@ -61,20 +61,14 @@ class EventService(
         query?.run { logger.debug("(Query: '$query')") }
         val event = getEvent(id)
         val series = seriesRepo.getAllByEventId(id).filterByStage(query).filterByParticipants(query)
-
         return event.toEventWithSeries(series)
     }
 
     override suspend fun createEvent(event: NewEvent): Event {
         logger.debug("Creating new event...")
         logger.debug(event.toString())
-        if (!event.startDate.isBefore(
-                event.endDate,
-            )
-        ) {
-            throw IllegalArgumentException("Events cannot start after they end.")
-        }
-        checkName(event.name)
+        require(!event.startDate.isBefore(event.endDate)) { "Event start date must be before end date." }
+        require(isNameTaken(event.name)) { "Event '${event.name}' already exists." }
         val t =
             tournamentGateway.create(event.name)
                 ?: throw GatewayException("Failed to register tournament with Riot Games.")
@@ -89,11 +83,11 @@ class EventService(
         logger.debug(update.toString())
         val event = getEvent(id)
         update.name?.let {
-            checkName(it)
+            require(isNameTaken(it)) { "Event with name '$it' already exists." }
         }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
-        if (end.isBefore(start)) throw IllegalArgumentException("Events cannot start before they end.")
+        require(end.isBefore(start)) { "Event start date must be before end date." }
         return eventRepo.update(event, update)
             ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
     }
@@ -133,10 +127,6 @@ class EventService(
         return eventRepo.getByName(name) != null
     }
 
-    private fun checkName(name: EventName) {
-        if (isNameTaken(name)) throw IllegalArgumentException("Event '$name' already exists.")
-    }
-
     /**
      * Checks if an event exists.
      * @return true if event exists, false otherwise.
@@ -146,10 +136,6 @@ class EventService(
         return eventRepo.getById(eventId) != null
     }
 
-    private fun checkEvent(id: EventId) {
-        if (!doesEventExist(id)) throw NoSuchElementException("Event with id '${id.value}' not found.")
-    }
-
     /**
      * Checks if team exists
      * @return true if team exists, false otherwise
@@ -157,6 +143,10 @@ class EventService(
     fun doesTeamExist(teamId: TeamId): Boolean {
         logger.debug("Checking if team '$teamId' exists...")
         return teamRepo.getById(teamId) != null
+    }
+
+    private fun checkEvent(id: EventId) {
+        if (!doesEventExist(id)) throw NoSuchElementException("Event with id '${id.value}' not found.")
     }
 
     private fun checkTeam(teamId: TeamId) {

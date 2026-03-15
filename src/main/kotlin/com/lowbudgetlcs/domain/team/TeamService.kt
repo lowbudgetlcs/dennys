@@ -3,11 +3,7 @@ package com.lowbudgetlcs.domain.team
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
-import com.lowbudgetlcs.domain.team.models.NewTeam
-import com.lowbudgetlcs.domain.team.models.Team
-import com.lowbudgetlcs.domain.team.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.models.TeamWithPlayers
-import com.lowbudgetlcs.domain.team.models.toTeamWithPlayers
+import com.lowbudgetlcs.domain.team.models.*
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.DatabaseException
@@ -68,10 +64,9 @@ class TeamService(
         logger.debug("Creating new team...")
         logger.debug(team.toString())
         val name = team.name.value
-        if (name.isBlank()) throw IllegalArgumentException("Team name cannot be blank")
+        require(name.isBlank()) { "Team name cannot be blank" }
 
-        return teamRepository.insert(team)
-            ?: throw DatabaseException("Failed to create team")
+        return teamRepository.insert(team) ?: throw DatabaseException("Failed to create team")
     }
 
     override fun patchTeam(
@@ -83,14 +78,8 @@ class TeamService(
         val team = getTeam(teamId)
         // Check if name is taken
         patch.name?.let { name ->
-            if (isNameTaken(
-                    name,
-                    team.eventId,
-                )
-            ) {
-                throw IllegalArgumentException(
-                    "Team with name '${name.value}' (in event ${team.eventId?.value}) already taken.",
-                )
+            require(isNameTaken(name, team.eventId)) {
+                "Team with name '${name.value}' (in event ${team.eventId?.value}) already taken."
             }
         }
         return teamRepository.update(team, patch) ?: throw DatabaseException("Failed to patch team.")

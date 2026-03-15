@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.game.models.types
+package com.lowbudgetlcs.domain.series.game.models.types
 
 @JvmInline
 value class GameId(

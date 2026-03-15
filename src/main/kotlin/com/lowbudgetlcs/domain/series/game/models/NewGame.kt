@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.game.models
+package com.lowbudgetlcs.domain.series.game.models
 
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId

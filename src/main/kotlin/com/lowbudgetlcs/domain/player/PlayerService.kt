@@ -30,9 +30,8 @@ class PlayerService(
     override fun createPlayer(player: NewPlayer): Player {
         logger.debug("Creating new player...")
         logger.debug(player.toString())
-        if (player.name.value.isBlank()) throw IllegalArgumentException("Player name cannot be blank")
-        if (isNameTaken(player.name)) throw IllegalStateException("Player name already exists")
-
+        require(player.name.value.isBlank()) { "Player name cannot be blank" }
+        check(isNameTaken(player.name)) { "Player name already exists" }
         return playerRepository.insert(player) ?: throw DatabaseException("Failed to create player")
     }
 
@@ -41,12 +40,11 @@ class PlayerService(
         newName: PlayerName,
     ): Player {
         logger.debug("Renaming player '$playerId' to '$newName'...")
-        if (isNameTaken(newName)) throw IllegalStateException("Player name already exists")
+        check(isNameTaken(newName)) { "Player named ${newName.value} already exists" }
 
         this.getPlayer(playerId) // throws if not found
 
-        return playerRepository.renamePlayer(playerId, newName)
-            ?: throw DatabaseException("Failed to rename player")
+        return playerRepository.renamePlayer(playerId, newName) ?: throw DatabaseException("Failed to rename player")
     }
 
     override fun linkAccountToPlayer(
@@ -58,10 +56,7 @@ class PlayerService(
 
         val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account does not exist")
 
-        if (account.playerId != null) {
-            val p = this.getPlayer(account.playerId)
-            throw IllegalStateException("Account belongs to '${p.name.value}'.")
-        }
+        checkNotNull(account.playerId) { "Account already owned." }
 
         accountRepository.updatePlayerId(accountId, playerId)
             ?: throw DatabaseException("Failed to link account to player.")
@@ -77,11 +72,7 @@ class PlayerService(
 
         val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account not found.")
 
-        if (account.playerId != player.id) {
-            throw IllegalStateException(
-                "Account belongs to different player.",
-            )
-        }
+        check(account.playerId != player.id) { "Account belongs to different player." }
 
         accountRepository.updatePlayerId(accountId, null) ?: throw DatabaseException("Failed to remove account.")
         return playerRepository.getById(playerId) ?: throw NoSuchElementException("Player not found.")

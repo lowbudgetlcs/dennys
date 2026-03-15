@@ -1,7 +1,7 @@
-package com.lowbudgetlcs.domain.game.models
+package com.lowbudgetlcs.domain.series.game.models
 
 import com.lowbudgetlcs.domain.event.models.Shortcode
-import com.lowbudgetlcs.domain.game.models.types.GameId
+import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
