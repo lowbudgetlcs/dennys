@@ -85,9 +85,13 @@ class TeamService(
         patch.name?.let { name ->
             if (isNameTaken(
                     name,
-                    team.eventId
+                    team.eventId,
                 )
-            ) throw IllegalArgumentException("Team with name '${name.value}' (in event ${team.eventId?.value}) already taken.")
+            ) {
+                throw IllegalArgumentException(
+                    "Team with name '${name.value}' (in event ${team.eventId?.value}) already taken.",
+                )
+            }
         }
         return teamRepository.update(team, patch) ?: throw DatabaseException("Failed to patch team.")
     }
@@ -98,7 +102,10 @@ class TeamService(
         return player
     }
 
-    fun isNameTaken(name: TeamName, eventId: EventId?): Boolean {
+    fun isNameTaken(
+        name: TeamName,
+        eventId: EventId?,
+    ): Boolean {
         logger.debug("Checking if $name is available...")
         return teamRepository.getByName(name).any { it.eventId == eventId }
     }

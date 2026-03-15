@@ -1,6 +1,6 @@
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.extensions.testcontainers.JdbcDatabaseContainerExtension
+import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import java.util.Properties
 import org.jooq.codegen.GenerationTool
 import org.jooq.meta.jaxb.Configuration
@@ -9,15 +9,15 @@ import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Generator
 import org.jooq.meta.jaxb.Jdbc
 import org.jooq.meta.jaxb.Target
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 
 class JooqGenerator : FunSpec({
-    val postgres = PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+    val postgres = PostgreSQLContainer("postgres:15-alpine").apply {
         withCopyFileToContainer(MountableFile.forClasspathResource("sql"), "/docker-entrypoint-initdb.d/")
     }
 
-    val ds = install(JdbcDatabaseContainerExtension(postgres))
+    install(JdbcDatabaseContainerSpecExtension(postgres))
 
     @Suppress("UNCHECKED_CAST")
     fun getProp(key: String): String {
@@ -31,9 +31,9 @@ class JooqGenerator : FunSpec({
         val config = Configuration().apply {
             jdbc = Jdbc().apply {
                 driver = "org.postgresql.Driver"
-                url = ds.jdbcUrl
-                user = ds.username
-                password = ds.password
+                url = postgres.jdbcUrl
+                user = postgres.username
+                password = postgres.password
             }
             generator = Generator().apply {
                 name = "org.jooq.codegen.KotlinGenerator"

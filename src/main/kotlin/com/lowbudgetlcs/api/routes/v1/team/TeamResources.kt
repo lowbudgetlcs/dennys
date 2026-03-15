@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Resource("/")
-class TeamResourcesV1 {
+class TeamResources {
     @Serializable
     @Resource("{teamId}")
     data class ById(
-        val parent: TeamResourcesV1 = TeamResourcesV1(),
+        val parent: TeamResources = TeamResources(),
         val teamId: Int,
     )
 }

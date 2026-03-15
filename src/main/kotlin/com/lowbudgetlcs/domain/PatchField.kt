@@ -5,5 +5,7 @@ sealed interface PatchField<out T> {
     data object Unset : PatchField<Nothing>
 
     /** Field was provided (including null) */
-    data class Value<T>(val value: T) : PatchField<T>
+    data class Value<T>(
+        val value: T,
+    ) : PatchField<T>
 }

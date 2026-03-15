@@ -8,18 +8,17 @@ import com.lowbudgetlcs.domain.team.models.toTeamName
 fun NewTeamDto.toNewTeam(): NewTeam =
     NewTeam(
         name = name.toTeamName(),
-        logoName = logoName
     )
 
-fun Team.toDto(): TeamDto =
+fun Team.toDto(logoBucketUrl: String): TeamDto =
     TeamDto(
         id = id.value,
         name = name.value,
-        logoName = logoName,
+        logo = "$logoBucketUrl/$logoKey",
         eventId = eventId?.value,
     )
 
-fun PatchTeamDto.toTeamUpdate(): TeamUpdate = TeamUpdate(
-    name = name?.toTeamName(),
-    logoName = logoName
-)
+fun PatchTeamDto.toTeamUpdate(): TeamUpdate =
+    TeamUpdate(
+        name = name?.toTeamName(),
+    )

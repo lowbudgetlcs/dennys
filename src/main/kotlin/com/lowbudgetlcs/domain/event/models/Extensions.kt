@@ -81,10 +81,11 @@ fun Event.patch(update: EventUpdate): Event =
         startDate = update.startDate ?: this.startDate,
         endDate = update.endDate ?: this.endDate,
         status = update.status ?: this.status,
-        eventGroupId = when (update.eventGroupId) {
-            PatchField.Unset -> this.eventGroupId
-            is PatchField.Value -> update.eventGroupId.value
-        }
+        eventGroupId =
+            when (update.eventGroupId) {
+                PatchField.Unset -> this.eventGroupId
+                is PatchField.Value -> update.eventGroupId.value
+            },
     )
 
 // Filters

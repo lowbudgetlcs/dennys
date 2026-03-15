@@ -3,10 +3,10 @@ package com.lowbudgetlcs.api.routes.v1.series
 import io.ktor.resources.Resource
 
 @Resource("/")
-class SeriesResourcesV1 {
+class SeriesResources {
     @Resource("{seriesId}/game")
     data class Game(
-        val parent: SeriesResourcesV1 = SeriesResourcesV1(),
+        val parent: SeriesResources = SeriesResources(),
         val seriesId: Int,
     )
 }

@@ -215,6 +215,7 @@ jobs:
           RIOT_TOKEN: ${{ secrets.RIOT_API_TOKEN }}
           DENNYS_ADMIN_USERNAME: ${{ secrets.DENNYS_ADMIN_USERNAME }} 
           DENNYS_ADMIN_PASSWORD: ${{ secrets.DENNYS_ADMIN_PASSWORD }}
+          STORAGE_URL: ${{ secrets.STORAGE_URL }}
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
@@ -229,5 +230,6 @@ jobs:
             export RIOT_TOKEN
             export DENNYS_ADMIN_USERNAME
             export DENNYS_ADMIN_PASSWORD
+            export STORAGE_URL
             ./release.sh -csn ${{ needs.set-version.outputs.version }} 
             )

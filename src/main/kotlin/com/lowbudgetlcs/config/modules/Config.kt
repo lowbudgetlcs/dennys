@@ -8,6 +8,7 @@ val configModule =
         single<RiotConfig> { appConfig.riot }
         single<DatabaseConfig> { appConfig.database }
         single<CookieConfig> { appConfig.cookie }
-        single<CorsConfig> { appConfig.cors}
+        single<CorsConfig> { appConfig.cors }
+        single<StorageConfig> { appConfig.storage }
         single<AppConfig> { appConfig }
     }

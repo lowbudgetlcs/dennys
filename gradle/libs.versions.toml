@@ -36,7 +36,6 @@ ktor-server-config-yaml = { group = "io.ktor", name = "ktor-server-config-yaml",
 ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktor" }
 ktor-server-content-serialization = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktor" }
 ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
-ktor-server-request-validation = { group = "io.ktor", name = "ktor-server-request-validation", version.ref = "ktor" }
 ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
 ktor-server-resources = { group = "io.ktor", name = "ktor-server-resources", version.ref = "ktor" }
 ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktor" }
@@ -82,7 +81,7 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 
 [bundles]
 ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-config-yaml", ]
-ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-request-validation", "ktor-server-status-pages", "ktor-server-resources", "ktor-server-auth", "ktor-server-sessions", "ktor-auto-head"]
+ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-status-pages", "ktor-server-resources", "ktor-server-auth", "ktor-server-sessions", "ktor-auto-head"]
 server-logging = ["logback-core", "slf4j-core", "slf4j-coroutines"]
 ktor-client = ["ktor-client-core", "ktor-client-cio"]
 ktor-client-plugins = ["ktor-client-content-negotiation", "ktor-client-logging"]

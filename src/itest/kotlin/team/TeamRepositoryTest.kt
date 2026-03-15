@@ -65,8 +65,8 @@ class TeamRepositoryTest :
                 repo.update(
                     created,
                     TeamUpdate(
-                        logoName = "ggs.png"
-                    )
+                        logoName = "ggs.png",
+                    ),
                 )
 
             updated.shouldNotBeNull()

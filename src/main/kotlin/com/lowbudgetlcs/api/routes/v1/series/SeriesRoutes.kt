@@ -12,19 +12,22 @@ import io.ktor.server.request.receive
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.seriesEndpointsV1(seriesService: ISeriesService) {
-    post<SeriesResourcesV1.Game> { route ->
-        call.setCidContext {
-            logCall(call)
-            val dto = call.receive<CreateGameDto>()
-            logger.debug(dto.toString())
-            val created = seriesService.createGame(dto.toNewGame(route.seriesId))
-            call.respond(HttpStatusCode.Created, created.toDto())
+fun Route.seriesRoutesV1(seriesService: ISeriesService) {
+    route("/series") {
+        post<SeriesResources.Game> { route ->
+            call.setCidContext {
+                logCall(call)
+                val dto = call.receive<CreateGameDto>()
+                logger.debug(dto.toString())
+                val created = seriesService.createGame(dto.toNewGame(route.seriesId))
+                call.respond(HttpStatusCode.Created, created.toDto())
+            }
         }
     }
 }

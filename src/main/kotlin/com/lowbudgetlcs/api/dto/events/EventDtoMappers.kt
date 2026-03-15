@@ -52,7 +52,7 @@ fun Event.toDto(): EventDto =
         eventStages = eventStages,
     )
 
-fun EventWithTeams.toDto(): EventWithTeamsDto =
+fun EventWithTeams.toDto(logoBucketUrl: String): EventWithTeamsDto =
     EventWithTeamsDto(
         id = id.value,
         name = name.value,
@@ -61,7 +61,7 @@ fun EventWithTeams.toDto(): EventWithTeamsDto =
         createdAt = createdAt,
         description = description,
         status = status,
-        teams = teams.map { t -> t.toDto() },
+        teams = teams.map { t -> t.toDto(logoBucketUrl) },
         eventStages = eventStages,
     )
 
