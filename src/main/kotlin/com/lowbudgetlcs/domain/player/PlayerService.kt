@@ -30,8 +30,8 @@ class PlayerService(
     override fun createPlayer(player: NewPlayer): Player {
         logger.debug("Creating new player...")
         logger.debug(player.toString())
-        require(player.name.value.isBlank()) { "Player name cannot be blank" }
-        check(isNameTaken(player.name)) { "Player name already exists" }
+        require(player.name.value.isNotBlank()) { "Player name cannot be blank" }
+        check(!isNameTaken(player.name)) { "Player name already exists" }
         return playerRepository.insert(player) ?: throw DatabaseException("Failed to create player")
     }
 
@@ -40,7 +40,7 @@ class PlayerService(
         newName: PlayerName,
     ): Player {
         logger.debug("Renaming player '$playerId' to '$newName'...")
-        check(isNameTaken(newName)) { "Player named ${newName.value} already exists" }
+        check(!isNameTaken(newName)) { "Player named ${newName.value} already exists" }
 
         this.getPlayer(playerId) // throws if not found
 
@@ -72,7 +72,7 @@ class PlayerService(
 
         val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account not found.")
 
-        check(account.playerId != player.id) { "Account belongs to different player." }
+        check(account.playerId == player.id) { "Account belongs to different player." }
 
         accountRepository.updatePlayerId(accountId, null) ?: throw DatabaseException("Failed to remove account.")
         return playerRepository.getById(playerId) ?: throw NoSuchElementException("Player not found.")

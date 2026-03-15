@@ -45,12 +45,12 @@ class EventGroupService(
     override fun createEventGroup(group: NewEventGroup): EventGroup {
         logger.debug("Creating new event group...")
         logger.debug(group.toString())
-        require(isNameTaken(group.name)) { "Event group with name '${group.name}' already exists." }
+        require(!isNameTaken(group.name)) { "Event group with name '${group.name}' already exists." }
         val errors = mutableListOf<String>()
         group.events?.forEach { eventId ->
             eventRepo.getById(eventId) ?: errors.add("Event with id '${eventId.value}' not found.")
         }
-        require(errors.isNotEmpty()) { errors.joinToString(",") }
+        require(errors.isEmpty()) { errors.joinToString(",") }
         val created = eventGroupRepo.insert(group) ?: throw DatabaseException("Failed to create event group.")
         group.events?.forEach { eventId -> addEvent(created.id, eventId) }
         return created
@@ -64,7 +64,7 @@ class EventGroupService(
         val group =
             eventGroupRepo.getById(id) ?: throw NoSuchElementException("Event group with id '${id.value}' not found.")
         val name = update.name ?: group.name
-        require(isNameTaken(name)) { "Event group with name '$name' already exists." }
+        require(!isNameTaken(name)) { "Event group with name '$name' already exists." }
         return eventGroupRepo.update(group.patch(update))
             ?: throw DatabaseException("Failed to patch event group with id '${id.value}.")
     }

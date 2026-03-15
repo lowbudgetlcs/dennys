@@ -1,16 +1,7 @@
 package com.lowbudgetlcs.domain.event
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.EventQuery
-import com.lowbudgetlcs.domain.event.models.EventUpdate
-import com.lowbudgetlcs.domain.event.models.EventWithSeries
-import com.lowbudgetlcs.domain.event.models.EventWithTeams
-import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.filterByName
-import com.lowbudgetlcs.domain.event.models.filterByStatus
-import com.lowbudgetlcs.domain.event.models.toEventWithSeries
-import com.lowbudgetlcs.domain.event.models.toEventWithTeams
+import com.lowbudgetlcs.domain.event.models.*
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
@@ -67,8 +58,8 @@ class EventService(
     override suspend fun createEvent(event: NewEvent): Event {
         logger.debug("Creating new event...")
         logger.debug(event.toString())
-        require(!event.startDate.isBefore(event.endDate)) { "Event start date must be before end date." }
-        require(isNameTaken(event.name)) { "Event '${event.name}' already exists." }
+        require(event.startDate.isBefore(event.endDate)) { "Event start date must be before end date." }
+        check(!isNameTaken(event.name)) { "Event '${event.name}' already exists." }
         val t =
             tournamentGateway.create(event.name)
                 ?: throw GatewayException("Failed to register tournament with Riot Games.")
@@ -83,13 +74,18 @@ class EventService(
         logger.debug(update.toString())
         val event = getEvent(id)
         update.name?.let {
-            require(isNameTaken(it)) { "Event with name '$it' already exists." }
+            check(!isNameTaken(it)) { "Event with name '$it' already exists." }
         }
         val start = update.startDate ?: event.startDate
         val end = update.endDate ?: event.endDate
-        require(end.isBefore(start)) { "Event start date must be before end date." }
+        check(start.isBefore(end)) { "Event start date must be before end date." }
         return eventRepo.update(event, update)
             ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
+    }
+
+    private fun validateTeam(eventId: EventId, teamId: TeamId) {
+        if (!doesEventExist(eventId)) throw NoSuchElementException("Event with id '${eventId.value}' not found.")
+        if (!doesTeamExist(teamId)) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
     }
 
     override fun addTeam(
@@ -97,8 +93,7 @@ class EventService(
         teamId: TeamId,
     ): EventWithTeams {
         logger.debug("Adding team '$teamId' to event '$eventId'...")
-        checkEvent(eventId)
-        checkTeam(teamId)
+        validateTeam(eventId, teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
         val teamPatch = TeamUpdate(eventId = PatchField.Value(eventId))
         teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
@@ -110,8 +105,7 @@ class EventService(
         teamId: TeamId,
     ): EventWithTeams {
         logger.debug("Removing team '$teamId' from event '$eventId'...")
-        checkEvent(eventId)
-        checkTeam(teamId)
+        validateTeam(eventId, teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
         val teamPatch = TeamUpdate(eventId = PatchField.Value(null))
         teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
@@ -143,13 +137,5 @@ class EventService(
     fun doesTeamExist(teamId: TeamId): Boolean {
         logger.debug("Checking if team '$teamId' exists...")
         return teamRepo.getById(teamId) != null
-    }
-
-    private fun checkEvent(id: EventId) {
-        if (!doesEventExist(id)) throw NoSuchElementException("Event with id '${id.value}' not found.")
-    }
-
-    private fun checkTeam(teamId: TeamId) {
-        if (!doesTeamExist(teamId)) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
     }
 }

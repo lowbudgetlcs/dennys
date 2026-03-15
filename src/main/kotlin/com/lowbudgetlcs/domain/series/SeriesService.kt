@@ -66,7 +66,7 @@ class SeriesService(
         val t1 = teamRepo.getById(teamId1) ?: throw NoSuchElementException("Team with id '${teamId1.value}' not found")
         val t2 = teamRepo.getById(teamId2) ?: throw NoSuchElementException("Team with id '${teamId2.value}' not found")
         // TODO: Make eventId non-null.
-        require(t1.eventId != t2.eventId || t1.eventId == null) { "Teams are not in the same event." }
+        require(t1.eventId == t2.eventId && t1.eventId != null) { "Teams are not in the same event." }
 
         val series =
             seriesRepo
@@ -105,7 +105,7 @@ class SeriesService(
             Pair(
                 redTeam,
                 blueTeam,
-            ).equalsIgnoreOrder(series.participants),
+            ).equalsIgnoreOrder(series.participants)
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }

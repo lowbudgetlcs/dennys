@@ -32,7 +32,7 @@ class AccountService(
         logger.debug("Creating new account...")
         logger.debug(account.toString())
 
-        check(isPuuidTaken(account.puuid)) { "Account already exists." }
+        check(!isPuuidTaken(account.puuid)) { "Account already exists." }
 
         // Call Riot API to verify PUUID
         riotAccountGateway.getAccountByPuuid(account.puuid) // throws if anything fails

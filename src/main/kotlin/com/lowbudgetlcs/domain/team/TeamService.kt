@@ -64,7 +64,7 @@ class TeamService(
         logger.debug("Creating new team...")
         logger.debug(team.toString())
         val name = team.name.value
-        require(name.isBlank()) { "Team name cannot be blank" }
+        require(name.isNotBlank()) { "Team name cannot be blank" }
 
         return teamRepository.insert(team) ?: throw DatabaseException("Failed to create team")
     }
@@ -78,7 +78,7 @@ class TeamService(
         val team = getTeam(teamId)
         // Check if name is taken
         patch.name?.let { name ->
-            require(isNameTaken(name, team.eventId)) {
+            check(!isNameTaken(name, team.eventId)) {
                 "Team with name '${name.value}' (in event ${team.eventId?.value}) already taken."
             }
         }
