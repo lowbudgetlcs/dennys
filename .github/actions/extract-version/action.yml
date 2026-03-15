@@ -5,7 +5,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: gradle/actions/setup-gradle@v4
 
     - name: Extract version number

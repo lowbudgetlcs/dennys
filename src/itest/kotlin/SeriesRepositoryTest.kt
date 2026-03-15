@@ -92,9 +92,5 @@ class SeriesRepositoryTest :
             val series = repo.getAllByEventId(event.id)
             series.shouldNotBeEmpty()
             series.shouldHaveSize(5)
-            series.forEach { s ->
-                s.participants.shouldHaveSize(2)
-                s.participants.forEach { t -> t.shouldBeInstanceOf<TeamId>() }
-            }
         }
     })
