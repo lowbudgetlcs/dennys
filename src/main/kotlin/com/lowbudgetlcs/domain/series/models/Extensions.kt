@@ -15,7 +15,7 @@ fun List<Series>.filterByParticipants(query: SeriesQuery?): List<Series> {
     return when {
         participants == null -> this
         participants.isEmpty() -> this
-        participants.size == 1 -> this.filter { s -> s.participants.any { participants.contains(it) } }
-        else -> this.filter { s -> s.participants.equalsIgnoreOrder(participants) }
+        participants.size == 1 -> this.filter { s -> s.participants.toList().any { participants.contains(it) } }
+        else -> this.filter { s -> s.participants.toList().equalsIgnoreOrder(participants) }
     }
 }

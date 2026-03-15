@@ -10,6 +10,6 @@ data class Series(
     val eventId: EventId,
     val eventStage: EventStage,
     val totalGames: Int,
-    val participants: List<TeamId>,
+    val participants: Pair<TeamId, TeamId>,
     val result: SeriesResult?,
 )

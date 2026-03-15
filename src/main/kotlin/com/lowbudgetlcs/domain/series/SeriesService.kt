@@ -33,13 +33,11 @@ class SeriesService(
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
         logger.debug(series.toString())
-
-        require(series.totalGames < 1) { "A series must contain at least 1 game." }
-
+        require(series.totalGames > 0) { "A series must contain at least 1 game." }
         val validate = { id: TeamId ->
             logger.debug("Validating team '$id' exists and is participating in event '${series.eventId}'...")
             val team = teamRepo.getById(id) ?: throw NoSuchElementException("Team with id $id not found")
-            require(team.eventId != series.eventId) { "Team with id $id is not part of the event" }
+            check(team.eventId == series.eventId) { "Team with id $id is not part of the event" }
         }
         validate(series.participantIds.first)
         validate(series.participantIds.second)
@@ -104,7 +102,7 @@ class SeriesService(
             teamRepo.getById(newGame.redTeamId)
                 ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
         require(
-            listOf(
+            Pair(
                 redTeam,
                 blueTeam,
             ).equalsIgnoreOrder(series.participants),

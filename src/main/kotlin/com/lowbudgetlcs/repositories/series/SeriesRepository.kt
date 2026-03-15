@@ -88,7 +88,8 @@ class SeriesRepository(
         val eventId = row[SERIES.EVENT_ID]?.toEventId() ?: return null
         val eventStage = row[SERIES.STAGE]?.let { EventStage.valueOf(it) } ?: return null
         val totalGames = row[SERIES.TOTAL_GAMES] ?: return null
-        val participants = row[participants].mapNotNull { it.value1()?.toTeamId() }
+        val p = row[participants].mapNotNull { it.value1()?.toTeamId() }
+        val participants = Pair(p[0], p[1])
         // potentially null data
         val winner = row[SERIES_RESULTS.WINNER_TEAM_ID]?.toTeamId()
         val loser = row[SERIES_RESULTS.LOSER_TEAM_ID]?.toTeamId()

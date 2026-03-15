@@ -11,7 +11,7 @@ fun Series.toDto(): SeriesDto =
     SeriesDto(
         id = id.value,
         eventId = eventId.value,
-        teamIds = participants.map { it.value },
+        teamIds = participants.toList().map { it.value },
         totalGames = totalGames,
         eventStage = eventStage,
     )
