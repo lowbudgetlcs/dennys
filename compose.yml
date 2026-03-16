@@ -6,6 +6,8 @@ services:
       target: app
     image: dennys:local
     container_name: dennys-container
+    volumes:
+      - ./frontend:/frontend
     ports:
       - "127.0.0.1:9292:9292"
     env_file: .env
