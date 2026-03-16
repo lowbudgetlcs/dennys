@@ -42,3 +42,5 @@ out/
 **/*.local.yaml
 .env*
 !.env.example
+
+frontend*
