@@ -83,7 +83,10 @@ class EventService(
             ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
     }
 
-    private fun validateTeam(eventId: EventId, teamId: TeamId) {
+    private fun validateTeam(
+        eventId: EventId,
+        teamId: TeamId,
+    ) {
         if (!doesEventExist(eventId)) throw NoSuchElementException("Event with id '${eventId.value}' not found.")
         if (!doesTeamExist(teamId)) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
     }

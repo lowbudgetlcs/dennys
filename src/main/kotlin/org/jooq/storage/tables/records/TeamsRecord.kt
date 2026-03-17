@@ -4,8 +4,6 @@
 package org.jooq.storage.tables.records
 
 
-import java.util.UUID
-
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 import org.jooq.storage.tables.Teams
@@ -25,13 +23,13 @@ open class TeamsRecord() : UpdatableRecordImpl<TeamsRecord>(Teams.TEAMS) {
         set(value): Unit = set(1, value)
         get(): String? = get(1) as String?
 
-    open var eventId: Int?
+    open var logo: String?
         set(value): Unit = set(2, value)
-        get(): Int? = get(2) as Int?
+        get(): String? = get(2) as String?
 
-    open var logoKey: UUID?
+    open var eventId: Int?
         set(value): Unit = set(3, value)
-        get(): UUID? = get(3) as UUID?
+        get(): Int? = get(3) as Int?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -42,11 +40,11 @@ open class TeamsRecord() : UpdatableRecordImpl<TeamsRecord>(Teams.TEAMS) {
     /**
      * Create a detached, initialised TeamsRecord
      */
-    constructor(id: Int? = null, name: String? = null, eventId: Int? = null, logoKey: UUID? = null): this() {
+    constructor(id: Int? = null, name: String? = null, logo: String? = null, eventId: Int? = null): this() {
         this.id = id
         this.name = name
+        this.logo = logo
         this.eventId = eventId
-        this.logoKey = logoKey
         resetChangedOnNotNull()
     }
 }

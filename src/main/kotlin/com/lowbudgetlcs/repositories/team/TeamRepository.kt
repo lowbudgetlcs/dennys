@@ -24,7 +24,7 @@ class TeamRepository(
 
     override fun getBySeriesId(seriesId: SeriesId): List<Team> =
         dsl
-            .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_KEY, TEAMS.EVENT_ID)
+            .select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO, TEAMS.EVENT_ID)
             .from(TEAMS.innerJoin(TEAM_TO_SERIES).on(TEAMS.ID.eq(TEAM_TO_SERIES.TEAM_ID)))
             .where(TEAM_TO_SERIES.SERIES_ID.eq(seriesId.value))
             .fetch()
@@ -55,6 +55,7 @@ class TeamRepository(
                 .update(TEAMS)
                 .set(TEAMS.NAME, patch.name.value)
                 .set(TEAMS.EVENT_ID, patch.eventId?.value)
+                .set(TEAMS.LOGO, patch.logo)
                 .where(TEAMS.ID.eq(team.id.value))
                 .returning(TEAMS.ID)
                 .fetchOne()
@@ -93,18 +94,18 @@ class TeamRepository(
 
     // Helper functions
 
-    private fun selectTeams() = dsl.select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO_KEY, TEAMS.EVENT_ID).from(TEAMS)
+    private fun selectTeams() = dsl.select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO, TEAMS.EVENT_ID).from(TEAMS)
 
     private fun rowToTeam(row: Record): Team? {
         val teamId = row[TEAMS.ID]?.toTeamId() ?: return null
         val name = row[TEAMS.NAME]?.toTeamName() ?: return null
-        val logoKey = row[TEAMS.LOGO_KEY]
+        val logo = row[TEAMS.LOGO]
         val eventId = row[TEAMS.EVENT_ID]?.toEventId()
 
         return Team(
             id = teamId,
             name = name,
-            logoKey = logoKey.toString(),
+            logo = logo,
             eventId = eventId,
         )
     }

@@ -1744,6 +1744,9 @@ components:
         name:
           type: string
           example: Golden Guardians
+        logo:
+          type: string
+          example: https://google.com
         eventId:
           type: integer
           example: 1
@@ -1756,6 +1759,9 @@ components:
           type: string
           maxLength: 80
           example: Golden Guardians Rebranded
+        logo:
+          type: string
+          example: https://google.com
 
     TeamDto:
       type: object

@@ -9,6 +9,5 @@ val configModule =
         single<DatabaseConfig> { appConfig.database }
         single<CookieConfig> { appConfig.cookie }
         single<CorsConfig> { appConfig.cors }
-        single<StorageConfig> { appConfig.storage }
         single<AppConfig> { appConfig }
     }

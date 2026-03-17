@@ -105,7 +105,7 @@ class SeriesService(
             Pair(
                 redTeam,
                 blueTeam,
-            ).equalsIgnoreOrder(series.participants)
+            ).equalsIgnoreOrder(series.participants),
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }

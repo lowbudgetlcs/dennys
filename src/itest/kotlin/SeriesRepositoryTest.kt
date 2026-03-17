@@ -8,7 +8,6 @@ import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
-import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
@@ -19,7 +18,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.postgresql.PostgreSQLContainer

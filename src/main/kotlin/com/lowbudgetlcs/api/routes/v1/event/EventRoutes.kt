@@ -4,7 +4,6 @@ import com.lowbudgetlcs.api.dto.events.*
 import com.lowbudgetlcs.api.dto.series.*
 import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.config.StorageConfig
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.series.ISeriesService
@@ -27,7 +26,6 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.eventRoutesV1(
     eventService: IEventService,
     seriesService: ISeriesService,
-    storageConfig: StorageConfig,
 ) {
     route("/event") {
         get<EventResources> { route ->
@@ -71,7 +69,7 @@ fun Route.eventRoutesV1(
             call.setCidContext {
                 logCall(call)
                 val events = eventService.getEventWithTeams(route.eventId.toEventId())
-                call.respond(events.toDto(storageConfig.logobucketurl))
+                call.respond(events.toDto())
             }
         }
         post<EventResources.ByIdTeams> { route ->
@@ -80,7 +78,7 @@ fun Route.eventRoutesV1(
                 val dto = call.receive<EventTeamLinkDto>()
                 logger.debug(dto.toString())
                 val event = eventService.addTeam(route.eventId.toEventId(), dto.toTeamId())
-                call.respond(event.toDto(storageConfig.logobucketurl))
+                call.respond(event.toDto())
             }
         }
         get<EventResources.ByIdSeries> { route ->
@@ -117,7 +115,7 @@ fun Route.eventRoutesV1(
             call.setCidContext {
                 logCall(call)
                 val event = eventService.removeTeam(route.eventId.toEventId(), route.teamId.toTeamId())
-                call.respond(event.toDto(storageConfig.logobucketurl))
+                call.respond(event.toDto())
             }
         }
     }

@@ -9,7 +9,6 @@ import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
 import com.lowbudgetlcs.api.setCidContext
-import com.lowbudgetlcs.config.StorageConfig
 import com.lowbudgetlcs.domain.account.IAccountService
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
@@ -35,7 +34,6 @@ fun Route.apiRoutes() {
     val accountService by inject<IAccountService>()
     val seriesService by inject<ISeriesService>()
     val eventGroupService by inject<IEventGroupService>()
-    val storageConfig by inject<StorageConfig>()
 
     route("/api/v1") {
         route("/riot-callback") {
@@ -49,8 +47,8 @@ fun Route.apiRoutes() {
             }
         }
         authenticate("auth-session", "auth-token") {
-            eventRoutesV1(eventService = eventService, seriesService = seriesService, storageConfig = storageConfig)
-            teamRoutesV1(teamService = teamService, storageConfig = storageConfig)
+            eventRoutesV1(eventService = eventService, seriesService = seriesService)
+            teamRoutesV1(teamService = teamService)
             playerRoutesV1(playerService = playerService)
             accountRoutesV1(accountService = accountService)
             seriesRoutesV1(

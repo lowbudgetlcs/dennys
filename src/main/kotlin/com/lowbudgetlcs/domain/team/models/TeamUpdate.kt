@@ -6,5 +6,6 @@ import com.lowbudgetlcs.domain.team.models.types.TeamName
 
 data class TeamUpdate(
     val name: TeamName? = null,
+    val logo: PatchField<String?> = PatchField.Unset,
     val eventId: PatchField<EventId?> = PatchField.Unset,
 )

@@ -2,13 +2,7 @@ package com.lowbudgetlcs.api.dto.events
 
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.teams.toDto
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.EventQuery
-import com.lowbudgetlcs.domain.event.models.EventUpdate
-import com.lowbudgetlcs.domain.event.models.EventWithSeries
-import com.lowbudgetlcs.domain.event.models.EventWithTeams
-import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.toEventName
+import com.lowbudgetlcs.domain.event.models.*
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
@@ -52,7 +46,7 @@ fun Event.toDto(): EventDto =
         eventStages = eventStages,
     )
 
-fun EventWithTeams.toDto(logoBucketUrl: String): EventWithTeamsDto =
+fun EventWithTeams.toDto(): EventWithTeamsDto =
     EventWithTeamsDto(
         id = id.value,
         name = name.value,
@@ -61,7 +55,7 @@ fun EventWithTeams.toDto(logoBucketUrl: String): EventWithTeamsDto =
         createdAt = createdAt,
         description = description,
         status = status,
-        teams = teams.map { t -> t.toDto(logoBucketUrl) },
+        teams = teams.map { t -> t.toDto() },
         eventStages = eventStages,
     )
 

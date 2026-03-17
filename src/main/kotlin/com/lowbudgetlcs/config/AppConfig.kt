@@ -7,7 +7,6 @@ data class AppConfig(
     val database: DatabaseConfig,
     val cookie: CookieConfig,
     val cors: CorsConfig,
-    val storage: StorageConfig,
 )
 
 data class CookieConfig(
@@ -29,8 +28,4 @@ data class DatabaseConfig(
 data class CorsConfig(
     val url: String? = null,
     val scheme: String? = null,
-)
-
-data class StorageConfig(
-    val logobucketurl: String,
 )

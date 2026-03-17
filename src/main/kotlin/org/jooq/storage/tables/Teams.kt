@@ -4,8 +4,6 @@
 package org.jooq.storage.tables
 
 
-import java.util.UUID
-
 import kotlin.collections.Collection
 import kotlin.collections.List
 
@@ -102,14 +100,14 @@ open class Teams(
     val NAME: TableField<TeamsRecord, String?> = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "")
 
     /**
+     * The column <code>dennys.teams.logo</code>.
+     */
+    val LOGO: TableField<TeamsRecord, String?> = createField(DSL.name("logo"), SQLDataType.CLOB, this, "")
+
+    /**
      * The column <code>dennys.teams.event_id</code>.
      */
     val EVENT_ID: TableField<TeamsRecord, Int?> = createField(DSL.name("event_id"), SQLDataType.INTEGER, this, "")
-
-    /**
-     * The column <code>dennys.teams.logo_key</code>.
-     */
-    val LOGO_KEY: TableField<TeamsRecord, UUID?> = createField(DSL.name("logo_key"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("dennys.uuid_generate_v4()"), SQLDataType.UUID)), this, "")
 
     private constructor(alias: Name, aliased: Table<TeamsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<TeamsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

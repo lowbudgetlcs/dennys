@@ -15,7 +15,7 @@ fun Team.toTeamWithPlayers(players: List<Player>): TeamWithPlayers =
     TeamWithPlayers(
         id = this.id,
         name = this.name,
-        logoKey = this.logoKey,
+        logo = this.logo,
         eventId = this.eventId,
         players = players,
     )
@@ -23,6 +23,11 @@ fun Team.toTeamWithPlayers(players: List<Player>): TeamWithPlayers =
 fun Team.patch(update: TeamUpdate): Team =
     copy(
         name = update.name ?: this.name,
+        logo =
+            when (update.logo) {
+                PatchField.Unset -> this.logo
+                is PatchField.Value -> update.logo.value
+            },
         eventId =
             when (update.eventId) {
                 PatchField.Unset -> this.eventId

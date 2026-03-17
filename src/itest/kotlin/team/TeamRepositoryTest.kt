@@ -1,5 +1,6 @@
 package team
 
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.toTeamName
@@ -31,6 +32,7 @@ class TeamRepositoryTest :
         val newTeam =
             NewTeam(
                 name = "Golden Guardians".toTeamName(),
+                null,
             )
 
         "getAll returns 0 teams" {
@@ -56,8 +58,17 @@ class TeamRepositoryTest :
             updated.name.value shouldBe "New Name"
         }
 
-        "getAll returns 2 teams" {
+        "update logo" {
+            val created = repo.insert(NewTeam("Testing".toTeamName()))!!
+            val updated = repo.update(created, TeamUpdate(logo = PatchField.Value("New Name")))
+
+            updated.shouldNotBeNull()
+            updated.id shouldBe created.id
+            updated.logo shouldBe "New Name"
+        }
+
+        "getAll returns 3 teams" {
             val teams = repo.getAll()
-            teams.shouldHaveSize(2)
+            teams.shouldHaveSize(3)
         }
     })

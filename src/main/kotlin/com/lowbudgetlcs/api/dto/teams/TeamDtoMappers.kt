@@ -1,5 +1,7 @@
 package com.lowbudgetlcs.api.dto.teams
 
+import com.lowbudgetlcs.api.dto.UNSET_PATCH_FIELD
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
@@ -8,17 +10,25 @@ import com.lowbudgetlcs.domain.team.models.toTeamName
 fun NewTeamDto.toNewTeam(): NewTeam =
     NewTeam(
         name = name.toTeamName(),
+        logo = logo,
     )
 
-fun Team.toDto(logoBucketUrl: String): TeamDto =
+fun Team.toDto(): TeamDto =
     TeamDto(
         id = id.value,
         name = name.value,
-        logo = "$logoBucketUrl/$logoKey",
+        logo = logo,
         eventId = eventId?.value,
     )
 
 fun PatchTeamDto.toTeamUpdate(): TeamUpdate =
     TeamUpdate(
         name = name?.toTeamName(),
+        logo = when (logo) {
+            UNSET_PATCH_FIELD -> {
+                PatchField.Unset
+            }
+
+            else -> PatchField.Value(logo)
+        }
     )
