@@ -52,5 +52,12 @@ fun Route.teamRoutesV1(teamService: ITeamService) {
                 call.respond(updated.toDto())
             }
         }
+        get<TeamResources.ByIdPlayers> { route ->
+            call.setCidContext {
+                logCall(call)
+                val team = teamService.getTeamWithPlayers(route.teamId.toTeamId())
+                call.respond(team.toDto())
+            }
+        }
     }
 }
