@@ -6,16 +6,26 @@ import com.lowbudgetlcs.api.routes.authEndpoints
 import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.user.IUserService
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.autohead.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.plugins.swagger.*
-import io.ktor.server.request.*
-import io.ktor.server.resources.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.sessions.*
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.http.content.singlePageApplication
+import io.ktor.server.http.content.vue
+import io.ktor.server.plugins.autohead.AutoHeadResponse
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.swagger.swaggerUI
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.path
+import io.ktor.server.resources.Resources
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingCall
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import io.ktor.server.sessions.Sessions
+import io.ktor.server.sessions.cookie
+import io.ktor.server.sessions.sameSite
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,6 +66,11 @@ fun Application.routes() {
             }
         }
         install(AutoHeadResponse)
+        route("/") {
+            singlePageApplication {
+                vue("/frontend")
+            }
+        }
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
             version = "5.26.1"
         }
