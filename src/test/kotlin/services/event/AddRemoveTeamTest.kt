@@ -1,10 +1,10 @@
-/*
 package services.events
 
 import com.lowbudgetlcs.domain.event.EventService
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEvent
 import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -35,7 +35,7 @@ class AddRemoveTeamTest :
         val end = Instant.now().plusSeconds(3600L)
         val newEvent =
             NewEvent(
-                name = "Test",
+                name = "Test".toEventName(),
                 description = "This is a test.",
                 startDate = start,
                 endDate = end,
@@ -82,6 +82,3 @@ class AddRemoveTeamTest :
             event shouldBe expectedEventWithTeams
         }
     })
-
-
- */
