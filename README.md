@@ -107,16 +107,19 @@ If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there 
     ```
 4. Enter your API key in `.env`
    ```sh
-   riot.key='ENTER YOUR API TOKEN';
+   riot.key=ENTER YOUR API TOKEN;
    ```
 5. Clone and build the [frontend](https://github.com/lowbudgetlcs/stephen).
    ```sh
    git clone https://github.com/lowbudgetlcs/stephen
    # Follow README.md instructions.
    ```
-6. Create a symlink to the local Stephen build.
+6. 
    ```sh
+   # Linux
    ln -s PATH_TO_STEPHEN_DIST frontend/
+   # Windows
+   cp PATH_TO_STEPHEN_DIST dist/
 7. Build and run the project 
    ```sh
    make 

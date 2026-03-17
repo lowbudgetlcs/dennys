@@ -27,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=admin
     volumes:
       # DB Init Scripts
-      - ./docker/postgres/sql:/docker-entrypoint-initdb.d
+      - ./src/migrations/sql:/docker-entrypoint-initdb.d
       - dennys-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
