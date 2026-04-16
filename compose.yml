@@ -47,3 +47,4 @@ services:
 
 volumes:
   dennys-data:
+    name: "dennys-data"
