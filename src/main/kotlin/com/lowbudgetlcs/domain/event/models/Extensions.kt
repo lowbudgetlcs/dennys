@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.event.models
 
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.event.models.types.EventDescription
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -24,6 +25,8 @@ fun String.toStage(): EventStage =
     } catch (_: IllegalArgumentException) {
         throw IllegalArgumentException("Invalid stage.")
     }
+
+fun String.toEventDescription(): EventDescription = EventDescription(this)
 
 // Class Extensions
 fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams =

@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.event.models
 
+import com.lowbudgetlcs.domain.event.models.types.EventDescription
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
@@ -8,7 +9,7 @@ import java.time.Instant
 
 data class NewEvent(
     val name: EventName,
-    val description: String,
+    val description: EventDescription,
     val startDate: Instant,
     val endDate: Instant,
     val status: EventStatus,

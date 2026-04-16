@@ -38,7 +38,7 @@ class PatchEventTest :
                 createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
                 riotTournamentId = 9999.toRiotTournamentId(),
                 name = "Test".toEventName(),
-                description = "This is a test.",
+                description = "This is a test.".toEventDescription(),
                 eventGroupId = 10.toEventGroupId(),
                 startDate = start,
                 endDate = end,
@@ -57,7 +57,7 @@ class PatchEventTest :
             new.name shouldBe n
         }
         test("Event.patch() updates description") {
-            val d = "New description!!"
+            val d = "New description!!".toEventDescription()
             val update = EventUpdate(description = d)
             val new = testEvent.patch(update)
             new shouldNotBe testEvent
@@ -128,7 +128,7 @@ class PatchEventTest :
         }
 
         test("patchEvent() updates description field") {
-            val description = "ABCDEFG"
+            val description = "ABCDEFG".toEventDescription()
             val update = EventUpdate(description = description)
             val patched = testEvent.patch(update)
             every { eventRepo.getByName(any()) } returns null

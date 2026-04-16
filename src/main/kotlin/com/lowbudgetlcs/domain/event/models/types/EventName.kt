@@ -1,5 +1,8 @@
 package com.lowbudgetlcs.domain.event.models.types
 
+const val EVENT_NAME_MAX_LENGTH = 120
+const val EVENT_NAME_MIN_LENGTH = 3
+
 data class EventName(
     val value: String,
 ) {
@@ -7,9 +10,8 @@ data class EventName(
 
     init {
         require(value.isNotEmpty()) { "Event name cannot be empty." }
+        require(value.length <= EVENT_NAME_MAX_LENGTH) { "Event name must not exceed $EVENT_NAME_MAX_LENGTH characters." }
+        require(value.length >= EVENT_NAME_MIN_LENGTH) { "Event name must be at least $EVENT_NAME_MAX_LENGTH characters." }
     }
 
-    init {
-        require(value.length < 300) { "Event name cannot be more than 300 characters." }
-    }
 }

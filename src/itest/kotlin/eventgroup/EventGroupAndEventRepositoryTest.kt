@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -49,7 +50,7 @@ class EventGroupAndEventRepositoryTest :
         val newEvent =
             NewEvent(
                 "Test Event".toEventName(),
-                description = "Hello World!",
+                description = "Hello World!".toEventDescription(),
                 startDate = now,
                 endDate = now.plus(1, ChronoUnit.HOURS),
                 status = EventStatus.ACTIVE,

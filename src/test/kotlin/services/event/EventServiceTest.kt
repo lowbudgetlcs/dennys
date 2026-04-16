@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.EventService
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.RiotTournament
 import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
@@ -33,7 +34,7 @@ class EventServiceTest :
         val newEvent =
             NewEvent(
                 name = "Test".toEventName(),
-                description = "This is a test.",
+                description = "This is a test.".toEventDescription(),
                 startDate = start,
                 endDate = end,
                 status = EventStatus.ACTIVE,

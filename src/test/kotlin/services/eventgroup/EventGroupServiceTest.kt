@@ -66,7 +66,7 @@ class EventGroupServiceTest :
             Event(
                 id = 0.toEventId(),
                 name = "Testing 1".toEventName(),
-                description = "Testing stuff",
+                description = "Testing stuff".toEventDescription(),
                 eventGroupId = null,
                 riotTournamentId = 0.toRiotTournamentId(),
                 createdAt = now,
@@ -79,7 +79,7 @@ class EventGroupServiceTest :
             Event(
                 id = 1.toEventId(),
                 name = "Testing 2".toEventName(),
-                description = "Testing stuff",
+                description = "Testing stuff".toEventDescription(),
                 eventGroupId = null,
                 riotTournamentId = 1.toRiotTournamentId(),
                 createdAt = now,
