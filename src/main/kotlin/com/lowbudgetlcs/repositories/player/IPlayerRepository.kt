@@ -11,6 +11,8 @@ interface IPlayerRepository {
 
     fun getById(id: PlayerId): Player?
 
+    fun getByName(playerName: PlayerName): Player?
+
     fun getByTeamId(teamId: TeamId): List<Player>
 
     fun insert(newPlayer: NewPlayer): Player?

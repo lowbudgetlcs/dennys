@@ -1,12 +1,11 @@
-/*
-package services.events
+package services.event
 
 import com.lowbudgetlcs.domain.event.EventService
-import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.RiotTournament
 import com.lowbudgetlcs.domain.event.models.toEvent
 import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
@@ -16,7 +15,6 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -34,7 +32,7 @@ class EventServiceTest :
         val end = Instant.now().plusSeconds(3600L)
         val newEvent =
             NewEvent(
-                name = "Test",
+                name = "Test".toEventName(),
                 description = "This is a test.",
                 startDate = start,
                 endDate = end,
@@ -49,25 +47,22 @@ class EventServiceTest :
             )
         val newRiotTournament = expectedEvent.name
 
-        test("Creating event succeeds") {
+        beforeTest {
             coEvery {
                 tournamentGate.create(newRiotTournament)
             } returns
                 RiotTournament(
                     id = 9999.toRiotTournamentId(),
-                    name = "Test",
+                    name = "Test".toEventName(),
                 )
+        }
+
+        test("Creating event succeeds") {
             every { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
             every { eventRepo.getByName(newEvent.name) } returns null
             val event = service.createEvent(newEvent)
             event.shouldNotBeNull()
-            // We ignore generated fields as those are out-of-scope for this test
-            event.shouldBeEqualToIgnoringFields(
-                expectedEvent,
-                Event::id,
-                Event::riotTournamentId,
-                Event::createdAt,
-            )
+            event shouldBe expectedEvent
         }
 
         test("getEvent() returns valid event") {
@@ -81,6 +76,3 @@ class EventServiceTest :
             shouldThrow<NoSuchElementException> { service.getEvent(expectedEvent.id) }
         }
     })
-
-
- */

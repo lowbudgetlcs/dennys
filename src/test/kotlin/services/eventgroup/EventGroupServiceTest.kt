@@ -1,11 +1,7 @@
-/*
 package services.events.groups
 
-import com.lowbudgetlcs.domain.Zeroable
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.EventUpdate
-import com.lowbudgetlcs.domain.event.models.toEventId
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.event.models.*
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.EventGroupService
@@ -69,7 +65,7 @@ class EventGroupServiceTest :
         val expectedEvent1 =
             Event(
                 id = 0.toEventId(),
-                name = "Testing 1",
+                name = "Testing 1".toEventName(),
                 description = "Testing stuff",
                 eventGroupId = null,
                 riotTournamentId = 0.toRiotTournamentId(),
@@ -82,7 +78,7 @@ class EventGroupServiceTest :
         val expectedEvent2 =
             Event(
                 id = 1.toEventId(),
-                name = "Testing 2",
+                name = "Testing 2".toEventName(),
                 description = "Testing stuff",
                 eventGroupId = null,
                 riotTournamentId = 1.toRiotTournamentId(),
@@ -106,11 +102,21 @@ class EventGroupServiceTest :
             every { groupRepo.getById(expectedGroup2.id) } returns expectedGroup2
             every { eventRepo.getById(expectedEvent1.id) } returns expectedEvent1
             every { eventRepo.getById(expectedEvent2.id) } returns expectedEvent2
-            every { eventRepo.update(expectedEvent1, EventUpdate(eventGroupId = Zeroable(expectedGroup2.id))) } returns
+            every {
+                eventRepo.update(
+                    expectedEvent1,
+                    EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id))
+                )
+            } returns
                 expectedEvent1.copy(
                     eventGroupId = expectedGroup2.id,
                 )
-            every { eventRepo.update(expectedEvent2, EventUpdate(eventGroupId = Zeroable(expectedGroup2.id))) } returns
+            every {
+                eventRepo.update(
+                    expectedEvent2,
+                    EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id))
+                )
+            } returns
                 expectedEvent2.copy(
                     eventGroupId = expectedGroup2.id,
                 )
@@ -119,6 +125,3 @@ class EventGroupServiceTest :
             group shouldBe expectedGroup
         }
     })
-
-
- */
