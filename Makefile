@@ -35,7 +35,7 @@ seed:
 	./scripts/seed_local.sh
 
 drop:
-	docker volume rm main_dennys-data
+	docker volume rm dennys-data
 
 # Start database
 db:
