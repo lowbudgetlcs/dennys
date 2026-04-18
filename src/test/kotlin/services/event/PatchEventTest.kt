@@ -1,13 +1,8 @@
-/*
 package services.events
 
-import com.lowbudgetlcs.domain.Zeroable
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.EventService
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.EventUpdate
-import com.lowbudgetlcs.domain.event.models.patch
-import com.lowbudgetlcs.domain.event.models.toEventId
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.*
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
@@ -42,7 +37,7 @@ class PatchEventTest :
                 id = 0.toEventId(),
                 createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS),
                 riotTournamentId = 9999.toRiotTournamentId(),
-                name = "Test",
+                name = "Test".toEventName(),
                 description = "This is a test.",
                 eventGroupId = 10.toEventGroupId(),
                 startDate = start,
@@ -55,7 +50,7 @@ class PatchEventTest :
         }
 
         test("Event.patch() updates name") {
-            val n = "New"
+            val n = "New".toEventName()
             val update = EventUpdate(name = n)
             val new = testEvent.patch(update)
             new shouldNotBe testEvent
@@ -86,13 +81,13 @@ class PatchEventTest :
         }
         test("Event.patch() updates eventGroupId") {
             val e = 4.toEventGroupId()
-            val update = EventUpdate(eventGroupId = Zeroable(e))
+            val update = EventUpdate(eventGroupId = PatchField.Value(e))
             val new = testEvent.patch(update)
             new shouldNotBe testEvent
             new.eventGroupId shouldBe e
         }
         test("Event.patch() NULLIFIES eventGroupId") {
-            val update = EventUpdate(eventGroupId = Zeroable(null))
+            val update = EventUpdate(eventGroupId = PatchField.Value(null))
             val new = testEvent.patch(update)
             new shouldNotBe testEvent
             new.eventGroupId shouldBe null
@@ -119,7 +114,7 @@ class PatchEventTest :
         }
 
         test("patchEvent() updates name field") {
-            val name = "ABCDEFG"
+            val name = "ABCDEFG".toEventName()
             val update = EventUpdate(name = name)
             val patched = testEvent.patch(update)
             every { eventRepo.getByName(name) } returns null
@@ -189,12 +184,12 @@ class PatchEventTest :
         }
 
         test("patchEvent() cannot invalidate start and end dates.") {
-            shouldThrow<IllegalArgumentException> {
+            shouldThrow<IllegalStateException> {
                 service.patchEvent(
                     testEvent.id,
                     EventUpdate(
-                        endDate = testEvent.startDate,
                         startDate = testEvent.endDate,
+                        endDate = testEvent.startDate,
                     ),
                 )
             }
@@ -202,11 +197,8 @@ class PatchEventTest :
 
         test("patchEvent() throws exception when name is taken") {
             every { eventRepo.getByName(testEvent.name) } returns testEvent
-            shouldThrow<IllegalArgumentException> {
+            shouldThrow<IllegalStateException> {
                 service.patchEvent(testEvent.id, EventUpdate(name = testEvent.name))
             }
         }
     })
-
-
- */

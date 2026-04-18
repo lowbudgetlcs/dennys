@@ -78,8 +78,12 @@ class PlayerService(
         return playerRepository.getById(playerId) ?: throw NoSuchElementException("Player not found.")
     }
 
+    /**
+     * @param name The PlayerName to check.
+     * @return True if the name is taken, false otherwise.
+     */
     fun isNameTaken(name: PlayerName): Boolean {
         logger.debug("Checking if name '$name' is taken...")
-        return playerRepository.getAll().any { it.name == name }
+        return playerRepository.getByName(name) != null
     }
 }

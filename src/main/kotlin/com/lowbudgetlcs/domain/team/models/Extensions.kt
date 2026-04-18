@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.team.models
 
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamName
@@ -34,3 +35,10 @@ fun Team.patch(update: TeamUpdate): Team =
                 is PatchField.Value -> update.eventId.value
             },
     )
+
+fun NewTeam.toTeam(id: TeamId, eventId: EventId?): Team = Team(
+    id = id,
+    name = name,
+    logo = logo,
+    eventId = eventId
+)
