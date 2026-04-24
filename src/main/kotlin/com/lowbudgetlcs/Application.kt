@@ -28,9 +28,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.UUID
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+
+private val SESSION_CLEANUP_DELAY = 360.seconds
 
 fun main(args: Array<String>) =
     io.ktor.server.netty.EngineMain
@@ -42,7 +44,7 @@ fun Application.startSessionCleanup() =
         val authService by inject<IAuthService>()
         repeat(Int.MAX_VALUE) {
             authService.cleanupExpiredSessions()
-            delay(60000.milliseconds)
+            delay(SESSION_CLEANUP_DELAY)
         }
     }
 
