@@ -29,15 +29,15 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.eventRoutesV1(
-    eventService: IEventService,
-    seriesService: ISeriesService,
-) {
+fun Route.eventRoutesV1() {
+    val eventService by inject<IEventService>()
+    val seriesService by inject<ISeriesService>()
     route("/event") {
         get<EventResources> { route ->
             val filter =

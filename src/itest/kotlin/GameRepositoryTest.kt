@@ -6,6 +6,8 @@ import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.series.game.models.Game
+import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
@@ -21,6 +23,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
@@ -50,6 +53,7 @@ class GameRepositoryTest :
         lateinit var team2: Team
         lateinit var series: Series
         lateinit var newGame: NewGame
+        lateinit var createdGame: Game
 
         beforeSpec {
             val e = EventRepository(dsl)
@@ -102,6 +106,7 @@ class GameRepositoryTest :
             game.shouldNotBeNull()
             game.number shouldBe 1
             game.shortcode shouldBe shortcode
+            createdGame = game
         }
 
         "Inserting game succeeds and number = 2" {
@@ -126,5 +131,22 @@ class GameRepositoryTest :
             shouldThrow<IntegrityConstraintViolationException> {
                 repo.insert(newGame, shortcode = "ABCD".toShortcode())
             }
+        }
+
+        "Insert game result succeeds." {
+            val game = repo.getById(createdGame.id)
+            game.shouldNotBeNull()
+            val result =
+                GameResult(
+                    gameId = game.id,
+                    winningTeamId = team1.id,
+                    losingTeamId = team2.id,
+                )
+            val g = repo.insertGameResult(result)
+            g.shouldNotBeNull()
+            g.shouldBeEqualToIgnoringFields(game, Game::result)
+            g.result.shouldNotBeNull()
+            g.result!!.winningTeamId shouldBe team1.id
+            g.result!!.losingTeamId shouldBe team2.id
         }
     })

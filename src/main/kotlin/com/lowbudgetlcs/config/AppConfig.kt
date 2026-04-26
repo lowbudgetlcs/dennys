@@ -32,5 +32,5 @@ data class CorsConfig(
 )
 
 data class LoggingConfig(
-    val cid: String
+    val cid: String,
 )

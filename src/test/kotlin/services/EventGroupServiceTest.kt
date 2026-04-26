@@ -110,7 +110,7 @@ class EventGroupServiceTest :
             every {
                 eventRepo.update(
                     expectedEvent1,
-                    EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id))
+                    EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id)),
                 )
             } returns
                 expectedEvent1.copy(
@@ -119,7 +119,7 @@ class EventGroupServiceTest :
             every {
                 eventRepo.update(
                     expectedEvent2,
-                    EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id))
+                    EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id)),
                 )
             } returns
                 expectedEvent2.copy(

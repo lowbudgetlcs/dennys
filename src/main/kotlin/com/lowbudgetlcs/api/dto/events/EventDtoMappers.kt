@@ -2,7 +2,14 @@ package com.lowbudgetlcs.api.dto.events
 
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.teams.toDto
-import com.lowbudgetlcs.domain.event.models.*
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventQuery
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.EventWithSeries
+import com.lowbudgetlcs.domain.event.models.EventWithTeams
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 

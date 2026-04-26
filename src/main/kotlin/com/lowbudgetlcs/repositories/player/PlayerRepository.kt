@@ -17,7 +17,8 @@ class PlayerRepository(
     override fun getAll(): List<Player> = selectPlayers().fetch().mapNotNull(::rowToPlayer)
 
     override fun getById(id: PlayerId): Player? = selectPlayers().where(PLAYERS.ID.eq(id.value)).fetchOne(::rowToPlayer)
-    override fun getByName(playerName: PlayerName): Player? = selectPlayers().where(PLAYERS.NAME.eq(playerName.value)).fetchOne(::rowToPlayer)
+    override fun getByName(playerName: PlayerName): Player? =
+        selectPlayers().where(PLAYERS.NAME.eq(playerName.value)).fetchOne(::rowToPlayer)
 
     override fun getByTeamId(teamId: TeamId): List<Player> =
         dsl

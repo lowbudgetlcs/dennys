@@ -20,7 +20,8 @@ class Argon2Hasher : IHasher {
         }
 
 
-    override suspend fun hash(input: String): String = argon2.hash(iterations.await(), HASH_MAX_MEMORY, HASH_PARALLELISM, input.byteify())
+    override suspend fun hash(input: String): String =
+        argon2.hash(iterations.await(), HASH_MAX_MEMORY, HASH_PARALLELISM, input.byteify())
 
     override suspend fun verify(
         input: String,

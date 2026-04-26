@@ -10,8 +10,11 @@ data class EventName(
 
     init {
         require(value.isNotEmpty()) { "Event name cannot be empty." }
-        require(value.length <= EVENT_NAME_MAX_LENGTH) { "Event name must not exceed $EVENT_NAME_MAX_LENGTH characters." }
-        require(value.length >= EVENT_NAME_MIN_LENGTH) { "Event name must be at least $EVENT_NAME_MAX_LENGTH characters." }
+        require(
+            value.length <= EVENT_NAME_MAX_LENGTH,
+        ) { "Event name must not exceed $EVENT_NAME_MAX_LENGTH characters." }
+        require(
+            value.length >= EVENT_NAME_MIN_LENGTH,
+        ) { "Event name must be at least $EVENT_NAME_MAX_LENGTH characters." }
     }
-
 }

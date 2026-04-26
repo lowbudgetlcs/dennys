@@ -9,7 +9,11 @@ value class EventGroupName(
 ) {
     init {
         require(!value.isBlank()) { "Event group name cannot be blank." }
-        require(value.length <= EVENT_GROUP_NAME_MAX_LENGTH) { "Event group name cannot exceed $EVENT_GROUP_NAME_MAX_LENGTH characters." }
-        require(value.length >= EVENT_GROUP_NAME_MIN_LENGTH) { "Event group name must be at least $EVENT_GROUP_NAME_MAX_LENGTH characters." }
+        require(value.length <= EVENT_GROUP_NAME_MAX_LENGTH) {
+            "Event group name cannot exceed $EVENT_GROUP_NAME_MAX_LENGTH characters."
+        }
+        require(value.length >= EVENT_GROUP_NAME_MIN_LENGTH) {
+            "Event group name must be at least $EVENT_GROUP_NAME_MAX_LENGTH characters."
+        }
     }
 }

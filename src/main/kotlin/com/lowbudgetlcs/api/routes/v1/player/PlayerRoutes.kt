@@ -19,12 +19,14 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.playerRoutesV1(playerService: IPlayerService) {
+fun Route.playerRoutesV1() {
+    val playerService by inject<IPlayerService>()
     route("/player") {
         get<PlayerResources> {
             val players = playerService.getAllPlayers()

@@ -6,6 +6,8 @@ import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
@@ -13,10 +15,11 @@ import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
@@ -26,7 +29,7 @@ import org.testcontainers.utility.MountableFile
 import java.time.Instant
 
 class SeriesRepositoryTest :
-    FunSpec({
+    StringSpec({
         val postgres =
             PostgreSQLContainer("postgres:15-alpine").apply {
                 withCopyFileToContainer(
@@ -44,6 +47,7 @@ class SeriesRepositoryTest :
         lateinit var team1: Team
         lateinit var team2: Team
         lateinit var newSeries: NewSeries
+        lateinit var createdSeries: Series
 
         beforeSpec {
             val e = EventRepository(dsl)
@@ -78,18 +82,36 @@ class SeriesRepositoryTest :
                 )
         }
 
-        test("insert and fetch series by id") {
+        "insert and fetch series by id" {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
 
             val fetched = repo.getById(created.id)
             fetched shouldBe created
+            createdSeries = created
         }
 
-        test("get all series by eventId, series have teamIds in output") {
+        "get all series by eventId, series have teamIds in output" {
             repeat(4) { repo.insert(newSeries) }
             val series = repo.getAllByEventId(event.id)
             series.shouldNotBeEmpty()
             series.shouldHaveSize(5)
+        }
+
+        "insert series result" {
+            val series = repo.getById(createdSeries.id)
+            series.shouldNotBeNull()
+            val result =
+                SeriesResult(
+                    seriesId = series.id,
+                    winningTeamId = team1.id,
+                    losingTeamId = team2.id,
+                )
+            val s = repo.insertSeriesResult(result)
+            s.shouldNotBeNull()
+            s.shouldBeEqualToIgnoringFields(series, Series::result)
+            s.result.shouldNotBeNull()
+            s.result!!.winningTeamId shouldBe team1.id
+            s.result!!.losingTeamId shouldBe team2.id
         }
     })

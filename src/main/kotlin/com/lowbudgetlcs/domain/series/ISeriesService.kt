@@ -2,10 +2,9 @@ package com.lowbudgetlcs.domain.series
 
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.series.game.models.Game
-import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
@@ -66,9 +65,16 @@ interface ISeriesService {
     fun removeSeries(id: SeriesId)
 
     /**
-     * Create a game inside of a series.
+     * Process a series result.
      *
-     * @param NewGame the new game parameters.
+     * @param SeriesResult the series result to be processed.
      */
-    suspend fun createGame(newGame: NewGame): Game
+    fun completeSeries(result: SeriesResult): Series
+
+    /**
+     * Returns true if a series is completed, false otherwise.
+     *
+     * @param SeriesId the series to check.
+     */
+    fun isSeriesCompleted(seriesId: SeriesId): Boolean
 }

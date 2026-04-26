@@ -4,7 +4,12 @@ import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.models.*
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.models.TeamUpdate
+import com.lowbudgetlcs.domain.team.models.patch
+import com.lowbudgetlcs.domain.team.models.toTeamId
+import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 import org.jooq.DSLContext

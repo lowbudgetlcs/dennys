@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PatchTeamDto(
     val name: String? = null,
-    val logo: String? = UNSET_PATCH_FIELD
+    val logo: String? = UNSET_PATCH_FIELD,
 )

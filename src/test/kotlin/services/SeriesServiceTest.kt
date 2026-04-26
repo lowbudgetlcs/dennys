@@ -37,8 +37,7 @@ class SeriesServiceTest :
         val eventRepo = mockk<IEventRepository>(relaxed = false)
         val teamRepo = mockk<ITeamRepository>(relaxed = false)
         val seriesRepo = mockk<ISeriesRepository>(relaxed = false)
-        val tournamentGateway = mockk<IRiotTournamentGateway>(relaxed = false)
-        val service = SeriesService(gameRepo, seriesRepo, eventRepo, teamRepo, tournamentGateway)
+        val service = SeriesService(gameRepo, seriesRepo, eventRepo, teamRepo)
 
         beforeTest { clearAllMocks() }
 

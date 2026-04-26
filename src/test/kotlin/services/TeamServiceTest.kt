@@ -1,7 +1,7 @@
 package services
 
-import com.lowbudgetlcs.domain.team.TeamService
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.team.TeamService
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
@@ -90,7 +90,7 @@ class TeamServiceTest :
             val updated = original.copy(name = newName)
 
             every { teamRepo.getById(id) } returns original
-            every { teamRepo.getByName(newName)} returns listOf()
+            every { teamRepo.getByName(newName) } returns listOf()
             every { teamRepo.update(any(), any()) } returns updated
 
             service.patchTeam(id, TeamUpdate(name = "New".toTeamName())) shouldBe updated

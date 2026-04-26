@@ -36,9 +36,13 @@ fun Team.patch(update: TeamUpdate): Team =
             },
     )
 
-fun NewTeam.toTeam(id: TeamId, eventId: EventId?): Team = Team(
-    id = id,
-    name = name,
-    logo = logo,
-    eventId = eventId
-)
+fun NewTeam.toTeam(
+    id: TeamId,
+    eventId: EventId?,
+): Team =
+    Team(
+        id = id,
+        name = name,
+        logo = logo,
+        eventId = eventId,
+    )

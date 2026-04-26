@@ -19,12 +19,14 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.eventGroupRoutesV1(eventGroupService: IEventGroupService) {
+fun Route.eventGroupRoutesV1() {
+    val eventGroupService by inject<IEventGroupService>()
     route("/eventGroup") {
         get<EventGroupResources> {
             val groups = eventGroupService.getAllEventGroups()

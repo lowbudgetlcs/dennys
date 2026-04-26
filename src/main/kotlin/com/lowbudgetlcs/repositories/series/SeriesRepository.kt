@@ -27,6 +27,21 @@ class SeriesRepository(
     override fun getAllByEventId(id: EventId): List<Series> =
         selectSeries().where(SERIES.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToSeries)
 
+    override fun insertSeriesResult(seriesResult: SeriesResult): Series? {
+        val insertedId =
+            dsl
+                .insertInto(
+                    SERIES_RESULTS,
+                ).set(SERIES_RESULTS.SERIES_ID, seriesResult.seriesId.value)
+                .set(SERIES_RESULTS.WINNER_TEAM_ID, seriesResult.winningTeamId.value)
+                .set(SERIES_RESULTS.LOSER_TEAM_ID, seriesResult.losingTeamId.value)
+                .returning(SERIES_RESULTS.SERIES_ID)
+                .fetchOne()
+                ?.get(SERIES_RESULTS.SERIES_ID)
+
+        return insertedId?.toSeriesId()?.let(::getById)
+    }
+
     override fun insert(newSeries: NewSeries): Series? {
         val id =
             dsl.transactionResult { t ->
@@ -101,7 +116,7 @@ class SeriesRepository(
                 eventStage = eventStage,
                 totalGames = totalGames,
                 participants = participants,
-                result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,
+                result = if (winner != null && loser != null) SeriesResult(seriesId, winner, loser) else null,
             )
         return s
     }
