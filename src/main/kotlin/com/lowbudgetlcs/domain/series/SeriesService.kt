@@ -92,10 +92,13 @@ class SeriesService(
         val series =
             seriesRepo.getById(result.seriesId)
                 ?: throw NoSuchElementException("Series with id ${result.seriesId.value} not found.")
+        logger.debug(series.toString())
         require(
             Pair(result.winningTeamId, result.losingTeamId).equalsIgnoreOrder(series.participants),
         ) { "Invalid team ids passed with series ${result.seriesId.value}." }
-        return seriesRepo.insertSeriesResult(result) ?: throw DatabaseException("Failed to complete series.")
+        return if (series.result == null)
+            seriesRepo.insertResult(result) ?: throw DatabaseException("Failed to complete series.")
+        else seriesRepo.overwriteResult(result) ?: throw DatabaseException("Failed to complete series.")
     }
 
     override fun isSeriesCompleted(seriesId: SeriesId): Boolean {

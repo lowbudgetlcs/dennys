@@ -1,0 +1,19 @@
+package com.lowbudgetlcs.api.routes.v1.event.dto
+
+import com.lowbudgetlcs.domain.event.models.types.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import java.time.Instant
+
+@Serializable
+data class CreateEventDto(
+    val name: String,
+    val description: String,
+    @Contextual
+    val startDate: Instant,
+    @Contextual
+    val endDate: Instant,
+    val status: EventStatus,
+    val eventStages: Set<EventStage>,
+)

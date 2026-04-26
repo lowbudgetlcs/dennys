@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.api.dto.Error
+import com.lowbudgetlcs.api.routes.Error
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException

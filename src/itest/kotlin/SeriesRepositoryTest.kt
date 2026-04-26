@@ -107,11 +107,28 @@ class SeriesRepositoryTest :
                     winningTeamId = team1.id,
                     losingTeamId = team2.id,
                 )
-            val s = repo.insertSeriesResult(result)
+            val s = repo.insertResult(result)
             s.shouldNotBeNull()
             s.shouldBeEqualToIgnoringFields(series, Series::result)
             s.result.shouldNotBeNull()
             s.result!!.winningTeamId shouldBe team1.id
             s.result!!.losingTeamId shouldBe team2.id
+        }
+
+        "overwrite series result" {
+            val series = repo.getById(createdSeries.id)
+            series.shouldNotBeNull()
+            val result =
+                SeriesResult(
+                    seriesId = series.id,
+                    winningTeamId = team2.id,
+                    losingTeamId = team1.id,
+                )
+            val s = repo.overwriteResult(result)
+            s.shouldNotBeNull()
+            s.shouldBeEqualToIgnoringFields(series, Series::result)
+            s.result.shouldNotBeNull()
+            s.result!!.winningTeamId shouldBe team2.id
+            s.result!!.losingTeamId shouldBe team1.id
         }
     })

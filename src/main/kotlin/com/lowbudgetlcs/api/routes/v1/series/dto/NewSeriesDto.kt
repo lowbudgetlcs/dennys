@@ -1,0 +1,11 @@
+package com.lowbudgetlcs.api.routes.v1.series.dto
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class NewSeriesDto(
+    val team1Id: Int,
+    val team2Id: Int,
+    val totalGames: Int,
+    val stage: String,
+)

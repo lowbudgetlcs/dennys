@@ -4,8 +4,10 @@ import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.types.GameId
 
 interface IGameService {
+    fun getById(id: GameId): Game
     fun getByShortcode(shortcode: Shortcode): Game
 
     /**

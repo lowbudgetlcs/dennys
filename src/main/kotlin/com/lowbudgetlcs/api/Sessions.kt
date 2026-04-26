@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.api.dto.auth.UserSession
+import com.lowbudgetlcs.api.routes.auth.dto.UserSession
 import com.lowbudgetlcs.config.CookieConfig
 import io.ktor.server.application.Application
 import io.ktor.server.application.install

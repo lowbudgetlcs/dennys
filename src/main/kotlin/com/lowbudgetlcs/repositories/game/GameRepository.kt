@@ -43,13 +43,27 @@ class GameRepository(
         return insertedId?.toGameId()?.let(::getById)
     }
 
-    override fun insertGameResult(gameResult: GameResult): Game? {
+    override fun insertResult(gameResult: GameResult): Game? {
         val insertedId =
             dsl
                 .insertInto(GAME_RESULTS)
                 .set(GAME_RESULTS.GAME_ID, gameResult.gameId.value)
                 .set(GAME_RESULTS.WINNER_TEAM_ID, gameResult.winningTeamId.value)
                 .set(GAME_RESULTS.LOSER_TEAM_ID, gameResult.losingTeamId.value)
+                .returning(GAME_RESULTS.GAME_ID)
+                .fetchOne()
+                ?.get(GAME_RESULTS.GAME_ID)
+        return insertedId?.toGameId()?.let(::getById)
+    }
+
+    override fun overwriteResult(gameResult: GameResult): Game? {
+        val insertedId =
+            dsl
+                .update(GAME_RESULTS)
+                .set(GAME_RESULTS.GAME_ID, gameResult.gameId.value)
+                .set(GAME_RESULTS.WINNER_TEAM_ID, gameResult.winningTeamId.value)
+                .set(GAME_RESULTS.LOSER_TEAM_ID, gameResult.losingTeamId.value)
+                .where(GAME_RESULTS.GAME_ID.eq(gameResult.gameId.value))
                 .returning(GAME_RESULTS.GAME_ID)
                 .fetchOne()
                 ?.get(GAME_RESULTS.GAME_ID)

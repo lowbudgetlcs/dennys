@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
-import com.lowbudgetlcs.api.dto.teams.NewTeamDto
-import com.lowbudgetlcs.api.dto.teams.PatchTeamDto
-import com.lowbudgetlcs.api.dto.teams.toDto
-import com.lowbudgetlcs.api.dto.teams.toNewTeam
-import com.lowbudgetlcs.api.dto.teams.toTeamUpdate
+import com.lowbudgetlcs.api.routes.v1.team.dto.NewTeamDto
+import com.lowbudgetlcs.api.routes.v1.team.dto.PatchTeamDto
+import com.lowbudgetlcs.api.routes.v1.team.dto.toDto
+import com.lowbudgetlcs.api.routes.v1.team.dto.toNewTeam
+import com.lowbudgetlcs.api.routes.v1.team.dto.toTeamUpdate
 import com.lowbudgetlcs.domain.team.ITeamService
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode

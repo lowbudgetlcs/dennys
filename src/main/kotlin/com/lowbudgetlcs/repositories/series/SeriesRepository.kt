@@ -27,47 +27,45 @@ class SeriesRepository(
     override fun getAllByEventId(id: EventId): List<Series> =
         selectSeries().where(SERIES.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToSeries)
 
-    override fun insertSeriesResult(seriesResult: SeriesResult): Series? {
-        val insertedId =
-            dsl
-                .insertInto(
-                    SERIES_RESULTS,
-                ).set(SERIES_RESULTS.SERIES_ID, seriesResult.seriesId.value)
-                .set(SERIES_RESULTS.WINNER_TEAM_ID, seriesResult.winningTeamId.value)
-                .set(SERIES_RESULTS.LOSER_TEAM_ID, seriesResult.losingTeamId.value)
-                .returning(SERIES_RESULTS.SERIES_ID)
-                .fetchOne()
-                ?.get(SERIES_RESULTS.SERIES_ID)
+    override fun insertResult(seriesResult: SeriesResult): Series? {
+        val insertedId = dsl.insertInto(
+                SERIES_RESULTS,
+            ).set(SERIES_RESULTS.SERIES_ID, seriesResult.seriesId.value)
+            .set(SERIES_RESULTS.WINNER_TEAM_ID, seriesResult.winningTeamId.value)
+            .set(SERIES_RESULTS.LOSER_TEAM_ID, seriesResult.losingTeamId.value).returning(SERIES_RESULTS.SERIES_ID)
+            .fetchOne()?.get(SERIES_RESULTS.SERIES_ID)
+
+        return insertedId?.toSeriesId()?.let(::getById)
+    }
+
+    override fun overwriteResult(seriesResult: SeriesResult): Series? {
+        val insertedId = dsl.update(
+                SERIES_RESULTS,
+            ).set(SERIES_RESULTS.SERIES_ID, seriesResult.seriesId.value)
+            .set(SERIES_RESULTS.WINNER_TEAM_ID, seriesResult.winningTeamId.value)
+            .set(SERIES_RESULTS.LOSER_TEAM_ID, seriesResult.losingTeamId.value)
+            .where(SERIES_RESULTS.SERIES_ID.eq(seriesResult.seriesId.value)).returning(SERIES_RESULTS.SERIES_ID)
+            .fetchOne()?.get(SERIES_RESULTS.SERIES_ID)
 
         return insertedId?.toSeriesId()?.let(::getById)
     }
 
     override fun insert(newSeries: NewSeries): Series? {
-        val id =
-            dsl.transactionResult { t ->
-                val tx = t.dsl()
-                val insertedId =
-                    tx
-                        .insertInto(
-                            SERIES,
-                        ).set(SERIES.EVENT_ID, newSeries.eventId.value)
-                        .set(SERIES.TOTAL_GAMES, newSeries.totalGames)
-                        .set(SERIES.STAGE, newSeries.eventStage.name)
-                        .returning(SERIES.ID)
-                        .fetchOne()
-                        ?.get(SERIES.ID)
+        val id = dsl.transactionResult { t ->
+            val tx = t.dsl()
+            val insertedId = tx.insertInto(
+                    SERIES,
+                ).set(SERIES.EVENT_ID, newSeries.eventId.value).set(SERIES.TOTAL_GAMES, newSeries.totalGames)
+                .set(SERIES.STAGE, newSeries.eventStage.name).returning(SERIES.ID).fetchOne()?.get(SERIES.ID)
 
-                val insertChild = { id: TeamId ->
-                    tx
-                        .insertInto(TEAM_TO_SERIES)
-                        .set(TEAM_TO_SERIES.SERIES_ID, insertedId)
-                        .set(TEAM_TO_SERIES.TEAM_ID, id.value)
-                        .execute()
-                }
-                insertChild(newSeries.participantIds.first)
-                insertChild(newSeries.participantIds.second)
-                insertedId
+            val insertChild = { id: TeamId ->
+                tx.insertInto(TEAM_TO_SERIES).set(TEAM_TO_SERIES.SERIES_ID, insertedId)
+                    .set(TEAM_TO_SERIES.TEAM_ID, id.value).execute()
             }
+            insertChild(newSeries.participantIds.first)
+            insertChild(newSeries.participantIds.second)
+            insertedId
+        }
         return id?.toSeriesId()?.let(::getById)
     }
 
@@ -83,19 +81,15 @@ class SeriesRepository(
         ).`as`("participants")
     }
 
-    private fun selectSeries() =
-        dsl
-            .select(
-                SERIES.ID,
-                SERIES.TOTAL_GAMES,
-                SERIES.EVENT_ID,
-                SERIES.STAGE,
-                participants,
-                SERIES_RESULTS.WINNER_TEAM_ID,
-                SERIES_RESULTS.LOSER_TEAM_ID,
-            ).from(SERIES)
-            .leftJoin(SERIES_RESULTS)
-            .on(SERIES.ID.eq(SERIES_RESULTS.SERIES_ID))
+    private fun selectSeries() = dsl.select(
+            SERIES.ID,
+            SERIES.TOTAL_GAMES,
+            SERIES.EVENT_ID,
+            SERIES.STAGE,
+            participants,
+            SERIES_RESULTS.WINNER_TEAM_ID,
+            SERIES_RESULTS.LOSER_TEAM_ID,
+        ).from(SERIES).leftJoin(SERIES_RESULTS).on(SERIES.ID.eq(SERIES_RESULTS.SERIES_ID))
 
     private fun rowToSeries(row: Record): Series? {
         // NOT NULL data
@@ -109,15 +103,14 @@ class SeriesRepository(
         val winner = row[SERIES_RESULTS.WINNER_TEAM_ID]?.toTeamId()
         val loser = row[SERIES_RESULTS.LOSER_TEAM_ID]?.toTeamId()
 
-        val s =
-            Series(
-                id = seriesId,
-                eventId = eventId,
-                eventStage = eventStage,
-                totalGames = totalGames,
-                participants = participants,
-                result = if (winner != null && loser != null) SeriesResult(seriesId, winner, loser) else null,
-            )
+        val s = Series(
+            id = seriesId,
+            eventId = eventId,
+            eventStage = eventStage,
+            totalGames = totalGames,
+            participants = participants,
+            result = if (winner != null && loser != null) SeriesResult(seriesId, winner, loser) else null,
+        )
         return s
     }
 }

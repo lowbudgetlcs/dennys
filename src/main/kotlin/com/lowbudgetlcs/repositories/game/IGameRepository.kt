@@ -19,5 +19,6 @@ interface IGameRepository {
         shortcode: Shortcode,
     ): Game?
 
-    fun insertGameResult(gameResult: GameResult): Game?
+    fun insertResult(gameResult: GameResult): Game?
+    fun overwriteResult(gameResult: GameResult): Game?
 }

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.routes.apiRoutes
-import com.lowbudgetlcs.api.routes.authRoutes
+import com.lowbudgetlcs.api.routes.auth.authRoutes
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.http.content.singlePageApplication

@@ -142,11 +142,28 @@ class GameRepositoryTest :
                     winningTeamId = team1.id,
                     losingTeamId = team2.id,
                 )
-            val g = repo.insertGameResult(result)
+            val g = repo.insertResult(result)
             g.shouldNotBeNull()
             g.shouldBeEqualToIgnoringFields(game, Game::result)
             g.result.shouldNotBeNull()
             g.result!!.winningTeamId shouldBe team1.id
             g.result!!.losingTeamId shouldBe team2.id
+        }
+
+        "Insert game result overwrites without failing." {
+            val game = repo.getById(createdGame.id)
+            game.shouldNotBeNull()
+            val result =
+                GameResult(
+                    gameId = game.id,
+                    winningTeamId = team2.id,
+                    losingTeamId = team1.id,
+                )
+            val g = repo.overwriteResult(result)
+            g.shouldNotBeNull()
+            g.shouldBeEqualToIgnoringFields(game, Game::result)
+            g.result.shouldNotBeNull()
+            g.result!!.winningTeamId shouldBe team2.id
+            g.result!!.losingTeamId shouldBe team1.id
         }
     })

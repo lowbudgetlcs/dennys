@@ -1,19 +1,19 @@
 package com.lowbudgetlcs.api.routes.v1.event
 
-import com.lowbudgetlcs.api.dto.events.CreateEventDto
-import com.lowbudgetlcs.api.dto.events.EventFilterParams
-import com.lowbudgetlcs.api.dto.events.EventTeamLinkDto
-import com.lowbudgetlcs.api.dto.events.PatchEventDto
-import com.lowbudgetlcs.api.dto.events.toDto
-import com.lowbudgetlcs.api.dto.events.toEventUpdate
-import com.lowbudgetlcs.api.dto.events.toNewEvent
-import com.lowbudgetlcs.api.dto.events.toQuery
-import com.lowbudgetlcs.api.dto.events.toTeamId
-import com.lowbudgetlcs.api.dto.series.NewSeriesDto
-import com.lowbudgetlcs.api.dto.series.SeriesFilterParams
-import com.lowbudgetlcs.api.dto.series.toDto
-import com.lowbudgetlcs.api.dto.series.toNewSeries
-import com.lowbudgetlcs.api.dto.series.toQuery
+import com.lowbudgetlcs.api.routes.v1.event.dto.CreateEventDto
+import com.lowbudgetlcs.api.routes.v1.event.dto.EventFilterParams
+import com.lowbudgetlcs.api.routes.v1.event.dto.EventTeamLinkDto
+import com.lowbudgetlcs.api.routes.v1.event.dto.PatchEventDto
+import com.lowbudgetlcs.api.routes.v1.event.dto.toDto
+import com.lowbudgetlcs.api.routes.v1.event.dto.toEventUpdate
+import com.lowbudgetlcs.api.routes.v1.event.dto.toNewEvent
+import com.lowbudgetlcs.api.routes.v1.event.dto.toQuery
+import com.lowbudgetlcs.api.routes.v1.event.dto.toTeamId
+import com.lowbudgetlcs.api.routes.v1.series.dto.NewSeriesDto
+import com.lowbudgetlcs.api.routes.v1.series.dto.SeriesFilterParams
+import com.lowbudgetlcs.api.routes.v1.series.dto.toDto
+import com.lowbudgetlcs.api.routes.v1.series.dto.toNewSeries
+import com.lowbudgetlcs.api.routes.v1.series.dto.toQuery
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.series.ISeriesService
@@ -35,7 +35,8 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.eventRoutesV1() {
+fun Route.eventRoutesV1(
+) {
     val eventService by inject<IEventService>()
     val seriesService by inject<ISeriesService>()
     route("/event") {

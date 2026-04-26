@@ -13,7 +13,8 @@ interface ISeriesRepository {
 
     fun getAllByEventId(id: EventId): List<Series>
 
-    fun insertSeriesResult(seriesResult: SeriesResult): Series?
+    fun insertResult(seriesResult: SeriesResult): Series?
+    fun overwriteResult(seriesResult: SeriesResult): Series?
 
     fun delete(id: SeriesId)
 }

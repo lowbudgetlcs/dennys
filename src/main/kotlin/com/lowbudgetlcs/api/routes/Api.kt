@@ -4,6 +4,7 @@ import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
+import com.lowbudgetlcs.api.routes.v1.series.game.gameRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
 import io.ktor.server.auth.authenticate
@@ -19,6 +20,7 @@ fun Route.apiRoutes() {
             playerRoutesV1()
             accountRoutesV1()
             seriesRoutesV1()
+            gameRoutesV1()
             eventGroupRoutesV1()
         }
     }

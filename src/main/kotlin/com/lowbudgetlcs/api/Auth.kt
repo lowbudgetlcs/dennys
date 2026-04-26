@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.api.dto.auth.UserPrincipal
-import com.lowbudgetlcs.api.dto.auth.UserSession
-import com.lowbudgetlcs.api.dto.auth.toSession
+import com.lowbudgetlcs.api.routes.auth.dto.UserPrincipal
+import com.lowbudgetlcs.api.routes.auth.dto.UserSession
+import com.lowbudgetlcs.api.routes.auth.dto.toSession
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.domain.auth.models.toMasked

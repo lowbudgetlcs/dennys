@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.api.routes.v1.player
 
-import com.lowbudgetlcs.api.dto.players.AccountLinkRequestDto
-import com.lowbudgetlcs.api.dto.players.NewPlayerDto
-import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
-import com.lowbudgetlcs.api.dto.players.toDto
-import com.lowbudgetlcs.api.dto.players.toNewPlayer
+import com.lowbudgetlcs.api.routes.v1.player.dto.AccountLinkRequestDto
+import com.lowbudgetlcs.api.routes.v1.player.dto.NewPlayerDto
+import com.lowbudgetlcs.api.routes.v1.player.dto.PatchPlayerDto
+import com.lowbudgetlcs.api.routes.v1.player.dto.toDto
+import com.lowbudgetlcs.api.routes.v1.player.dto.toNewPlayer
 import com.lowbudgetlcs.domain.account.models.toAccountId
 import com.lowbudgetlcs.domain.player.IPlayerService
 import com.lowbudgetlcs.domain.player.models.toPlayerId

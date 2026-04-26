@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.api.routes.v1.event.group
 
-import com.lowbudgetlcs.api.dto.events.groups.CreateEventGroupDto
-import com.lowbudgetlcs.api.dto.events.groups.EventGroupAddEventDto
-import com.lowbudgetlcs.api.dto.events.groups.PatchEventGroupDto
-import com.lowbudgetlcs.api.dto.events.groups.toDto
-import com.lowbudgetlcs.api.dto.events.groups.toEventGroupUpdate
-import com.lowbudgetlcs.api.dto.events.groups.toNewEventGroup
+import com.lowbudgetlcs.api.routes.v1.event.group.dto.CreateEventGroupDto
+import com.lowbudgetlcs.api.routes.v1.event.group.dto.EventGroupAddEventDto
+import com.lowbudgetlcs.api.routes.v1.event.group.dto.PatchEventGroupDto
+import com.lowbudgetlcs.api.routes.v1.event.group.dto.toDto
+import com.lowbudgetlcs.api.routes.v1.event.group.dto.toEventGroupUpdate
+import com.lowbudgetlcs.api.routes.v1.event.group.dto.toNewEventGroup
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
