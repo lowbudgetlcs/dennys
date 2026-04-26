@@ -6,8 +6,6 @@ import com.lowbudgetlcs.api.dto.events.groups.PatchEventGroupDto
 import com.lowbudgetlcs.api.dto.events.groups.toDto
 import com.lowbudgetlcs.api.dto.events.groups.toEventGroupUpdate
 import com.lowbudgetlcs.api.dto.events.groups.toNewEventGroup
-import com.lowbudgetlcs.api.logCall
-import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
@@ -29,61 +27,40 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.eventGroupRoutesV1(eventGroupService: IEventGroupService) {
     route("/eventGroup") {
         get<EventGroupResources> {
-            call.setCidContext {
-                logCall(call)
-                val groups = eventGroupService.getAllEventGroups()
-                call.respond(groups.map { it.toDto() })
-            }
+            val groups = eventGroupService.getAllEventGroups()
+            call.respond(groups.map { it.toDto() })
         }
         post<EventGroupResources> {
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<CreateEventGroupDto>()
-                logger.debug(dto.toString())
-                val created = eventGroupService.createEventGroup(dto.toNewEventGroup())
-                call.respond(HttpStatusCode.Created, created.toDto())
-            }
+            val dto = call.receive<CreateEventGroupDto>()
+            logger.debug(dto.toString())
+            val created = eventGroupService.createEventGroup(dto.toNewEventGroup())
+            call.respond(HttpStatusCode.Created, created.toDto())
         }
         get<EventGroupResources.ById> { route ->
-            call.setCidContext {
-                logCall(call)
-                val event = eventGroupService.getEventGroup(route.eventGroupId.toEventGroupId())
-                call.respond(event.toDto())
-            }
+            val event = eventGroupService.getEventGroup(route.eventGroupId.toEventGroupId())
+            call.respond(event.toDto())
         }
         patch<EventGroupResources.ById> { route ->
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<PatchEventGroupDto>()
-                logger.debug("\uD83C\uDF81 Body: {}", dto)
-                val updated =
-                    eventGroupService.patchEventGroup(route.eventGroupId.toEventGroupId(), dto.toEventGroupUpdate())
-                call.respond(updated.toDto())
-            }
+            val dto = call.receive<PatchEventGroupDto>()
+            logger.debug("\uD83C\uDF81 Body: {}", dto)
+            val updated =
+                eventGroupService.patchEventGroup(route.eventGroupId.toEventGroupId(), dto.toEventGroupUpdate())
+            call.respond(updated.toDto())
         }
         get<EventGroupResources.ByIdEvents> { route ->
-            call.setCidContext {
-                logCall(call)
-                val groups = eventGroupService.getEventGroupWithEvents(route.eventGroupId.toEventGroupId())
-                call.respond(groups.toDto())
-            }
+            val groups = eventGroupService.getEventGroupWithEvents(route.eventGroupId.toEventGroupId())
+            call.respond(groups.toDto())
         }
         post<EventGroupResources.ByIdEvents> { route ->
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<EventGroupAddEventDto>()
-                logger.debug(dto.toString())
-                val event = eventGroupService.addEvent(route.eventGroupId.toEventGroupId(), dto.eventId.toEventId())
-                call.respond(event.toDto())
-            }
+            val dto = call.receive<EventGroupAddEventDto>()
+            logger.debug(dto.toString())
+            val event = eventGroupService.addEvent(route.eventGroupId.toEventGroupId(), dto.eventId.toEventId())
+            call.respond(event.toDto())
         }
         delete<EventGroupResources.ByIdEventId> { route ->
-            call.setCidContext {
-                logCall(call)
-                val event =
-                    eventGroupService.removeEvent(route.eventGroupId.toEventGroupId(), route.eventId.toEventId())
-                call.respond(event.toDto())
-            }
+            val event =
+                eventGroupService.removeEvent(route.eventGroupId.toEventGroupId(), route.eventId.toEventId())
+            call.respond(event.toDto())
         }
     }
 }

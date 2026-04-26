@@ -3,8 +3,6 @@ package com.lowbudgetlcs.api.routes.v1.account
 import com.lowbudgetlcs.api.dto.accounts.NewAccountDto
 import com.lowbudgetlcs.api.dto.accounts.toDto
 import com.lowbudgetlcs.api.dto.accounts.toNewAccount
-import com.lowbudgetlcs.api.logCall
-import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.account.IAccountService
 import com.lowbudgetlcs.domain.account.models.toAccountId
 import io.ktor.http.HttpStatusCode
@@ -23,29 +21,18 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.accountRoutesV1(accountService: IAccountService) {
     route("/account") {
         post<AccountResources> {
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<NewAccountDto>()
-                logger.debug(dto.toString())
-                val created = accountService.createAccount(dto.toNewAccount())
-                call.respond(HttpStatusCode.Created, created.toDto())
-            }
+            val dto = call.receive<NewAccountDto>()
+            logger.debug(dto.toString())
+            val created = accountService.createAccount(dto.toNewAccount())
+            call.respond(HttpStatusCode.Created, created.toDto())
         }
-
         get<AccountResources> {
-            call.setCidContext {
-                logCall(call)
-                val accounts = accountService.getAllAccounts()
-                call.respond(HttpStatusCode.OK, accounts.map { it.toDto() })
-            }
+            val accounts = accountService.getAllAccounts()
+            call.respond(HttpStatusCode.OK, accounts.map { it.toDto() })
         }
-
         get<AccountResources.ById> { route ->
-            call.setCidContext {
-                logCall(call)
-                val account = accountService.getAccount(route.accountId.toAccountId()) // throws if not found
-                call.respond(account.toDto())
-            }
+            val account = accountService.getAccount(route.accountId.toAccountId()) // throws if not found
+            call.respond(account.toDto())
         }
     }
 }
