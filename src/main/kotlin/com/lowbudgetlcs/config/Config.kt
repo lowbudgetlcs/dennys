@@ -10,7 +10,6 @@ val appConfig: AppConfig by lazy {
         .withReport()
         .addEnvironmentSource()
         .addResourceSource("/default.properties")
-        .addResourceSource("/secret.properties", optional = true)
         .build()
         .loadConfigOrThrow<AppConfig>()
 }
