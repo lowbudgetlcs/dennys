@@ -3,6 +3,7 @@ package team
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -44,7 +45,7 @@ class TeamAndEventRepositoryTest :
             event = eventRepo.insert(
                 NewEvent(
                     name = "Season 1".toEventName(),
-                    description = "The first season",
+                    description = "The first season".toEventDescription(),
                     startDate = now,
                     endDate = now.plusSeconds(604_800L),
                     status = EventStatus.ACTIVE,

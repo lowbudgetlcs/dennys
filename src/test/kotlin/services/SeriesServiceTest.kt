@@ -1,6 +1,7 @@
 package services
 
 import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
@@ -45,7 +46,7 @@ class SeriesServiceTest :
             Event(
                 id = 0.toEventId(),
                 name = "Test".toEventName(),
-                description = "",
+                description = "Testing 2".toEventDescription(),
                 riotTournamentId = 0.toRiotTournamentId(),
                 createdAt = Instant.now(),
                 startDate = Instant.now(),

@@ -16,10 +16,10 @@ object InstantSerializer : KSerializer<Instant> {
         encoder: Encoder,
         value: Instant,
     ) {
-        encoder.encodeString(value.toString()) // Convert Instant → String
+        encoder.encodeString(value.toString())
     }
 
     override fun deserialize(decoder: Decoder): Instant {
-        return Instant.parse(decoder.decodeString()) // Convert String → Instant
+        return Instant.parse(decoder.decodeString())
     }
 }

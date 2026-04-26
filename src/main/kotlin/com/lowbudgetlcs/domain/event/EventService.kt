@@ -1,7 +1,16 @@
 package com.lowbudgetlcs.domain.event
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.models.*
+import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.EventQuery
+import com.lowbudgetlcs.domain.event.models.EventUpdate
+import com.lowbudgetlcs.domain.event.models.EventWithSeries
+import com.lowbudgetlcs.domain.event.models.EventWithTeams
+import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.filterByName
+import com.lowbudgetlcs.domain.event.models.filterByStatus
+import com.lowbudgetlcs.domain.event.models.toEventWithSeries
+import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.series.models.SeriesQuery

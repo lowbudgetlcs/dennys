@@ -62,8 +62,8 @@ class TeamServiceTest :
         }
 
         "getAllTeams returns teamRepo data" {
-            val t1 = Team(TeamId(1), TeamName("A"), null, null)
-            val t2 = Team(TeamId(2), TeamName("B"), "b.png", null)
+            val t1 = Team(TeamId(1), TeamName("abcd"), null, null)
+            val t2 = Team(TeamId(2), TeamName("cdas"), "b.png", null)
 
             every { teamRepo.getAll() } returns listOf(t1, t2)
 

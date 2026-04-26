@@ -5,8 +5,6 @@ import com.lowbudgetlcs.api.dto.players.NewPlayerDto
 import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
 import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.api.dto.players.toNewPlayer
-import com.lowbudgetlcs.api.logCall
-import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.account.models.toAccountId
 import com.lowbudgetlcs.domain.player.IPlayerService
 import com.lowbudgetlcs.domain.player.models.toPlayerId
@@ -29,64 +27,46 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.playerRoutesV1(playerService: IPlayerService) {
     route("/player") {
         get<PlayerResources> {
-            call.setCidContext {
-                logCall(call)
-                val players = playerService.getAllPlayers()
-                call.respond(players.map { it.toDto() })
-            }
+            val players = playerService.getAllPlayers()
+            call.respond(players.map { it.toDto() })
         }
 
         post<PlayerResources> {
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<NewPlayerDto>()
-                logger.debug(dto.toString())
-                val created = playerService.createPlayer(dto.toNewPlayer())
-                call.respond(HttpStatusCode.Created, created.toDto())
-            }
+            val dto = call.receive<NewPlayerDto>()
+            logger.debug(dto.toString())
+            val created = playerService.createPlayer(dto.toNewPlayer())
+            call.respond(HttpStatusCode.Created, created.toDto())
         }
         get<PlayerResources.ById> { route ->
-            call.setCidContext {
-                logCall(call)
-                val player = playerService.getPlayer(route.playerId.toPlayerId())
-                call.respond(player.toDto())
-            }
+            val player = playerService.getPlayer(route.playerId.toPlayerId())
+            call.respond(player.toDto())
         }
 
         patch<PlayerResources.ById> { route ->
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<PatchPlayerDto>()
-                logger.debug(dto.toString())
-                val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name.toPlayerName())
-                call.respond(updated.toDto())
-            }
+            val dto = call.receive<PatchPlayerDto>()
+            logger.debug(dto.toString())
+            val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name.toPlayerName())
+            call.respond(updated.toDto())
         }
 
         post<PlayerResources.Accounts> { route ->
-            call.setCidContext {
-                logCall(call)
-                val dto = call.receive<AccountLinkRequestDto>()
-                logger.debug(dto.toString())
-                val updated =
-                    playerService.linkAccountToPlayer(
-                        route.playerId.toPlayerId(),
-                        dto.accountId.toAccountId(),
-                    )
-                call.respond(updated.toDto())
-            }
+            val dto = call.receive<AccountLinkRequestDto>()
+            logger.debug(dto.toString())
+            val updated =
+                playerService.linkAccountToPlayer(
+                    route.playerId.toPlayerId(),
+                    dto.accountId.toAccountId(),
+                )
+            call.respond(updated.toDto())
         }
 
         delete<PlayerResources.AccountById> { route ->
-            call.setCidContext {
-                logCall(call)
-                val updated =
-                    playerService.unlinkAccountFromPlayer(
-                        route.playerId.toPlayerId(),
-                        route.accountId.toAccountId(),
-                    )
-                call.respond(updated.toDto())
-            }
+            val updated =
+                playerService.unlinkAccountFromPlayer(
+                    route.playerId.toPlayerId(),
+                    route.accountId.toAccountId(),
+                )
+            call.respond(updated.toDto())
         }
     }
 }

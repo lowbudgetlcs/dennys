@@ -5,6 +5,7 @@ import org.koin.dsl.module
 
 val configModule =
     module {
+        single<LoggingConfig> { appConfig.logging }
         single<RiotConfig> { appConfig.riot }
         single<DatabaseConfig> { appConfig.database }
         single<CookieConfig> { appConfig.cookie }
