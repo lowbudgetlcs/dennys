@@ -8,6 +8,7 @@ import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.repositories.account.IAccountRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
+import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -22,7 +23,8 @@ class PlayerServiceTest : StringSpec({
 
     val playerRepo = mockk<IPlayerRepository>()
     val accountRepo = mockk<IAccountRepository>()
-    val service = PlayerService(playerRepo, accountRepo)
+    val teamRepo = mockk<ITeamRepository>()
+    val service = PlayerService(playerRepo, accountRepo, teamRepo)
 
     beforeEach { clearAllMocks() }
 
