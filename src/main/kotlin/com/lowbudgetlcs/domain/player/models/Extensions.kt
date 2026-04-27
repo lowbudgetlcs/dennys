@@ -2,6 +2,7 @@ package com.lowbudgetlcs.domain.player.models
 
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.player.models.types.PlayerName
+import com.lowbudgetlcs.domain.team.models.Team
 
 // Type Extensions
 fun Int.toPlayerId(): PlayerId = PlayerId(this)
@@ -14,3 +15,9 @@ fun NewPlayer.toPlayer(id: PlayerId): Player =
         id = id,
         name = name,
     )
+
+fun Player.toPlayerWithTeams(player: Player, teams: List<Team>): PlayerWithTeams = PlayerWithTeams(
+    id = id,
+    name = name,
+    teams = teams
+)

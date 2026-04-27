@@ -26,7 +26,6 @@ class PlayerTypesTest :
         "PlayerName must be at least $PLAYER_NAME_MIN_LENGTH characters" {
             shouldThrow<IllegalArgumentException> {
                 "1".repeat(PLAYER_NAME_MIN_LENGTH - 1).toPlayerName()
-                "".repeat(PLAYER_NAME_MAX_LENGTH + 1).toPlayerName()
             }
         }
 

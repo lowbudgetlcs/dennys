@@ -3,6 +3,7 @@ package com.lowbudgetlcs.domain.player
 import com.lowbudgetlcs.domain.account.models.types.AccountId
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.models.PlayerWithTeams
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.player.models.types.PlayerName
 
@@ -10,6 +11,8 @@ interface IPlayerService {
     fun getAllPlayers(): List<Player>
 
     fun getPlayer(id: PlayerId): Player
+
+    fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams
 
     fun createPlayer(player: NewPlayer): Player
 

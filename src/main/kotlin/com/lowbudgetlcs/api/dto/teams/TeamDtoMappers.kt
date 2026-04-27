@@ -3,12 +3,22 @@ package com.lowbudgetlcs.api.dto.teams
 import com.lowbudgetlcs.api.dto.UNSET_PATCH_FIELD
 import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.team.models.*
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.models.TeamQuery
+import com.lowbudgetlcs.domain.team.models.TeamUpdate
+import com.lowbudgetlcs.domain.team.models.TeamWithPlayers
+import com.lowbudgetlcs.domain.team.models.toTeamName
 
 fun NewTeamDto.toNewTeam(): NewTeam =
     NewTeam(
         name = name.toTeamName(),
         logo = logo,
+    )
+
+fun TeamFilterParams.toQuery(): TeamQuery =
+    TeamQuery(
+        name = name
     )
 
 fun Team.toDto(): TeamDto =

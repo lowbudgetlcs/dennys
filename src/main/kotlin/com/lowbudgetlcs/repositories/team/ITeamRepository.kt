@@ -18,6 +18,8 @@ interface ITeamRepository {
 
     fun getByEventId(id: EventId): List<Team>
 
+    fun getByPlayerId(id: PlayerId): List<Team>
+
     fun getBySeriesId(seriesId: SeriesId): List<Team>
 
     fun getByName(name: TeamName): List<Team>

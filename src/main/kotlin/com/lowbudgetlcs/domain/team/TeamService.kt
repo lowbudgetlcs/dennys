@@ -3,7 +3,13 @@ package com.lowbudgetlcs.domain.team
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
-import com.lowbudgetlcs.domain.team.models.*
+import com.lowbudgetlcs.domain.team.models.NewTeam
+import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.models.TeamQuery
+import com.lowbudgetlcs.domain.team.models.TeamUpdate
+import com.lowbudgetlcs.domain.team.models.TeamWithPlayers
+import com.lowbudgetlcs.domain.team.models.filterByString
+import com.lowbudgetlcs.domain.team.models.toTeamWithPlayers
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.DatabaseException
@@ -18,9 +24,9 @@ class TeamService(
 ) : ITeamService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun getAllTeams(): List<Team> {
+    override fun getAllTeams(query: TeamQuery?): List<Team> {
         logger.debug("Fetching all teams...")
-        return teamRepository.getAll()
+        return teamRepository.getAll().filterByString(query)
     }
 
     override fun getTeam(id: TeamId): Team {

@@ -1,0 +1,13 @@
+package com.lowbudgetlcs.api.dto.players
+
+import com.lowbudgetlcs.api.dto.accounts.AccountDto
+import com.lowbudgetlcs.api.dto.teams.TeamDto
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class PlayerWithTeamsDto(
+    val id: Int,
+    val name: String,
+    val accounts: List<AccountDto>,
+    val teams: List<TeamDto>,
+)
