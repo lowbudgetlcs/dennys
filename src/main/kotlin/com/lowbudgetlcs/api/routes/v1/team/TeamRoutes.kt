@@ -1,10 +1,13 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
+import com.lowbudgetlcs.api.dto.events.EventFilterParams
 import com.lowbudgetlcs.api.dto.teams.NewTeamDto
 import com.lowbudgetlcs.api.dto.teams.PatchTeamDto
+import com.lowbudgetlcs.api.dto.teams.TeamFilterParams
 import com.lowbudgetlcs.api.dto.teams.TeamPlayerLinkRequestDto
 import com.lowbudgetlcs.api.dto.teams.toDto
 import com.lowbudgetlcs.api.dto.teams.toNewTeam
+import com.lowbudgetlcs.api.dto.teams.toQuery
 import com.lowbudgetlcs.api.dto.teams.toTeamUpdate
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.team.ITeamService
@@ -26,15 +29,19 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.teamRoutesV1(teamService: ITeamService) {
     route("/team") {
+        get<TeamResources> { route ->
+            val filter =
+                TeamFilterParams(
+                    name = route.name,
+                )
+            val teams = teamService.getAllTeams(filter.toQuery())
+            call.respond(teams.map { it.toDto() })
+        }
         post<TeamResources> {
             val dto = call.receive<NewTeamDto>()
             logger.debug(dto.toString())
             val created = teamService.createTeam(dto.toNewTeam())
             call.respond(HttpStatusCode.Created, created.toDto())
-        }
-        get<TeamResources> {
-            val teams = teamService.getAllTeams()
-            call.respond(teams.map { it.toDto() })
         }
         get<TeamResources.ById> { route ->
             val team = teamService.getTeam(route.teamId.toTeamId())

@@ -12,33 +12,30 @@ fun Int.toTeamId(): TeamId = TeamId(this)
 fun String.toTeamName(): TeamName = TeamName(this)
 
 // Class Extensions
-fun Team.toTeamWithPlayers(players: List<Player>): TeamWithPlayers =
-    TeamWithPlayers(
-        id = this.id,
-        name = this.name,
-        logo = this.logo,
-        eventId = this.eventId,
-        players = players,
-    )
+fun Team.toTeamWithPlayers(players: List<Player>): TeamWithPlayers = TeamWithPlayers(
+    id = this.id,
+    name = this.name,
+    logo = this.logo,
+    eventId = this.eventId,
+    players = players,
+)
 
-fun Team.patch(update: TeamUpdate): Team =
-    copy(
-        name = update.name ?: this.name,
-        logo =
-            when (update.logo) {
-                PatchField.Unset -> this.logo
-                is PatchField.Value -> update.logo.value
-            },
-        eventId =
-            when (update.eventId) {
-                PatchField.Unset -> this.eventId
-                is PatchField.Value -> update.eventId.value
-            },
-    )
+fun Team.patch(update: TeamUpdate): Team = copy(
+    name = update.name ?: this.name,
+    logo = when (update.logo) {
+        PatchField.Unset -> this.logo
+        is PatchField.Value -> update.logo.value
+    },
+    eventId = when (update.eventId) {
+        PatchField.Unset -> this.eventId
+        is PatchField.Value -> update.eventId.value
+    },
+)
 
 fun NewTeam.toTeam(id: TeamId, eventId: EventId?): Team = Team(
-    id = id,
-    name = name,
-    logo = logo,
-    eventId = eventId
+    id = id, name = name, logo = logo, eventId = eventId
 )
+
+// Filters
+fun List<Team>.filterByString(query: TeamQuery?): List<Team> =
+    this.filter { if (query?.name == null) true else it.name.contains(query.name) }

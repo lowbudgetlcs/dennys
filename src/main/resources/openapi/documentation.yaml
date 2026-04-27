@@ -794,6 +794,12 @@ paths:
       operationId: getTeams
       tags:
         - Teams (v1)
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter teams matching this name. Partial completions are allowed.
       responses:
         "200":
           description: List of teams

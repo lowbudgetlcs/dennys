@@ -1,11 +1,14 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
+import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import io.ktor.resources.Resource
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Resource("/")
-class TeamResources {
+class TeamResources(
+    val name: String? = null,
+) {
     @Serializable
     @Resource("{teamId}")
     data class ById(
