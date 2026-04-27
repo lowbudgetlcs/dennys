@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ktor)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
 }
@@ -37,6 +38,14 @@ ktlint {
     filter {
         exclude("**/org/jooq/**")
         exclude("src/main/kotlin/org/jooq/**")
+    }
+}
+
+ktor {
+    openApi {
+        enabled = true
+        codeInferenceEnabled = true
+        onlyCommented = false
     }
 }
 

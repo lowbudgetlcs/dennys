@@ -1,13 +1,13 @@
 [versions]
-kotlin = "2.2.0"
-ktor = "3.2.3"
-logback = "1.5.18"
+kotlin = "2.2.20"
+ktor = "3.4.3"
+logback = "1.5.32"
 jooq = "3.19.18"
-kotest = "6.1.0"
-testcontainers = "2.0.2"
-koin = "4.1.1"
-hikaricp = "5.1.0"
-postgres = "42.7.7"
+kotest = "6.1.11"
+testcontainers = "2.0.5"
+koin = "4.2.0"
+hikaricp = "7.0.2"
+postgres = "42.7.10"
 hoplite = "2.9.0"
 mockk = "1.14.9"
 kotlinx-coroutines = "1.10.2"
@@ -34,6 +34,7 @@ ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty-jvm", version
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
 ktor-server-config-yaml = { group = "io.ktor", name = "ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-swagger = { group = "io.ktor", name = "ktor-server-swagger", version.ref = "ktor" }
+ktor-server-routing-openapi = { group = "io.ktor", name = "ktor-server-routing-openapi", version.ref = "ktor" }
 ktor-server-content-serialization = { group = "io.ktor", name = "ktor-server-content-negotiation-jvm", version.ref = "ktor" }
 ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
 ktor-server-status-pages = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
@@ -78,12 +79,13 @@ argon2-impl = { group = "de.mkammerer", name = "argon2-jvm", version.ref = "argo
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 application = { id = "application" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 
 [bundles]
 ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-config-yaml", ]
-ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-status-pages", "ktor-server-resources", "ktor-server-auth", "ktor-server-sessions", "ktor-auto-head", "ktor-call-id", "ktor-call-logging"]
+ktor-server-plugins = ["ktor-serialization-json", "ktor-server-swagger", "ktor-server-routing-openapi", "ktor-server-content-serialization", "ktor-server-cors", "ktor-server-status-pages", "ktor-server-resources", "ktor-server-auth", "ktor-server-sessions", "ktor-auto-head", "ktor-call-id", "ktor-call-logging"]
 server-logging = ["logback-core", "slf4j-core", "slf4j-coroutines"]
 ktor-client = ["ktor-client-core", "ktor-client-cio"]
 ktor-client-plugins = ["ktor-client-content-negotiation", "ktor-client-logging"]

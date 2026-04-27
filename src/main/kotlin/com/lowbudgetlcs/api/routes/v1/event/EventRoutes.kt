@@ -39,6 +39,10 @@ fun Route.eventRoutesV1(
     seriesService: ISeriesService,
 ) {
     route("/event") {
+        /**
+         * Get all events.
+         * Tag: Event (V1)
+         */
         get<EventResources> { route ->
             val filter =
                 EventFilterParams(
