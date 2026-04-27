@@ -19,4 +19,11 @@ class TeamResources {
         val parent: TeamResources = TeamResources(),
         val teamId: Int,
     )
+    @Serializable
+    @Resource("{teamId}/players/{playerId}")
+    data class ByIdPlayersById(
+        val parent: TeamResources = TeamResources(),
+        val teamId: Int,
+        val playerId: Int,
+    )
 }
