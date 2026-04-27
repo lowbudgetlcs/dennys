@@ -28,6 +28,10 @@ class TeamRepository(
     override fun getByEventId(id: EventId): List<Team> =
         selectTeams().where(TEAMS.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToTeam)
 
+    override fun getByPlayerId(id: PlayerId): List<Team> =
+        selectTeams().join(PLAYERS_TO_TEAM).on(PLAYERS_TO_TEAM.TEAM_ID.eq(TEAMS.ID))
+            .where(PLAYERS_TO_TEAM.PLAYER_ID.eq(id.value)).fetch().mapNotNull(::rowToTeam)
+
     override fun getBySeriesId(seriesId: SeriesId): List<Team> =
         dsl.select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO, TEAMS.EVENT_ID)
             .from(TEAMS.innerJoin(TEAM_TO_SERIES).on(TEAMS.ID.eq(TEAM_TO_SERIES.TEAM_ID)))

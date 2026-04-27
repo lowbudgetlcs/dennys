@@ -49,6 +49,11 @@ fun Route.playerRoutesV1(playerService: IPlayerService) {
             call.respond(updated.toDto())
         }
 
+        get<PlayerResources.ByIdTeams> { route ->
+            val player = playerService.getPlayerWithTeams(route.playerId.toPlayerId())
+            call.respond(player.toDto())
+        }
+
         post<PlayerResources.Accounts> { route ->
             val dto = call.receive<AccountLinkRequestDto>()
             logger.debug(dto.toString())

@@ -10,6 +10,12 @@ class PlayerResources {
         val playerId: Int,
     )
 
+    @Resource("{playerId}/teams")
+    data class ByIdTeams(
+        val parent: PlayerResources = PlayerResources(),
+        val playerId: Int,
+    )
+
     @Resource("{playerId}/accounts")
     data class Accounts(
         val parent: PlayerResources = PlayerResources(),
