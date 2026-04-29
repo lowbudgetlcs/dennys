@@ -1,12 +1,9 @@
 package com.lowbudgetlcs.domain.event.models
 
-import com.lowbudgetlcs.domain.event.models.types.EventDescription
-import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.types.EventName
-import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
+import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.team.models.Team
 import java.time.Instant
 
 data class Event(
@@ -20,4 +17,45 @@ data class Event(
     val endDate: Instant,
     val status: EventStatus,
     val eventStages: Set<EventStage>,
+)
+
+// Extensions
+fun Event.patch(update: EventUpdate): Event = copy(
+    name = update.name ?: this.name,
+    description = update.description ?: this.description,
+    startDate = update.startDate ?: this.startDate,
+    endDate = update.endDate ?: this.endDate,
+    status = update.status ?: this.status,
+    eventGroupId = when (update.eventGroupId) {
+        PatchField.Unset -> this.eventGroupId
+        is PatchField.Value -> update.eventGroupId.value
+    },
+)
+
+fun Event.toEventWithTeams(teams: List<Team>): EventWithTeams = EventWithTeams(
+    id = id,
+    name = name,
+    description = description,
+    eventGroupId = eventGroupId,
+    riotTournamentId = riotTournamentId,
+    createdAt = createdAt,
+    startDate = startDate,
+    endDate = endDate,
+    status = status,
+    teams = teams,
+    eventStages = eventStages,
+)
+
+fun Event.toEventWithSeries(series: List<Series>): EventWithSeries = EventWithSeries(
+    id = id,
+    name = name,
+    description = description,
+    eventGroupId = eventGroupId,
+    riotTournamentId = riotTournamentId,
+    createdAt = createdAt,
+    startDate = startDate,
+    endDate = endDate,
+    status = status,
+    series = series,
+    eventStages = eventStages,
 )

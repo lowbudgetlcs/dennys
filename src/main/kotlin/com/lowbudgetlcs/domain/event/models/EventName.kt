@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.event.models.types
+package com.lowbudgetlcs.domain.event.models
 
 const val EVENT_NAME_MAX_LENGTH = 120
 const val EVENT_NAME_MIN_LENGTH = 3
@@ -16,3 +16,6 @@ data class EventName(
     }
 
 }
+
+// Extensions
+fun String.toEventName(): EventName = EventName(this)

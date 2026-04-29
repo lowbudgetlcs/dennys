@@ -2,8 +2,8 @@ package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.domain.account.repositories.AccountRepository
 import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
-import com.lowbudgetlcs.repositories.event.EventRepository
-import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.domain.event.repositories.EventRepository
+import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import com.lowbudgetlcs.repositories.game.GameRepository

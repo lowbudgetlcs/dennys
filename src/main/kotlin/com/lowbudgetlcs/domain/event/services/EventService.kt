@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.event
+package com.lowbudgetlcs.domain.event.services
 
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.Event
@@ -11,8 +11,8 @@ import com.lowbudgetlcs.domain.event.models.filterByName
 import com.lowbudgetlcs.domain.event.models.filterByStatus
 import com.lowbudgetlcs.domain.event.models.toEventWithSeries
 import com.lowbudgetlcs.domain.event.models.toEventWithTeams
-import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.types.EventName
+import com.lowbudgetlcs.domain.event.models.EventId
+import com.lowbudgetlcs.domain.event.models.EventName
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
 import com.lowbudgetlcs.domain.series.models.filterByParticipants
 import com.lowbudgetlcs.domain.series.models.filterByStage
@@ -21,7 +21,7 @@ import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import org.slf4j.Logger

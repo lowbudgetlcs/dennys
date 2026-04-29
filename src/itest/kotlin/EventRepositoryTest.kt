@@ -5,9 +5,9 @@ import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import com.lowbudgetlcs.repositories.event.EventRepository
+import com.lowbudgetlcs.domain.event.models.EventStage
+import com.lowbudgetlcs.domain.event.models.EventStatus
+import com.lowbudgetlcs.domain.event.repositories.EventRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension

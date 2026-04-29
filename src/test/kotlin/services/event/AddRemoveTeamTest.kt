@@ -1,6 +1,6 @@
 package services.events
 
-import com.lowbudgetlcs.domain.event.EventService
+import com.lowbudgetlcs.domain.event.services.EventService
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEvent
 import com.lowbudgetlcs.domain.event.models.toEventDescription
@@ -8,14 +8,14 @@ import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.event.models.EventStage
+import com.lowbudgetlcs.domain.event.models.EventStatus
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.toTeam
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
-import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.core.spec.style.FunSpec

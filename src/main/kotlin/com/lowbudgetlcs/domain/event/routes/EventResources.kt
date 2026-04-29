@@ -1,7 +1,7 @@
-package com.lowbudgetlcs.api.routes.v1.event
+package com.lowbudgetlcs.domain.event.routes
 
-import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.event.models.EventStage
+import com.lowbudgetlcs.domain.event.models.EventStatus
 import io.ktor.resources.Resource
 
 @Resource("/")

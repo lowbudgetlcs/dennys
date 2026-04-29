@@ -1,11 +1,5 @@
 package com.lowbudgetlcs.domain.event.models
 
-import com.lowbudgetlcs.domain.event.models.types.EventDescription
-import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.types.EventName
-import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import com.lowbudgetlcs.domain.team.models.Team
 import java.time.Instant

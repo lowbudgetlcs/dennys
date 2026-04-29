@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.dto.events.groups
 
-import com.lowbudgetlcs.api.dto.events.toDto
+import com.lowbudgetlcs.domain.event.dto.toDto
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroupUpdate

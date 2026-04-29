@@ -1,8 +1,8 @@
 package models
 
 import com.lowbudgetlcs.domain.event.models.toEventName
-import com.lowbudgetlcs.domain.event.models.types.EVENT_NAME_MAX_LENGTH
-import com.lowbudgetlcs.domain.event.models.types.EVENT_NAME_MIN_LENGTH
+import com.lowbudgetlcs.domain.event.models.EVENT_NAME_MAX_LENGTH
+import com.lowbudgetlcs.domain.event.models.EVENT_NAME_MIN_LENGTH
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

@@ -1,6 +1,5 @@
 package com.lowbudgetlcs.api.routes.v1.team
 
-import com.lowbudgetlcs.api.dto.events.EventFilterParams
 import com.lowbudgetlcs.api.dto.teams.NewTeamDto
 import com.lowbudgetlcs.api.dto.teams.PatchTeamDto
 import com.lowbudgetlcs.api.dto.teams.TeamFilterParams
