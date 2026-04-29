@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.dto.players
 
-import com.lowbudgetlcs.api.dto.accounts.AccountDto
+import com.lowbudgetlcs.domain.account.dto.AccountDto
 import kotlinx.serialization.Serializable
 
 @Serializable

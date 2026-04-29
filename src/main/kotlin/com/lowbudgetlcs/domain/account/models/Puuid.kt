@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.account.models.types
+package com.lowbudgetlcs.domain.account.models
 
 const val PUUID_LENGTH = 78
 
@@ -10,3 +10,6 @@ value class Puuid(
         require(value.length == PUUID_LENGTH) { "Puuids must be exactly 78 characters." }
     }
 }
+
+// Extensions
+fun String.toPuuid(): Puuid = Puuid(this)

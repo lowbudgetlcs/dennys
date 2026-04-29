@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.config.modules
 
-import com.lowbudgetlcs.domain.account.AccountService
-import com.lowbudgetlcs.domain.account.IAccountService
+import com.lowbudgetlcs.domain.account.services.AccountService
+import com.lowbudgetlcs.domain.account.services.IAccountService
 import com.lowbudgetlcs.domain.auth.AuthService
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.event.EventService

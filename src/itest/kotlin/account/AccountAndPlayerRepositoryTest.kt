@@ -2,13 +2,13 @@ package account
 
 import com.lowbudgetlcs.domain.account.models.Account
 import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.account.models.Puuid
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
-import com.lowbudgetlcs.repositories.account.AccountRepository
+import com.lowbudgetlcs.domain.account.repositories.AccountRepository
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install

@@ -1,9 +1,9 @@
-package com.lowbudgetlcs.api.routes.v1.account
+package com.lowbudgetlcs.domain.account.routes
 
-import com.lowbudgetlcs.api.dto.accounts.NewAccountDto
-import com.lowbudgetlcs.api.dto.accounts.toDto
-import com.lowbudgetlcs.api.dto.accounts.toNewAccount
-import com.lowbudgetlcs.domain.account.IAccountService
+import com.lowbudgetlcs.domain.account.dto.NewAccountDto
+import com.lowbudgetlcs.domain.account.dto.toDto
+import com.lowbudgetlcs.domain.account.dto.toNewAccount
+import com.lowbudgetlcs.domain.account.services.IAccountService
 import com.lowbudgetlcs.domain.account.models.toAccountId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application

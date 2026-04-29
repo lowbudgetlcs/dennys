@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.api.routes
 
-import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
+import com.lowbudgetlcs.domain.account.routes.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
-import com.lowbudgetlcs.domain.account.IAccountService
+import com.lowbudgetlcs.domain.account.services.IAccountService
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.player.IPlayerService

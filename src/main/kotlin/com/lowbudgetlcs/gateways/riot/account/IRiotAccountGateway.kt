@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.gateways.riot.account
 
 import com.lowbudgetlcs.domain.account.models.RiotAccount
-import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.account.models.Puuid
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 
 interface IRiotAccountGateway {

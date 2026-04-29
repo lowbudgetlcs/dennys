@@ -1,12 +1,12 @@
-package com.lowbudgetlcs.domain.account
+package com.lowbudgetlcs.domain.account.services
 
 import com.lowbudgetlcs.domain.account.models.Account
 import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.types.AccountId
-import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.account.models.AccountId
+import com.lowbudgetlcs.domain.account.models.Puuid
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.account.IAccountRepository
+import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

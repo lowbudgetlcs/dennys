@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.config.modules
 
-import com.lowbudgetlcs.repositories.account.AccountRepository
-import com.lowbudgetlcs.repositories.account.IAccountRepository
+import com.lowbudgetlcs.domain.account.repositories.AccountRepository
+import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository

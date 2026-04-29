@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.routes.v1.account
+package com.lowbudgetlcs.domain.account.routes
 
 import io.ktor.resources.Resource
 

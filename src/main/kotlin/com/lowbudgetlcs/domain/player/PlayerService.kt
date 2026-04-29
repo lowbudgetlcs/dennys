@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.player
 
-import com.lowbudgetlcs.domain.account.models.types.AccountId
+import com.lowbudgetlcs.domain.account.models.AccountId
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.PlayerWithTeams
@@ -8,7 +8,7 @@ import com.lowbudgetlcs.domain.player.models.toPlayerWithTeams
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.player.models.types.PlayerName
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.account.IAccountRepository
+import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import org.slf4j.Logger
