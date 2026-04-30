@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.toPlayer
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
-import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
+import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow

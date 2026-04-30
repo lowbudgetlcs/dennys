@@ -1,10 +1,10 @@
-package com.lowbudgetlcs.domain.account.routes
+package com.lowbudgetlcs.domain.account.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.account.IAccountService
-import com.lowbudgetlcs.domain.account.models.types.toAccountId
-import com.lowbudgetlcs.domain.account.routes.dto.NewAccountDto
-import com.lowbudgetlcs.domain.account.routes.dto.toDto
-import com.lowbudgetlcs.domain.account.routes.dto.toNewAccount
+import com.lowbudgetlcs.domain.account.core.port.IAccountService
+import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
+import com.lowbudgetlcs.domain.account.adapter.`in`.web.dto.NewAccountDto
+import com.lowbudgetlcs.domain.account.adapter.`in`.web.dto.toDto
+import com.lowbudgetlcs.domain.account.adapter.`in`.web.dto.toNewAccount
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -20,17 +20,17 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.accountRoutesV1(accountService: IAccountService) {
     route("/account") {
-        post<AccountResources> {
+        post<AccountResourcesV1> {
             val dto = call.receive<NewAccountDto>()
             logger.debug(dto.toString())
             val created = accountService.createAccount(dto.toNewAccount())
             call.respond(HttpStatusCode.Created, created.toDto())
         }
-        get<AccountResources> {
+        get<AccountResourcesV1> {
             val accounts = accountService.getAllAccounts()
             call.respond(HttpStatusCode.OK, accounts.map { it.toDto() })
         }
-        get<AccountResources.ById> { route ->
+        get<AccountResourcesV1.ById> { route ->
             val account = accountService.getAccount(route.accountId.toAccountId()) // throws if not found
             call.respond(account.toDto())
         }

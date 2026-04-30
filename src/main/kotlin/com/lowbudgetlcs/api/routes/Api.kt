@@ -4,9 +4,9 @@ import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
-import com.lowbudgetlcs.domain.account.IAccountService
-import com.lowbudgetlcs.domain.account.routes.accountRoutesV1
-import com.lowbudgetlcs.domain.event.core.IEventService
+import com.lowbudgetlcs.domain.account.core.port.IAccountService
+import com.lowbudgetlcs.domain.account.adapter.`in`.web.accountRoutesV1
+import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.eventRoutesV1
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.player.IPlayerService

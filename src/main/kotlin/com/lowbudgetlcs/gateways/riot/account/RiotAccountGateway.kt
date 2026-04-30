@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.gateways.riot.account
 
-import com.lowbudgetlcs.domain.account.models.RiotAccount
-import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.account.core.model.RiotAccount
+import com.lowbudgetlcs.domain.account.core.model.types.Puuid
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

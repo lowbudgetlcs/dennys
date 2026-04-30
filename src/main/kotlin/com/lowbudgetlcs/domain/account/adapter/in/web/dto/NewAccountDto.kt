@@ -1,7 +1,7 @@
-package com.lowbudgetlcs.domain.account.routes.dto
+package com.lowbudgetlcs.domain.account.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.types.toPuuid
+import com.lowbudgetlcs.domain.account.core.model.NewAccount
+import com.lowbudgetlcs.domain.account.core.model.types.toPuuid
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -1,6 +1,6 @@
-package com.lowbudgetlcs.domain.account.models
+package com.lowbudgetlcs.domain.account.core.model
 
-import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.account.core.model.types.Puuid
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 
 data class NewAccount(

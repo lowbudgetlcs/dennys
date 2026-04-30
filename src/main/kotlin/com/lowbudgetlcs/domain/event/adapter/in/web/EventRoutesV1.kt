@@ -9,7 +9,7 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.CreateEventDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventFilterParams
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventTeamLinkDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.PatchEventDto
-import com.lowbudgetlcs.domain.event.core.IEventService
+import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventStage
@@ -40,7 +40,7 @@ fun Route.eventRoutesV1(
     seriesService: ISeriesService,
 ) {
     route("/event") {
-        get<ResourcesV1> { route ->
+        get<EventResourcesV1> { route ->
             val filter =
                 EventFilterParams(
                     name = route.name,
@@ -49,33 +49,33 @@ fun Route.eventRoutesV1(
             val events = eventService.getAllEvents(filter.toQuery())
             call.respond(events.map { it.toDto() })
         }
-        post<ResourcesV1> {
+        post<EventResourcesV1> {
             val dto = call.receive<CreateEventDto>()
             logger.debug(dto.toString())
             val created = eventService.createEvent(dto.toNewEvent())
             call.respond(HttpStatusCode.Created, created.toDto())
         }
-        get<ResourcesV1.ById> { route ->
+        get<EventResourcesV1.ById> { route ->
             val event = eventService.getEvent(route.eventId.toEventId())
             call.respond(event.toDto())
         }
-        patch<ResourcesV1.ById> { route ->
+        patch<EventResourcesV1.ById> { route ->
             val dto = call.receive<PatchEventDto>()
             logger.debug("\uD83C\uDF81 Body: {}", dto)
             val updated = eventService.patchEvent(route.eventId.toEventId(), dto.toEventUpdate())
             call.respond(updated.toDto())
         }
-        get<ResourcesV1.ByIdTeams> { route ->
+        get<EventResourcesV1.ByIdTeams> { route ->
             val events = eventService.getEventWithTeams(route.eventId.toEventId())
             call.respond(events.toDto())
         }
-        post<ResourcesV1.ByIdTeams> { route ->
+        post<EventResourcesV1.ByIdTeams> { route ->
             val dto = call.receive<EventTeamLinkDto>()
             logger.debug(dto.toString())
             val event = eventService.addTeam(route.eventId.toEventId(), dto.toTeamId())
             call.respond(event.toDto())
         }
-        get<ResourcesV1.ByIdSeries> { route ->
+        get<EventResourcesV1.ByIdSeries> { route ->
             val filter =
                 SeriesFilterParams(
                     teamIds = route.teamIds,
@@ -85,18 +85,18 @@ fun Route.eventRoutesV1(
 
             call.respond(event.toDto())
         }
-        post<ResourcesV1.ByIdSeries> { route ->
+        post<EventResourcesV1.ByIdSeries> { route ->
             val dto = call.receive<NewSeriesDto>()
             logger.debug(dto.toString())
             val series = seriesService.createSeries(dto.toNewSeries(route.eventId))
             call.respond(HttpStatusCode.Created, series.toDto())
         }
-        delete<ResourcesV1.ByIdSeriesId> { route ->
+        delete<EventResourcesV1.ByIdSeriesId> { route ->
             seriesService.removeSeries(route.seriesId.toSeriesId())
             val event = eventService.getEventWithSeries(route.eventId.toEventId())
             call.respond(event.toDto())
         }
-        delete<ResourcesV1.ByIdTeamsId> { route ->
+        delete<EventResourcesV1.ByIdTeamsId> { route ->
             val event = eventService.removeTeam(route.eventId.toEventId(), route.teamId.toTeamId())
             call.respond(event.toDto())
         }

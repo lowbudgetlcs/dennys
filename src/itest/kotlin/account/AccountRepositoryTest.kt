@@ -1,9 +1,9 @@
 package account
 
-import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.types.AccountId
-import com.lowbudgetlcs.domain.account.models.types.Puuid
-import com.lowbudgetlcs.domain.account.repositories.AccountRepository
+import com.lowbudgetlcs.domain.account.core.model.NewAccount
+import com.lowbudgetlcs.domain.account.core.model.types.AccountId
+import com.lowbudgetlcs.domain.account.core.model.types.Puuid
+import com.lowbudgetlcs.domain.account.adapter.out.persistence.SqlAccountRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -26,7 +26,7 @@ class AccountRepositoryTest :
             }
         val ds = install(JdbcDatabaseContainerSpecExtension(postgres))
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-        val repo = AccountRepository(dsl)
+        val repo = SqlAccountRepository(dsl)
         val testPuuid = Puuid("mCLCPW2XhEy2NpOk3yoDHWPN-Fu-tWnZ-klQ1lBMNgH38k-0JTN27aBh0xT9_F2aD4SvkLj1CpC791")
 
         "getAll returns an empty list" {

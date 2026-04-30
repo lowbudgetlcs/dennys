@@ -1,10 +1,11 @@
-package com.lowbudgetlcs.domain.account
+package com.lowbudgetlcs.domain.account.core
 
-import com.lowbudgetlcs.domain.account.models.Account
-import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.types.AccountId
-import com.lowbudgetlcs.domain.account.models.types.Puuid
-import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
+import com.lowbudgetlcs.domain.account.core.model.Account
+import com.lowbudgetlcs.domain.account.core.model.NewAccount
+import com.lowbudgetlcs.domain.account.core.model.types.AccountId
+import com.lowbudgetlcs.domain.account.core.model.types.Puuid
+import com.lowbudgetlcs.domain.account.core.port.IAccountService
+import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.player.IPlayerRepository

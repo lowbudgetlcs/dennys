@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.player
 
-import com.lowbudgetlcs.domain.account.models.types.AccountId
-import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
+import com.lowbudgetlcs.domain.account.core.model.types.AccountId
+import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.PlayerWithTeams

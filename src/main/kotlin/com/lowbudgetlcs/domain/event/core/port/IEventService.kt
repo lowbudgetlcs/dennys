@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.event.core
+package com.lowbudgetlcs.domain.event.core.port
 
 import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.EventQuery

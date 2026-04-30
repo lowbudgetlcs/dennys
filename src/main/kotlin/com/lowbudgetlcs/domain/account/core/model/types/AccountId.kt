@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.account.models.types
+package com.lowbudgetlcs.domain.account.core.model.types
 
 @JvmInline
 value class AccountId(

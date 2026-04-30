@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.config.modules
 
-import com.lowbudgetlcs.domain.account.repositories.AccountRepository
-import com.lowbudgetlcs.domain.account.repositories.IAccountRepository
+import com.lowbudgetlcs.domain.account.adapter.out.persistence.SqlAccountRepository
+import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
@@ -30,7 +30,7 @@ val repositoryModule =
         single<IEventGroupRepository> { EventGroupRepository(get()) }
         single<IPlayerRepository> { PlayerRepository(get()) }
         single<ISeriesRepository> { SeriesRepository(get()) }
-        single<IAccountRepository> { AccountRepository(get()) }
+        single<IAccountRepository> { SqlAccountRepository(get()) }
         single<ISessionRepository> { SessionRepository(get()) }
         single<IUserRepository> { UserRepostitory(get()) }
         single<IAccessTokenRepository> { AccessTokenRepository(get()) }

@@ -14,6 +14,7 @@ import com.lowbudgetlcs.domain.event.core.model.toEventWithTeams
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
 import com.lowbudgetlcs.domain.series.models.filterByParticipants
 import com.lowbudgetlcs.domain.series.models.filterByStage

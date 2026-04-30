@@ -1,14 +1,14 @@
 package account
 
-import com.lowbudgetlcs.domain.account.models.Account
-import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.account.core.model.Account
+import com.lowbudgetlcs.domain.account.core.model.NewAccount
+import com.lowbudgetlcs.domain.account.core.model.types.Puuid
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
-import com.lowbudgetlcs.domain.account.repositories.AccountRepository
+import com.lowbudgetlcs.domain.account.adapter.out.persistence.SqlAccountRepository
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
@@ -31,7 +31,7 @@ class AccountAndPlayerRepositoryTest :
             }
         val ds = install(JdbcDatabaseContainerSpecExtension(postgres))
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-        val accountRepo = AccountRepository(dsl)
+        val accountRepo = SqlAccountRepository(dsl)
         val playerRepo = PlayerRepository(dsl)
         lateinit var account: Account
         lateinit var player: Player
