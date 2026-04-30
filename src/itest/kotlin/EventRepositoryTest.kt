@@ -1,14 +1,14 @@
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.types.toEventDescription
-import com.lowbudgetlcs.domain.event.models.types.toEventId
-import com.lowbudgetlcs.domain.event.models.types.toEventName
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.enums.EventStage
-import com.lowbudgetlcs.domain.event.models.enums.EventStatus
-import com.lowbudgetlcs.domain.event.repositories.EventRepository
-import com.lowbudgetlcs.domain.event.models.RiotTournamentId
-import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.core.model.Event
+import com.lowbudgetlcs.domain.event.core.model.NewEvent
+import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.toEventId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventName
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
+import com.lowbudgetlcs.domain.event.core.model.RiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
@@ -25,12 +25,12 @@ import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-fun com.lowbudgetlcs.domain.event.models.NewEvent.toEvent(
-    id: com.lowbudgetlcs.domain.event.models.types.EventId,
+fun NewEvent.toEvent(
+    id: EventId,
     createdAt: Instant,
-    riotTournamentId: com.lowbudgetlcs.domain.event.models.RiotTournamentId,
-): com.lowbudgetlcs.domain.event.models.Event =
-    _root_ide_package_.com.lowbudgetlcs.domain.event.models.Event(
+    riotTournamentId: RiotTournamentId,
+): Event =
+    Event(
         id = id,
         name = name,
         description = description,
@@ -54,7 +54,7 @@ class EventRepositoryTest :
                 maximumPoolSize = 1
             }
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
-        val repo = EventRepository(dslContext)
+        val repo = SqlEventRepository(dslContext)
 
         // Data
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)

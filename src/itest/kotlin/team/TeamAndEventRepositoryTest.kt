@@ -1,18 +1,18 @@
 package team
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.types.toEventDescription
-import com.lowbudgetlcs.domain.event.models.types.toEventName
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.enums.EventStage
-import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.core.model.Event
+import com.lowbudgetlcs.domain.event.core.model.NewEvent
+import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.toEventName
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.toTeamName
-import com.lowbudgetlcs.domain.event.repositories.EventRepository
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -34,7 +34,7 @@ class TeamAndEventRepositoryTest :
             }
         val ds = install(JdbcDatabaseContainerSpecExtension(postgres))
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
-        val eventRepo = EventRepository(dslContext)
+        val eventRepo = SqlEventRepository(dslContext)
         val teamRepo = TeamRepository(dslContext)
         // Data
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)

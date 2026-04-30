@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.repositories.game
 
-import com.lowbudgetlcs.domain.event.models.types.Shortcode
+import com.lowbudgetlcs.domain.event.core.model.types.Shortcode
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.types.GameId

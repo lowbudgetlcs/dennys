@@ -1,13 +1,13 @@
 package services
 
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.types.toEventDescription
-import com.lowbudgetlcs.domain.event.models.types.toEventId
-import com.lowbudgetlcs.domain.event.models.types.toEventName
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.enums.EventStage
-import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.core.model.Event
+import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.toEventId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventName
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.types.EventId
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.domain.series.SeriesService
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
@@ -17,7 +17,7 @@ import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
-import com.lowbudgetlcs.domain.event.repositories.IEventRepository
+import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository

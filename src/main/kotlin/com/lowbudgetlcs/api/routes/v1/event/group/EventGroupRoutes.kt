@@ -6,7 +6,7 @@ import com.lowbudgetlcs.api.dto.events.groups.PatchEventGroupDto
 import com.lowbudgetlcs.api.dto.events.groups.toDto
 import com.lowbudgetlcs.api.dto.events.groups.toEventGroupUpdate
 import com.lowbudgetlcs.api.dto.events.groups.toNewEventGroup
-import com.lowbudgetlcs.domain.event.models.types.toEventId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.eventgroup.models.types.toEventGroupId
 import io.ktor.http.HttpStatusCode

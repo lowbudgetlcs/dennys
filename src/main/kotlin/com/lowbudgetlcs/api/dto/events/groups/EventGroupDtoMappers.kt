@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto.events.groups
 
-import com.lowbudgetlcs.domain.event.models.types.toEventId
-import com.lowbudgetlcs.domain.event.routes.dto.toDto
+import com.lowbudgetlcs.domain.event.core.model.types.toEventId
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroupUpdate
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroupWithEvents

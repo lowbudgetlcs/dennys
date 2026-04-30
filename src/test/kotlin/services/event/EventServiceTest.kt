@@ -1,17 +1,17 @@
 package services.event
 
-import com.lowbudgetlcs.domain.event.EventService
-import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.RiotTournament
+import com.lowbudgetlcs.domain.event.core.EventService
+import com.lowbudgetlcs.domain.event.core.model.NewEvent
+import com.lowbudgetlcs.domain.event.core.model.RiotTournament
 import com.lowbudgetlcs.domain.event.models.toEvent
-import com.lowbudgetlcs.domain.event.models.types.toEventDescription
-import com.lowbudgetlcs.domain.event.models.types.toEventId
-import com.lowbudgetlcs.domain.event.models.types.toEventName
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.enums.EventStage
-import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.toEventId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventName
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
-import com.lowbudgetlcs.domain.event.repositories.IEventRepository
+import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow

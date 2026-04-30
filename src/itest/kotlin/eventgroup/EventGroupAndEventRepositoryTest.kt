@@ -1,19 +1,19 @@
 package eventgroup
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.models.Event
-import com.lowbudgetlcs.domain.event.models.EventUpdate
-import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.types.toEventDescription
-import com.lowbudgetlcs.domain.event.models.types.toEventName
-import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.enums.EventStage
-import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.core.model.Event
+import com.lowbudgetlcs.domain.event.core.model.EventUpdate
+import com.lowbudgetlcs.domain.event.core.model.NewEvent
+import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.toEventName
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
-import com.lowbudgetlcs.domain.event.repositories.EventRepository
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
@@ -42,7 +42,7 @@ class EventGroupAndEventRepositoryTest :
             }
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
         val eventGroupRepo = EventGroupRepository(dslContext)
-        val eventRepo = EventRepository(dslContext)
+        val eventRepo = SqlEventRepository(dslContext)
         // Data
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)
         lateinit var group: EventGroup

@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.eventgroup.models
 
-import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupName
 
