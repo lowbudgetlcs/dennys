@@ -6,11 +6,11 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.series.core.model.NewSeries
 import com.lowbudgetlcs.domain.series.core.model.Series
 import com.lowbudgetlcs.domain.series.core.model.SeriesResult
-import com.lowbudgetlcs.domain.series.core.model.toSeriesId
 import com.lowbudgetlcs.domain.series.core.model.types.SeriesId
+import com.lowbudgetlcs.domain.series.core.model.types.toSeriesId
 import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
-import com.lowbudgetlcs.domain.team.core.model.toTeamId
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.impl.DSL.multiset
@@ -90,7 +90,6 @@ class SeriesRepository(
         val eventStage = row[SERIES.STAGE]?.let { EventStage.valueOf(it) } ?: return null
         val totalGames = row[SERIES.TOTAL_GAMES] ?: return null
         val p = row[participants].mapNotNull { it.value1()?.toTeamId() }
-        val participants = Pair(p[0], p[1])
         // potentially null data
         val winner = row[SERIES_RESULTS.WINNER_TEAM_ID]?.toTeamId()
         val loser = row[SERIES_RESULTS.LOSER_TEAM_ID]?.toTeamId()
@@ -101,7 +100,7 @@ class SeriesRepository(
                 eventId = eventId,
                 eventStage = eventStage,
                 totalGames = totalGames,
-                participants = participants,
+                participants = p[0] to p[1],
                 result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,
             )
         return s

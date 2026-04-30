@@ -13,12 +13,15 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.accountRoutesV1(accountService: IAccountService) {
+fun Route.accountRoutesV1() {
+    val accountService by inject<IAccountService>()
+    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+
     route("/account") {
         post<AccountResourcesV1> {
             val dto = call.receive<NewAccountDto>()

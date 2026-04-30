@@ -1,24 +1,24 @@
 package com.lowbudgetlcs.domain.event.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.NewSeriesDto
-import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.SeriesFilterParams
-import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toDto
-import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toNewSeries
-import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.CreateEventDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventFilterParams
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventTeamLinkDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.PatchEventDto
-import com.lowbudgetlcs.domain.event.core.port.IEventService
-import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventStage
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventUpdate
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toNewEvent
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toTeamId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventId
+import com.lowbudgetlcs.domain.event.core.port.IEventService
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.NewSeriesDto
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.SeriesFilterParams
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toDto
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toNewSeries
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toQuery
+import com.lowbudgetlcs.domain.series.core.model.types.toSeriesId
 import com.lowbudgetlcs.domain.series.core.port.ISeriesService
-import com.lowbudgetlcs.domain.series.core.model.toSeriesId
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -30,15 +30,16 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-fun Route.eventRoutesV1(
-    eventService: IEventService,
-    seriesService: ISeriesService,
-) {
+fun Route.eventRoutesV1() {
+    val eventService by inject<IEventService>()
+    val seriesService by inject<ISeriesService>()
     val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+
     route("/event") {
         get<EventResourcesV1> { route ->
             val filter =

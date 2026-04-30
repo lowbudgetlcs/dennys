@@ -21,18 +21,20 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
-fun Route.teamRoutesV1(teamService: ITeamService) {
+fun Route.teamRoutesV1() {
+    val teamService by inject<ITeamService>()
+    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+
     route("/team") {
         get<TeamResourcesV1> { route ->
-            val filter =
-                TeamFilterParams(
-                    name = route.name,
-                )
+            val filter = TeamFilterParams(
+                name = route.name,
+            )
             val teams = teamService.getAllTeams(filter.toQuery())
             call.respond(teams.map { it.toDto() })
         }

@@ -4,11 +4,11 @@ import com.lowbudgetlcs.domain.event.core.model.types.Shortcode
 import com.lowbudgetlcs.domain.event.core.model.types.toShortcode
 import com.lowbudgetlcs.domain.series.core.model.Game
 import com.lowbudgetlcs.domain.series.core.model.NewGame
-import com.lowbudgetlcs.domain.series.game.models.toGameId
 import com.lowbudgetlcs.domain.series.core.model.types.GameId
-import com.lowbudgetlcs.domain.series.core.model.toSeriesId
+import com.lowbudgetlcs.domain.series.core.model.types.toGameId
+import com.lowbudgetlcs.domain.series.core.model.types.toSeriesId
 import com.lowbudgetlcs.domain.series.core.port.IGameRepository
-import com.lowbudgetlcs.domain.team.core.model.toTeamId
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.GAMES
