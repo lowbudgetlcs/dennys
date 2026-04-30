@@ -12,7 +12,7 @@ import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.repositories.series.ISeriesRepository
+import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec

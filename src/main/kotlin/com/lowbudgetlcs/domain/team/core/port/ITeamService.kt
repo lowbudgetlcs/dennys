@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.domain.team.core.port
 
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
-import com.lowbudgetlcs.domain.team.core.models.NewTeam
-import com.lowbudgetlcs.domain.team.core.models.Team
-import com.lowbudgetlcs.domain.team.core.models.TeamQuery
-import com.lowbudgetlcs.domain.team.core.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.core.models.TeamWithPlayers
-import com.lowbudgetlcs.domain.team.core.models.types.TeamId
+import com.lowbudgetlcs.domain.team.core.model.NewTeam
+import com.lowbudgetlcs.domain.team.core.model.Team
+import com.lowbudgetlcs.domain.team.core.model.TeamQuery
+import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
+import com.lowbudgetlcs.domain.team.core.model.TeamWithPlayers
+import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 
 interface ITeamService {
     fun getAllTeams(query: TeamQuery? = null): List<Team>

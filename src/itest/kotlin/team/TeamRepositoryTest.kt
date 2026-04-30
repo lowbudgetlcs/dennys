@@ -1,9 +1,9 @@
 package team
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.team.core.models.NewTeam
-import com.lowbudgetlcs.domain.team.core.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.core.models.toTeamName
+import com.lowbudgetlcs.domain.team.core.model.NewTeam
+import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
+import com.lowbudgetlcs.domain.team.core.model.toTeamName
 import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

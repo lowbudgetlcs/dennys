@@ -2,12 +2,12 @@ package com.lowbudgetlcs.domain.team.core.port
 
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
-import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.core.models.NewTeam
-import com.lowbudgetlcs.domain.team.core.models.Team
-import com.lowbudgetlcs.domain.team.core.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.core.models.types.TeamId
-import com.lowbudgetlcs.domain.team.core.models.types.TeamName
+import com.lowbudgetlcs.domain.series.core.model.types.SeriesId
+import com.lowbudgetlcs.domain.team.core.model.NewTeam
+import com.lowbudgetlcs.domain.team.core.model.Team
+import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
+import com.lowbudgetlcs.domain.team.core.model.types.TeamId
+import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 
 interface ITeamRepository {
     fun insert(newTeam: NewTeam): Team?

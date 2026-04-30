@@ -1,7 +1,7 @@
 import com.lowbudgetlcs.domain.player.core.model.NewPlayer
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
-import com.lowbudgetlcs.domain.team.core.models.toTeamId
+import com.lowbudgetlcs.domain.team.core.model.toTeamId
 import com.lowbudgetlcs.domain.player.adapter.out.persistence.PlayerRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

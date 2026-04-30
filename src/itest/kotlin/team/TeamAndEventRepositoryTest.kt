@@ -8,10 +8,10 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.team.core.models.NewTeam
-import com.lowbudgetlcs.domain.team.core.models.Team
-import com.lowbudgetlcs.domain.team.core.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.core.models.toTeamName
+import com.lowbudgetlcs.domain.team.core.model.NewTeam
+import com.lowbudgetlcs.domain.team.core.model.Team
+import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
+import com.lowbudgetlcs.domain.team.core.model.toTeamName
 import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import io.kotest.core.extensions.install

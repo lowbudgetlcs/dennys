@@ -1,20 +1,23 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
+import com.lowbudgetlcs.api.plugins.setupAuth
+import com.lowbudgetlcs.api.plugins.setupCors
+import com.lowbudgetlcs.api.plugins.setupLogging
+import com.lowbudgetlcs.api.plugins.setupSessions
+import com.lowbudgetlcs.api.plugins.setupStatusPages
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authRoutes
+import com.lowbudgetlcs.api.routes.healthRoutes
+import com.lowbudgetlcs.api.routes.uiRoutes
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.http.content.singlePageApplication
-import io.ktor.server.http.content.vue
 import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.request.receive
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -24,7 +27,6 @@ import org.slf4j.LoggerFactory
 val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Application.routes() {
-
     routing {
         setupLogging()
         setupStatusPages()
@@ -33,19 +35,13 @@ fun Application.routes() {
         setupSessions()
         install(Resources)
         install(AutoHeadResponse)
-        route("/") {
-            singlePageApplication {
-                vue("/frontend")
-            }
-        }
+        uiRoutes()
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
             version = "5.26.1"
         }
-        route("/health") {
-            get {
-                call.respondText("OK")
-            }
-        }
+        healthRoutes()
+        authRoutes()
+        apiRoutes()
         route("/riot-callback") {
             post {
                 val dto = call.receive<PostMatchDto>()
@@ -53,7 +49,5 @@ fun Application.routes() {
                 call.respond(HttpStatusCode.OK)
             }
         }
-        authRoutes()
-        apiRoutes()
     }
 }

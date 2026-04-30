@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.team.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.team.core.models.NewTeam
-import com.lowbudgetlcs.domain.team.core.models.types.toTeamName
+import com.lowbudgetlcs.domain.team.core.model.NewTeam
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamName
 import kotlinx.serialization.Serializable
 
 @Serializable

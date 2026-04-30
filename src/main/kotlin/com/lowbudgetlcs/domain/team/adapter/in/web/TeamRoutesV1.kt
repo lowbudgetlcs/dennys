@@ -9,7 +9,7 @@ import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toNewTeam
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toTeamUpdate
-import com.lowbudgetlcs.domain.team.core.models.types.toTeamId
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application

@@ -2,7 +2,7 @@ package com.lowbudgetlcs.domain.team.adapter.`in`.web.dto
 
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.PlayerDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.toDto
-import com.lowbudgetlcs.domain.team.core.models.TeamWithPlayers
+import com.lowbudgetlcs.domain.team.core.model.TeamWithPlayers
 import kotlinx.serialization.Serializable
 
 @Serializable

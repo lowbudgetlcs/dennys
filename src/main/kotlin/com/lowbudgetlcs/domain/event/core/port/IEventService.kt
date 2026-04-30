@@ -7,8 +7,8 @@ import com.lowbudgetlcs.domain.event.core.model.EventWithSeries
 import com.lowbudgetlcs.domain.event.core.model.EventWithTeams
 import com.lowbudgetlcs.domain.event.core.model.NewEvent
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
-import com.lowbudgetlcs.domain.series.models.SeriesQuery
-import com.lowbudgetlcs.domain.team.core.models.types.TeamId
+import com.lowbudgetlcs.domain.series.core.model.SeriesQuery
+import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 
 interface IEventService {
     /**

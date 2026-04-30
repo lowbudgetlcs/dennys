@@ -6,12 +6,12 @@ import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
-import com.lowbudgetlcs.repositories.game.GameRepository
-import com.lowbudgetlcs.repositories.game.IGameRepository
+import com.lowbudgetlcs.domain.series.adapter.out.persistence.GameRepository
+import com.lowbudgetlcs.domain.series.core.port.IGameRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.player.adapter.out.persistence.PlayerRepository
-import com.lowbudgetlcs.repositories.series.ISeriesRepository
-import com.lowbudgetlcs.repositories.series.SeriesRepository
+import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
+import com.lowbudgetlcs.domain.series.adapter.out.persistence.SeriesRepository
 import com.lowbudgetlcs.repositories.session.ISessionRepository
 import com.lowbudgetlcs.repositories.session.SessionRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository

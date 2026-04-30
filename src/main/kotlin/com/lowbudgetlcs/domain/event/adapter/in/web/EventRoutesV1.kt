@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.domain.event.adapter.`in`.web
 
-import com.lowbudgetlcs.api.dto.series.NewSeriesDto
-import com.lowbudgetlcs.api.dto.series.SeriesFilterParams
-import com.lowbudgetlcs.api.dto.series.toDto
-import com.lowbudgetlcs.api.dto.series.toNewSeries
-import com.lowbudgetlcs.api.dto.series.toQuery
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.NewSeriesDto
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.SeriesFilterParams
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toDto
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toNewSeries
+import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.CreateEventDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventFilterParams
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventTeamLinkDto
@@ -17,9 +17,9 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventUpdate
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toNewEvent
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toTeamId
-import com.lowbudgetlcs.domain.series.ISeriesService
-import com.lowbudgetlcs.domain.series.models.toSeriesId
-import com.lowbudgetlcs.domain.team.core.models.types.toTeamId
+import com.lowbudgetlcs.domain.series.core.port.ISeriesService
+import com.lowbudgetlcs.domain.series.core.model.toSeriesId
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
