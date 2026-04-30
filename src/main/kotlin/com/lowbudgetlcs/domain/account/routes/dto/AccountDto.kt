@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.account.dto
+package com.lowbudgetlcs.domain.account.routes.dto
 
 import com.lowbudgetlcs.domain.account.models.Account
 import kotlinx.serialization.Serializable

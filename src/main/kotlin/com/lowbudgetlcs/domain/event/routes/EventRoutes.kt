@@ -1,21 +1,22 @@
 package com.lowbudgetlcs.domain.event.routes
 
-import com.lowbudgetlcs.domain.event.dto.CreateEventDto
-import com.lowbudgetlcs.domain.event.dto.EventFilterParams
-import com.lowbudgetlcs.domain.event.dto.EventTeamLinkDto
-import com.lowbudgetlcs.domain.event.dto.PatchEventDto
-import com.lowbudgetlcs.domain.event.dto.toDto
-import com.lowbudgetlcs.domain.event.dto.toEventUpdate
-import com.lowbudgetlcs.domain.event.dto.toNewEvent
-import com.lowbudgetlcs.domain.event.dto.toQuery
-import com.lowbudgetlcs.domain.event.dto.toTeamId
 import com.lowbudgetlcs.api.dto.series.NewSeriesDto
 import com.lowbudgetlcs.api.dto.series.SeriesFilterParams
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.api.dto.series.toNewSeries
 import com.lowbudgetlcs.api.dto.series.toQuery
-import com.lowbudgetlcs.domain.event.services.IEventService
-import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.IEventService
+import com.lowbudgetlcs.domain.event.models.types.toEventId
+import com.lowbudgetlcs.domain.event.routes.dto.CreateEventDto
+import com.lowbudgetlcs.domain.event.routes.dto.EventFilterParams
+import com.lowbudgetlcs.domain.event.routes.dto.EventTeamLinkDto
+import com.lowbudgetlcs.domain.event.routes.dto.PatchEventDto
+import com.lowbudgetlcs.domain.event.routes.dto.toDto
+import com.lowbudgetlcs.domain.event.routes.dto.toEventStage
+import com.lowbudgetlcs.domain.event.routes.dto.toEventUpdate
+import com.lowbudgetlcs.domain.event.routes.dto.toNewEvent
+import com.lowbudgetlcs.domain.event.routes.dto.toQuery
+import com.lowbudgetlcs.domain.event.routes.dto.toTeamId
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
@@ -78,7 +79,7 @@ fun Route.eventRoutesV1(
             val filter =
                 SeriesFilterParams(
                     teamIds = route.teamIds,
-                    stage = route.stage,
+                    stage = route.stage?.toEventStage(),
                 )
             val event = eventService.getEventWithSeries(route.eventId.toEventId(), filter.toQuery())
 

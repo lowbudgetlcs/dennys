@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.dto.series
 
-import com.lowbudgetlcs.domain.event.models.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
 import kotlinx.serialization.Serializable
 
 @Serializable

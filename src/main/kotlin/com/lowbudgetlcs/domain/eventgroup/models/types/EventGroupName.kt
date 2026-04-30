@@ -13,3 +13,6 @@ value class EventGroupName(
         require(value.length >= EVENT_GROUP_NAME_MIN_LENGTH) { "Event group name must be at least $EVENT_GROUP_NAME_MAX_LENGTH characters." }
     }
 }
+
+// Extensions
+fun String.toEventGroupName(): EventGroupName = EventGroupName(this)

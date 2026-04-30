@@ -4,12 +4,13 @@ import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.repositories.DatabaseException
-import io.ktor.http.*
-import io.ktor.serialization.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.response.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.JsonConvertException
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
 
 fun Application.setupStatusPages() {
     install(StatusPages) {

@@ -2,7 +2,8 @@ package com.lowbudgetlcs.domain.eventgroup
 
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.models.EventUpdate
-import com.lowbudgetlcs.domain.event.models.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroupUpdate
 import com.lowbudgetlcs.domain.eventgroup.models.EventGroupWithEvents
@@ -12,7 +13,6 @@ import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupWithEvents
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupName
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

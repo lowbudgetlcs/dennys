@@ -2,8 +2,8 @@ package com.lowbudgetlcs.domain.account.repositories
 
 import com.lowbudgetlcs.domain.account.models.Account
 import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.AccountId
-import com.lowbudgetlcs.domain.account.models.Puuid
+import com.lowbudgetlcs.domain.account.models.types.AccountId
+import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 
 interface IAccountRepository {

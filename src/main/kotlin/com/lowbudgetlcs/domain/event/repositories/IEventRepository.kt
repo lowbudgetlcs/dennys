@@ -3,9 +3,9 @@ package com.lowbudgetlcs.domain.event.repositories
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.EventId
-import com.lowbudgetlcs.domain.event.models.EventName
 import com.lowbudgetlcs.domain.event.models.RiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 
 interface IEventRepository {

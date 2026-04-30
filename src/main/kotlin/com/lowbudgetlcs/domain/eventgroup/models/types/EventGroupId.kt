@@ -4,3 +4,6 @@ package com.lowbudgetlcs.domain.eventgroup.models.types
 value class EventGroupId(
     val value: Int,
 )
+
+// Extensions
+fun Int.toEventGroupId(): EventGroupId = EventGroupId(this)

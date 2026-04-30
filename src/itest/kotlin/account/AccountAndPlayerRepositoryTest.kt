@@ -2,7 +2,7 @@ package account
 
 import com.lowbudgetlcs.domain.account.models.Account
 import com.lowbudgetlcs.domain.account.models.NewAccount
-import com.lowbudgetlcs.domain.account.models.Puuid
+import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.toPlayerId

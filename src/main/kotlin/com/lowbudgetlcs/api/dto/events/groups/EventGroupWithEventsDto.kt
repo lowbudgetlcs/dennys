@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.api.dto.events.groups
 
-import com.lowbudgetlcs.domain.event.dto.EventDto
+import com.lowbudgetlcs.domain.event.routes.dto.EventDto
 import kotlinx.serialization.Serializable
 
 @Serializable

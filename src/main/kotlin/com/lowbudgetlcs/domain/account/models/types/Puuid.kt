@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.account.models
+package com.lowbudgetlcs.domain.account.models.types
 
 const val PUUID_LENGTH = 78
 

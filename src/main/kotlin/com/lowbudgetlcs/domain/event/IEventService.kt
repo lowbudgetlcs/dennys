@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.event.services
+package com.lowbudgetlcs.domain.event
 
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventQuery
@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.EventWithSeries
 import com.lowbudgetlcs.domain.event.models.EventWithTeams
 import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.repositories.DatabaseException

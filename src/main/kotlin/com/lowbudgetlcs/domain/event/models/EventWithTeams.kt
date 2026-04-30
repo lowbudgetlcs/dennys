@@ -1,5 +1,10 @@
 package com.lowbudgetlcs.domain.event.models
 
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.models.types.EventDescription
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import com.lowbudgetlcs.domain.team.models.Team
 import java.time.Instant

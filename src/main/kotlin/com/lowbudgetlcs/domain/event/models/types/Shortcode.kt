@@ -1,6 +1,7 @@
-package com.lowbudgetlcs.domain.event.models
+package com.lowbudgetlcs.domain.event.models.types
 
-data class Shortcode(
+@JvmInline
+value class Shortcode(
     val value: String,
 )
 

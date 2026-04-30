@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.series.models
 
-import com.lowbudgetlcs.domain.event.models.EventId
-import com.lowbudgetlcs.domain.event.models.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 

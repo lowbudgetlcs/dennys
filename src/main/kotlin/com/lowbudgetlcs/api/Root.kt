@@ -1,12 +1,8 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.api.dto.auth.UserSession
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authRoutes
-import com.lowbudgetlcs.config.CookieConfig
-import com.lowbudgetlcs.domain.auth.IAuthService
-import com.lowbudgetlcs.domain.user.IUserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -22,10 +18,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import io.ktor.server.sessions.Sessions
-import io.ktor.server.sessions.cookie
-import io.ktor.server.sessions.sameSite
-import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

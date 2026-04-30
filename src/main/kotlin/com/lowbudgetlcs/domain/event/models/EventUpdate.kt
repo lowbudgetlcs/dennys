@@ -1,6 +1,9 @@
 package com.lowbudgetlcs.domain.event.models
 
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.models.types.EventDescription
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
 import java.time.Instant
 

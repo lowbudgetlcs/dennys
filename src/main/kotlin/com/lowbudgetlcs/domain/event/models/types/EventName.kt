@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.event.models
+package com.lowbudgetlcs.domain.event.models.types
 
 const val EVENT_NAME_MAX_LENGTH = 120
 const val EVENT_NAME_MIN_LENGTH = 3

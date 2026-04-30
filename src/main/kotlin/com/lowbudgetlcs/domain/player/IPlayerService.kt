@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.player
 
-import com.lowbudgetlcs.domain.account.models.AccountId
+import com.lowbudgetlcs.domain.account.models.types.AccountId
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
 import com.lowbudgetlcs.domain.player.models.PlayerWithTeams

@@ -1,10 +1,13 @@
 package services.events
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.services.EventService
+import com.lowbudgetlcs.domain.event.EventService
 import com.lowbudgetlcs.domain.event.models.*
-import com.lowbudgetlcs.domain.event.models.EventStage
-import com.lowbudgetlcs.domain.event.models.EventStatus
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStatus
+import com.lowbudgetlcs.domain.event.models.types.toEventDescription
+import com.lowbudgetlcs.domain.event.models.types.toEventId
+import com.lowbudgetlcs.domain.event.models.types.toEventName
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.domain.event.repositories.IEventRepository

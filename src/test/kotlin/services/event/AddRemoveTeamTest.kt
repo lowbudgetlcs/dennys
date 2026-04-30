@@ -1,15 +1,15 @@
 package services.events
 
-import com.lowbudgetlcs.domain.event.services.EventService
+import com.lowbudgetlcs.domain.event.EventService
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEvent
-import com.lowbudgetlcs.domain.event.models.toEventDescription
-import com.lowbudgetlcs.domain.event.models.toEventId
-import com.lowbudgetlcs.domain.event.models.toEventName
+import com.lowbudgetlcs.domain.event.models.types.toEventDescription
+import com.lowbudgetlcs.domain.event.models.types.toEventId
+import com.lowbudgetlcs.domain.event.models.types.toEventName
 import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.EventStage
-import com.lowbudgetlcs.domain.event.models.EventStatus
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStatus
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.toTeam
 import com.lowbudgetlcs.domain.team.models.toTeamId

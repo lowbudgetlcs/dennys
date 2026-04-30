@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto.players
 
-import com.lowbudgetlcs.domain.account.dto.AccountDto
 import com.lowbudgetlcs.api.dto.teams.TeamDto
+import com.lowbudgetlcs.domain.account.routes.dto.AccountDto
 import kotlinx.serialization.Serializable
 
 @Serializable

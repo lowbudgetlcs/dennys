@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.event.models
+package com.lowbudgetlcs.domain.event.models.types
 
 const val EVENT_DESCRIPTION_MAX_LENGTH = 10_000
 

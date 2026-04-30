@@ -1,9 +1,10 @@
 package com.lowbudgetlcs.domain.series
 
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
-import com.lowbudgetlcs.domain.event.models.toShortcode
-import com.lowbudgetlcs.domain.event.models.EventId
-import com.lowbudgetlcs.domain.event.models.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
+import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.toShortcode
+import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
@@ -14,7 +15,6 @@ import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.domain.event.repositories.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository

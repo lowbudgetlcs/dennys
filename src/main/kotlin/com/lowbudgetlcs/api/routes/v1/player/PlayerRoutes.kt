@@ -5,7 +5,7 @@ import com.lowbudgetlcs.api.dto.players.NewPlayerDto
 import com.lowbudgetlcs.api.dto.players.PatchPlayerDto
 import com.lowbudgetlcs.api.dto.players.toDto
 import com.lowbudgetlcs.api.dto.players.toNewPlayer
-import com.lowbudgetlcs.domain.account.models.toAccountId
+import com.lowbudgetlcs.domain.account.models.types.toAccountId
 import com.lowbudgetlcs.domain.player.IPlayerService
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName

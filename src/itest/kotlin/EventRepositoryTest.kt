@@ -1,13 +1,14 @@
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
-import com.lowbudgetlcs.domain.event.models.toEvent
-import com.lowbudgetlcs.domain.event.models.toEventDescription
-import com.lowbudgetlcs.domain.event.models.toEventId
-import com.lowbudgetlcs.domain.event.models.toEventName
+import com.lowbudgetlcs.domain.event.models.types.toEventDescription
+import com.lowbudgetlcs.domain.event.models.types.toEventId
+import com.lowbudgetlcs.domain.event.models.types.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.models.EventStage
-import com.lowbudgetlcs.domain.event.models.EventStatus
+import com.lowbudgetlcs.domain.event.models.enums.EventStage
+import com.lowbudgetlcs.domain.event.models.enums.EventStatus
 import com.lowbudgetlcs.domain.event.repositories.EventRepository
+import com.lowbudgetlcs.domain.event.models.RiotTournamentId
+import com.lowbudgetlcs.domain.event.models.types.EventId
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
@@ -23,6 +24,24 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+
+fun com.lowbudgetlcs.domain.event.models.NewEvent.toEvent(
+    id: com.lowbudgetlcs.domain.event.models.types.EventId,
+    createdAt: Instant,
+    riotTournamentId: com.lowbudgetlcs.domain.event.models.RiotTournamentId,
+): com.lowbudgetlcs.domain.event.models.Event =
+    _root_ide_package_.com.lowbudgetlcs.domain.event.models.Event(
+        id = id,
+        name = name,
+        description = description,
+        riotTournamentId = riotTournamentId,
+        createdAt = createdAt,
+        startDate = startDate,
+        endDate = endDate,
+        eventGroupId = null,
+        status = status,
+        eventStages = eventStages,
+    )
 
 class EventRepositoryTest :
     StringSpec({
