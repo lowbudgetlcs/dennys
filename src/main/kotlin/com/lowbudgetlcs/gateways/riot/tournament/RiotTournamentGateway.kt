@@ -6,6 +6,7 @@ import com.lowbudgetlcs.domain.event.core.model.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
 import com.lowbudgetlcs.gateways.riot.RiotApiException
+import com.lowbudgetlcs.logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -15,8 +16,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class RiotTournamentGateway(
     private val client: HttpClient,
@@ -28,10 +27,9 @@ class RiotTournamentGateway(
     private val url: String by lazy {
         if (useStubs) "$baseUrl/lol/tournament-stub/v5" else "$baseUrl/lol/tournament/v5"
     }
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun create(tournamentName: EventName): RiotTournament {
-        logger.debug("Creating tournament named '$tournamentName'...")
+        logger.debug("Creating tournament named '{}'...", tournamentName)
         val res =
             client.post("$url/tournaments") {
                 headers {

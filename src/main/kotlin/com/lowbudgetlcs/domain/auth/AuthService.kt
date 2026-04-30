@@ -8,13 +8,12 @@ import com.lowbudgetlcs.domain.auth.models.Session
 import com.lowbudgetlcs.domain.user.models.User
 import com.lowbudgetlcs.domain.user.models.types.Username
 import com.lowbudgetlcs.hashing.IHasher
+import com.lowbudgetlcs.logger
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.session.ISessionRepository
 import com.lowbudgetlcs.repositories.tokens.IAccessTokenRepository
 import com.lowbudgetlcs.repositories.user.IUserRepository
 import com.sksamuel.hoplite.Masked
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.UUID
 
@@ -26,7 +25,6 @@ class AuthService(
     private val tokenHasher: IHasher,
     private val cookieConfig: CookieConfig,
 ) : IAuthService {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override suspend fun authenticate(
         username: Username,

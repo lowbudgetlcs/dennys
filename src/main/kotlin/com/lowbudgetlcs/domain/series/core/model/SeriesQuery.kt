@@ -7,3 +7,4 @@ data class SeriesQuery(
     val teamIds: List<TeamId>?,
     val eventStage: EventStage?,
 )
+

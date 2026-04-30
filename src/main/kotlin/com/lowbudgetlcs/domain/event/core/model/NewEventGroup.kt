@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.event.core.model
 
-import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.EventGroupName
+import com.lowbudgetlcs.domain.event.core.model.types.EventId
 
 data class NewEventGroup(
     val name: EventGroupName,

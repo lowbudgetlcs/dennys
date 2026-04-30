@@ -10,17 +10,16 @@ import com.lowbudgetlcs.domain.series.core.model.NewGame
 import com.lowbudgetlcs.domain.series.core.model.NewSeries
 import com.lowbudgetlcs.domain.series.core.model.Series
 import com.lowbudgetlcs.domain.series.core.model.types.SeriesId
+import com.lowbudgetlcs.domain.series.core.port.IGameRepository
+import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
 import com.lowbudgetlcs.domain.series.core.port.ISeriesService
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
+import com.lowbudgetlcs.logger
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.domain.series.core.port.IGameRepository
-import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class SeriesService(
     private val gameRepo: IGameRepository,
@@ -29,7 +28,6 @@ class SeriesService(
     private val teamRepo: ITeamRepository,
     private val gate: IRiotTournamentGateway,
 ) : ISeriesService {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
@@ -62,7 +60,7 @@ class SeriesService(
         teamId2: TeamId,
         eventStage: EventStage,
     ): Series {
-        logger.debug("Fetching series containing ('$teamId1', '$teamId2') in stage '$eventStage'...")
+        logger.debug("Fetching series containing ('{}', '{}') in stage '{}'...", teamId1, teamId2, eventStage)
         eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id ${eventId.value} not found")
         val t1 = teamRepo.getById(teamId1) ?: throw NoSuchElementException("Team with id '${teamId1.value}' not found")
         val t2 = teamRepo.getById(teamId2) ?: throw NoSuchElementException("Team with id '${teamId2.value}' not found")
@@ -87,8 +85,8 @@ class SeriesService(
         logger.debug("Deleting series '$id'...")
         try {
             return seriesRepo.delete(id)
-        } catch (e: Throwable) {
-            throw DatabaseException("Failed to remove series")
+        } catch (_: Throwable) {
+            throw DatabaseException("Failed to remove series.")
         }
     }
 
@@ -98,10 +96,10 @@ class SeriesService(
         val series = getSeries(newGame.seriesId) // Throws if not found
         val blueTeam =
             teamRepo.getById(newGame.blueTeamId)
-                ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found")
+                ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found.")
         val redTeam =
             teamRepo.getById(newGame.redTeamId)
-                ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
+                ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found.")
         require(
             Pair(
                 redTeam,
@@ -110,7 +108,7 @@ class SeriesService(
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
-        logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
+        logger.debug("Fetching tournament id for event '${series.eventId}'...")
         val event =
             eventRepo.getById(series.eventId)
                 ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")

@@ -21,11 +21,10 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.invoke.MethodHandles
 
-val logger: Logger = LoggerFactory.getLogger(Application::class.java)
-
+private val logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass())
 fun Application.routes() {
     routing {
         setupLogging()

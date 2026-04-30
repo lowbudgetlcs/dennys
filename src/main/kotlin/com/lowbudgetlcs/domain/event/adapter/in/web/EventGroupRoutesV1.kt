@@ -6,11 +6,10 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.PatchEventGroupDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventGroupUpdate
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toNewEventGroup
+import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
-import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
 import io.ktor.server.request.receive
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
@@ -20,12 +19,12 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.invoke.MethodHandles
 
 
+private val logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass())
 fun Route.eventGroupRoutesV1() {
-    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
     val eventGroupService by inject<IEventGroupService>()
 
     route("/eventGroup") {

@@ -4,9 +4,9 @@ import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.EventUpdate
 import com.lowbudgetlcs.domain.event.core.model.NewEvent
 import com.lowbudgetlcs.domain.event.core.model.RiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
-import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 
 interface IEventRepository {
     fun getAll(): List<Event>

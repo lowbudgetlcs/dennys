@@ -18,15 +18,14 @@ import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.series.core.model.SeriesQuery
 import com.lowbudgetlcs.domain.series.core.model.filterByParticipants
 import com.lowbudgetlcs.domain.series.core.model.filterByStage
+import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
 import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
+import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
+import com.lowbudgetlcs.logger
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
-import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class EventService(
     private val eventRepo: IEventRepository,
@@ -34,11 +33,10 @@ class EventService(
     private val teamRepo: ITeamRepository,
     private val seriesRepo: ISeriesRepository,
 ) : IEventService {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun getAllEvents(query: EventQuery?): List<Event> {
         logger.debug("Fetching all events...")
-        query?.run { logger.debug("(Query: '$query')") }
+        query?.run { logger.debug("(Query: '{}')", query) }
         return eventRepo.getAll().filterByName(query).filterByStatus(query)
     }
 

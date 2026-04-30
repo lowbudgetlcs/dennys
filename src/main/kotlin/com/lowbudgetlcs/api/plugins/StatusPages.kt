@@ -3,7 +3,6 @@ package com.lowbudgetlcs.api.plugins
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
-import com.lowbudgetlcs.api.logger
 import com.lowbudgetlcs.repositories.DatabaseException
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.JsonConvertException
@@ -12,6 +11,10 @@ import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
+import org.slf4j.LoggerFactory
+import java.lang.invoke.MethodHandles
+
+private val logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass())
 
 fun Application.setupStatusPages() {
     install(StatusPages) {

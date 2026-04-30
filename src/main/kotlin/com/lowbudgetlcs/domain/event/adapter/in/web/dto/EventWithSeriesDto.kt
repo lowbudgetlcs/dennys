@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.event.adapter.`in`.web.dto
 
+import com.lowbudgetlcs.domain.event.core.model.EventWithSeries
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.SeriesDto
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toDto
-import com.lowbudgetlcs.domain.event.core.model.EventWithSeries
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.Instant

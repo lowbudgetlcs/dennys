@@ -13,17 +13,15 @@ import com.lowbudgetlcs.domain.team.core.model.filterByString
 import com.lowbudgetlcs.domain.team.core.model.toTeamWithPlayers
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 import com.lowbudgetlcs.domain.team.core.model.types.TeamName
-import com.lowbudgetlcs.domain.team.core.port.ITeamService
-import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import com.lowbudgetlcs.domain.team.core.port.ITeamService
+import com.lowbudgetlcs.logger
+import com.lowbudgetlcs.repositories.DatabaseException
 
 class TeamService(
     private val teamRepository: ITeamRepository,
     private val playerRepository: IPlayerRepository,
 ) : ITeamService {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun getAllTeams(query: TeamQuery?): List<Team> {
         logger.debug("Fetching all teams...")

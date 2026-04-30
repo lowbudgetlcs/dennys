@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.domain.event.core.port
 
-import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.EventGroup
 import com.lowbudgetlcs.domain.event.core.model.EventGroupUpdate
 import com.lowbudgetlcs.domain.event.core.model.EventGroupWithEvents
 import com.lowbudgetlcs.domain.event.core.model.NewEventGroup
 import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
+import com.lowbudgetlcs.domain.event.core.model.types.EventId
 
 interface IEventGroupService {
     /**

@@ -4,9 +4,9 @@ import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.domain.event.core.model.types.EventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
-import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 import com.lowbudgetlcs.domain.series.core.model.Series
 import com.lowbudgetlcs.domain.team.core.model.Team
 import java.time.Instant

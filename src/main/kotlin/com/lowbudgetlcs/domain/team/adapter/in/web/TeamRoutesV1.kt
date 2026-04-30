@@ -12,7 +12,6 @@ import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toTeamUpdate
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
 import io.ktor.server.request.receive
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
@@ -22,13 +21,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.invoke.MethodHandles
 
 
+private val logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass())
 fun Route.teamRoutesV1() {
     val teamService by inject<ITeamService>()
-    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
     route("/team") {
         get<TeamResourcesV1> { route ->

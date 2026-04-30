@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.event.adapter.`in`.web.dto
 
+import com.lowbudgetlcs.domain.event.core.model.EventWithTeams
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.TeamDto
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toDto
-import com.lowbudgetlcs.domain.event.core.model.EventWithTeams
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.Instant

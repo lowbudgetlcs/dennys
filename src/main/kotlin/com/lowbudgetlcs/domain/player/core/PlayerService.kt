@@ -10,17 +10,15 @@ import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
-import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import com.lowbudgetlcs.logger
+import com.lowbudgetlcs.repositories.DatabaseException
 
 class PlayerService(
     private val playerRepository: IPlayerRepository,
     private val accountRepository: IAccountRepository,
     private val teamRepository: ITeamRepository,
 ) : IPlayerService {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun getAllPlayers(): List<Player> {
         logger.info("Fetching all players...")

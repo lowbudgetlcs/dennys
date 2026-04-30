@@ -14,15 +14,13 @@ import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import com.lowbudgetlcs.logger
 import com.lowbudgetlcs.repositories.DatabaseException
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class EventGroupService(
     private val eventGroupRepo: IEventGroupRepository,
     private val eventRepo: IEventRepository,
 ) : IEventGroupService {
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun getAllEventGroups(): List<EventGroup> {
         logger.debug("Fetching all event groups...")

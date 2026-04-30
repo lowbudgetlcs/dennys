@@ -1,16 +1,15 @@
 package com.lowbudgetlcs.domain.player.adapter.`in`.web
 
+import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.AccountLinkRequestDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.NewPlayerDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.PatchPlayerDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.toNewPlayer
-import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
 import com.lowbudgetlcs.domain.player.core.model.types.toPlayerId
 import com.lowbudgetlcs.domain.player.core.model.types.toPlayerName
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
 import io.ktor.server.request.receive
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
@@ -20,13 +19,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.invoke.MethodHandles
 
 
+private val logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass())
 fun Route.playerRoutesV1() {
     val playerService by inject<IPlayerService>()
-    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
     route("/player") {
         get<PlayerResourcesV1> {

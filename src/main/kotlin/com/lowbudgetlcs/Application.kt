@@ -30,7 +30,8 @@ import java.time.Instant
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
+val <T : Any> T.logger: Logger
+    get() = LoggerFactory.getLogger(this.javaClass)
 
 private val SESSION_CLEANUP_DELAY = 360.seconds
 
