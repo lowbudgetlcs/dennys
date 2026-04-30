@@ -1,30 +1,30 @@
-package com.lowbudgetlcs.api.routes.v1.team
+package com.lowbudgetlcs.domain.team.adapter.`in`.web
 
 import io.ktor.resources.Resource
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Resource("/")
-class TeamResources(
+class TeamResourcesV1(
     val name: String? = null,
 ) {
     @Serializable
     @Resource("{teamId}")
     data class ById(
-        val parent: TeamResources = TeamResources(),
+        val parent: TeamResourcesV1 = TeamResourcesV1(),
         val teamId: Int,
     )
 
     @Serializable
     @Resource("{teamId}/players")
     data class ByIdPlayers(
-        val parent: TeamResources = TeamResources(),
+        val parent: TeamResourcesV1 = TeamResourcesV1(),
         val teamId: Int,
     )
     @Serializable
     @Resource("{teamId}/players/{playerId}")
     data class ByIdPlayersById(
-        val parent: TeamResources = TeamResources(),
+        val parent: TeamResourcesV1 = TeamResourcesV1(),
         val teamId: Int,
         val playerId: Int,
     )

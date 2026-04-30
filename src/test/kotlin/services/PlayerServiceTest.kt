@@ -8,7 +8,7 @@ import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
-import com.lowbudgetlcs.repositories.team.ITeamRepository
+import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty

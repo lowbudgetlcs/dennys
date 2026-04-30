@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.series.game.models
 
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.core.models.types.TeamId
 
 data class NewGame(
     val seriesId: SeriesId,

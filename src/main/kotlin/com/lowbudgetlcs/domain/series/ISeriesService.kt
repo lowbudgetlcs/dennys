@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.core.models.types.TeamId
 
 interface ISeriesService {
     /**

@@ -1,8 +1,8 @@
-package com.lowbudgetlcs.domain.team.models
+package com.lowbudgetlcs.domain.team.core.models
 
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
-import com.lowbudgetlcs.domain.team.models.types.TeamName
+import com.lowbudgetlcs.domain.team.core.models.types.TeamName
 
 data class TeamUpdate(
     val name: TeamName? = null,

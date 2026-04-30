@@ -1,16 +1,16 @@
-package com.lowbudgetlcs.api.routes.v1.team
+package com.lowbudgetlcs.domain.team.adapter.`in`.web
 
-import com.lowbudgetlcs.api.dto.teams.NewTeamDto
-import com.lowbudgetlcs.api.dto.teams.PatchTeamDto
-import com.lowbudgetlcs.api.dto.teams.TeamFilterParams
-import com.lowbudgetlcs.api.dto.teams.TeamPlayerLinkRequestDto
-import com.lowbudgetlcs.api.dto.teams.toDto
-import com.lowbudgetlcs.api.dto.teams.toNewTeam
-import com.lowbudgetlcs.api.dto.teams.toQuery
-import com.lowbudgetlcs.api.dto.teams.toTeamUpdate
-import com.lowbudgetlcs.domain.player.models.toPlayerId
-import com.lowbudgetlcs.domain.team.ITeamService
-import com.lowbudgetlcs.domain.team.models.toTeamId
+import com.lowbudgetlcs.domain.player.core.model.types.toPlayerId
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.NewTeamDto
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.PatchTeamDto
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.TeamFilterParams
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.TeamPlayerLinkRequestDto
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toDto
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toNewTeam
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toQuery
+import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.toTeamUpdate
+import com.lowbudgetlcs.domain.team.core.models.types.toTeamId
+import com.lowbudgetlcs.domain.team.core.port.ITeamService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -28,7 +28,7 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.teamRoutesV1(teamService: ITeamService) {
     route("/team") {
-        get<TeamResources> { route ->
+        get<TeamResourcesV1> { route ->
             val filter =
                 TeamFilterParams(
                     name = route.name,
@@ -36,33 +36,33 @@ fun Route.teamRoutesV1(teamService: ITeamService) {
             val teams = teamService.getAllTeams(filter.toQuery())
             call.respond(teams.map { it.toDto() })
         }
-        post<TeamResources> {
+        post<TeamResourcesV1> {
             val dto = call.receive<NewTeamDto>()
             logger.debug(dto.toString())
             val created = teamService.createTeam(dto.toNewTeam())
             call.respond(HttpStatusCode.Created, created.toDto())
         }
-        get<TeamResources.ById> { route ->
+        get<TeamResourcesV1.ById> { route ->
             val team = teamService.getTeam(route.teamId.toTeamId())
             call.respond(team.toDto())
         }
-        patch<TeamResources.ById> { route ->
+        patch<TeamResourcesV1.ById> { route ->
             val dto = call.receive<PatchTeamDto>()
             val updated = teamService.patchTeam(route.teamId.toTeamId(), dto.toTeamUpdate())
             call.respond(updated.toDto())
         }
-        get<TeamResources.ByIdPlayers> { route ->
+        get<TeamResourcesV1.ByIdPlayers> { route ->
             val team = teamService.getTeamWithPlayers(route.teamId.toTeamId())
             call.respond(team.toDto())
         }
-        post<TeamResources.ByIdPlayers> { route ->
+        post<TeamResourcesV1.ByIdPlayers> { route ->
             val dto = call.receive<TeamPlayerLinkRequestDto>()
             logger.debug(dto.toString())
             val teamId = route.teamId.toTeamId()
             val team = teamService.addPlayerToTeam(dto.playerId.toPlayerId(), teamId)
             call.respond(team.toDto())
         }
-        delete<TeamResources.ByIdPlayersById> { route ->
+        delete<TeamResourcesV1.ByIdPlayersById> { route ->
             val teamId = route.teamId.toTeamId()
             val playerId = route.playerId.toPlayerId()
             val team = teamService.removePlayerFromTeam(playerId, teamId)

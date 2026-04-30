@@ -12,8 +12,8 @@ import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.domain.player.core.PlayerService
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.series.SeriesService
-import com.lowbudgetlcs.domain.team.ITeamService
-import com.lowbudgetlcs.domain.team.TeamService
+import com.lowbudgetlcs.domain.team.core.port.ITeamService
+import com.lowbudgetlcs.domain.team.core.TeamService
 import com.lowbudgetlcs.domain.user.IUserService
 import com.lowbudgetlcs.domain.user.UserService
 import org.koin.core.qualifier.named

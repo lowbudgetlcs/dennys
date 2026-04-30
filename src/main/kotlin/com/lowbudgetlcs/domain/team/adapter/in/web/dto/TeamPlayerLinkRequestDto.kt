@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.dto.teams
+package com.lowbudgetlcs.domain.team.adapter.`in`.web.dto
 
 import kotlinx.serialization.Serializable
 

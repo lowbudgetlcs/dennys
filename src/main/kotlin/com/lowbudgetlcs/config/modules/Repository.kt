@@ -14,8 +14,8 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.session.ISessionRepository
 import com.lowbudgetlcs.repositories.session.SessionRepository
-import com.lowbudgetlcs.repositories.team.ITeamRepository
-import com.lowbudgetlcs.repositories.team.TeamRepository
+import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
+import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import com.lowbudgetlcs.repositories.tokens.AccessTokenRepository
 import com.lowbudgetlcs.repositories.tokens.IAccessTokenRepository
 import com.lowbudgetlcs.repositories.user.IUserRepository

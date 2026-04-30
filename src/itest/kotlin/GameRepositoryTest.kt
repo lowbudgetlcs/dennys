@@ -10,13 +10,13 @@ import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.toSeriesId
-import com.lowbudgetlcs.domain.team.models.NewTeam
-import com.lowbudgetlcs.domain.team.models.Team
-import com.lowbudgetlcs.domain.team.models.toTeamName
+import com.lowbudgetlcs.domain.team.core.models.NewTeam
+import com.lowbudgetlcs.domain.team.core.models.Team
+import com.lowbudgetlcs.domain.team.core.models.toTeamName
 import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
-import com.lowbudgetlcs.repositories.team.TeamRepository
+import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

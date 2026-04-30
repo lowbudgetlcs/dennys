@@ -8,8 +8,8 @@ import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.models.toTeamId
-import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.core.models.toTeamId
+import com.lowbudgetlcs.domain.team.core.models.types.TeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.impl.DSL.multiset

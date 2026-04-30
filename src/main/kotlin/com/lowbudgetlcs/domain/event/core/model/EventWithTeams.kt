@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.event.core.model.types.EventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
 import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
-import com.lowbudgetlcs.domain.team.models.Team
+import com.lowbudgetlcs.domain.team.core.models.Team
 import java.time.Instant
 
 data class EventWithTeams(

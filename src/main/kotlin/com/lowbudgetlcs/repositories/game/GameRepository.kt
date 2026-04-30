@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.toGameId
 import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.series.models.toSeriesId
-import com.lowbudgetlcs.domain.team.models.toTeamId
+import com.lowbudgetlcs.domain.team.core.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.GAMES

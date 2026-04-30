@@ -5,7 +5,7 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventStage
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
-import com.lowbudgetlcs.domain.team.models.toTeamId
+import com.lowbudgetlcs.domain.team.core.models.toTeamId
 
 fun Series.toDto(): SeriesDto =
     SeriesDto(

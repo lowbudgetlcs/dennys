@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.team.models.types
+package com.lowbudgetlcs.domain.team.core.models.types
 
 const val TEAM_NAME_MAX_LENGTH = 80
 const val TEAM_NAME_MIN_LENGTH = 3
@@ -16,3 +16,6 @@ value class TeamName(
         require(value.length >= TEAM_NAME_MIN_LENGTH) { "Team name must be at least $TEAM_NAME_MIN_LENGTH characters." }
     }
 }
+
+// Extensions
+fun String.toTeamName(): TeamName = TeamName(this)

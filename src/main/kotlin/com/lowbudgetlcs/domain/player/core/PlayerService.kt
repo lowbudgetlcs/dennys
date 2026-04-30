@@ -11,7 +11,7 @@ import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.team.ITeamRepository
+import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

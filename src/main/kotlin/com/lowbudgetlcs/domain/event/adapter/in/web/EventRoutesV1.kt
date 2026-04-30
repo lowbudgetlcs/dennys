@@ -19,7 +19,7 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toTeamId
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.series.models.toSeriesId
-import com.lowbudgetlcs.domain.team.models.toTeamId
+import com.lowbudgetlcs.domain.team.core.models.types.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive

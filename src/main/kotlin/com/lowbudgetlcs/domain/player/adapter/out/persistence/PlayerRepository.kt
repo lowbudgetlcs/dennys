@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
 import com.lowbudgetlcs.domain.player.core.model.types.toPlayerId
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
-import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.core.models.types.TeamId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS

@@ -10,14 +10,14 @@ import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.models.types.TeamId
+import com.lowbudgetlcs.domain.team.core.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
-import com.lowbudgetlcs.repositories.team.ITeamRepository
+import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
