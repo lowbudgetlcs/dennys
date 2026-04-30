@@ -8,8 +8,8 @@ import com.lowbudgetlcs.domain.event.core.EventService
 import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.event.core.EventGroupService
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
-import com.lowbudgetlcs.domain.player.IPlayerService
-import com.lowbudgetlcs.domain.player.PlayerService
+import com.lowbudgetlcs.domain.player.core.port.IPlayerService
+import com.lowbudgetlcs.domain.player.core.PlayerService
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.series.SeriesService
 import com.lowbudgetlcs.domain.team.ITeamService

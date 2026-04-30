@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.team
 
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
-import com.lowbudgetlcs.domain.player.models.Player
-import com.lowbudgetlcs.domain.player.models.types.PlayerId
+import com.lowbudgetlcs.domain.player.core.model.Player
+import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamQuery
@@ -13,7 +13,7 @@ import com.lowbudgetlcs.domain.team.models.toTeamWithPlayers
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.player.IPlayerRepository
+import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

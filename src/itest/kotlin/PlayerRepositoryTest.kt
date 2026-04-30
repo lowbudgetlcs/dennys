@@ -1,8 +1,8 @@
-import com.lowbudgetlcs.domain.player.models.NewPlayer
+import com.lowbudgetlcs.domain.player.core.model.NewPlayer
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.team.models.toTeamId
-import com.lowbudgetlcs.repositories.player.PlayerRepository
+import com.lowbudgetlcs.domain.player.adapter.out.persistence.PlayerRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension

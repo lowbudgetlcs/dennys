@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto.teams
 
 import com.lowbudgetlcs.api.dto.UNSET_PATCH_FIELD
-import com.lowbudgetlcs.api.dto.players.toDto
+import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team

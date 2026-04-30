@@ -8,7 +8,7 @@ import com.lowbudgetlcs.domain.account.core.port.IAccountService
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
 import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.player.IPlayerRepository
+import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

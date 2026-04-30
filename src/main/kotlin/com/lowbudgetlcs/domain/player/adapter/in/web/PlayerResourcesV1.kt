@@ -1,30 +1,30 @@
-package com.lowbudgetlcs.api.routes.v1.player
+package com.lowbudgetlcs.domain.player.adapter.`in`.web
 
 import io.ktor.resources.Resource
 
 @Resource("/")
-class PlayerResources {
+class PlayerResourcesV1 {
     @Resource("{playerId}")
     data class ById(
-        val parent: PlayerResources = PlayerResources(),
+        val parent: PlayerResourcesV1 = PlayerResourcesV1(),
         val playerId: Int,
     )
 
     @Resource("{playerId}/teams")
     data class ByIdTeams(
-        val parent: PlayerResources = PlayerResources(),
+        val parent: PlayerResourcesV1 = PlayerResourcesV1(),
         val playerId: Int,
     )
 
     @Resource("{playerId}/accounts")
     data class Accounts(
-        val parent: PlayerResources = PlayerResources(),
+        val parent: PlayerResourcesV1 = PlayerResourcesV1(),
         val playerId: Int,
     )
 
     @Resource("{playerId}/accounts/{accountId}")
     data class AccountById(
-        val parent: PlayerResources = PlayerResources(),
+        val parent: PlayerResourcesV1 = PlayerResourcesV1(),
         val playerId: Int,
         val accountId: Int,
     )

@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.routes
 
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.eventGroupRoutesV1
-import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
+import com.lowbudgetlcs.domain.player.adapter.`in`.web.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
 import com.lowbudgetlcs.domain.account.core.port.IAccountService
@@ -9,7 +9,7 @@ import com.lowbudgetlcs.domain.account.adapter.`in`.web.accountRoutesV1
 import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.eventRoutesV1
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
-import com.lowbudgetlcs.domain.player.IPlayerService
+import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.team.ITeamService
 import io.ktor.server.auth.authenticate

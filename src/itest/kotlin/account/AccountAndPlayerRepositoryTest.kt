@@ -3,13 +3,13 @@ package account
 import com.lowbudgetlcs.domain.account.core.model.Account
 import com.lowbudgetlcs.domain.account.core.model.NewAccount
 import com.lowbudgetlcs.domain.account.core.model.types.Puuid
-import com.lowbudgetlcs.domain.player.models.NewPlayer
-import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.core.model.NewPlayer
+import com.lowbudgetlcs.domain.player.core.model.Player
 import com.lowbudgetlcs.domain.player.models.toPlayerId
 import com.lowbudgetlcs.domain.player.models.toPlayerName
-import com.lowbudgetlcs.domain.player.models.types.PlayerId
+import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.account.adapter.out.persistence.SqlAccountRepository
-import com.lowbudgetlcs.repositories.player.PlayerRepository
+import com.lowbudgetlcs.domain.player.adapter.out.persistence.PlayerRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

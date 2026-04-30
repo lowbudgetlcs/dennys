@@ -6,7 +6,7 @@ import com.lowbudgetlcs.domain.account.core.model.types.AccountId
 import com.lowbudgetlcs.domain.account.core.model.types.Puuid
 import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
-import com.lowbudgetlcs.domain.player.models.types.PlayerId
+import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS

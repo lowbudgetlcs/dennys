@@ -8,8 +8,8 @@ import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupReposi
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
-import com.lowbudgetlcs.repositories.player.IPlayerRepository
-import com.lowbudgetlcs.repositories.player.PlayerRepository
+import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
+import com.lowbudgetlcs.domain.player.adapter.out.persistence.PlayerRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.session.ISessionRepository

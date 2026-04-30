@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.repositories.team
 
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
-import com.lowbudgetlcs.domain.player.models.types.PlayerId
+import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team

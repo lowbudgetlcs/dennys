@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.team.models
 
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
-import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.core.model.Player
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 

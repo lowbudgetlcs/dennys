@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.dto.players
+package com.lowbudgetlcs.domain.player.adapter.`in`.web.dto
 
 import kotlinx.serialization.Serializable
 

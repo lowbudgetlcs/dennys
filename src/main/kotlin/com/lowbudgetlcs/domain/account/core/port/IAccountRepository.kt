@@ -4,7 +4,7 @@ import com.lowbudgetlcs.domain.account.core.model.Account
 import com.lowbudgetlcs.domain.account.core.model.NewAccount
 import com.lowbudgetlcs.domain.account.core.model.types.AccountId
 import com.lowbudgetlcs.domain.account.core.model.types.Puuid
-import com.lowbudgetlcs.domain.player.models.types.PlayerId
+import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 
 interface IAccountRepository {
     fun getAll(): List<Account>
