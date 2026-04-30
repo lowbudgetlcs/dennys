@@ -33,12 +33,12 @@ import io.ktor.server.routing.route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.eventRoutesV1(
     eventService: IEventService,
     seriesService: ISeriesService,
 ) {
+    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
     route("/event") {
         get<EventResourcesV1> { route ->
             val filter =

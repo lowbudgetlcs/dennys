@@ -9,13 +9,13 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.eventgroup.EventGroupService
-import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
-import com.lowbudgetlcs.domain.eventgroup.models.toEventGroup
+import com.lowbudgetlcs.domain.event.core.EventGroupService
+import com.lowbudgetlcs.domain.event.core.model.NewEventGroup
+import com.lowbudgetlcs.domain.event.core.model.toEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
+import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FunSpec

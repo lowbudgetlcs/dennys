@@ -1,11 +1,11 @@
 package eventgroup
 
-import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
-import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
-import com.lowbudgetlcs.domain.eventgroup.models.toEventGroup
+import com.lowbudgetlcs.domain.event.core.model.EventGroup
+import com.lowbudgetlcs.domain.event.core.model.NewEventGroup
+import com.lowbudgetlcs.domain.event.core.model.toEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
-import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -30,7 +30,7 @@ class EventGroupRepositoryTest :
             }
         val ds = install(JdbcDatabaseContainerSpecExtension(postgres))
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
-        val repo = EventGroupRepository(dslContext)
+        val repo = SqlEventGroupRepository(dslContext)
 
         // Data
         val newGroup = NewEventGroup(name = "Test Group".toEventGroupName())

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.eventgroup.models.types
+package com.lowbudgetlcs.domain.event.core.model.types
 
 @JvmInline
 value class EventGroupId(

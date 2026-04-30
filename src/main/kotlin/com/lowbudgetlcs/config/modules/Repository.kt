@@ -4,8 +4,8 @@ import com.lowbudgetlcs.domain.account.adapter.out.persistence.SqlAccountReposit
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
-import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupRepository
+import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
@@ -27,7 +27,7 @@ val repositoryModule =
         single<IGameRepository> { GameRepository(get()) }
         single<ITeamRepository> { TeamRepository(get()) }
         single<IEventRepository> { SqlEventRepository(get()) }
-        single<IEventGroupRepository> { EventGroupRepository(get()) }
+        single<IEventGroupRepository> { SqlEventGroupRepository(get()) }
         single<IPlayerRepository> { PlayerRepository(get()) }
         single<ISeriesRepository> { SeriesRepository(get()) }
         single<IAccountRepository> { SqlAccountRepository(get()) }

@@ -9,12 +9,12 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.eventgroup.models.EventGroup
-import com.lowbudgetlcs.domain.eventgroup.models.NewEventGroup
+import com.lowbudgetlcs.domain.event.core.model.EventGroup
+import com.lowbudgetlcs.domain.event.core.model.NewEventGroup
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupId
 import com.lowbudgetlcs.domain.eventgroup.models.toEventGroupName
 import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
-import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -41,7 +41,7 @@ class EventGroupAndEventRepositoryTest :
                 maximumPoolSize = 1
             }
         val dslContext = DSL.using(ds, SQLDialect.POSTGRES)
-        val eventGroupRepo = EventGroupRepository(dslContext)
+        val eventGroupRepo = SqlEventGroupRepository(dslContext)
         val eventRepo = SqlEventRepository(dslContext)
         // Data
         val now = Instant.now().truncatedTo(ChronoUnit.MICROS)

@@ -4,7 +4,7 @@ import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.domain.event.core.model.types.EventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
-import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
+import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 import java.time.Instant
 
 data class NewEvent(

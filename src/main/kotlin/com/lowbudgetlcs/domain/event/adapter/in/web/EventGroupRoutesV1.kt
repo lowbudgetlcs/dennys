@@ -1,14 +1,14 @@
-package com.lowbudgetlcs.api.routes.v1.event.group
+package com.lowbudgetlcs.domain.event.adapter.`in`.web
 
-import com.lowbudgetlcs.api.dto.events.groups.CreateEventGroupDto
-import com.lowbudgetlcs.api.dto.events.groups.EventGroupAddEventDto
-import com.lowbudgetlcs.api.dto.events.groups.PatchEventGroupDto
-import com.lowbudgetlcs.api.dto.events.groups.toDto
-import com.lowbudgetlcs.api.dto.events.groups.toEventGroupUpdate
-import com.lowbudgetlcs.api.dto.events.groups.toNewEventGroup
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.CreateEventGroupDto
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventGroupAddEventDto
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.PatchEventGroupDto
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toDto
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventGroupUpdate
+import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toNewEventGroup
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
-import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
-import com.lowbudgetlcs.domain.eventgroup.models.types.toEventGroupId
+import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
+import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -22,42 +22,42 @@ import io.ktor.server.routing.route
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.eventGroupRoutesV1(eventGroupService: IEventGroupService) {
+    val logger: Logger = LoggerFactory.getLogger(Application::class.java)
     route("/eventGroup") {
-        get<EventGroupResources> {
+        get<EventGroupResourcesV1> {
             val groups = eventGroupService.getAllEventGroups()
             call.respond(groups.map { it.toDto() })
         }
-        post<EventGroupResources> {
+        post<EventGroupResourcesV1> {
             val dto = call.receive<CreateEventGroupDto>()
             logger.debug(dto.toString())
             val created = eventGroupService.createEventGroup(dto.toNewEventGroup())
             call.respond(HttpStatusCode.Created, created.toDto())
         }
-        get<EventGroupResources.ById> { route ->
+        get<EventGroupResourcesV1.ById> { route ->
             val event = eventGroupService.getEventGroup(route.eventGroupId.toEventGroupId())
             call.respond(event.toDto())
         }
-        patch<EventGroupResources.ById> { route ->
+        patch<EventGroupResourcesV1.ById> { route ->
             val dto = call.receive<PatchEventGroupDto>()
             logger.debug("\uD83C\uDF81 Body: {}", dto)
             val updated =
                 eventGroupService.patchEventGroup(route.eventGroupId.toEventGroupId(), dto.toEventGroupUpdate())
             call.respond(updated.toDto())
         }
-        get<EventGroupResources.ByIdEvents> { route ->
+        get<EventGroupResourcesV1.ByIdEvents> { route ->
             val groups = eventGroupService.getEventGroupWithEvents(route.eventGroupId.toEventGroupId())
             call.respond(groups.toDto())
         }
-        post<EventGroupResources.ByIdEvents> { route ->
+        post<EventGroupResourcesV1.ByIdEvents> { route ->
             val dto = call.receive<EventGroupAddEventDto>()
             logger.debug(dto.toString())
             val event = eventGroupService.addEvent(route.eventGroupId.toEventGroupId(), dto.eventId.toEventId())
             call.respond(event.toDto())
         }
-        delete<EventGroupResources.ByIdEventId> { route ->
+        delete<EventGroupResourcesV1.ByIdEventId> { route ->
             val event =
                 eventGroupService.removeEvent(route.eventGroupId.toEventGroupId(), route.eventId.toEventId())
             call.respond(event.toDto())

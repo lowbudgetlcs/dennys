@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.api.dto.events.groups
+package com.lowbudgetlcs.domain.event.adapter.`in`.web.dto
 
 import kotlinx.serialization.Serializable
 

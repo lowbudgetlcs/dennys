@@ -14,8 +14,8 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.domain.eventgroup.models.types.EventGroupId
-import com.lowbudgetlcs.domain.eventgroup.models.types.toEventGroupId
+import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENTS
