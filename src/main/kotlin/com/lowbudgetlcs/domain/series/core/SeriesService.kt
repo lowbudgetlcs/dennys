@@ -19,7 +19,7 @@ import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.DatabaseException
 
 class SeriesService(
     private val gameRepo: IGameRepository,

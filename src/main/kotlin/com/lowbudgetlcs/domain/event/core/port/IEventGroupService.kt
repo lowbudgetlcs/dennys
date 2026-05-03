@@ -22,7 +22,7 @@ interface IEventGroupService {
      * @return the specified event group.
      *
      * @throws NoSuchElementException when the event group is not found.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repository fails.
+     * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
      */
     fun getEventGroup(id: EventGroupId): EventGroup
 
@@ -33,7 +33,7 @@ interface IEventGroupService {
      * @return the newly created event group.
      *
      * @throws IllegalArgumentException if the event group cannot be created.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repository fails.
+     * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
      */
     fun createEventGroup(group: NewEventGroup): EventGroup
 
@@ -45,7 +45,7 @@ interface IEventGroupService {
      * @return the updated event.
      *
      * @throws IllegalArgumentException if the new details are invalid.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories fail.
+     * @throws com.lowbudgetlcs.DatabaseException when the underlying repositories fail.
      */
     fun patchEventGroup(
         id: EventGroupId,

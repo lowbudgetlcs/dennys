@@ -12,7 +12,7 @@ import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.DatabaseException
 
 class PlayerService(
     private val playerRepository: IPlayerRepository,

@@ -14,12 +14,12 @@ import com.lowbudgetlcs.domain.series.core.port.IGameRepository
 import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
 import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
-import com.lowbudgetlcs.repositories.session.ISessionRepository
-import com.lowbudgetlcs.repositories.session.SessionRepository
-import com.lowbudgetlcs.repositories.tokens.AccessTokenRepository
-import com.lowbudgetlcs.repositories.tokens.IAccessTokenRepository
-import com.lowbudgetlcs.repositories.user.IUserRepository
-import com.lowbudgetlcs.repositories.user.UserRepostitory
+import com.lowbudgetlcs.domain.auth.core.port.ISessionRepository
+import com.lowbudgetlcs.domain.auth.adapter.out.persistence.SessionRepository
+import com.lowbudgetlcs.domain.auth.adapter.out.persistence.AccessTokenRepository
+import com.lowbudgetlcs.domain.auth.core.port.IAccessTokenRepository
+import com.lowbudgetlcs.domain.auth.core.port.IUserRepository
+import com.lowbudgetlcs.domain.auth.adapter.out.persistence.UserRepostitory
 import org.koin.dsl.module
 
 val repositoryModule =

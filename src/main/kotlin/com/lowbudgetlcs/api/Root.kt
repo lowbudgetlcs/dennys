@@ -1,13 +1,13 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.riot.PostMatchDto
-import com.lowbudgetlcs.api.plugins.setupAuth
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.setupAuth
 import com.lowbudgetlcs.api.plugins.setupCors
 import com.lowbudgetlcs.api.plugins.setupLogging
 import com.lowbudgetlcs.api.plugins.setupSessions
 import com.lowbudgetlcs.api.plugins.setupStatusPages
 import com.lowbudgetlcs.api.routes.apiRoutes
-import com.lowbudgetlcs.api.routes.authRoutes
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.authRoutes
 import com.lowbudgetlcs.api.routes.healthRoutes
 import com.lowbudgetlcs.api.routes.uiRoutes
 import io.ktor.http.HttpStatusCode

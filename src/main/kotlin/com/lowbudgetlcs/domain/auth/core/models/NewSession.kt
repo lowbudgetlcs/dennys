@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.auth.models
+package com.lowbudgetlcs.domain.auth.core.models
 
 import com.lowbudgetlcs.domain.user.models.User
 import java.time.Instant

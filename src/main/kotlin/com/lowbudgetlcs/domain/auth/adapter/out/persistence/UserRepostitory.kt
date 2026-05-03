@@ -1,5 +1,6 @@
-package com.lowbudgetlcs.repositories.user
+package com.lowbudgetlcs.domain.auth.adapter.out.persistence
 
+import com.lowbudgetlcs.domain.auth.core.port.IUserRepository
 import com.lowbudgetlcs.domain.user.models.NewUser
 import com.lowbudgetlcs.domain.user.models.User
 import com.lowbudgetlcs.domain.user.models.toUserId

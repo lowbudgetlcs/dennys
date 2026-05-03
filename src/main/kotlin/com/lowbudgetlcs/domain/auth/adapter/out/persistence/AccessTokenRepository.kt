@@ -1,7 +1,8 @@
-package com.lowbudgetlcs.repositories.tokens
+package com.lowbudgetlcs.domain.auth.adapter.out.persistence
 
-import com.lowbudgetlcs.domain.auth.models.AccessToken
-import com.lowbudgetlcs.domain.auth.models.NewAccessToken
+import com.lowbudgetlcs.domain.auth.core.models.AccessToken
+import com.lowbudgetlcs.domain.auth.core.models.NewAccessToken
+import com.lowbudgetlcs.domain.auth.core.port.IAccessTokenRepository
 import com.lowbudgetlcs.domain.user.models.toUserId
 import org.jooq.DSLContext
 import org.jooq.Record

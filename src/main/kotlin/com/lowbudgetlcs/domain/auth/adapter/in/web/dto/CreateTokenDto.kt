@@ -1,6 +1,6 @@
-package com.lowbudgetlcs.api.dto
+package com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.auth.models.NewAccessToken
+import com.lowbudgetlcs.domain.auth.core.models.NewAccessToken
 import com.lowbudgetlcs.domain.user.models.types.UserId
 import com.lowbudgetlcs.serializers.InstantSerializer
 import kotlinx.serialization.Serializable

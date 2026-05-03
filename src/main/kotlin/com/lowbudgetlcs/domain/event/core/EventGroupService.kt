@@ -15,7 +15,7 @@ import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.DatabaseException
 
 class EventGroupService(
     private val eventGroupRepo: IEventGroupRepository,

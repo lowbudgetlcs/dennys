@@ -3,7 +3,7 @@ package com.lowbudgetlcs.config.modules
 import com.lowbudgetlcs.domain.account.core.AccountService
 import com.lowbudgetlcs.domain.account.core.port.IAccountService
 import com.lowbudgetlcs.domain.auth.AuthService
-import com.lowbudgetlcs.domain.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.domain.event.core.EventGroupService
 import com.lowbudgetlcs.domain.event.core.EventService
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService

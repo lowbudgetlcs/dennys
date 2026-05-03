@@ -8,7 +8,7 @@ import com.lowbudgetlcs.config.modules.hashingModule
 import com.lowbudgetlcs.config.modules.httpClientModule
 import com.lowbudgetlcs.config.modules.repositoryModule
 import com.lowbudgetlcs.config.modules.serviceModule
-import com.lowbudgetlcs.domain.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.serializers.InstantSerializer
 import com.lowbudgetlcs.serializers.UUIDSerializer
 import io.ktor.serialization.kotlinx.json.json

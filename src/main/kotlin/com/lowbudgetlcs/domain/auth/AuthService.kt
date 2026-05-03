@@ -1,18 +1,19 @@
 package com.lowbudgetlcs.domain.auth
 
 import com.lowbudgetlcs.config.CookieConfig
-import com.lowbudgetlcs.domain.auth.models.FreshAccessToken
-import com.lowbudgetlcs.domain.auth.models.NewAccessToken
-import com.lowbudgetlcs.domain.auth.models.NewSession
-import com.lowbudgetlcs.domain.auth.models.Session
+import com.lowbudgetlcs.domain.auth.core.models.FreshAccessToken
+import com.lowbudgetlcs.domain.auth.core.models.NewAccessToken
+import com.lowbudgetlcs.domain.auth.core.models.NewSession
+import com.lowbudgetlcs.domain.auth.core.models.Session
+import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.domain.user.models.User
 import com.lowbudgetlcs.domain.user.models.types.Username
 import com.lowbudgetlcs.hashing.IHasher
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.repositories.DatabaseException
-import com.lowbudgetlcs.repositories.session.ISessionRepository
-import com.lowbudgetlcs.repositories.tokens.IAccessTokenRepository
-import com.lowbudgetlcs.repositories.user.IUserRepository
+import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.auth.core.port.ISessionRepository
+import com.lowbudgetlcs.domain.auth.core.port.IAccessTokenRepository
+import com.lowbudgetlcs.domain.auth.core.port.IUserRepository
 import com.sksamuel.hoplite.Masked
 import java.time.Instant
 import java.util.UUID

@@ -25,7 +25,7 @@ interface IEventService {
      * @return the specified event.
      *
      * @throws NoSuchElementException when the event is not found.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repository fails.
+     * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
      */
     fun getEvent(id: EventId): Event
 
@@ -36,7 +36,7 @@ interface IEventService {
      * @return the newly created event.
      *
      * @throws IllegalArgumentException if the event cannot be created.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException if the underlying repositories fail.
+     * @throws com.lowbudgetlcs.DatabaseException if the underlying repositories fail.
      */
     suspend fun createEvent(event: NewEvent): Event
 
@@ -48,7 +48,7 @@ interface IEventService {
      * @return the updated event.
      *
      * @throws IllegalArgumentException if the new details are invalid
-     * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repositories
+     * @throws com.lowbudgetlcs.DatabaseException when the underlying repositories
      * fail.
      */
     fun patchEvent(

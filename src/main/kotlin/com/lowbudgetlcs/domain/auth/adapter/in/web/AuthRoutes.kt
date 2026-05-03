@@ -1,12 +1,12 @@
-package com.lowbudgetlcs.api.routes
+package com.lowbudgetlcs.domain.auth.adapter.`in`.web
 
-import com.lowbudgetlcs.api.dto.CreateTokenDto
-import com.lowbudgetlcs.api.dto.auth.UserPrincipal
-import com.lowbudgetlcs.api.dto.auth.UserSession
-import com.lowbudgetlcs.api.dto.auth.toSession
-import com.lowbudgetlcs.api.dto.auth.toUserSession
-import com.lowbudgetlcs.api.dto.toNewAccessToken
-import com.lowbudgetlcs.domain.auth.IAuthService
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.CreateTokenDto
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserPrincipal
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserSession
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toNewAccessToken
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toSession
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toUserSession
+import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.domain.user.IUserService
 import com.lowbudgetlcs.domain.user.models.toUserId
 import io.ktor.http.HttpStatusCode

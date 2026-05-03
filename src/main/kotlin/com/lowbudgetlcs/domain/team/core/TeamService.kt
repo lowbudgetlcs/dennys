@@ -16,7 +16,7 @@ import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.repositories.DatabaseException
+import com.lowbudgetlcs.DatabaseException
 
 class TeamService(
     private val teamRepository: ITeamRepository,

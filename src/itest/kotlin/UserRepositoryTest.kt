@@ -4,7 +4,7 @@ import com.lowbudgetlcs.domain.user.models.toUser
 import com.lowbudgetlcs.domain.user.models.toUserId
 import com.lowbudgetlcs.domain.user.models.toUsername
 import com.lowbudgetlcs.hashing.Argon2Hasher
-import com.lowbudgetlcs.repositories.user.UserRepostitory
+import com.lowbudgetlcs.domain.auth.adapter.out.persistence.UserRepostitory
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

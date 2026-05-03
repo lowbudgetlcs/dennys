@@ -1,9 +1,10 @@
-package com.lowbudgetlcs.repositories.session
+package com.lowbudgetlcs.domain.auth.adapter.out.persistence
 
-import com.lowbudgetlcs.domain.auth.models.NewSession
-import com.lowbudgetlcs.domain.auth.models.Session
-import com.lowbudgetlcs.domain.auth.models.toSessionId
-import com.lowbudgetlcs.domain.auth.models.types.SessionId
+import com.lowbudgetlcs.domain.auth.core.models.NewSession
+import com.lowbudgetlcs.domain.auth.core.models.Session
+import com.lowbudgetlcs.domain.auth.core.models.types.SessionId
+import com.lowbudgetlcs.domain.auth.core.models.types.toSessionId
+import com.lowbudgetlcs.domain.auth.core.port.ISessionRepository
 import com.lowbudgetlcs.domain.user.models.toUserId
 import org.jooq.DSLContext
 import org.jooq.Record

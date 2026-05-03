@@ -3,7 +3,7 @@ package com.lowbudgetlcs.domain.user
 import com.lowbudgetlcs.domain.user.models.User
 import com.lowbudgetlcs.domain.user.models.types.UserId
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.repositories.user.IUserRepository
+import com.lowbudgetlcs.domain.auth.core.port.IUserRepository
 
 class UserService(
     private val repo: IUserRepository,
