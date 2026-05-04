@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.series.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.FeatureRoute
+import com.lowbudgetlcs.domain.ApiRoute
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.CreateGameDto
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toNewGame
@@ -12,13 +12,9 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
-import org.koin.ktor.ext.inject
-import org.slf4j.LoggerFactory
-import java.lang.invoke.MethodHandles
 
 
-
-class SeriesRoutesV1(private val seriesService: ISeriesService) :  FeatureRoute {
+class SeriesRoutesV1(private val seriesService: ISeriesService) :  ApiRoute {
     override fun register(routing: Route) {
         routing.route("/series") {
             post<SeriesResources.Game> { route ->

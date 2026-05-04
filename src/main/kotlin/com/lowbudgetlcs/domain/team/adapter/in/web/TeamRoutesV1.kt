@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.team.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.FeatureRoute
+import com.lowbudgetlcs.domain.ApiRoute
 import com.lowbudgetlcs.domain.player.core.model.types.toPlayerId
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.NewTeamDto
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.dto.PatchTeamDto
@@ -23,7 +23,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
-class TeamRoutesV1(private val teamService: ITeamService) : FeatureRoute {
+class TeamRoutesV1(private val teamService: ITeamService) : ApiRoute {
     override fun register(routing: Route) {
         routing.route("/team") {
             get<TeamResourcesV1> { route ->

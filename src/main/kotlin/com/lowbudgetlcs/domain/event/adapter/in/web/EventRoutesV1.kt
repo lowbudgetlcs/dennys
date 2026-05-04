@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.event.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.FeatureRoute
+import com.lowbudgetlcs.domain.ApiRoute
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.CreateEventDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventFilterParams
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.EventTeamLinkDto
@@ -30,10 +30,9 @@ import io.ktor.server.resources.patch
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.Routing
 import io.ktor.server.routing.route
 
-class EventRoutesV1(private val eventService: IEventService, private val seriesService: ISeriesService) : FeatureRoute {
+class EventRoutesV1(private val eventService: IEventService, private val seriesService: ISeriesService) : ApiRoute {
     override fun register(routing: Route) {
         routing.route("/event") {
             get<EventResourcesV1> { route ->

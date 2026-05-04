@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.account.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.FeatureRoute
+import com.lowbudgetlcs.domain.ApiRoute
 import com.lowbudgetlcs.domain.account.adapter.`in`.web.dto.NewAccountDto
 import com.lowbudgetlcs.domain.account.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.account.adapter.`in`.web.dto.toNewAccount
@@ -14,11 +14,9 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
-import org.slf4j.LoggerFactory
-import java.lang.invoke.MethodHandles
 
 
-class AccountRoutesV1(private val accountService: IAccountService): FeatureRoute {
+class AccountRoutesV1(private val accountService: IAccountService): ApiRoute {
     override fun register(routing: Route) {
         routing.route("/account") {
             post<AccountResourcesV1> {

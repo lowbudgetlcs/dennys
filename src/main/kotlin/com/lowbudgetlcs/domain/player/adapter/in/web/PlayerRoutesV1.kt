@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.player.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.FeatureRoute
+import com.lowbudgetlcs.domain.ApiRoute
 import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.AccountLinkRequestDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.NewPlayerDto
@@ -21,7 +21,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
-class PlayerRoutesV1(private val playerService: IPlayerService) : FeatureRoute {
+class PlayerRoutesV1(private val playerService: IPlayerService) : ApiRoute {
     override fun register(routing: Route) {
         routing.route("/player") {
             get<PlayerResourcesV1> {
