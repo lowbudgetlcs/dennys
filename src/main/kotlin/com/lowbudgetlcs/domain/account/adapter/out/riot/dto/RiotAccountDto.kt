@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.gateways.riot.account
+package com.lowbudgetlcs.domain.account.adapter.out.riot.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

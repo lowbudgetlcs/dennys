@@ -7,7 +7,7 @@ import com.lowbudgetlcs.domain.account.core.model.types.Puuid
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.account.core.port.IAccountService
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
-import com.lowbudgetlcs.gateways.riot.account.IRiotAccountGateway
+import com.lowbudgetlcs.domain.account.core.port.IRiotAccountGateway
 import com.lowbudgetlcs.logger
 import com.lowbudgetlcs.DatabaseException
 
