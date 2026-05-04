@@ -1,19 +1,19 @@
 package team
 
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
 import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.NewEvent
-import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
-import com.lowbudgetlcs.domain.event.core.model.types.toEventName
-import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.event.core.model.types.toEventName
+import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import com.lowbudgetlcs.domain.team.core.model.NewTeam
 import com.lowbudgetlcs.domain.team.core.model.Team
 import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
-import com.lowbudgetlcs.domain.team.core.model.toTeamName
-import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
-import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamName
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
