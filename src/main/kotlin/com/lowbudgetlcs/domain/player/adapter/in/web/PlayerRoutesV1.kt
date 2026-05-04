@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.player.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.account.adapter.out.persistence.toAccountId
+import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.AccountLinkRequestDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.NewPlayerDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.PatchPlayerDto
@@ -21,7 +21,6 @@ import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 import java.lang.invoke.MethodHandles
-
 
 private val logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass())
 fun Route.playerRoutesV1() {
