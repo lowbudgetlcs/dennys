@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.player.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
+import com.lowbudgetlcs.domain.account.adapter.out.persistence.toAccountId
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.AccountLinkRequestDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.NewPlayerDto
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.dto.PatchPlayerDto

@@ -7,6 +7,7 @@ import com.lowbudgetlcs.config.modules.gatewayModule
 import com.lowbudgetlcs.config.modules.hashingModule
 import com.lowbudgetlcs.config.modules.httpClientModule
 import com.lowbudgetlcs.config.modules.repositoryModule
+import com.lowbudgetlcs.config.modules.routeModule
 import com.lowbudgetlcs.config.modules.serviceModule
 import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.serializers.InstantSerializer
@@ -62,6 +63,7 @@ fun Application.module() {
             gatewayModule,
             httpClientModule,
             hashingModule,
+            routeModule
         )
     }
 

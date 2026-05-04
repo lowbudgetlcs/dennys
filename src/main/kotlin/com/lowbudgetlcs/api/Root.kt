@@ -10,6 +10,7 @@ import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.authRoutes
 import com.lowbudgetlcs.api.routes.healthRoutes
 import com.lowbudgetlcs.api.routes.uiRoutes
+import com.lowbudgetlcs.domain.FeatureRoute
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -21,6 +22,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import org.koin.ktor.ext.getKoin
+import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 import java.lang.invoke.MethodHandles
 
