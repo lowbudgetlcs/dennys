@@ -1,10 +1,10 @@
-import com.lowbudgetlcs.domain.user.models.NewUser
-import com.lowbudgetlcs.domain.user.models.User
-import com.lowbudgetlcs.domain.user.models.toUser
-import com.lowbudgetlcs.domain.user.models.toUserId
-import com.lowbudgetlcs.domain.user.models.toUsername
-import com.lowbudgetlcs.hashing.Argon2Hasher
 import com.lowbudgetlcs.domain.auth.adapter.out.persistence.UserRepostitory
+import com.lowbudgetlcs.domain.auth.core.models.NewUser
+import com.lowbudgetlcs.domain.auth.core.models.User
+import com.lowbudgetlcs.domain.auth.core.models.toUser
+import com.lowbudgetlcs.domain.auth.core.models.types.toUserId
+import com.lowbudgetlcs.domain.auth.core.models.types.toUsername
+import com.lowbudgetlcs.hashing.Argon2Hasher
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

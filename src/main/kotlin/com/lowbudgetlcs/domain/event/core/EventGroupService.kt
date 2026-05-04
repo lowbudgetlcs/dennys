@@ -22,12 +22,12 @@ class EventGroupService(
     private val eventRepo: IEventRepository,
 ) : IEventGroupService {
 
-    override fun getAllEventGroups(): List<EventGroup> {
+    override suspend fun getAllEventGroups(): List<EventGroup> {
         logger.debug("Fetching all event groups...")
         return eventGroupRepo.getAll()
     }
 
-    override fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents {
+    override suspend fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents {
         logger.debug("Getting event group by '$id' (with events)...")
         val group =
             eventGroupRepo.getById(id) ?: throw NoSuchElementException("Event group with id '${id.value}' not found.")
@@ -35,13 +35,13 @@ class EventGroupService(
         return group.toEventGroupWithEvents(events)
     }
 
-    override fun getEventGroup(id: EventGroupId): EventGroup {
+    override suspend fun getEventGroup(id: EventGroupId): EventGroup {
         logger.debug("Getting event group by '$id'...")
         return eventGroupRepo.getById(id)
             ?: throw NoSuchElementException("Event group with id '${id.value}' not found.")
     }
 
-    override fun createEventGroup(group: NewEventGroup): EventGroup {
+    override suspend fun createEventGroup(group: NewEventGroup): EventGroup {
         logger.debug("Creating new event group...")
         logger.debug(group.toString())
         require(!isNameTaken(group.name)) { "Event group with name '${group.name}' already exists." }
@@ -55,7 +55,7 @@ class EventGroupService(
         return created
     }
 
-    override fun patchEventGroup(
+    override suspend fun patchEventGroup(
         id: EventGroupId,
         update: EventGroupUpdate,
     ): EventGroup {
@@ -68,7 +68,7 @@ class EventGroupService(
             ?: throw DatabaseException("Failed to patch event group with id '${id.value}.")
     }
 
-    override fun addEvent(
+    override suspend fun addEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents {
@@ -83,7 +83,7 @@ class EventGroupService(
         return getEventGroupWithEvents(eventGroupId)
     }
 
-    override fun removeEvent(
+    override suspend fun removeEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents {
@@ -104,7 +104,7 @@ class EventGroupService(
      * @param name the name of the event.
      * @return True if name is taken.
      */
-    fun isNameTaken(name: EventGroupName): Boolean {
+    suspend fun isNameTaken(name: EventGroupName): Boolean {
         logger.debug("Checking if '$name' is available...")
         return eventGroupRepo.getByName(name) != null
     }

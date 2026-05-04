@@ -34,25 +34,25 @@ class EventService(
     private val seriesRepo: ISeriesRepository,
 ) : IEventService {
 
-    override fun getAllEvents(query: EventQuery?): List<Event> {
+    override suspend fun getAllEvents(query: EventQuery?): List<Event> {
         logger.debug("Fetching all events...")
         query?.run { logger.debug("(Query: '{}')", query) }
         return eventRepo.getAll().filterByName(query).filterByStatus(query)
     }
 
-    override fun getEvent(id: EventId): Event {
+    override suspend fun getEvent(id: EventId): Event {
         logger.debug("Getting event by '$id'...")
         return eventRepo.getById(id) ?: throw NoSuchElementException("Event with id '${id.value}' not found.")
     }
 
-    override fun getEventWithTeams(id: EventId): EventWithTeams {
+    override suspend fun getEventWithTeams(id: EventId): EventWithTeams {
         logger.debug("Getting event by '$id' (with teams)...")
         val event = getEvent(id)
         val teams = teamRepo.getByEventId(id)
         return event.toEventWithTeams(teams)
     }
 
-    override fun getEventWithSeries(
+    override suspend fun getEventWithSeries(
         id: EventId,
         query: SeriesQuery?,
     ): EventWithSeries {
@@ -74,7 +74,7 @@ class EventService(
         return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
     }
 
-    override fun patchEvent(
+    override suspend fun patchEvent(
         id: EventId,
         update: EventUpdate,
     ): Event {
@@ -91,7 +91,7 @@ class EventService(
             ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
     }
 
-    private fun validateTeam(
+    private suspend fun validateTeam(
         eventId: EventId,
         teamId: TeamId,
     ) {
@@ -99,7 +99,7 @@ class EventService(
         if (!doesTeamExist(teamId)) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
     }
 
-    override fun addTeam(
+    override suspend fun addTeam(
         eventId: EventId,
         teamId: TeamId,
     ): EventWithTeams {
@@ -111,7 +111,7 @@ class EventService(
         return getEventWithTeams(eventId)
     }
 
-    override fun removeTeam(
+    override suspend fun removeTeam(
         eventId: EventId,
         teamId: TeamId,
     ): EventWithTeams {
@@ -127,7 +127,7 @@ class EventService(
      * Checks if an event name is taken.
      * @return true if name is taken, false otherwise.
      */
-    fun isNameTaken(name: EventName): Boolean {
+    suspend fun isNameTaken(name: EventName): Boolean {
         logger.debug("Checking if '$name' is available...")
         return eventRepo.getByName(name) != null
     }
@@ -136,7 +136,7 @@ class EventService(
      * Checks if an event exists.
      * @return true if event exists, false otherwise.
      */
-    fun doesEventExist(eventId: EventId): Boolean {
+    suspend fun doesEventExist(eventId: EventId): Boolean {
         logger.debug("Checking if event '$eventId' exists...")
         return eventRepo.getById(eventId) != null
     }
@@ -145,7 +145,7 @@ class EventService(
      * Checks if team exists
      * @return true if team exists, false otherwise
      */
-    fun doesTeamExist(teamId: TeamId): Boolean {
+    suspend fun doesTeamExist(teamId: TeamId): Boolean {
         logger.debug("Checking if team '$teamId' exists...")
         return teamRepo.getById(teamId) != null
     }

@@ -1,4 +1,4 @@
-package com.lowbudgetlcs.domain.user.models.types
+package com.lowbudgetlcs.domain.auth.core.models.types
 
 const val USER_NAME_MAX_LENGTH = 25
 const val USER_NAME_MIN_LENGTH = 3
@@ -13,3 +13,6 @@ value class Username(
         require(value.length >= USER_NAME_MIN_LENGTH) { "Minimum username length is $USER_NAME_MIN_LENGTH characters." }
     }
 }
+
+// Extensions
+fun String.toUsername(): Username = Username(this)

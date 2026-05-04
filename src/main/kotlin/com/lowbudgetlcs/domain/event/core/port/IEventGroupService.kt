@@ -13,7 +13,7 @@ interface IEventGroupService {
      *
      * @return a list containing all event groups.
      */
-    fun getAllEventGroups(): List<EventGroup>
+    suspend fun getAllEventGroups(): List<EventGroup>
 
     /**
      * Fetches the specified event group.
@@ -24,7 +24,7 @@ interface IEventGroupService {
      * @throws NoSuchElementException when the event group is not found.
      * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
      */
-    fun getEventGroup(id: EventGroupId): EventGroup
+    suspend fun getEventGroup(id: EventGroupId): EventGroup
 
     /**
      * Create a new event group.
@@ -35,7 +35,7 @@ interface IEventGroupService {
      * @throws IllegalArgumentException if the event group cannot be created.
      * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
      */
-    fun createEventGroup(group: NewEventGroup): EventGroup
+    suspend fun createEventGroup(group: NewEventGroup): EventGroup
 
     /**
      * Updates event group details.
@@ -47,7 +47,7 @@ interface IEventGroupService {
      * @throws IllegalArgumentException if the new details are invalid.
      * @throws com.lowbudgetlcs.DatabaseException when the underlying repositories fail.
      */
-    fun patchEventGroup(
+    suspend fun patchEventGroup(
         id: EventGroupId,
         update: EventGroupUpdate,
     ): EventGroup
@@ -60,7 +60,7 @@ interface IEventGroupService {
      *
      * @throws NoSuchElementException if the specified event cannot be found
      */
-    fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents
+    suspend fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents
 
     /**
      * Add an event to an event group.
@@ -71,7 +71,7 @@ interface IEventGroupService {
      *
      * @throws NoSuchElementException if the specified event group or event doesn't exist
      */
-    fun addEvent(
+    suspend fun addEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents
@@ -85,7 +85,7 @@ interface IEventGroupService {
      *
      * @throws NoSuchElementException if the specified event group or event doesn't exist
      */
-    fun removeEvent(
+    suspend fun removeEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents

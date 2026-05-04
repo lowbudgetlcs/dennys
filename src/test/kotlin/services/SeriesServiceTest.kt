@@ -26,9 +26,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import java.time.Instant
 
 class SeriesServiceTest :
@@ -92,13 +92,13 @@ class SeriesServiceTest :
                 eventStage = EventStage.REGULAR_SEASON,
             )
         "createSeries succeeds for valid input" {
-            every { seriesRepo.insert(newSeries) } returns expectedSeries
-            every { teamRepo.getById(participatingTeams.first) } returns team1
-            every { teamRepo.getById(participatingTeams.second) } returns team2
+            coEvery { seriesRepo.insert(newSeries) } returns expectedSeries
+            coEvery { teamRepo.getById(participatingTeams.first) } returns team1
+            coEvery { teamRepo.getById(participatingTeams.second) } returns team2
 
             service.createSeries(newSeries) shouldBe expectedSeries
 
-            verify(exactly = 1) { seriesRepo.insert(newSeries) }
+            coVerify(exactly = 1) { seriesRepo.insert(newSeries) }
         }
 
         "createSeries fails for 0 games to win" {
@@ -108,7 +108,7 @@ class SeriesServiceTest :
                 )
             }
             // repo.insert should never be called
-            verify(exactly = 0) { seriesRepo.insert(any()) }
+            coVerify(exactly = 0) { seriesRepo.insert(any()) }
         }
 
         "getAllTeams returns repo data" {
@@ -132,21 +132,21 @@ class SeriesServiceTest :
                     ),
                 )
 
-            every { seriesRepo.getAllByEventId(EventId(1)) } returns series
+            coEvery { seriesRepo.getAllByEventId(EventId(1)) } returns series
 
             val result = service.getAllSeriesFromEvent(EventId(1))
             result.map { it.id } shouldContainExactly listOf(SeriesId(1), SeriesId(2))
 
-            verify(exactly = 1) { seriesRepo.getAllByEventId(EventId(1)) }
+            coVerify(exactly = 1) { seriesRepo.getAllByEventId(EventId(1)) }
         }
 
         "getSeries throws for unknown id" {
             val id = SeriesId(999)
-            every { seriesRepo.getById(id) } returns null
+            coEvery { seriesRepo.getById(id) } returns null
 
             val ex = shouldThrow<NoSuchElementException> { service.getSeries(id) }
             ex.message shouldBe "Series not found"
 
-            verify(exactly = 1) { seriesRepo.getById(id) }
+            coVerify(exactly = 1) { seriesRepo.getById(id) }
         }
     })

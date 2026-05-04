@@ -2,7 +2,7 @@ package com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto
 
 import com.lowbudgetlcs.domain.auth.core.models.Session
 import com.lowbudgetlcs.domain.auth.core.models.types.toSessionId
-import com.lowbudgetlcs.domain.user.models.toUserId
+import com.lowbudgetlcs.domain.auth.core.models.types.toUserId
 import com.lowbudgetlcs.serializers.InstantSerializer
 import com.lowbudgetlcs.serializers.UUIDSerializer
 import kotlinx.serialization.Serializable

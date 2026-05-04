@@ -16,7 +16,7 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 
 class PlayerServiceTest : StringSpec({
@@ -29,7 +29,7 @@ class PlayerServiceTest : StringSpec({
     beforeEach { clearAllMocks() }
 
     "getAllPlayers() should return empty list when no players exist" {
-        every { playerRepo.getAll() } returns listOf()
+        coEvery { playerRepo.getAll() } returns listOf()
         val players = service.getAllPlayers()
         players.shouldBeEmpty()
     }
@@ -40,7 +40,7 @@ class PlayerServiceTest : StringSpec({
         val expectedPlayers = listOf(
             newPlayer1.toPlayer(0.toPlayerId()), newPlayer2.toPlayer(1.toPlayerId())
         )
-        every { playerRepo.getAll() } returns expectedPlayers
+        coEvery { playerRepo.getAll() } returns expectedPlayers
 
         val all = service.getAllPlayers()
         all shouldContainExactly expectedPlayers
@@ -50,8 +50,8 @@ class PlayerServiceTest : StringSpec({
         val newPlayer = NewPlayer("player#123".toPlayerName())
         val expectedPlayer = newPlayer.toPlayer(0.toPlayerId())
 
-        every { playerRepo.getByName(newPlayer.name) } returns null
-        every { playerRepo.insert(newPlayer) } returns expectedPlayer
+        coEvery { playerRepo.getByName(newPlayer.name) } returns null
+        coEvery { playerRepo.insert(newPlayer) } returns expectedPlayer
         val created = service.createPlayer(newPlayer)
 
         created.shouldNotBeNull()
@@ -61,7 +61,7 @@ class PlayerServiceTest : StringSpec({
     "Creating duplicate player names fails" {
         val newPlayer = NewPlayer("player#123".toPlayerName())
         val duplicatePlayer = newPlayer.toPlayer(0.toPlayerId())
-        every { playerRepo.getByName(duplicatePlayer.name) } returns duplicatePlayer
+        coEvery { playerRepo.getByName(duplicatePlayer.name) } returns duplicatePlayer
         val exception = shouldThrow<IllegalStateException> {
             service.createPlayer(newPlayer)
         }
@@ -70,15 +70,15 @@ class PlayerServiceTest : StringSpec({
 
     "isNameTaken returns true for existing names" {
         val newPlayer = NewPlayer("player#123".toPlayerName())
-        every { playerRepo.getByName(newPlayer.name) } returns null
+        coEvery { playerRepo.getByName(newPlayer.name) } returns null
         service.isNameTaken(newPlayer.name) shouldBe false
-        every { playerRepo.getByName(newPlayer.name) } returns newPlayer.toPlayer(0.toPlayerId())
+        coEvery { playerRepo.getByName(newPlayer.name) } returns newPlayer.toPlayer(0.toPlayerId())
         service.isNameTaken(newPlayer.name) shouldBe true
     }
 
     "getPlayer throws for unknown ID" {
         val unknownPlayer = 0.toPlayerId()
-        every { playerRepo.getById(unknownPlayer) } throws NoSuchElementException("Player not found")
+        coEvery { playerRepo.getById(unknownPlayer) } throws NoSuchElementException("Player not found")
         val exception = shouldThrow<NoSuchElementException> {
             service.getPlayer(unknownPlayer)
         }
@@ -92,10 +92,10 @@ class PlayerServiceTest : StringSpec({
         )
         val newName = "new".toPlayerName()
         val newPlayer = player.copy(name = newName)
-        every { playerRepo.getByName(player.name) } returns player
-        every { playerRepo.getByName(newName) } returns null
-        every { playerRepo.getById(player.id) } returns player
-        every {
+        coEvery { playerRepo.getByName(player.name) } returns player
+        coEvery { playerRepo.getByName(newName) } returns null
+        coEvery { playerRepo.getById(player.id) } returns player
+        coEvery {
             playerRepo.renamePlayer(
                 player.id,
                 newName,
@@ -111,8 +111,8 @@ class PlayerServiceTest : StringSpec({
             id = 0.toPlayerId(),
             name = "player".toPlayerName(),
         )
-        every { playerRepo.getByName(player.name) } returns player
-        every { playerRepo.getById(player.id) } returns player
+        coEvery { playerRepo.getByName(player.name) } returns player
+        coEvery { playerRepo.getById(player.id) } returns player
         shouldThrow<IllegalStateException> {
             service.renamePlayer(player.id, player.name)
         }
@@ -120,8 +120,8 @@ class PlayerServiceTest : StringSpec({
 
     "renamePlayer should throw for nonexistent player ID" {
         val name = "irrelevant".toPlayerName()
-        every { playerRepo.getByName(name) } returns null
-        every { playerRepo.getById(any()) } returns null
+        coEvery { playerRepo.getByName(name) } returns null
+        coEvery { playerRepo.getById(any()) } returns null
         shouldThrow<NoSuchElementException> {
             service.renamePlayer(9999.toPlayerId(), name)
         }

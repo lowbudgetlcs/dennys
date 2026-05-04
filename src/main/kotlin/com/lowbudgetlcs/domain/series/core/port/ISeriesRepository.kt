@@ -6,11 +6,8 @@ import com.lowbudgetlcs.domain.series.core.model.Series
 import com.lowbudgetlcs.domain.series.core.model.types.SeriesId
 
 interface ISeriesRepository {
-    fun insert(newSeries: NewSeries): Series?
-
-    fun getById(id: SeriesId): Series?
-
-    fun getAllByEventId(id: EventId): List<Series>
-
-    fun delete(id: SeriesId)
+    suspend fun insert(newSeries: NewSeries): Series?
+    suspend fun getById(id: SeriesId): Series?
+    suspend fun getAllByEventId(id: EventId): List<Series>
+    suspend fun delete(id: SeriesId)
 }

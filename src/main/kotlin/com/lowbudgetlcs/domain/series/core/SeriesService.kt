@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.series.core
 
+import com.lowbudgetlcs.DatabaseException
 import com.lowbudgetlcs.domain.event.core.model.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
@@ -19,7 +20,6 @@ import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.DatabaseException
 
 class SeriesService(
     private val gameRepo: IGameRepository,
@@ -29,11 +29,11 @@ class SeriesService(
     private val gate: IRiotTournamentGateway,
 ) : ISeriesService {
 
-    override fun createSeries(series: NewSeries): Series {
+    override suspend fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
         logger.debug(series.toString())
         require(series.totalGames > 0) { "A series must contain at least 1 game." }
-        val validate = { id: TeamId ->
+        suspend fun validate(id: TeamId) {
             logger.debug("Validating team '$id' exists and is participating in event '${series.eventId}'...")
             val team = teamRepo.getById(id) ?: throw NoSuchElementException("Team with id $id not found")
             check(team.eventId == series.eventId) { "Team with id $id is not part of the event" }
@@ -44,17 +44,17 @@ class SeriesService(
         return seriesRepo.insert(series) ?: throw DatabaseException("Failed to create series")
     }
 
-    override fun getAllSeriesFromEvent(id: EventId): List<Series> {
+    override suspend fun getAllSeriesFromEvent(id: EventId): List<Series> {
         logger.debug("Fetching all series in event '$id'...")
         return seriesRepo.getAllByEventId(id)
     }
 
-    override fun getSeries(id: SeriesId): Series {
+    override suspend fun getSeries(id: SeriesId): Series {
         logger.debug("Fetching series '$id'...")
         return seriesRepo.getById(id) ?: throw NoSuchElementException("Series not found")
     }
 
-    override fun findSeries(
+    override suspend fun findSeries(
         eventId: EventId,
         teamId1: TeamId,
         teamId2: TeamId,
@@ -81,7 +81,7 @@ class SeriesService(
         return series.first()
     }
 
-    override fun removeSeries(id: SeriesId) {
+    override suspend fun removeSeries(id: SeriesId) {
         logger.debug("Deleting series '$id'...")
         try {
             return seriesRepo.delete(id)

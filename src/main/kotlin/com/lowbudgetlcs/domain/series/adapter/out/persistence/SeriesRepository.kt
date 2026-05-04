@@ -11,6 +11,8 @@ import com.lowbudgetlcs.domain.series.core.model.types.toSeriesId
 import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.impl.DSL.multiset
@@ -22,44 +24,52 @@ import org.jooq.storage.tables.references.TEAM_TO_SERIES
 class SeriesRepository(
     private val dsl: DSLContext,
 ) : ISeriesRepository {
-    override fun getById(id: SeriesId): Series? =
-        selectSeries().where(SERIES.ID.eq(id.value)).fetchOne()?.let(::rowToSeries)
+    override suspend fun getById(id: SeriesId): Series? =
+        withContext(Dispatchers.IO) {
+            selectSeries().where(SERIES.ID.eq(id.value)).fetchOne()
+        }?.let(::rowToSeries)
 
-    override fun getAllByEventId(id: EventId): List<Series> =
-        selectSeries().where(SERIES.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToSeries)
+    override suspend fun getAllByEventId(id: EventId): List<Series> =
+        withContext(Dispatchers.IO) {
+            selectSeries().where(SERIES.EVENT_ID.eq(id.value)).fetch()
+        }.mapNotNull(::rowToSeries)
 
-    override fun insert(newSeries: NewSeries): Series? {
+    override suspend fun insert(newSeries: NewSeries): Series? {
         val id =
-            dsl.transactionResult { t ->
-                val tx = t.dsl()
-                val insertedId =
-                    tx
-                        .insertInto(
-                            SERIES,
-                        ).set(SERIES.EVENT_ID, newSeries.eventId.value)
-                        .set(SERIES.TOTAL_GAMES, newSeries.totalGames)
-                        .set(SERIES.STAGE, newSeries.eventStage.name)
-                        .returning(SERIES.ID)
-                        .fetchOne()
-                        ?.get(SERIES.ID)
+            withContext(Dispatchers.IO) {
+                dsl.transactionResult { t ->
+                    val tx = t.dsl()
+                    val insertedId =
+                        tx
+                            .insertInto(
+                                SERIES,
+                            ).set(SERIES.EVENT_ID, newSeries.eventId.value)
+                            .set(SERIES.TOTAL_GAMES, newSeries.totalGames)
+                            .set(SERIES.STAGE, newSeries.eventStage.name)
+                            .returning(SERIES.ID)
+                            .fetchOne()
+                            ?.get(SERIES.ID)
 
-                val insertChild = { id: TeamId ->
-                    tx
-                        .insertInto(TEAM_TO_SERIES)
-                        .set(TEAM_TO_SERIES.SERIES_ID, insertedId)
-                        .set(TEAM_TO_SERIES.TEAM_ID, id.value)
-                        .execute()
+                    val insertChild = { id: TeamId ->
+                        tx
+                            .insertInto(TEAM_TO_SERIES)
+                            .set(TEAM_TO_SERIES.SERIES_ID, insertedId)
+                            .set(TEAM_TO_SERIES.TEAM_ID, id.value)
+                            .execute()
+                    }
+                    insertChild(newSeries.participantIds.first)
+                    insertChild(newSeries.participantIds.second)
+                    insertedId
                 }
-                insertChild(newSeries.participantIds.first)
-                insertChild(newSeries.participantIds.second)
-                insertedId
             }
-        return id?.toSeriesId()?.let(::getById)
+        return id?.toSeriesId()?.let { getById(it) }
     }
 
     // TEAM_TO_SERIES are defined with delete on cascade
-    override fun delete(id: SeriesId) {
-        dsl.delete(SERIES).where(SERIES.ID.eq(id.value)).execute()
+    override suspend fun delete(id: SeriesId) {
+        withContext(Dispatchers.IO) {
+            dsl.delete(SERIES).where(SERIES.ID.eq(id.value)).execute()
+        }
     }
 
     // Typed multiset to select all teams associated with a series.

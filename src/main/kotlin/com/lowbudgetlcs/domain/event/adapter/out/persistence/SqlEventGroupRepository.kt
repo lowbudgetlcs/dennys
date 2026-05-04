@@ -7,6 +7,8 @@ import com.lowbudgetlcs.domain.event.core.model.types.EventGroupName
 import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupName
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENT_GROUPS
@@ -14,35 +16,46 @@ import org.jooq.storage.tables.references.EVENT_GROUPS
 class SqlEventGroupRepository(
     private val dsl: DSLContext,
 ) : IEventGroupRepository {
-    override fun getAll(): List<EventGroup> = select().fetch().mapNotNull(::rowToEventGroup)
+    override suspend fun getAll(): List<EventGroup> =
+        withContext(Dispatchers.IO) {
+            select().fetch()
+        }.mapNotNull(::rowToEventGroup)
 
-    override fun getById(id: EventGroupId): EventGroup? =
-        select().where(EVENT_GROUPS.ID.eq(id.value)).fetchOne()?.let(::rowToEventGroup)
+    override suspend fun getById(id: EventGroupId): EventGroup? =
+        withContext(Dispatchers.IO) {
+            select().where(EVENT_GROUPS.ID.eq(id.value)).fetchOne()
+        }?.let(::rowToEventGroup)
 
-    override fun insert(group: NewEventGroup): EventGroup? {
+    override suspend fun insert(group: NewEventGroup): EventGroup? {
         val insertedId =
-            dsl
-                .insertInto(EVENT_GROUPS)
-                .set(EVENT_GROUPS.NAME, group.name.value)
-                .returning(EVENT_GROUPS.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .insertInto(EVENT_GROUPS)
+                    .set(EVENT_GROUPS.NAME, group.name.value)
+                    .returning(EVENT_GROUPS.ID)
+                    .fetchOne()
+            }
                 ?.get(EVENT_GROUPS.ID)
-        return insertedId?.toEventGroupId()?.let(::getById)
+        return insertedId?.toEventGroupId()?.let { getById(it) }
     }
 
-    override fun getByName(name: EventGroupName): EventGroup? =
-        select().where(EVENT_GROUPS.NAME.eq(name.value)).fetchOne()?.let(::rowToEventGroup)
+    override suspend fun getByName(name: EventGroupName): EventGroup? =
+        withContext(Dispatchers.IO) {
+            select().where(EVENT_GROUPS.NAME.eq(name.value)).fetchOne()
+        }?.let(::rowToEventGroup)
 
-    override fun update(update: EventGroup): EventGroup? {
+    override suspend fun update(update: EventGroup): EventGroup? {
         val insertedId =
-            dsl
-                .update(EVENT_GROUPS)
-                .set(EVENT_GROUPS.NAME, update.name.value)
-                .where(EVENT_GROUPS.ID.eq(update.id.value))
-                .returning(EVENT_GROUPS.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .update(EVENT_GROUPS)
+                    .set(EVENT_GROUPS.NAME, update.name.value)
+                    .where(EVENT_GROUPS.ID.eq(update.id.value))
+                    .returning(EVENT_GROUPS.ID)
+                    .fetchOne()
+            }
                 ?.get(EVENT_GROUPS.ID)
-        return insertedId?.toEventGroupId()?.let(::getById)
+        return insertedId?.toEventGroupId()?.let { getById(it) }
     }
 
     private fun select() =

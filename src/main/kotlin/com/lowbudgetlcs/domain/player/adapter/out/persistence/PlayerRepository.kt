@@ -7,6 +7,8 @@ import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
 import com.lowbudgetlcs.domain.player.core.model.types.toPlayerId
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS
@@ -15,41 +17,37 @@ import org.jooq.storage.tables.references.PLAYERS_TO_TEAM
 class PlayerRepository(
     private val dsl: DSLContext,
 ) : IPlayerRepository {
-    override fun getAll(): List<Player> = selectPlayers().fetch().mapNotNull(::rowToPlayer)
+    override suspend fun getAll(): List<Player> = selectPlayers().fetch().mapNotNull(::rowToPlayer)
 
-    override fun getById(id: PlayerId): Player? = selectPlayers().where(PLAYERS.ID.eq(id.value)).fetchOne(::rowToPlayer)
-    override fun getByName(playerName: PlayerName): Player? = selectPlayers().where(PLAYERS.NAME.eq(playerName.value)).fetchOne(::rowToPlayer)
-
-    override fun getByTeamId(teamId: TeamId): List<Player> =
-        dsl
-            .select(PLAYERS.ID, PLAYERS.NAME)
-            .from(PLAYERS.innerJoin(PLAYERS_TO_TEAM).on(PLAYERS.ID.eq(PLAYERS_TO_TEAM.PLAYER_ID)))
-            .where(PLAYERS_TO_TEAM.TEAM_ID.eq(teamId.value))
-            .fetch()
-            .mapNotNull(::rowToPlayer)
-
-    override fun insert(newPlayer: NewPlayer): Player? {
-        val insertedId =
-            dsl
-                .insertInto(PLAYERS)
-                .set(PLAYERS.NAME, newPlayer.name.value)
-                .returning(PLAYERS.ID)
-                .fetchOne()
-                ?.get(PLAYERS.ID)
-
-        return insertedId?.toPlayerId()?.let(::getById)
+    override suspend fun getById(id: PlayerId): Player? = withContext(Dispatchers.IO) {
+        selectPlayers().where(PLAYERS.ID.eq(id.value)).fetchOne(::rowToPlayer)
     }
 
-    override fun renamePlayer(
+    override suspend fun getByName(playerName: PlayerName): Player? = withContext(Dispatchers.IO) {
+        selectPlayers().where(PLAYERS.NAME.eq(playerName.value)).fetchOne(::rowToPlayer)
+    }
+
+    override suspend fun getByTeamId(teamId: TeamId): List<Player> = withContext(Dispatchers.IO) {
+        dsl.select(PLAYERS.ID, PLAYERS.NAME)
+            .from(PLAYERS.innerJoin(PLAYERS_TO_TEAM).on(PLAYERS.ID.eq(PLAYERS_TO_TEAM.PLAYER_ID)))
+            .where(PLAYERS_TO_TEAM.TEAM_ID.eq(teamId.value)).fetch()
+    }.mapNotNull(::rowToPlayer)
+
+    override suspend fun insert(newPlayer: NewPlayer): Player? {
+        val insertedId = withContext(Dispatchers.IO) {
+            dsl.insertInto(PLAYERS).set(PLAYERS.NAME, newPlayer.name.value).returning(PLAYERS.ID).fetchOne()
+        }?.get(PLAYERS.ID)
+
+        return insertedId?.toPlayerId()?.let { getById(it) }
+    }
+
+    override suspend fun renamePlayer(
         id: PlayerId,
         newName: PlayerName,
     ): Player? {
-        val updated =
-            dsl
-                .update(PLAYERS)
-                .set(PLAYERS.NAME, newName.value)
-                .where(PLAYERS.ID.eq(id.value))
-                .execute()
+        val updated = withContext(Dispatchers.IO) {
+            dsl.update(PLAYERS).set(PLAYERS.NAME, newName.value).where(PLAYERS.ID.eq(id.value)).execute()
+        }
 
         return if (updated > 0) getById(id) else null
     }

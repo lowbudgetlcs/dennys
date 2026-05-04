@@ -7,6 +7,8 @@ import com.lowbudgetlcs.domain.account.core.model.types.Puuid
 import com.lowbudgetlcs.domain.account.core.model.types.toAccountId
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.RIOT_ACCOUNTS
@@ -14,40 +16,50 @@ import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 class SqlAccountRepository(
     private val dsl: DSLContext,
 ) : IAccountRepository {
-    override fun getAll(): List<Account> = selectAccounts().fetch().mapNotNull(::rowToAccount)
+    override suspend fun getAll(): List<Account> = withContext(Dispatchers.IO) {
+        selectAccounts().fetch()
+    }.mapNotNull(::rowToAccount)
 
-    override fun getById(accountId: AccountId): Account? =
-        selectAccounts().where(RIOT_ACCOUNTS.ID.eq(accountId.value)).fetchOne()?.let(::rowToAccount)
+    override suspend fun getById(accountId: AccountId): Account? =
+        withContext(Dispatchers.IO) {
+            selectAccounts().where(RIOT_ACCOUNTS.ID.eq(accountId.value)).fetchOne()
+        }?.let(::rowToAccount)
 
-    override fun getAccountByPuuid(puuid: Puuid): Account? =
-        selectAccounts().where(RIOT_ACCOUNTS.RIOT_PUUID.eq(puuid.value)).fetchOne()?.let(::rowToAccount)
+    override suspend fun getAccountByPuuid(puuid: Puuid): Account? =
+        withContext(Dispatchers.IO) {
+            selectAccounts().where(RIOT_ACCOUNTS.RIOT_PUUID.eq(puuid.value)).fetchOne()
+        }?.let(::rowToAccount)
 
-    override fun insert(newAccount: NewAccount): Account? {
+    override suspend fun insert(newAccount: NewAccount): Account? {
         val insertedId =
-            dsl
-                .insertInto(RIOT_ACCOUNTS)
-                .set(RIOT_ACCOUNTS.RIOT_PUUID, newAccount.puuid.value)
-                .set(RIOT_ACCOUNTS.PLAYER_ID, newAccount.playerId?.value)
-                .returning(RIOT_ACCOUNTS.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .insertInto(RIOT_ACCOUNTS)
+                    .set(RIOT_ACCOUNTS.RIOT_PUUID, newAccount.puuid.value)
+                    .set(RIOT_ACCOUNTS.PLAYER_ID, newAccount.playerId?.value)
+                    .returning(RIOT_ACCOUNTS.ID)
+                    .fetchOne()
+            }
                 ?.get(RIOT_ACCOUNTS.ID)
 
-        return insertedId?.toAccountId()?.let(::getById)
+        return insertedId?.toAccountId()?.let { getById(it) }
     }
 
-    override fun updatePlayerId(
+    override suspend fun updatePlayerId(
         accountId: AccountId,
         playerId: PlayerId?,
     ): Account? {
         val updatedId =
-            dsl
-                .update(RIOT_ACCOUNTS)
-                .set(RIOT_ACCOUNTS.PLAYER_ID, playerId?.value)
-                .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
-                .returning(RIOT_ACCOUNTS.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .update(RIOT_ACCOUNTS)
+                    .set(RIOT_ACCOUNTS.PLAYER_ID, playerId?.value)
+                    .where(RIOT_ACCOUNTS.ID.eq(accountId.value))
+                    .returning(RIOT_ACCOUNTS.ID)
+                    .fetchOne()
+            }
                 ?.get(RIOT_ACCOUNTS.ID)
-        return updatedId?.toAccountId()?.let(::getById)
+        return updatedId?.toAccountId()?.let { getById(it) }
     }
 
     private fun selectAccounts() =

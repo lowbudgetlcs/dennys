@@ -17,12 +17,12 @@ class AccountService(
     private val riotAccountGateway: IRiotAccountGateway,
 ) : IAccountService {
 
-    override fun getAllAccounts(): List<Account> {
+    override suspend fun getAllAccounts(): List<Account> {
         logger.debug("Fetching all accounts...")
         return accountRepository.getAll()
     }
 
-    override fun getAccount(accountId: AccountId): Account {
+    override suspend fun getAccount(accountId: AccountId): Account {
         logger.debug("Fetching account '$accountId'...")
         return accountRepository.getById(accountId) ?: throw NoSuchElementException("Account not found")
     }
@@ -44,7 +44,7 @@ class AccountService(
         return accountRepository.insert(account) ?: throw DatabaseException("Failed to insert account")
     }
 
-    fun isPuuidTaken(puuid: Puuid): Boolean {
+    suspend fun isPuuidTaken(puuid: Puuid): Boolean {
         logger.debug("Checking if '$puuid' is taken...")
         return accountRepository.getAccountByPuuid(puuid) != null
     }

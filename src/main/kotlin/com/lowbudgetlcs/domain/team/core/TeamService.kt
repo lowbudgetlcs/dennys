@@ -23,24 +23,24 @@ class TeamService(
     private val playerRepository: IPlayerRepository,
 ) : ITeamService {
 
-    override fun getAllTeams(query: TeamQuery?): List<Team> {
+    override suspend fun getAllTeams(query: TeamQuery?): List<Team> {
         logger.debug("Fetching all teams...")
         return teamRepository.getAll().filterByString(query)
     }
 
-    override fun getTeam(id: TeamId): Team {
+    override suspend fun getTeam(id: TeamId): Team {
         logger.debug("Fetching team '$id'...")
         return teamRepository.getById(id) ?: throw NoSuchElementException("Team not found")
     }
 
-    override fun getTeamWithPlayers(id: TeamId): TeamWithPlayers {
+    override suspend fun getTeamWithPlayers(id: TeamId): TeamWithPlayers {
         logger.debug("Getting team by '$id' (with players)...")
         val team = getTeam(id)
         val players = playerRepository.getByTeamId(id)
         return team.toTeamWithPlayers(players)
     }
 
-    override fun addPlayerToTeam(
+    override suspend fun addPlayerToTeam(
         playerId: PlayerId,
         teamId: TeamId,
     ): TeamWithPlayers {
@@ -53,7 +53,7 @@ class TeamService(
         return getTeamWithPlayers(teamId)
     }
 
-    override fun removePlayerFromTeam(
+    override suspend fun removePlayerFromTeam(
         playerId: PlayerId,
         teamId: TeamId,
     ): TeamWithPlayers {
@@ -65,7 +65,7 @@ class TeamService(
         return getTeamWithPlayers(teamId)
     }
 
-    override fun createTeam(team: NewTeam): Team {
+    override suspend fun createTeam(team: NewTeam): Team {
         logger.debug("Creating new team...")
         logger.debug(team.toString())
         val name = team.name.value
@@ -74,7 +74,7 @@ class TeamService(
         return teamRepository.insert(team) ?: throw DatabaseException("Failed to create team")
     }
 
-    override fun patchTeam(
+    override suspend fun patchTeam(
         teamId: TeamId,
         patch: TeamUpdate,
     ): Team {
@@ -90,13 +90,13 @@ class TeamService(
         return teamRepository.update(team, patch) ?: throw DatabaseException("Failed to patch team.")
     }
 
-    private fun getPlayer(id: PlayerId): Player {
+    private suspend fun getPlayer(id: PlayerId): Player {
         logger.debug("Fetching player '$id'...")
         val player = playerRepository.getById(id) ?: throw NoSuchElementException("Player '${id.value}' not found.")
         return player
     }
 
-    fun isNameTaken(
+    suspend fun isNameTaken(
         name: TeamName,
         eventId: EventId?,
     ): Boolean {

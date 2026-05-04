@@ -4,8 +4,10 @@ import com.lowbudgetlcs.domain.auth.core.models.NewSession
 import com.lowbudgetlcs.domain.auth.core.models.Session
 import com.lowbudgetlcs.domain.auth.core.models.types.SessionId
 import com.lowbudgetlcs.domain.auth.core.models.types.toSessionId
+import com.lowbudgetlcs.domain.auth.core.models.types.toUserId
 import com.lowbudgetlcs.domain.auth.core.port.ISessionRepository
-import com.lowbudgetlcs.domain.user.models.toUserId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.SESSIONS
@@ -14,27 +16,35 @@ import java.util.UUID
 class SessionRepository(
     private val dsl: DSLContext,
 ) : ISessionRepository {
-    override fun getAll(): List<Session> = selectSessions().fetch(::rowToSession)
-
-    override fun getById(id: SessionId): Session? =
-        selectSessions().where(SESSIONS.ID.eq(id.value)).fetchOne(::rowToSession)
-
-    override fun insert(newSession: NewSession): Session? {
-        val insertedId =
-            dsl
-                .insertInto(
-                    SESSIONS,
-                ).set(SESSIONS.ID, UUID.randomUUID())
-                .set(SESSIONS.USER_ID, newSession.user.id.value)
-                .set(SESSIONS.EXPIRES_AT, newSession.expiresAt)
-                .returning(SESSIONS.ID)
-                .fetchOne()
-                ?.get(SESSIONS.ID)
-        return insertedId?.toSessionId()?.let(::getById)
+    override suspend fun getAll(): List<Session> = withContext(Dispatchers.IO) {
+        selectSessions().fetch(::rowToSession)
     }
 
-    override fun delete(id: SessionId) {
-        dsl.delete(SESSIONS).where(SESSIONS.ID.eq(id.value)).execute()
+    override suspend fun getById(id: SessionId): Session? =
+        withContext(Dispatchers.IO) {
+            selectSessions().where(SESSIONS.ID.eq(id.value)).fetchOne(::rowToSession)
+        }
+
+    override suspend fun insert(newSession: NewSession): Session? {
+        val insertedId =
+            withContext(Dispatchers.IO) {
+                dsl
+                    .insertInto(
+                        SESSIONS,
+                    ).set(SESSIONS.ID, UUID.randomUUID())
+                    .set(SESSIONS.USER_ID, newSession.user.id.value)
+                    .set(SESSIONS.EXPIRES_AT, newSession.expiresAt)
+                    .returning(SESSIONS.ID)
+                    .fetchOne()
+            }
+                ?.get(SESSIONS.ID)
+        return insertedId?.toSessionId()?.let { getById(it) }
+    }
+
+    override suspend fun delete(id: SessionId) {
+        withContext(Dispatchers.IO) {
+            dsl.delete(SESSIONS).where(SESSIONS.ID.eq(id.value)).execute()
+        }
     }
 
     private fun selectSessions() =

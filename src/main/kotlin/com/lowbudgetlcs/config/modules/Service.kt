@@ -2,7 +2,7 @@ package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.domain.account.core.AccountService
 import com.lowbudgetlcs.domain.account.core.port.IAccountService
-import com.lowbudgetlcs.domain.auth.AuthService
+import com.lowbudgetlcs.domain.auth.core.AuthService
 import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.domain.event.core.EventGroupService
 import com.lowbudgetlcs.domain.event.core.EventService
@@ -14,8 +14,8 @@ import com.lowbudgetlcs.domain.series.core.SeriesService
 import com.lowbudgetlcs.domain.series.core.port.ISeriesService
 import com.lowbudgetlcs.domain.team.core.TeamService
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
-import com.lowbudgetlcs.domain.user.IUserService
-import com.lowbudgetlcs.domain.user.UserService
+import com.lowbudgetlcs.domain.auth.core.port.IUserService
+import com.lowbudgetlcs.domain.auth.core.UserService
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 

@@ -16,9 +16,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.coVerify
 
 class TeamServiceTest :
     StringSpec({
@@ -39,11 +39,11 @@ class TeamServiceTest :
                     eventId = null,
                 )
 
-            every { teamRepo.insert(newTeam) } returns created
+            coEvery { teamRepo.insert(newTeam) } returns created
 
             service.createTeam(newTeam) shouldBe created
 
-            verify(exactly = 1) { teamRepo.insert(newTeam) }
+            coVerify(exactly = 1) { teamRepo.insert(newTeam) }
         }
 
         "createTeam fails for blank name" {
@@ -51,36 +51,36 @@ class TeamServiceTest :
                 service.createTeam(NewTeam(TeamName(""), null))
             }
             // teamRepo.insert should never be called
-            verify(exactly = 0) { teamRepo.insert(any()) }
+            coVerify(exactly = 0) { teamRepo.insert(any()) }
         }
 
         "createTeam fails for too-long name" {
             shouldThrow<IllegalArgumentException> {
                 service.createTeam(NewTeam(TeamName("x".repeat(81)), null))
             }
-            verify(exactly = 0) { teamRepo.insert(any()) }
+            coVerify(exactly = 0) { teamRepo.insert(any()) }
         }
 
         "getAllTeams returns teamRepo data" {
             val t1 = Team(TeamId(1), TeamName("abcd"), null, null)
             val t2 = Team(TeamId(2), TeamName("cdas"), "b.png", null)
 
-            every { teamRepo.getAll() } returns listOf(t1, t2)
+            coEvery { teamRepo.getAll() } returns listOf(t1, t2)
 
             val result = service.getAllTeams()
             result.map { it.id } shouldContainExactly listOf(t1.id, t2.id)
 
-            verify(exactly = 1) { teamRepo.getAll() }
+            coVerify(exactly = 1) { teamRepo.getAll() }
         }
 
         "getTeam throws for unknown id" {
             val id = TeamId(999)
-            every { teamRepo.getById(id) } returns null
+            coEvery { teamRepo.getById(id) } returns null
 
             val ex = shouldThrow<NoSuchElementException> { service.getTeam(id) }
             ex.message shouldBe "Team not found"
 
-            verify(exactly = 1) { teamRepo.getById(id) }
+            coVerify(exactly = 1) { teamRepo.getById(id) }
         }
 
         "update() correctly updates name" {
@@ -89,13 +89,13 @@ class TeamServiceTest :
             val original = Team(id, "Original".toTeamName(), null, null)
             val updated = original.copy(name = newName)
 
-            every { teamRepo.getById(id) } returns original
-            every { teamRepo.getByName(newName)} returns listOf()
-            every { teamRepo.update(any(), any()) } returns updated
+            coEvery { teamRepo.getById(id) } returns original
+            coEvery { teamRepo.getByName(newName)} returns listOf()
+            coEvery { teamRepo.update(any(), any()) } returns updated
 
             service.patchTeam(id, TeamUpdate(name = "New".toTeamName())) shouldBe updated
 
-            verify(exactly = 1) { teamRepo.update(any(), any()) }
+            coVerify(exactly = 1) { teamRepo.update(any(), any()) }
         }
 
         "update() correctly sets logo name" {
@@ -103,11 +103,11 @@ class TeamServiceTest :
             val original = Team(id, "Original".toTeamName(), null, null)
             val updated = original.copy(logo = "Logo")
 
-            every { teamRepo.getById(id) } returns original
-            every { teamRepo.update(any(), any()) } returns updated
+            coEvery { teamRepo.getById(id) } returns original
+            coEvery { teamRepo.update(any(), any()) } returns updated
 
             service.patchTeam(id, TeamUpdate(logo = PatchField.Value("logo.png"))) shouldBe updated
 
-            verify(exactly = 1) { teamRepo.update(any(), any()) }
+            coVerify(exactly = 1) { teamRepo.update(any(), any()) }
         }
     })

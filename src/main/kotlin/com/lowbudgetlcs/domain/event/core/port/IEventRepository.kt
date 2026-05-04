@@ -9,20 +9,15 @@ import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
 
 interface IEventRepository {
-    fun getAll(): List<Event>
-
-    fun getById(id: EventId): Event?
-
-    fun getByName(name: EventName): Event?
-
-    fun getAllByGroupId(groupId: EventGroupId): List<Event>
-
-    fun insert(
+    suspend fun getAll(): List<Event>
+    suspend fun getById(id: EventId): Event?
+    suspend fun getByName(name: EventName): Event?
+    suspend fun getAllByGroupId(groupId: EventGroupId): List<Event>
+    suspend fun insert(
         newEvent: NewEvent,
         riotTournamentId: RiotTournamentId,
     ): Event?
-
-    fun update(
+    suspend fun update(
         event: Event,
         update: EventUpdate,
     ): Event?

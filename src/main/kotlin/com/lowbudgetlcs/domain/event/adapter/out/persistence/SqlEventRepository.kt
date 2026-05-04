@@ -16,6 +16,8 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.EVENTS
@@ -23,57 +25,70 @@ import org.jooq.storage.tables.references.EVENTS
 class SqlEventRepository(
     private val dsl: DSLContext,
 ) : IEventRepository {
-    override fun getAll(): List<Event> = selectEvents().fetch().mapNotNull(::rowToEvent)
+    override suspend fun getAll(): List<Event> = withContext(Dispatchers.IO) {
+        selectEvents().fetch()
+    }.mapNotNull(::rowToEvent)
 
-    override fun getAllByGroupId(groupId: EventGroupId): List<Event> =
-        selectEvents().where(EVENTS.EVENT_GROUP_ID.eq(groupId.value)).fetch().mapNotNull(::rowToEvent)
+    override suspend fun getAllByGroupId(groupId: EventGroupId): List<Event> =
+        withContext(Dispatchers.IO) {
+            selectEvents().where(EVENTS.EVENT_GROUP_ID.eq(groupId.value)).fetch()
+        }.mapNotNull(::rowToEvent)
 
-    override fun getById(id: EventId): Event? = selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne(::rowToEvent)
+    override suspend fun getById(id: EventId): Event? =
+        withContext(Dispatchers.IO) {
+            selectEvents().where(EVENTS.ID.eq(id.value)).fetchOne(::rowToEvent)
+        }
 
-    override fun getByName(name: EventName): Event? =
-        selectEvents().where(EVENTS.NAME.eq(name.value)).fetchOne()?.let(::rowToEvent)
+    override suspend fun getByName(name: EventName): Event? =
+        withContext(Dispatchers.IO) {
+            selectEvents().where(EVENTS.NAME.eq(name.value)).fetchOne()
+        }?.let(::rowToEvent)
 
-    override fun insert(
+    override suspend fun insert(
         newEvent: NewEvent,
         riotTournamentId: RiotTournamentId,
     ): Event? {
         val insertedId =
-            dsl
-                .insertInto(
-                    EVENTS,
-                ).set(EVENTS.NAME, newEvent.name.value)
-                .set(EVENTS.DESCRIPTION, newEvent.description.value)
-                .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
-                .set(EVENTS.START_DATE, newEvent.startDate)
-                .set(EVENTS.END_DATE, newEvent.endDate)
-                .set(EVENTS.STATUS, newEvent.status.name)
-                .set(EVENTS.EVENT_GROUP_ID, newEvent.eventGroupId?.value)
-                .set(EVENTS.STAGES, newEvent.eventStages.map { it.name }.toTypedArray())
-                .returning(EVENTS.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .insertInto(
+                        EVENTS,
+                    ).set(EVENTS.NAME, newEvent.name.value)
+                    .set(EVENTS.DESCRIPTION, newEvent.description.value)
+                    .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
+                    .set(EVENTS.START_DATE, newEvent.startDate)
+                    .set(EVENTS.END_DATE, newEvent.endDate)
+                    .set(EVENTS.STATUS, newEvent.status.name)
+                    .set(EVENTS.EVENT_GROUP_ID, newEvent.eventGroupId?.value)
+                    .set(EVENTS.STAGES, newEvent.eventStages.map { it.name }.toTypedArray())
+                    .returning(EVENTS.ID)
+                    .fetchOne()
+            }
                 ?.get(EVENTS.ID)
-        return insertedId?.toEventId()?.let(::getById)
+        return insertedId?.toEventId()?.let { getById(it) }
     }
 
-    override fun update(
+    override suspend fun update(
         event: Event,
         update: EventUpdate,
     ): Event? {
         val patch = event.patch(update)
         val updatedId =
-            dsl
-                .update(EVENTS)
-                .set(EVENTS.NAME, patch.name.value)
-                .set(EVENTS.DESCRIPTION, patch.description.value)
-                .set(EVENTS.START_DATE, patch.startDate)
-                .set(EVENTS.END_DATE, patch.endDate)
-                .set(EVENTS.STATUS, patch.status.name)
-                .set(EVENTS.EVENT_GROUP_ID, patch.eventGroupId?.value)
-                .where(EVENTS.ID.eq(event.id.value))
-                .returning(EVENTS.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .update(EVENTS)
+                    .set(EVENTS.NAME, patch.name.value)
+                    .set(EVENTS.DESCRIPTION, patch.description.value)
+                    .set(EVENTS.START_DATE, patch.startDate)
+                    .set(EVENTS.END_DATE, patch.endDate)
+                    .set(EVENTS.STATUS, patch.status.name)
+                    .set(EVENTS.EVENT_GROUP_ID, patch.eventGroupId?.value)
+                    .where(EVENTS.ID.eq(event.id.value))
+                    .returning(EVENTS.ID)
+                    .fetchOne()
+            }
                 ?.get(EVENTS.ID)
-        return updatedId?.toEventId()?.let(::getById)
+        return updatedId?.toEventId()?.let { getById(it) }
     }
 
     private fun selectEvents() =

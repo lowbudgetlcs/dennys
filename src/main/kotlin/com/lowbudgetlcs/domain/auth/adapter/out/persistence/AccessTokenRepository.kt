@@ -2,8 +2,10 @@ package com.lowbudgetlcs.domain.auth.adapter.out.persistence
 
 import com.lowbudgetlcs.domain.auth.core.models.AccessToken
 import com.lowbudgetlcs.domain.auth.core.models.NewAccessToken
+import com.lowbudgetlcs.domain.auth.core.models.types.toUserId
 import com.lowbudgetlcs.domain.auth.core.port.IAccessTokenRepository
-import com.lowbudgetlcs.domain.user.models.toUserId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.ACCESS_TOKENS
@@ -11,26 +13,30 @@ import org.jooq.storage.tables.references.ACCESS_TOKENS
 class AccessTokenRepository(
     private val dsl: DSLContext,
 ) : IAccessTokenRepository {
-    override fun getByTokenHash(tokenHash: String): AccessToken? =
-        selectAccessTokens().where(ACCESS_TOKENS.TOKEN_HASH.eq(tokenHash)).fetchOne(::rowToAccessToken)
+    override suspend fun getByTokenHash(tokenHash: String): AccessToken? =
+        withContext(Dispatchers.IO) {
+            selectAccessTokens().where(ACCESS_TOKENS.TOKEN_HASH.eq(tokenHash)).fetchOne(::rowToAccessToken)
+        }
 
-    override fun insert(
+    override suspend fun insert(
         newToken: NewAccessToken,
         tokenHash: String,
     ): AccessToken? {
         val tokenHash =
-            dsl
-                .insertInto(
-                    ACCESS_TOKENS,
-                ).set(ACCESS_TOKENS.TOKEN_HASH, tokenHash)
-                .set(ACCESS_TOKENS.NAME, newToken.name)
-                .set(ACCESS_TOKENS.EXPIRES_AT, newToken.expiresAt)
-                .set(ACCESS_TOKENS.SCOPES, newToken.scopes.joinToString(":"))
-                .set(ACCESS_TOKENS.USER_ID, newToken.userId.value)
-                .returning(ACCESS_TOKENS.TOKEN_HASH)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .insertInto(
+                        ACCESS_TOKENS,
+                    ).set(ACCESS_TOKENS.TOKEN_HASH, tokenHash)
+                    .set(ACCESS_TOKENS.NAME, newToken.name)
+                    .set(ACCESS_TOKENS.EXPIRES_AT, newToken.expiresAt)
+                    .set(ACCESS_TOKENS.SCOPES, newToken.scopes.joinToString(":"))
+                    .set(ACCESS_TOKENS.USER_ID, newToken.userId.value)
+                    .returning(ACCESS_TOKENS.TOKEN_HASH)
+                    .fetchOne()
+            }
                 ?.get(ACCESS_TOKENS.TOKEN_HASH)
-        return tokenHash?.let(::getByTokenHash)
+        return tokenHash?.let { getByTokenHash(it) }
     }
 
     private fun selectAccessTokens() =

@@ -6,9 +6,8 @@ import com.lowbudgetlcs.domain.series.core.model.NewGame
 import com.lowbudgetlcs.domain.series.core.model.types.GameId
 
 interface IGameRepository {
-    fun getById(id: GameId): Game?
-
-    fun insert(
+    suspend fun getById(id: GameId): Game?
+    suspend fun insert(
         newGame: NewGame,
         shortcode: Shortcode,
     ): Game?

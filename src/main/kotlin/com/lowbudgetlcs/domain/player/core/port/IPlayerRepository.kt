@@ -7,17 +7,12 @@ import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 
 interface IPlayerRepository {
-    fun getAll(): List<Player>
-
-    fun getById(id: PlayerId): Player?
-
-    fun getByName(playerName: PlayerName): Player?
-
-    fun getByTeamId(teamId: TeamId): List<Player>
-
-    fun insert(newPlayer: NewPlayer): Player?
-
-    fun renamePlayer(
+    suspend fun getAll(): List<Player>
+    suspend fun getById(id: PlayerId): Player?
+    suspend fun getByName(playerName: PlayerName): Player?
+    suspend fun getByTeamId(teamId: TeamId): List<Player>
+    suspend fun insert(newPlayer: NewPlayer): Player?
+    suspend fun renamePlayer(
         id: PlayerId,
         newName: PlayerName,
     ): Player?

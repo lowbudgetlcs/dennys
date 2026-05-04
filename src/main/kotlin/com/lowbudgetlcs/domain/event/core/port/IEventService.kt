@@ -16,7 +16,7 @@ interface IEventService {
      *
      * @return a list containing all events.
      */
-    fun getAllEvents(query: EventQuery? = null): List<Event>
+    suspend fun getAllEvents(query: EventQuery? = null): List<Event>
 
     /**
      * Fetch an event by id.
@@ -27,7 +27,7 @@ interface IEventService {
      * @throws NoSuchElementException when the event is not found.
      * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
      */
-    fun getEvent(id: EventId): Event
+    suspend fun getEvent(id: EventId): Event
 
     /**
      * Create an event from a NewEvent and NewTournament.
@@ -51,7 +51,7 @@ interface IEventService {
      * @throws com.lowbudgetlcs.DatabaseException when the underlying repositories
      * fail.
      */
-    fun patchEvent(
+    suspend fun patchEvent(
         id: EventId,
         update: EventUpdate,
     ): Event
@@ -64,7 +64,7 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event cannot be found
      */
-    fun getEventWithTeams(id: EventId): EventWithTeams
+    suspend fun getEventWithTeams(id: EventId): EventWithTeams
 
     /**
      * Fetches all events and includes series that are registered to the event
@@ -74,7 +74,7 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event cannot be found
      */
-    fun getEventWithSeries(
+    suspend fun getEventWithSeries(
         id: EventId,
         query: SeriesQuery? = null,
     ): EventWithSeries
@@ -88,7 +88,7 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist
      */
-    fun addTeam(
+    suspend fun addTeam(
         eventId: EventId,
         teamId: TeamId,
     ): EventWithTeams
@@ -102,7 +102,7 @@ interface IEventService {
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist
      */
-    fun removeTeam(
+    suspend fun removeTeam(
         eventId: EventId,
         teamId: TeamId,
     ): EventWithTeams

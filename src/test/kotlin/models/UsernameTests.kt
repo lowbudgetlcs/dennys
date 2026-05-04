@@ -1,8 +1,8 @@
 package models
 
-import com.lowbudgetlcs.domain.user.models.toUsername
-import com.lowbudgetlcs.domain.user.models.types.USER_NAME_MAX_LENGTH
-import com.lowbudgetlcs.domain.user.models.types.USER_NAME_MIN_LENGTH
+import com.lowbudgetlcs.domain.auth.core.models.types.USER_NAME_MAX_LENGTH
+import com.lowbudgetlcs.domain.auth.core.models.types.USER_NAME_MIN_LENGTH
+import com.lowbudgetlcs.domain.auth.core.models.types.toUsername
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

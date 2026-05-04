@@ -8,25 +8,19 @@ import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
 
 interface IPlayerService {
-    fun getAllPlayers(): List<Player>
-
-    fun getPlayer(id: PlayerId): Player
-
-    fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams
-
-    fun createPlayer(player: NewPlayer): Player
-
-    fun renamePlayer(
+    suspend fun getAllPlayers(): List<Player>
+    suspend fun getPlayer(id: PlayerId): Player
+    suspend fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams
+    suspend fun createPlayer(player: NewPlayer): Player
+    suspend fun renamePlayer(
         playerId: PlayerId,
         newName: PlayerName,
     ): Player
-
-    fun linkAccountToPlayer(
+    suspend fun linkAccountToPlayer(
         playerId: PlayerId,
         accountId: AccountId,
     ): Player
-
-    fun unlinkAccountFromPlayer(
+    suspend fun unlinkAccountFromPlayer(
         playerId: PlayerId,
         accountId: AccountId,
     ): Player

@@ -13,6 +13,8 @@ import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamName
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS_TO_TEAM
@@ -22,58 +24,79 @@ import org.jooq.storage.tables.references.TEAM_TO_SERIES
 class TeamRepository(
     private val dsl: DSLContext,
 ) : ITeamRepository {
-    override fun getAll(): List<Team> = selectTeams().fetch().mapNotNull(::rowToTeam)
+    override suspend fun getAll(): List<Team> = withContext(Dispatchers.IO) {
+        selectTeams().fetch()
+    }.mapNotNull(::rowToTeam)
 
-    override fun getById(id: TeamId): Team? = selectTeams().where(TEAMS.ID.eq(id.value)).fetchOne(::rowToTeam)
+    override suspend fun getById(id: TeamId): Team? =
+        withContext(Dispatchers.IO) {
+            selectTeams().where(TEAMS.ID.eq(id.value)).fetchOne(::rowToTeam)
+        }
 
-    override fun getByEventId(id: EventId): List<Team> =
-        selectTeams().where(TEAMS.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToTeam)
+    override suspend fun getByEventId(id: EventId): List<Team> =
+        withContext(Dispatchers.IO) {
+            selectTeams().where(TEAMS.EVENT_ID.eq(id.value)).fetch()
+        }.mapNotNull(::rowToTeam)
 
-    override fun getByPlayerId(id: PlayerId): List<Team> =
-        selectTeams().join(PLAYERS_TO_TEAM).on(PLAYERS_TO_TEAM.TEAM_ID.eq(TEAMS.ID))
-            .where(PLAYERS_TO_TEAM.PLAYER_ID.eq(id.value)).fetch().mapNotNull(::rowToTeam)
+    override suspend fun getByPlayerId(id: PlayerId): List<Team> =
+        withContext(Dispatchers.IO) {
+            selectTeams().join(PLAYERS_TO_TEAM).on(PLAYERS_TO_TEAM.TEAM_ID.eq(TEAMS.ID))
+                .where(PLAYERS_TO_TEAM.PLAYER_ID.eq(id.value)).fetch()
+        }.mapNotNull(::rowToTeam)
 
-    override fun getBySeriesId(seriesId: SeriesId): List<Team> =
-        dsl.select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO, TEAMS.EVENT_ID)
-            .from(TEAMS.innerJoin(TEAM_TO_SERIES).on(TEAMS.ID.eq(TEAM_TO_SERIES.TEAM_ID)))
-            .where(TEAM_TO_SERIES.SERIES_ID.eq(seriesId.value)).fetch().mapNotNull(::rowToTeam)
+    override suspend fun getBySeriesId(seriesId: SeriesId): List<Team> =
+        withContext(Dispatchers.IO) {
+            dsl.select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO, TEAMS.EVENT_ID)
+                .from(TEAMS.innerJoin(TEAM_TO_SERIES).on(TEAMS.ID.eq(TEAM_TO_SERIES.TEAM_ID)))
+                .where(TEAM_TO_SERIES.SERIES_ID.eq(seriesId.value)).fetch()
+        }.mapNotNull(::rowToTeam)
 
-    override fun getByName(name: TeamName): List<Team> =
-        selectTeams().where(TEAMS.NAME.eq(name.value)).fetch().mapNotNull(::rowToTeam)
+    override suspend fun getByName(name: TeamName): List<Team> =
+        withContext(Dispatchers.IO) {
+            selectTeams().where(TEAMS.NAME.eq(name.value)).fetch()
+        }.mapNotNull(::rowToTeam)
 
-    override fun insert(newTeam: NewTeam): Team? {
+    override suspend fun insert(newTeam: NewTeam): Team? {
         val insertedId =
-            dsl.insertInto(TEAMS).set(TEAMS.NAME, newTeam.name.value).returning(TEAMS.ID).fetchOne()?.get(TEAMS.ID)
+            withContext(Dispatchers.IO) {
+                dsl.insertInto(TEAMS).set(TEAMS.NAME, newTeam.name.value).returning(TEAMS.ID).fetchOne()
+            }?.get(TEAMS.ID)
 
-        return insertedId?.toTeamId()?.let(::getById)
+        return insertedId?.toTeamId()?.let { getById(it) }
     }
 
-    override fun update(
+    override suspend fun update(
         team: Team,
         update: TeamUpdate,
     ): Team? {
         val patch = team.patch(update)
-        val updatedId = dsl.update(TEAMS).set(TEAMS.NAME, patch.name.value).set(TEAMS.EVENT_ID, patch.eventId?.value)
-            .set(TEAMS.LOGO, patch.logo).where(TEAMS.ID.eq(team.id.value)).returning(TEAMS.ID).fetchOne()?.get(TEAMS.ID)
-        return updatedId?.toTeamId()?.let(::getById)
+        val updatedId = withContext(Dispatchers.IO) {
+            dsl.update(TEAMS).set(TEAMS.NAME, patch.name.value).set(TEAMS.EVENT_ID, patch.eventId?.value)
+                .set(TEAMS.LOGO, patch.logo).where(TEAMS.ID.eq(team.id.value)).returning(TEAMS.ID).fetchOne()
+        }?.get(TEAMS.ID)
+        return updatedId?.toTeamId()?.let { getById(it) }
     }
 
-    override fun insertPlayerTeamLink(
+    override suspend fun insertPlayerTeamLink(
         teamId: TeamId,
         playerId: PlayerId,
     ): Team? {
-        val insertedId = dsl.insertInto(PLAYERS_TO_TEAM).set(PLAYERS_TO_TEAM.PLAYER_ID, playerId.value)
-            .set(PLAYERS_TO_TEAM.TEAM_ID, teamId.value).returning(PLAYERS_TO_TEAM.TEAM_ID).fetchOne()
+        val insertedId = withContext(Dispatchers.IO) {
+            dsl.insertInto(PLAYERS_TO_TEAM).set(PLAYERS_TO_TEAM.PLAYER_ID, playerId.value)
+                .set(PLAYERS_TO_TEAM.TEAM_ID, teamId.value).returning(PLAYERS_TO_TEAM.TEAM_ID).fetchOne()
+        }
             ?.get(PLAYERS_TO_TEAM.TEAM_ID)
-        return insertedId?.toTeamId()?.let(::getById)
+        return insertedId?.toTeamId()?.let { getById(it) }
     }
 
-    override fun deletePlayerTeamLink(
+    override suspend fun deletePlayerTeamLink(
         teamId: TeamId,
         playerId: PlayerId,
     ): Team? {
-        val updated = dsl.delete(PLAYERS_TO_TEAM).where(PLAYERS_TO_TEAM.PLAYER_ID.eq(playerId.value))
-            .and(PLAYERS_TO_TEAM.TEAM_ID.eq(teamId.value)).execute()
+        val updated = withContext(Dispatchers.IO) {
+            dsl.delete(PLAYERS_TO_TEAM).where(PLAYERS_TO_TEAM.PLAYER_ID.eq(playerId.value))
+                .and(PLAYERS_TO_TEAM.TEAM_ID.eq(teamId.value)).execute()
+        }
 
         return if (updated > 0) getById(teamId) else null
     }

@@ -19,7 +19,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -59,21 +59,21 @@ class EventServiceTest :
         }
 
         test("Creating event succeeds") {
-            every { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
-            every { eventRepo.getByName(newEvent.name) } returns null
+            coEvery { eventRepo.insert(newEvent, 9999.toRiotTournamentId()) } returns expectedEvent
+            coEvery { eventRepo.getByName(newEvent.name) } returns null
             val event = service.createEvent(newEvent)
             event.shouldNotBeNull()
             event shouldBe expectedEvent
         }
 
         test("getEvent() returns valid event") {
-            every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
+            coEvery { eventRepo.getById(expectedEvent.id) } returns expectedEvent
             val fetched = service.getEvent(expectedEvent.id)
             fetched shouldBe expectedEvent
         }
 
         test("Fetching event that doesn't exist throws NoSuchElementException") {
-            every { eventRepo.getById(expectedEvent.id) } returns null
+            coEvery { eventRepo.getById(expectedEvent.id) } returns null
             shouldThrow<NoSuchElementException> { service.getEvent(expectedEvent.id) }
         }
     })

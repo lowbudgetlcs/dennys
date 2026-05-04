@@ -10,31 +10,31 @@ import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 
 interface ITeamRepository {
-    fun insert(newTeam: NewTeam): Team?
+    suspend fun insert(newTeam: NewTeam): Team?
 
-    fun getAll(): List<Team>
+    suspend fun getAll(): List<Team>
 
-    fun getById(id: TeamId): Team?
+    suspend fun getById(id: TeamId): Team?
 
-    fun getByEventId(id: EventId): List<Team>
+    suspend fun getByEventId(id: EventId): List<Team>
 
-    fun getByPlayerId(id: PlayerId): List<Team>
+    suspend fun getByPlayerId(id: PlayerId): List<Team>
 
-    fun getBySeriesId(seriesId: SeriesId): List<Team>
+    suspend fun getBySeriesId(seriesId: SeriesId): List<Team>
 
-    fun getByName(name: TeamName): List<Team>
+    suspend fun getByName(name: TeamName): List<Team>
 
-    fun update(
+    suspend fun update(
         team: Team,
         update: TeamUpdate,
     ): Team?
 
-    fun insertPlayerTeamLink(
+    suspend fun insertPlayerTeamLink(
         teamId: TeamId,
         playerId: PlayerId,
     ): Team?
 
-    fun deletePlayerTeamLink(
+    suspend fun deletePlayerTeamLink(
         teamId: TeamId,
         playerId: PlayerId,
     ): Team?

@@ -6,9 +6,9 @@ import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserSession
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toNewAccessToken
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toSession
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toUserSession
+import com.lowbudgetlcs.domain.auth.core.models.types.toUserId
 import com.lowbudgetlcs.domain.auth.core.port.IAuthService
-import com.lowbudgetlcs.domain.user.IUserService
-import com.lowbudgetlcs.domain.user.models.toUserId
+import com.lowbudgetlcs.domain.auth.core.port.IUserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal

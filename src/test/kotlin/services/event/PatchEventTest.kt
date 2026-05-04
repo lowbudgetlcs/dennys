@@ -21,7 +21,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -101,8 +101,8 @@ class PatchEventTest :
 
         // service.patchEvent()
         test("patchEvent() throws exception when event id not found") {
-            every { eventRepo.getById(testEvent.id) } returns null
-            every { eventRepo.update(testEvent, EventUpdate()) } returns testEvent
+            coEvery { eventRepo.getById(testEvent.id) } returns null
+            coEvery { eventRepo.update(testEvent, EventUpdate()) } returns testEvent
 
             shouldThrow<NoSuchElementException> {
                 service.patchEvent(testEvent.id, EventUpdate())
@@ -111,9 +111,9 @@ class PatchEventTest :
 
         test("patchEvent() does nothing when update is empty") {
             val update = EventUpdate()
-            every { eventRepo.getByName(any()) } returns null
-            every { eventRepo.getById(testEvent.id) } returns testEvent
-            every { eventRepo.update(testEvent, update) } returns testEvent
+            coEvery { eventRepo.getByName(any()) } returns null
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
+            coEvery { eventRepo.update(testEvent, update) } returns testEvent
 
             val event = service.patchEvent(testEvent.id, update)
             event shouldBe testEvent
@@ -123,9 +123,9 @@ class PatchEventTest :
             val name = "ABCDEFG".toEventName()
             val update = EventUpdate(name = name)
             val patched = testEvent.patch(update)
-            every { eventRepo.getByName(name) } returns null
-            every { eventRepo.getById(testEvent.id) } returns testEvent
-            every { eventRepo.update(testEvent, update) } returns patched
+            coEvery { eventRepo.getByName(name) } returns null
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
+            coEvery { eventRepo.update(testEvent, update) } returns patched
 
             val event = service.patchEvent(testEvent.id, update)
             event.name shouldBe name
@@ -137,9 +137,9 @@ class PatchEventTest :
             val description = "ABCDEFG".toEventDescription()
             val update = EventUpdate(description = description)
             val patched = testEvent.patch(update)
-            every { eventRepo.getByName(any()) } returns null
-            every { eventRepo.getById(testEvent.id) } returns testEvent
-            every { eventRepo.update(testEvent, update) } returns patched
+            coEvery { eventRepo.getByName(any()) } returns null
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
+            coEvery { eventRepo.update(testEvent, update) } returns patched
 
             val event = service.patchEvent(testEvent.id, update)
             event.description shouldBe description
@@ -151,9 +151,9 @@ class PatchEventTest :
             val startDate = Instant.now()
             val update = EventUpdate(startDate = startDate)
             val patched = testEvent.patch(update)
-            every { eventRepo.getByName(any()) } returns null
-            every { eventRepo.getById(testEvent.id) } returns testEvent
-            every { eventRepo.update(testEvent, update) } returns patched
+            coEvery { eventRepo.getByName(any()) } returns null
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
+            coEvery { eventRepo.update(testEvent, update) } returns patched
 
             val event = service.patchEvent(testEvent.id, update)
             event.startDate shouldBe startDate
@@ -165,9 +165,9 @@ class PatchEventTest :
             val endDate = Instant.now()
             val update = EventUpdate(endDate = endDate)
             val patched = testEvent.patch(update)
-            every { eventRepo.getByName(any()) } returns null
-            every { eventRepo.getById(testEvent.id) } returns testEvent
-            every { eventRepo.update(testEvent, update) } returns patched
+            coEvery { eventRepo.getByName(any()) } returns null
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
+            coEvery { eventRepo.update(testEvent, update) } returns patched
 
             val event = service.patchEvent(testEvent.id, update)
             event.endDate shouldBe endDate
@@ -179,9 +179,9 @@ class PatchEventTest :
             val status = EventStatus.CANCELED
             val update = EventUpdate(status = status)
             val patched = testEvent.patch(update)
-            every { eventRepo.getByName(any()) } returns null
-            every { eventRepo.getById(testEvent.id) } returns testEvent
-            every { eventRepo.update(testEvent, update) } returns patched
+            coEvery { eventRepo.getByName(any()) } returns null
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
+            coEvery { eventRepo.update(testEvent, update) } returns patched
 
             val event = service.patchEvent(testEvent.id, update)
             event.status shouldBe status
@@ -202,7 +202,7 @@ class PatchEventTest :
         }
 
         test("patchEvent() throws exception when name is taken") {
-            every { eventRepo.getByName(testEvent.name) } returns testEvent
+            coEvery { eventRepo.getByName(testEvent.name) } returns testEvent
             shouldThrow<IllegalStateException> {
                 service.patchEvent(testEvent.id, EventUpdate(name = testEvent.name))
             }

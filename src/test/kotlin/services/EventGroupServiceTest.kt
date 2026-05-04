@@ -21,7 +21,8 @@ import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -47,20 +48,20 @@ class EventGroupServiceTest :
             name.shouldNotBeNull()
         }
         test("Creating event group succeeds.") {
-            every { groupRepo.getByName(newGroup.name) } returns null
-            every { groupRepo.insert(newGroup) } returns expectedGroup
+            coEvery { groupRepo.getByName(newGroup.name) } returns null
+            coEvery { groupRepo.insert(newGroup) } returns expectedGroup
             val group = service.createEventGroup(newGroup)
             group.shouldNotBeNull()
             group shouldBe expectedGroup
         }
         test("getEventGroup() returns valid event group") {
-            every { groupRepo.getById(expectedGroup.id) } returns expectedGroup
+            coEvery { groupRepo.getById(expectedGroup.id) } returns expectedGroup
             val group = service.getEventGroup(expectedGroup.id)
             group.shouldNotBeNull()
             group shouldBe expectedGroup
         }
         test("Fetching event that doesn't exist throws NoSuchElementException") {
-            every { groupRepo.getById(any()) } returns null
+            coEvery { groupRepo.getById(any()) } returns null
             shouldThrow<NoSuchElementException> {
                 service.getEventGroup(1.toEventGroupId())
             }
@@ -102,12 +103,12 @@ class EventGroupServiceTest :
         val expectedGroup2 = newGroup2.toEventGroup(1.toEventGroupId())
 
         test("Created event group with events succeeds.") {
-            every { groupRepo.getByName(newGroup2.name) } returns null
-            every { groupRepo.insert(newGroup2) } returns expectedGroup2
-            every { groupRepo.getById(expectedGroup2.id) } returns expectedGroup2
-            every { eventRepo.getById(expectedEvent1.id) } returns expectedEvent1
-            every { eventRepo.getById(expectedEvent2.id) } returns expectedEvent2
-            every {
+            coEvery { groupRepo.getByName(newGroup2.name) } returns null
+            coEvery { groupRepo.insert(newGroup2) } returns expectedGroup2
+            coEvery { groupRepo.getById(expectedGroup2.id) } returns expectedGroup2
+            coEvery { eventRepo.getById(expectedEvent1.id) } returns expectedEvent1
+            coEvery { eventRepo.getById(expectedEvent2.id) } returns expectedEvent2
+            coEvery {
                 eventRepo.update(
                     expectedEvent1,
                     EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id))
@@ -116,7 +117,7 @@ class EventGroupServiceTest :
                 expectedEvent1.copy(
                     eventGroupId = expectedGroup2.id,
                 )
-            every {
+            coEvery {
                 eventRepo.update(
                     expectedEvent2,
                     EventUpdate(eventGroupId = PatchField.Value(expectedGroup2.id))
@@ -125,8 +126,8 @@ class EventGroupServiceTest :
                 expectedEvent2.copy(
                     eventGroupId = expectedGroup2.id,
                 )
-            val group = service.createEventGroup(newGroup)
+            val group = service.createEventGroup(newGroup2)
             group.shouldNotBeNull()
-            group shouldBe expectedGroup
+            group shouldBe expectedGroup2
         }
     })

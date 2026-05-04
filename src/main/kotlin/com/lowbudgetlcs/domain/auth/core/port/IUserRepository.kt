@@ -1,16 +1,13 @@
 package com.lowbudgetlcs.domain.auth.core.port
 
-import com.lowbudgetlcs.domain.user.models.NewUser
-import com.lowbudgetlcs.domain.user.models.User
-import com.lowbudgetlcs.domain.user.models.types.UserId
-import com.lowbudgetlcs.domain.user.models.types.Username
+import com.lowbudgetlcs.domain.auth.core.models.NewUser
+import com.lowbudgetlcs.domain.auth.core.models.User
+import com.lowbudgetlcs.domain.auth.core.models.types.UserId
+import com.lowbudgetlcs.domain.auth.core.models.types.Username
 
 interface IUserRepository {
-    fun getAll(): List<User>
-
-    fun getById(id: UserId): User?
-
-    fun getByUsername(username: Username): User?
-
-    fun insert(newUser: NewUser): User?
+    suspend fun getAll(): List<User>
+    suspend fun getById(id: UserId): User?
+    suspend fun getByUsername(username: Username): User?
+    suspend fun insert(newUser: NewUser): User?
 }

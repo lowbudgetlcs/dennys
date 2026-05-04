@@ -21,7 +21,7 @@ import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -57,27 +57,27 @@ class AddRemoveTeamTest() :
         val expectedEventWithTeams = expectedEvent.toEventWithTeams(listOf(expectedTeam))
 
         test("addTeam() associates a team with an event") {
-            every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
-            every { teamRepo.getById(expectedTeam.id) } returns expectedTeam
-            every {
+            coEvery { eventRepo.getById(expectedEvent.id) } returns expectedEvent
+            coEvery { teamRepo.getById(expectedTeam.id) } returns expectedTeam
+            coEvery {
                 teamRepo.update(any(), any())
             } returns expectedTeam
-            every { teamRepo.getByEventId(expectedEvent.id) } returns listOf(expectedTeam)
+            coEvery { teamRepo.getByEventId(expectedEvent.id) } returns listOf(expectedTeam)
             val event = service.addTeam(expectedEvent.id, expectedTeam.id)
             event.shouldNotBeNull()
             event shouldBe expectedEventWithTeams
         }
 
         test("remove() sets eventId to null") {
-            every { eventRepo.getById(expectedEvent.id) } returns expectedEvent
-            every { teamRepo.getById(expectedTeam.id) } returns expectedTeam
-            every {
+            coEvery { eventRepo.getById(expectedEvent.id) } returns expectedEvent
+            coEvery { teamRepo.getById(expectedTeam.id) } returns expectedTeam
+            coEvery {
                 teamRepo.update(
                     any(),
                     any(),
                 )
             } returns expectedTeam.copy(eventId = null)
-            every { teamRepo.getByEventId(expectedEvent.id) } returns listOf(expectedTeam)
+            coEvery { teamRepo.getByEventId(expectedEvent.id) } returns listOf(expectedTeam)
             val event = service.addTeam(expectedEvent.id, expectedTeam.id)
             event.shouldNotBeNull()
             event shouldBe expectedEventWithTeams

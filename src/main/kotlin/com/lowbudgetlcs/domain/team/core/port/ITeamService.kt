@@ -9,25 +9,25 @@ import com.lowbudgetlcs.domain.team.core.model.TeamWithPlayers
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 
 interface ITeamService {
-    fun getAllTeams(query: TeamQuery? = null): List<Team>
+    suspend fun getAllTeams(query: TeamQuery? = null): List<Team>
 
-    fun getTeam(id: TeamId): Team
+    suspend fun getTeam(id: TeamId): Team
 
-    fun createTeam(team: NewTeam): Team
+    suspend fun createTeam(team: NewTeam): Team
 
-    fun patchTeam(
+    suspend fun patchTeam(
         teamId: TeamId,
         patch: TeamUpdate,
     ): Team
 
-    fun getTeamWithPlayers(id: TeamId): TeamWithPlayers
+    suspend fun getTeamWithPlayers(id: TeamId): TeamWithPlayers
 
-    fun addPlayerToTeam(
+    suspend fun addPlayerToTeam(
         playerId: PlayerId,
         teamId: TeamId,
     ): TeamWithPlayers
 
-    fun removePlayerFromTeam(
+    suspend fun removePlayerFromTeam(
         playerId: PlayerId,
         teamId: TeamId,
     ): TeamWithPlayers

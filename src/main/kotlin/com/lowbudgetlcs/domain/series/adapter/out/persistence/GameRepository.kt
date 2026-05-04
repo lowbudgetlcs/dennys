@@ -9,6 +9,8 @@ import com.lowbudgetlcs.domain.series.core.model.types.toGameId
 import com.lowbudgetlcs.domain.series.core.model.types.toSeriesId
 import com.lowbudgetlcs.domain.series.core.port.IGameRepository
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.GAMES
@@ -16,23 +18,27 @@ import org.jooq.storage.tables.references.GAMES
 class GameRepository(
     private val dsl: DSLContext,
 ) : IGameRepository {
-    override fun getById(id: GameId) = selectGames().where(GAMES.ID.eq(id.value)).fetchOne()?.let(::rowToGames)
+    override suspend fun getById(id: GameId) = withContext(Dispatchers.IO) {
+        selectGames().where(GAMES.ID.eq(id.value)).fetchOne()
+    }?.let(::rowToGames)
 
-    override fun insert(
+    override suspend fun insert(
         newGame: NewGame,
         shortcode: Shortcode,
     ): Game? {
         val insertedId =
-            dsl
-                .insertInto(GAMES)
-                .set(GAMES.SHORTCODE, shortcode.value)
-                .set(GAMES.SERIES_ID, newGame.seriesId.value)
-                .set(GAMES.BLUE_TEAM_ID, newGame.blueTeamId.value)
-                .set(GAMES.RED_TEAM_ID, newGame.redTeamId.value)
-                .returning(GAMES.ID)
-                .fetchOne()
+            withContext(Dispatchers.IO) {
+                dsl
+                    .insertInto(GAMES)
+                    .set(GAMES.SHORTCODE, shortcode.value)
+                    .set(GAMES.SERIES_ID, newGame.seriesId.value)
+                    .set(GAMES.BLUE_TEAM_ID, newGame.blueTeamId.value)
+                    .set(GAMES.RED_TEAM_ID, newGame.redTeamId.value)
+                    .returning(GAMES.ID)
+                    .fetchOne()
+            }
                 ?.get(GAMES.ID)
-        return insertedId?.toGameId()?.let(::getById)
+        return insertedId?.toGameId()?.let { getById(it) }
     }
 
     private fun selectGames() =

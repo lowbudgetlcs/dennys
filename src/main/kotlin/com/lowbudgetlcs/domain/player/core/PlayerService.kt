@@ -20,7 +20,7 @@ class PlayerService(
     private val teamRepository: ITeamRepository,
 ) : IPlayerService {
 
-    override fun getAllPlayers(): List<Player> {
+    override suspend fun getAllPlayers(): List<Player> {
         logger.info("Fetching all players...")
         val players = playerRepository.getAll()
         logger.debug("Fetched ${players.size} players.")
@@ -28,14 +28,14 @@ class PlayerService(
         return players
     }
 
-    override fun getPlayer(id: PlayerId): Player {
+    override suspend fun getPlayer(id: PlayerId): Player {
         logger.info("Fetching player '$id'...")
         val player = playerRepository.getById(id) ?: throw NoSuchElementException("Player not found")
         logger.debug("Fetched: {}.", player)
         return player
     }
 
-    override fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams {
+    override suspend fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams {
         logger.info("Fetching player '$id' with teams...")
         val player = getPlayer(id)
         val teams = teamRepository.getByPlayerId(player.id)
@@ -44,7 +44,7 @@ class PlayerService(
         return player.toPlayerWithTeams(player, teams)
     }
 
-    override fun createPlayer(player: NewPlayer): Player {
+    override suspend fun createPlayer(player: NewPlayer): Player {
         logger.info("Creating new player...")
         logger.debug(player.toString())
         require(player.name.value.isNotBlank()) { "Player name cannot be blank" }
@@ -54,7 +54,7 @@ class PlayerService(
         return player
     }
 
-    override fun renamePlayer(
+    override suspend fun renamePlayer(
         playerId: PlayerId,
         newName: PlayerName,
     ): Player {
@@ -67,7 +67,7 @@ class PlayerService(
     }
 
     // TODO: Extract some of this logic into separate functions
-    override fun linkAccountToPlayer(
+    override suspend fun linkAccountToPlayer(
         playerId: PlayerId,
         accountId: AccountId,
     ): Player {
@@ -82,7 +82,7 @@ class PlayerService(
         return player
     }
 
-    override fun unlinkAccountFromPlayer(
+    override suspend fun unlinkAccountFromPlayer(
         playerId: PlayerId,
         accountId: AccountId,
     ): Player {
@@ -99,7 +99,7 @@ class PlayerService(
      * @param name The PlayerName to check.
      * @return True if the name is taken, false otherwise.
      */
-    fun isNameTaken(name: PlayerName): Boolean {
+    suspend fun isNameTaken(name: PlayerName): Boolean {
         logger.debug("Checking if name '$name' is taken...")
         return playerRepository.getByName(name) != null
     }
