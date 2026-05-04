@@ -1,9 +1,9 @@
 package models
 
-import com.lowbudgetlcs.domain.player.models.toPlayerName
 import com.lowbudgetlcs.domain.player.core.model.types.PLAYER_NAME_MAX_LENGTH
 import com.lowbudgetlcs.domain.player.core.model.types.PLAYER_NAME_MIN_LENGTH
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerName
+import com.lowbudgetlcs.domain.player.core.model.types.toPlayerName
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

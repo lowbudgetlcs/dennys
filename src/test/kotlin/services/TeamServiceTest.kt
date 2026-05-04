@@ -1,15 +1,15 @@
 package services
 
-import com.lowbudgetlcs.domain.team.core.TeamService
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
+import com.lowbudgetlcs.domain.team.core.TeamService
 import com.lowbudgetlcs.domain.team.core.model.NewTeam
 import com.lowbudgetlcs.domain.team.core.model.Team
 import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
-import com.lowbudgetlcs.domain.team.core.model.toTeamId
-import com.lowbudgetlcs.domain.team.core.model.toTeamName
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 import com.lowbudgetlcs.domain.team.core.model.types.TeamName
-import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamName
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

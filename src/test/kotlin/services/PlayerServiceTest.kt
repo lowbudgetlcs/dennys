@@ -1,12 +1,12 @@
 package services
 
+import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.player.core.PlayerService
 import com.lowbudgetlcs.domain.player.core.model.NewPlayer
 import com.lowbudgetlcs.domain.player.core.model.Player
 import com.lowbudgetlcs.domain.player.core.model.toPlayer
-import com.lowbudgetlcs.domain.player.models.toPlayerId
-import com.lowbudgetlcs.domain.player.models.toPlayerName
-import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
+import com.lowbudgetlcs.domain.player.core.model.types.toPlayerId
+import com.lowbudgetlcs.domain.player.core.model.types.toPlayerName
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow

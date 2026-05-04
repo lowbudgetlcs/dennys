@@ -1,8 +1,8 @@
 package models
 
-import com.lowbudgetlcs.domain.team.core.model.toTeamName
 import com.lowbudgetlcs.domain.team.core.model.types.TEAM_NAME_MAX_LENGTH
 import com.lowbudgetlcs.domain.team.core.model.types.TEAM_NAME_MIN_LENGTH
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamName
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec

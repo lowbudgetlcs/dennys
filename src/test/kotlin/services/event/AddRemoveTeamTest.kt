@@ -1,23 +1,23 @@
-package services.events
+package services.event
 
 import com.lowbudgetlcs.domain.event.core.EventService
 import com.lowbudgetlcs.domain.event.core.model.NewEvent
-import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
+import com.lowbudgetlcs.domain.event.core.model.toEvent
+import com.lowbudgetlcs.domain.event.core.model.toEventWithTeams
+import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
-import com.lowbudgetlcs.domain.event.core.model.toEventWithTeams
-import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.team.core.model.NewTeam
-import com.lowbudgetlcs.domain.team.core.model.toTeam
-import com.lowbudgetlcs.domain.team.core.model.toTeamId
-import com.lowbudgetlcs.domain.team.core.model.toTeamName
-import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
+import com.lowbudgetlcs.domain.team.core.model.NewTeam
+import com.lowbudgetlcs.domain.team.core.model.toTeam
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
+import com.lowbudgetlcs.domain.team.core.model.types.toTeamName
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -26,7 +26,7 @@ import io.mockk.mockk
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class AddRemoveTeamTest :
+class AddRemoveTeamTest() :
     FunSpec({
         val eventRepo = mockk<IEventRepository>()
         val tournamentGate = mockk<IRiotTournamentGateway>()

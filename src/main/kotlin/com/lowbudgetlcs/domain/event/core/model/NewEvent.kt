@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
 import com.lowbudgetlcs.domain.event.core.model.types.EventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
+import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
 import java.time.Instant
 
@@ -15,4 +16,19 @@ data class NewEvent(
     val status: EventStatus,
     val eventGroupId: EventGroupId? = null,
     val eventStages: Set<EventStage>,
+) {
+}
+
+// Extensions
+fun NewEvent.toEvent(id: EventId, createdAt: Instant, riotTournamentId: RiotTournamentId): Event = Event(
+    id = id,
+    name = this.name,
+    description = this.description,
+    eventGroupId = this.eventGroupId,
+    riotTournamentId = riotTournamentId,
+    createdAt = createdAt,
+    startDate = this.startDate,
+    endDate = this.endDate,
+    status = this.status,
+    eventStages = this.eventStages
 )
