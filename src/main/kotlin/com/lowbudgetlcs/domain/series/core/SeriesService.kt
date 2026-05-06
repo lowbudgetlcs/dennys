@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.series.core
 
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.event.core.model.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
@@ -41,7 +41,7 @@ class SeriesService(
         validate(series.participantIds.first)
         validate(series.participantIds.second)
 
-        return seriesRepo.insert(series) ?: throw DatabaseException("Failed to create series")
+        return seriesRepo.insert(series) ?: throw RepositoryException("Failed to create series")
     }
 
     override suspend fun getAllSeriesFromEvent(id: EventId): List<Series> {
@@ -74,7 +74,7 @@ class SeriesService(
                 .filter { it.participants == listOf(teamId1, teamId2) }
 
         if (series.size > 1) {
-            throw DatabaseException("More than one series matched this filter.")
+            throw RepositoryException("More than one series matched this filter.")
         } else if (series.isEmpty()) {
             throw NoSuchElementException("No series matched this filter.")
         }
@@ -86,7 +86,7 @@ class SeriesService(
         try {
             return seriesRepo.delete(id)
         } catch (_: Throwable) {
-            throw DatabaseException("Failed to remove series.")
+            throw RepositoryException("Failed to remove series.")
         }
     }
 
@@ -111,11 +111,11 @@ class SeriesService(
         logger.debug("Fetching tournament id for event '${series.eventId}'...")
         val event =
             eventRepo.getById(series.eventId)
-                ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+                ?: throw RepositoryException("Series with id '${series.id}' does not have parent event.")
         val response =
             gate.getCode(event.riotTournamentId, ShortcodeOptions())
                 ?: throw GatewayException("Failed to create tournament code.")
         val shortcode = response.codes.first()
-        return gameRepo.insert(newGame, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
+        return gameRepo.insert(newGame, shortcode.toShortcode()) ?: throw RepositoryException("Failed to save game.")
     }
 }

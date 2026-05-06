@@ -1,6 +1,6 @@
-package com.lowbudgetlcs
+package com.lowbudgetlcs.domain
 
-class DatabaseException(
+class RepositoryException(
     message: String,
     cause: Throwable? = null,
 ) : RuntimeException(message, cause)

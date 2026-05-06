@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.event.core
 
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.EventQuery
@@ -16,29 +17,21 @@ import com.lowbudgetlcs.domain.event.core.model.types.EventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.series.core.model.SeriesQuery
-import com.lowbudgetlcs.domain.series.core.model.filterByParticipants
-import com.lowbudgetlcs.domain.series.core.model.filterByStage
-import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
+import com.lowbudgetlcs.domain.series.core.port.ISeriesService
 import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.DatabaseException
 
 class EventService(
     private val eventRepo: IEventRepository,
     private val tournamentGateway: IRiotTournamentGateway,
     private val teamRepo: ITeamRepository,
-    private val seriesRepo: ISeriesRepository,
+    private val seriesService: ISeriesService,
 ) : IEventService {
 
-    override suspend fun getAllEvents(query: EventQuery?): List<Event> {
-        logger.debug("Fetching all events...")
-        query?.run { logger.debug("(Query: '{}')", query) }
-        return eventRepo.getAll().filterByName(query).filterByStatus(query)
-    }
 
     override suspend fun getEvent(id: EventId): Event {
         logger.debug("Getting event by '$id'...")
@@ -59,8 +52,14 @@ class EventService(
         logger.debug("Getting event by '$id' (with series)...")
         query?.run { logger.debug("(Query: '$query')") }
         val event = getEvent(id)
-        val series = seriesRepo.getAllByEventId(id).filterByStage(query).filterByParticipants(query)
+        val series = seriesService.getAllSeriesFromEvent(id)
         return event.toEventWithSeries(series)
+    }
+
+    override suspend fun getAllEvents(query: EventQuery?): List<Event> {
+        logger.debug("Fetching all events...")
+        query?.run { logger.debug("(Query: '{}')", query) }
+        return eventRepo.getAll().filterByName(query).filterByStatus(query)
     }
 
     override suspend fun createEvent(event: NewEvent): Event {
@@ -71,7 +70,7 @@ class EventService(
         val t =
             tournamentGateway.create(event.name)
                 ?: throw GatewayException("Failed to register tournament with Riot Games.")
-        return eventRepo.insert(event, t.id) ?: throw DatabaseException("Failed to create event.")
+        return eventRepo.insert(event, t.id) ?: throw RepositoryException("Failed to create event.")
     }
 
     override suspend fun patchEvent(
@@ -88,7 +87,7 @@ class EventService(
         val end = update.endDate ?: event.endDate
         check(start.isBefore(end)) { "Event start date must be before end date." }
         return eventRepo.update(event, update)
-            ?: throw DatabaseException("Failed to update event with id '${id.value}'.")
+            ?: throw RepositoryException("Failed to update event with id '${id.value}'.")
     }
 
     private suspend fun validateTeam(
@@ -107,7 +106,7 @@ class EventService(
         validateTeam(eventId, teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
         val teamPatch = TeamUpdate(eventId = PatchField.Value(eventId))
-        teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
+        teamRepo.update(team, teamPatch) ?: throw RepositoryException("Failed to add team to event.")
         return getEventWithTeams(eventId)
     }
 
@@ -119,7 +118,7 @@ class EventService(
         validateTeam(eventId, teamId)
         val team = teamRepo.getById(teamId) ?: throw NoSuchElementException("Team with id '${teamId.value}' not found.")
         val teamPatch = TeamUpdate(eventId = PatchField.Value(null))
-        teamRepo.update(team, teamPatch) ?: throw DatabaseException("Failed to add team to event.")
+        teamRepo.update(team, teamPatch) ?: throw RepositoryException("Failed to add team to event.")
         return getEventWithTeams(eventId)
     }
 

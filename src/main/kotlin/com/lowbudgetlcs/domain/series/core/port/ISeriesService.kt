@@ -17,7 +17,7 @@ interface ISeriesService {
      * @return the newly created Series.
      *
      * @throws IllegalArgumentException if the series cannot be created.
-     * @throws com.lowbudgetlcs.DatabaseException if the underlying repositories fail.
+     * @throws com.lowbudgetlcs.domain.RepositoryException if the underlying repositories fail.
      */
     suspend fun createSeries(series: NewSeries): Series
 
@@ -31,7 +31,7 @@ interface ISeriesService {
      * @return the specified series.
      *
      * @throws NoSuchElementException when the series is not found.
-     * @throws com.lowbudgetlcs.DatabaseException when the underlying repository fails.
+     * @throws com.lowbudgetlcs.domain.RepositoryException when the underlying repository fails.
      */
     suspend fun getSeries(id: SeriesId): Series
 
@@ -45,7 +45,7 @@ interface ISeriesService {
      * @return a series containing both team ids inside the specified event stage.
      *
      * @throws NoSuchElementException when no series is found.
-     * @throws com.lowbudgetlcs.DatabaseException if >1 series is found.
+     * @throws com.lowbudgetlcs.domain.RepositoryException if >1 series is found.
      * @throws IllegalArgumentException when the teamIds are invalid.
      */
     suspend fun findSeries(
@@ -61,7 +61,7 @@ interface ISeriesService {
      * @param SeriesId the target series.
      *
      * @throws NoSuchElementException if the specified event or team doesn't exist
-     * @throws com.lowbudgetlcs.DatabaseException if the delete operation fails
+     * @throws com.lowbudgetlcs.domain.RepositoryException if the delete operation fails
      */
     suspend fun removeSeries(id: SeriesId)
 

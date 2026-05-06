@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.auth.core
 
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.config.CookieConfig
 import com.lowbudgetlcs.domain.auth.core.models.FreshAccessToken
 import com.lowbudgetlcs.domain.auth.core.models.NewAccessToken
@@ -71,7 +71,7 @@ class AuthService(
     override suspend fun createSession(user: User): Session {
         logger.debug("Starting session for '${user.username}'...")
         val newSession = NewSession(user, Instant.now().plusSeconds(cookieConfig.expiration))
-        if (user.isActive) return sessionRepo.insert(newSession) ?: throw DatabaseException("An unkown error occured.")
+        if (user.isActive) return sessionRepo.insert(newSession) ?: throw RepositoryException("An unkown error occured.")
         throw UnauthorizedException("This user is locked.")
     }
 
@@ -93,7 +93,7 @@ class AuthService(
     override suspend fun createAccessToken(newToken: NewAccessToken): FreshAccessToken {
         val token = UUID.randomUUID().toString()
         val tokenHash = tokenHasher.hash(token)
-        tokenRepo.insert(newToken, tokenHash) ?: DatabaseException("An unknown error occured.")
+        tokenRepo.insert(newToken, tokenHash) ?: RepositoryException("An unknown error occured.")
         return FreshAccessToken(token)
     }
 

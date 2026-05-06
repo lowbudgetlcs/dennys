@@ -12,7 +12,7 @@ import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 
 class PlayerService(
     private val playerRepository: IPlayerRepository,
@@ -49,7 +49,7 @@ class PlayerService(
         logger.debug(player.toString())
         require(player.name.value.isNotBlank()) { "Player name cannot be blank" }
         check(!isNameTaken(player.name)) { "Player name already exists" }
-        val player = playerRepository.insert(player) ?: throw DatabaseException("Failed to create player")
+        val player = playerRepository.insert(player) ?: throw RepositoryException("Failed to create player")
         logger.debug("Created: {}", player)
         return player
     }
@@ -61,7 +61,7 @@ class PlayerService(
         logger.info("Renaming player '$playerId' to '$newName'...")
         check(!isNameTaken(newName)) { "Player named ${newName.value} already exists" }
         this.getPlayer(playerId) // throws if not found
-        val player = playerRepository.renamePlayer(playerId, newName) ?: throw DatabaseException("Failed to rename player")
+        val player = playerRepository.renamePlayer(playerId, newName) ?: throw RepositoryException("Failed to rename player")
         logger.debug("Renamed: {}", player)
         return player
     }
@@ -76,7 +76,7 @@ class PlayerService(
         val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account does not exist")
         checkNotNull(account.playerId) { "Account already owned." }
         accountRepository.updatePlayerId(accountId, playerId)
-            ?: throw DatabaseException("Failed to link account to player.")
+            ?: throw RepositoryException("Failed to link account to player.")
         val player = playerRepository.getById(playerId) ?: throw NoSuchElementException("Player not found.")
         logger.debug("Linked: {}", player)
         return player
@@ -91,7 +91,7 @@ class PlayerService(
         val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account not found.")
         logger.debug("Account: {}", account)
         check(account.playerId == player.id) { "Account belongs to different player." }
-        accountRepository.updatePlayerId(accountId, null) ?: throw DatabaseException("Failed to remove account.")
+        accountRepository.updatePlayerId(accountId, null) ?: throw RepositoryException("Failed to remove account.")
         return playerRepository.getById(playerId) ?: throw NoSuchElementException("Player not found.")
     }
 

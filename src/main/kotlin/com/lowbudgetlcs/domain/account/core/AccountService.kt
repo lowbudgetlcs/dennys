@@ -9,7 +9,7 @@ import com.lowbudgetlcs.domain.account.core.port.IAccountService
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.account.core.port.IRiotAccountGateway
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 
 class AccountService(
     private val accountRepository: IAccountRepository,
@@ -41,7 +41,7 @@ class AccountService(
             playerRepository.getById(id) // throws if anything fails
         }
 
-        return accountRepository.insert(account) ?: throw DatabaseException("Failed to insert account")
+        return accountRepository.insert(account) ?: throw RepositoryException("Failed to insert account")
     }
 
     suspend fun isPuuidTaken(puuid: Puuid): Boolean {

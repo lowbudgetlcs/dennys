@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.plugins
 
 import com.lowbudgetlcs.gateways.GatewayException
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.auth.core.UnauthorizedException
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.JsonConvertException
@@ -47,7 +47,7 @@ fun Application.setupStatusPages() {
             val e = Error(code = code.value, message = cause.message ?: "Not found")
             call.respond(code, e)
         }
-        exception<DatabaseException> { call, cause ->
+        exception<RepositoryException> { call, cause ->
             logger.error("⚠️ Database Exception: $call", cause)
             val code = HttpStatusCode.InternalServerError
             val e = Error(code = code.value, message = cause.message ?: "Internal server error")

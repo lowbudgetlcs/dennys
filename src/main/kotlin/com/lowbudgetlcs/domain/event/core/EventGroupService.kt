@@ -15,7 +15,7 @@ import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 
 class EventGroupService(
     private val eventGroupRepo: IEventGroupRepository,
@@ -50,7 +50,7 @@ class EventGroupService(
             eventRepo.getById(eventId) ?: errors.add("Event with id '${eventId.value}' not found.")
         }
         require(errors.isEmpty()) { errors.joinToString(",") }
-        val created = eventGroupRepo.insert(group) ?: throw DatabaseException("Failed to create event group.")
+        val created = eventGroupRepo.insert(group) ?: throw RepositoryException("Failed to create event group.")
         group.events?.forEach { eventId -> addEvent(created.id, eventId) }
         return created
     }
@@ -65,7 +65,7 @@ class EventGroupService(
         val name = update.name ?: group.name
         require(!isNameTaken(name)) { "Event group with name '$name' already exists." }
         return eventGroupRepo.update(group.patch(update))
-            ?: throw DatabaseException("Failed to patch event group with id '${id.value}.")
+            ?: throw RepositoryException("Failed to patch event group with id '${id.value}.")
     }
 
     override suspend fun addEvent(
@@ -79,7 +79,7 @@ class EventGroupService(
         val event =
             eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id '${eventId.value}' not found.")
         eventRepo.update(event, EventUpdate(eventGroupId = PatchField.Value(group.id)))
-            ?: throw DatabaseException("Failed to add event to event group.")
+            ?: throw RepositoryException("Failed to add event to event group.")
         return getEventGroupWithEvents(eventGroupId)
     }
 
@@ -94,7 +94,7 @@ class EventGroupService(
             event,
             EventUpdate(eventGroupId = PatchField.Value(null)),
         )
-            ?: throw DatabaseException("Failed to remove event from event group.")
+            ?: throw RepositoryException("Failed to remove event from event group.")
         return getEventGroupWithEvents(eventGroupId)
     }
 

@@ -16,7 +16,7 @@ import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.DatabaseException
+import com.lowbudgetlcs.domain.RepositoryException
 
 class TeamService(
     private val teamRepository: ITeamRepository,
@@ -49,7 +49,7 @@ class TeamService(
         getTeam(teamId)
         getPlayer(playerId)
         teamRepository.insertPlayerTeamLink(teamId, playerId)
-            ?: throw DatabaseException("Failed to add player '${playerId.value}' to team '${teamId.value}'.")
+            ?: throw RepositoryException("Failed to add player '${playerId.value}' to team '${teamId.value}'.")
         return getTeamWithPlayers(teamId)
     }
 
@@ -61,7 +61,7 @@ class TeamService(
         getTeam(teamId)
         getPlayer(playerId)
         teamRepository.deletePlayerTeamLink(teamId, playerId)
-            ?: throw DatabaseException("Failed to remove player '${playerId.value}' from team '${teamId.value}'.")
+            ?: throw RepositoryException("Failed to remove player '${playerId.value}' from team '${teamId.value}'.")
         return getTeamWithPlayers(teamId)
     }
 
@@ -71,7 +71,7 @@ class TeamService(
         val name = team.name.value
         require(name.isNotBlank()) { "Team name cannot be blank" }
 
-        return teamRepository.insert(team) ?: throw DatabaseException("Failed to create team")
+        return teamRepository.insert(team) ?: throw RepositoryException("Failed to create team")
     }
 
     override suspend fun patchTeam(
@@ -87,7 +87,7 @@ class TeamService(
                 "Team with name '${name.value}' (in event ${team.eventId?.value}) already taken."
             }
         }
-        return teamRepository.update(team, patch) ?: throw DatabaseException("Failed to patch team.")
+        return teamRepository.update(team, patch) ?: throw RepositoryException("Failed to patch team.")
     }
 
     private suspend fun getPlayer(id: PlayerId): Player {
