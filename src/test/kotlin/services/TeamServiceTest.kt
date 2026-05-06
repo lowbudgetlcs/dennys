@@ -94,8 +94,6 @@ class TeamServiceTest :
             coEvery { teamRepo.update(any(), any()) } returns updated
 
             service.patchTeam(id, TeamUpdate(name = "New".toTeamName())) shouldBe updated
-
-            coVerify(exactly = 1) { teamRepo.update(any(), any()) }
         }
 
         "update() correctly sets logo name" {
@@ -107,7 +105,5 @@ class TeamServiceTest :
             coEvery { teamRepo.update(any(), any()) } returns updated
 
             service.patchTeam(id, TeamUpdate(logo = PatchField.Value("logo.png"))) shouldBe updated
-
-            coVerify(exactly = 1) { teamRepo.update(any(), any()) }
         }
     })

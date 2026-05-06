@@ -11,8 +11,8 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventUpdate
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toNewEvent
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toQuery
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toTeamId
+import com.lowbudgetlcs.domain.event.core.services.EventService
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
-import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.NewSeriesDto
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.SeriesFilterParams
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.dto.toDto
@@ -32,7 +32,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
-class EventRoutesV1(private val eventService: IEventService, private val seriesService: ISeriesService) : ApiRoute {
+class EventRoutesV1(private val eventService: EventService, private val seriesService: ISeriesService) : ApiRoute {
     override fun register(routing: Route) {
         routing.route("/event") {
             get<EventResourcesV1> { route ->
@@ -88,7 +88,7 @@ class EventRoutesV1(private val eventService: IEventService, private val seriesS
             }
             delete<EventResourcesV1.ByIdSeriesId> { route ->
                 seriesService.removeSeries(route.seriesId.toSeriesId())
-                val event = eventService.getEventWithSeries(route.eventId.toEventId())
+                val event = eventService.getEventWithSeries(route.eventId.toEventId(), null)
                 call.respond(event.toDto())
             }
             delete<EventResourcesV1.ByIdTeamsId> { route ->

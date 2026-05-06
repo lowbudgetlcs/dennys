@@ -1,6 +1,6 @@
 package services.event
 
-import com.lowbudgetlcs.domain.event.core.EventService
+import com.lowbudgetlcs.domain.event.core.services.EventService
 import com.lowbudgetlcs.domain.event.core.model.NewEvent
 import com.lowbudgetlcs.domain.event.core.model.RiotTournament
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
@@ -11,14 +11,13 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
+import com.lowbudgetlcs.domain.series.core.SeriesService
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
@@ -28,7 +27,7 @@ class EventServiceTest :
     FunSpec({
         val eventRepo = mockk<IEventRepository>()
         val tournamentGate = mockk<IRiotTournamentGateway>()
-        val service = EventService(eventRepo, tournamentGate, mockk<ITeamRepository>(), mockk<ISeriesRepository>())
+        val service = EventService(eventRepo, tournamentGate, mockk<ITeamRepository>(), mockk<SeriesService>())
         val start = Instant.now()
         val end = Instant.now().plusSeconds(3600L)
         val newEvent =

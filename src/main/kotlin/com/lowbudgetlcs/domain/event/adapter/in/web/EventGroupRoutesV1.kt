@@ -7,9 +7,9 @@ import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.PatchEventGroupDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventGroupUpdate
 import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toNewEventGroup
+import com.lowbudgetlcs.domain.event.core.services.EventGroupService
 import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
-import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
 import com.lowbudgetlcs.logger
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
@@ -22,7 +22,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 
 
-class EventGroupRoutesV1(private val eventGroupService: IEventGroupService) : ApiRoute {
+class EventGroupRoutesV1(private val eventGroupService: EventGroupService) : ApiRoute {
     override fun register(routing: Route) {
         routing.route("/eventGroup") {
             get<EventGroupResourcesV1> {

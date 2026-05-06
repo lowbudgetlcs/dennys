@@ -1,7 +1,6 @@
 package services
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.core.EventGroupService
 import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.EventUpdate
 import com.lowbudgetlcs.domain.event.core.model.NewEventGroup
@@ -16,12 +15,12 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import com.lowbudgetlcs.domain.event.core.services.EventGroupService
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
@@ -126,6 +125,10 @@ class EventGroupServiceTest :
                 expectedEvent2.copy(
                     eventGroupId = expectedGroup2.id,
                 )
+            coEvery { eventRepo.getAllByGroupId(expectedGroup2.id) } returns listOf(
+                expectedEvent1.copy(eventGroupId = expectedGroup2.id),
+                expectedEvent2.copy(eventGroupId = expectedGroup2.id)
+            )
             val group = service.createEventGroup(newGroup2)
             group.shouldNotBeNull()
             group shouldBe expectedGroup2

@@ -1,6 +1,7 @@
-package com.lowbudgetlcs.domain.event.core
+package com.lowbudgetlcs.domain.event.core.services
 
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.event.core.model.EventGroup
 import com.lowbudgetlcs.domain.event.core.model.EventGroupUpdate
 import com.lowbudgetlcs.domain.event.core.model.EventGroupWithEvents
@@ -12,22 +13,33 @@ import com.lowbudgetlcs.domain.event.core.model.types.EventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.EventGroupName
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
-import com.lowbudgetlcs.domain.event.core.port.IEventGroupService
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.domain.RepositoryException
 
 class EventGroupService(
     private val eventGroupRepo: IEventGroupRepository,
     private val eventRepo: IEventRepository,
-) : IEventGroupService {
+) {
 
-    override suspend fun getAllEventGroups(): List<EventGroup> {
+    /**
+     * Fetches all event groups.
+     *
+     * @return a list containing all event groups.
+     */
+    suspend fun getAllEventGroups(): List<EventGroup> {
         logger.debug("Fetching all event groups...")
         return eventGroupRepo.getAll()
     }
 
-    override suspend fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents {
+    /**
+     * Fetches an event group with its related events.
+     *
+     * @param id the event group to fetch.
+     * @return the specified event group with all related events.
+     *
+     * @throws NoSuchElementException if the specified event cannot be found
+     */
+    suspend fun getEventGroupWithEvents(id: EventGroupId): EventGroupWithEvents {
         logger.debug("Getting event group by '$id' (with events)...")
         val group =
             eventGroupRepo.getById(id) ?: throw NoSuchElementException("Event group with id '${id.value}' not found.")
@@ -35,13 +47,31 @@ class EventGroupService(
         return group.toEventGroupWithEvents(events)
     }
 
-    override suspend fun getEventGroup(id: EventGroupId): EventGroup {
+    /**
+     * Fetches the specified event group.
+     *
+     * @param EventId the id of the event group.
+     * @return the specified event group.
+     *
+     * @throws NoSuchElementException when the event group is not found.
+     * @throws com.lowbudgetlcs.domain.RepositoryException when the underlying repository fails.
+     */
+    suspend fun getEventGroup(id: EventGroupId): EventGroup {
         logger.debug("Getting event group by '$id'...")
         return eventGroupRepo.getById(id)
             ?: throw NoSuchElementException("Event group with id '${id.value}' not found.")
     }
 
-    override suspend fun createEventGroup(group: NewEventGroup): EventGroup {
+    /**
+     * Create a new event group.
+     *
+     * @param group The new event group's details.
+     * @return the newly created event group.
+     *
+     * @throws IllegalArgumentException if the event group cannot be created.
+     * @throws com.lowbudgetlcs.domain.RepositoryException when the underlying repository fails.
+     */
+    suspend fun createEventGroup(group: NewEventGroup): EventGroup {
         logger.debug("Creating new event group...")
         logger.debug(group.toString())
         require(!isNameTaken(group.name)) { "Event group with name '${group.name}' already exists." }
@@ -55,7 +85,17 @@ class EventGroupService(
         return created
     }
 
-    override suspend fun patchEventGroup(
+    /**
+     * Updates event group details.
+     *
+     * @param id the event to update.
+     * @param update the new event information.
+     * @return the updated event.
+     *
+     * @throws IllegalArgumentException if the new details are invalid.
+     * @throws RepositoryException when the underlying repositories fail.
+     */
+    suspend fun patchEventGroup(
         id: EventGroupId,
         update: EventGroupUpdate,
     ): EventGroup {
@@ -68,7 +108,16 @@ class EventGroupService(
             ?: throw RepositoryException("Failed to patch event group with id '${id.value}.")
     }
 
-    override suspend fun addEvent(
+    /**
+     * Add an event to an event group.
+     *
+     * @param eventGroupId the containing event group.
+     * @param eventId the event to add.
+     * @return the updated event group with all related events.
+     *
+     * @throws NoSuchElementException if the specified event group or event doesn't exist
+     */
+    suspend fun addEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents {
@@ -83,7 +132,16 @@ class EventGroupService(
         return getEventGroupWithEvents(eventGroupId)
     }
 
-    override suspend fun removeEvent(
+    /**
+     * Remove an event to an event group.
+     *
+     * @param eventGroupId the containing event group.
+     * @param eventId the event to remove.
+     * @return the updated event group with all related events.
+     *
+     * @throws NoSuchElementException if the specified event group or event doesn't exist
+     */
+    suspend fun removeEvent(
         eventGroupId: EventGroupId,
         eventId: EventId,
     ): EventGroupWithEvents {

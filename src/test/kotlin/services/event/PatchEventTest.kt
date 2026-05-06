@@ -1,7 +1,7 @@
 package services.events
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.core.EventService
+import com.lowbudgetlcs.domain.event.core.services.EventService
 import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.EventUpdate
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
@@ -13,7 +13,7 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
+import com.lowbudgetlcs.domain.series.core.SeriesService
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import io.kotest.assertions.throwables.shouldThrow
@@ -34,7 +34,7 @@ class PatchEventTest :
                 eventRepo,
                 mockk<IRiotTournamentGateway>(),
                 mockk<ITeamRepository>(),
-                mockk<ISeriesRepository>(),
+                mockk<SeriesService>(),
             )
         val start = Instant.now()
         val end = start.plusSeconds(40_000L)
@@ -190,6 +190,7 @@ class PatchEventTest :
         }
 
         test("patchEvent() cannot invalidate start and end dates.") {
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
             shouldThrow<IllegalStateException> {
                 service.patchEvent(
                     testEvent.id,
@@ -202,6 +203,7 @@ class PatchEventTest :
         }
 
         test("patchEvent() throws exception when name is taken") {
+            coEvery { eventRepo.getById(testEvent.id) } returns testEvent
             coEvery { eventRepo.getByName(testEvent.name) } returns testEvent
             shouldThrow<IllegalStateException> {
                 service.patchEvent(testEvent.id, EventUpdate(name = testEvent.name))

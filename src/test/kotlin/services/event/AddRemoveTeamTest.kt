@@ -1,6 +1,6 @@
 package services.event
 
-import com.lowbudgetlcs.domain.event.core.EventService
+import com.lowbudgetlcs.domain.event.core.services.EventService
 import com.lowbudgetlcs.domain.event.core.model.NewEvent
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
@@ -11,7 +11,7 @@ import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
 import com.lowbudgetlcs.domain.event.core.model.types.toEventId
 import com.lowbudgetlcs.domain.event.core.model.types.toEventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.domain.series.core.port.ISeriesRepository
+import com.lowbudgetlcs.domain.series.core.SeriesService
 import com.lowbudgetlcs.domain.team.core.model.NewTeam
 import com.lowbudgetlcs.domain.team.core.model.toTeam
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
@@ -31,7 +31,7 @@ class AddRemoveTeamTest() :
         val eventRepo = mockk<IEventRepository>()
         val tournamentGate = mockk<IRiotTournamentGateway>()
         val teamRepo = mockk<ITeamRepository>()
-        val service = EventService(eventRepo, tournamentGate, teamRepo, mockk<ISeriesRepository>())
+        val service = EventService(eventRepo, tournamentGate, teamRepo, mockk<SeriesService>())
         val start = Instant.now()
         val end = Instant.now().plusSeconds(3600L)
         val newEvent =

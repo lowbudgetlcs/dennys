@@ -1,7 +1,7 @@
-package com.lowbudgetlcs.domain.event.core
+package com.lowbudgetlcs.domain.event.core.services
 
-import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.PatchField
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.event.core.model.Event
 import com.lowbudgetlcs.domain.event.core.model.EventQuery
 import com.lowbudgetlcs.domain.event.core.model.EventUpdate
@@ -15,7 +15,6 @@ import com.lowbudgetlcs.domain.event.core.model.toEventWithTeams
 import com.lowbudgetlcs.domain.event.core.model.types.EventId
 import com.lowbudgetlcs.domain.event.core.model.types.EventName
 import com.lowbudgetlcs.domain.event.core.port.IEventRepository
-import com.lowbudgetlcs.domain.event.core.port.IEventService
 import com.lowbudgetlcs.domain.series.core.model.SeriesQuery
 import com.lowbudgetlcs.domain.series.core.port.ISeriesService
 import com.lowbudgetlcs.domain.team.core.model.TeamUpdate
@@ -30,22 +29,47 @@ class EventService(
     private val tournamentGateway: IRiotTournamentGateway,
     private val teamRepo: ITeamRepository,
     private val seriesService: ISeriesService,
-) : IEventService {
+) {
 
 
-    override suspend fun getEvent(id: EventId): Event {
+    /**
+     * Fetch an event by id.
+     *
+     * @param EventId the id of the event.
+     * @return the specified event.
+     *
+     * @throws NoSuchElementException when the event is not found.
+     * @throws com.lowbudgetlcs.domain.RepositoryException when the underlying repository fails.
+     */
+    suspend fun getEvent(id: EventId): Event {
         logger.debug("Getting event by '$id'...")
         return eventRepo.getById(id) ?: throw NoSuchElementException("Event with id '${id.value}' not found.")
     }
 
-    override suspend fun getEventWithTeams(id: EventId): EventWithTeams {
+    /**
+     * Fetches all events and includes teams that are registered to the event
+     *
+     * @param EventId the event to fetch.
+     * @return the specified event with all child teams.
+     *
+     * @throws NoSuchElementException if the specified event cannot be found
+     */
+    suspend fun getEventWithTeams(id: EventId): EventWithTeams {
         logger.debug("Getting event by '$id' (with teams)...")
         val event = getEvent(id)
         val teams = teamRepo.getByEventId(id)
         return event.toEventWithTeams(teams)
     }
 
-    override suspend fun getEventWithSeries(
+    /**
+     * Fetches all events and includes series that are registered to the event
+     *
+     * @param EventId the event to fetch.
+     * @return the specified event with all child series.
+     *
+     * @throws NoSuchElementException if the specified event cannot be found
+     */
+    suspend fun getEventWithSeries(
         id: EventId,
         query: SeriesQuery?,
     ): EventWithSeries {
@@ -56,13 +80,27 @@ class EventService(
         return event.toEventWithSeries(series)
     }
 
-    override suspend fun getAllEvents(query: EventQuery?): List<Event> {
+    /**
+     *  Fetches all events.
+     *
+     * @return a list containing all events.
+     */
+    suspend fun getAllEvents(query: EventQuery?): List<Event> {
         logger.debug("Fetching all events...")
         query?.run { logger.debug("(Query: '{}')", query) }
         return eventRepo.getAll().filterByName(query).filterByStatus(query)
     }
 
-    override suspend fun createEvent(event: NewEvent): Event {
+    /**
+     * Create an event from a NewEvent and NewTournament.
+     *
+     * @param NewEvent event details.
+     * @return the newly created event.
+     *
+     * @throws IllegalArgumentException if the event cannot be created.
+     * @throws com.lowbudgetlcs.domain.RepositoryException if the underlying repositories fail.
+     */
+    suspend fun createEvent(event: NewEvent): Event {
         logger.debug("Creating new event...")
         logger.debug(event.toString())
         require(event.startDate.isBefore(event.endDate)) { "Event start date must be before end date." }
@@ -73,7 +111,18 @@ class EventService(
         return eventRepo.insert(event, t.id) ?: throw RepositoryException("Failed to create event.")
     }
 
-    override suspend fun patchEvent(
+    /**
+     * Updates event details.
+     *
+     * @param Event the event to update.
+     * @param EventUpdate the new event information.
+     * @return the updated event.
+     *
+     * @throws IllegalArgumentException if the new details are invalid
+     * @throws RepositoryException when the underlying repositories
+     * fail.
+     */
+    suspend fun patchEvent(
         id: EventId,
         update: EventUpdate,
     ): Event {
@@ -98,7 +147,16 @@ class EventService(
         if (!doesTeamExist(teamId)) throw NoSuchElementException("Team with id '${teamId.value}' not found.")
     }
 
-    override suspend fun addTeam(
+    /**
+     * Associate a team with an event
+     *
+     * @param EventId the target event.
+     * @param TeamId the team to add.
+     * @return the event with all registered teams.
+     *
+     * @throws NoSuchElementException if the specified event or team doesn't exist
+     */
+    suspend fun addTeam(
         eventId: EventId,
         teamId: TeamId,
     ): EventWithTeams {
@@ -110,7 +168,16 @@ class EventService(
         return getEventWithTeams(eventId)
     }
 
-    override suspend fun removeTeam(
+    /**
+     * Unassociate a team with an event
+     *
+     * @param EventId the target event.
+     * @param TeamId the team to add.
+     * @return the event with all registered teams.
+     *
+     * @throws NoSuchElementException if the specified event or team doesn't exist
+     */
+    suspend fun removeTeam(
         eventId: EventId,
         teamId: TeamId,
     ): EventWithTeams {
