@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.series.adapter.out.persistence
 
-import com.lowbudgetlcs.domain.event.core.model.types.Shortcode
-import com.lowbudgetlcs.domain.event.core.model.types.toShortcode
+import com.lowbudgetlcs.domain.division.core.model.types.Shortcode
+import com.lowbudgetlcs.domain.division.core.model.types.toShortcode
 import com.lowbudgetlcs.domain.series.core.model.Game
 import com.lowbudgetlcs.domain.series.core.model.NewGame
 import com.lowbudgetlcs.domain.series.core.model.types.GameId

@@ -1,11 +1,11 @@
 package eventgroup
 
-import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupRepository
-import com.lowbudgetlcs.domain.event.core.model.EventGroup
-import com.lowbudgetlcs.domain.event.core.model.NewEventGroup
-import com.lowbudgetlcs.domain.event.core.model.toEventGroup
-import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupId
-import com.lowbudgetlcs.domain.event.core.model.types.toEventGroupName
+import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlEventGroupRepository
+import com.lowbudgetlcs.domain.division.core.model.EventGroup
+import com.lowbudgetlcs.domain.division.core.model.NewEventGroup
+import com.lowbudgetlcs.domain.division.core.model.toEventGroup
+import com.lowbudgetlcs.domain.division.core.model.types.toEventGroupId
+import com.lowbudgetlcs.domain.division.core.model.types.toEventGroupName
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec

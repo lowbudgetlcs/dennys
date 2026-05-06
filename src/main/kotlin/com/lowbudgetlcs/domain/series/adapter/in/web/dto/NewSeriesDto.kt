@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.series.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.event.adapter.`in`.web.dto.toEventStage
-import com.lowbudgetlcs.domain.event.core.model.types.toEventId
+import com.lowbudgetlcs.domain.division.adapter.`in`.web.dto.toEventStage
+import com.lowbudgetlcs.domain.division.core.model.types.toEventId
 import com.lowbudgetlcs.domain.series.core.model.NewSeries
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 import kotlinx.serialization.Serializable

@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.team.core
 
-import com.lowbudgetlcs.domain.event.core.model.types.EventId
+import com.lowbudgetlcs.domain.division.core.model.types.EventId
 import com.lowbudgetlcs.domain.player.core.model.Player
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository

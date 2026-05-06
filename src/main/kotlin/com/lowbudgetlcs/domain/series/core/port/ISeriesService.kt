@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.series.core.port
 
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
-import com.lowbudgetlcs.domain.event.core.model.types.EventId
+import com.lowbudgetlcs.domain.division.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.division.core.model.types.EventId
 import com.lowbudgetlcs.domain.series.core.model.Game
 import com.lowbudgetlcs.domain.series.core.model.NewGame
 import com.lowbudgetlcs.domain.series.core.model.NewSeries

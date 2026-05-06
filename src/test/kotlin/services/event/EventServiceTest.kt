@@ -1,16 +1,16 @@
 package services.event
 
-import com.lowbudgetlcs.domain.event.core.services.EventService
-import com.lowbudgetlcs.domain.event.core.model.NewEvent
-import com.lowbudgetlcs.domain.event.core.model.RiotTournament
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.event.core.model.toEvent
-import com.lowbudgetlcs.domain.event.core.model.toRiotTournamentId
-import com.lowbudgetlcs.domain.event.core.model.types.toEventDescription
-import com.lowbudgetlcs.domain.event.core.model.types.toEventId
-import com.lowbudgetlcs.domain.event.core.model.types.toEventName
-import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import com.lowbudgetlcs.domain.division.core.services.EventService
+import com.lowbudgetlcs.domain.division.core.model.NewEvent
+import com.lowbudgetlcs.domain.division.core.model.RiotTournament
+import com.lowbudgetlcs.domain.division.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.division.core.model.enums.EventStatus
+import com.lowbudgetlcs.domain.division.core.model.toEvent
+import com.lowbudgetlcs.domain.division.core.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.division.core.model.types.toEventDescription
+import com.lowbudgetlcs.domain.division.core.model.types.toEventId
+import com.lowbudgetlcs.domain.division.core.model.types.toEventName
+import com.lowbudgetlcs.domain.division.core.port.IEventRepository
 import com.lowbudgetlcs.domain.series.core.SeriesService
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway

@@ -1,11 +1,11 @@
 package com.lowbudgetlcs.domain.series.core
 
 import com.lowbudgetlcs.domain.RepositoryException
-import com.lowbudgetlcs.domain.event.core.model.ShortcodeOptions
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
-import com.lowbudgetlcs.domain.event.core.model.types.EventId
-import com.lowbudgetlcs.domain.event.core.model.types.toShortcode
-import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import com.lowbudgetlcs.domain.division.core.model.ShortcodeOptions
+import com.lowbudgetlcs.domain.division.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.division.core.model.types.EventId
+import com.lowbudgetlcs.domain.division.core.model.types.toShortcode
+import com.lowbudgetlcs.domain.division.core.port.IEventRepository
 import com.lowbudgetlcs.domain.series.core.model.Game
 import com.lowbudgetlcs.domain.series.core.model.NewGame
 import com.lowbudgetlcs.domain.series.core.model.NewSeries

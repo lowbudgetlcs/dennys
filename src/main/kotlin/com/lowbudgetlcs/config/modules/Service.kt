@@ -4,8 +4,8 @@ import com.lowbudgetlcs.domain.account.core.AccountService
 import com.lowbudgetlcs.domain.account.core.port.IAccountService
 import com.lowbudgetlcs.domain.auth.core.AuthService
 import com.lowbudgetlcs.domain.auth.core.port.IAuthService
-import com.lowbudgetlcs.domain.event.core.services.EventGroupService
-import com.lowbudgetlcs.domain.event.core.services.EventService
+import com.lowbudgetlcs.domain.division.core.services.EventGroupService
+import com.lowbudgetlcs.domain.division.core.services.EventService
 import com.lowbudgetlcs.domain.player.core.PlayerService
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.domain.series.core.SeriesService

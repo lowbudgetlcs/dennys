@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.team.core.model
 
 import com.lowbudgetlcs.domain.PatchField
-import com.lowbudgetlcs.domain.event.core.model.types.EventId
+import com.lowbudgetlcs.domain.division.core.model.types.EventId
 import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 
 data class TeamUpdate(

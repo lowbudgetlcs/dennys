@@ -2,10 +2,10 @@ package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.domain.account.adapter.out.persistence.SqlAccountRepository
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
-import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventGroupRepository
-import com.lowbudgetlcs.domain.event.adapter.out.persistence.SqlEventRepository
-import com.lowbudgetlcs.domain.event.core.port.IEventGroupRepository
-import com.lowbudgetlcs.domain.event.core.port.IEventRepository
+import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlEventGroupRepository
+import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlEventRepository
+import com.lowbudgetlcs.domain.division.core.port.IEventGroupRepository
+import com.lowbudgetlcs.domain.division.core.port.IEventRepository
 import com.lowbudgetlcs.domain.player.adapter.out.persistence.PlayerRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.series.adapter.out.persistence.GameRepository

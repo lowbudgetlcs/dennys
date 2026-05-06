@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.series.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.event.core.model.enums.EventStage
+import com.lowbudgetlcs.domain.division.core.model.enums.EventStage
 import com.lowbudgetlcs.domain.series.core.model.SeriesQuery
 import com.lowbudgetlcs.domain.team.core.model.types.toTeamId
 

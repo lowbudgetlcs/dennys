@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.series.core.model
 
-import com.lowbudgetlcs.domain.event.core.model.types.Shortcode
+import com.lowbudgetlcs.domain.division.core.model.types.Shortcode
 import com.lowbudgetlcs.domain.series.core.model.types.GameId
 import com.lowbudgetlcs.domain.series.core.model.types.SeriesId
 import com.lowbudgetlcs.domain.team.core.model.types.TeamId

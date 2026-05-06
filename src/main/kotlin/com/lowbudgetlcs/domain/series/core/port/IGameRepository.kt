@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.series.core.port
 
-import com.lowbudgetlcs.domain.event.core.model.types.Shortcode
+import com.lowbudgetlcs.domain.division.core.model.types.Shortcode
 import com.lowbudgetlcs.domain.series.core.model.Game
 import com.lowbudgetlcs.domain.series.core.model.NewGame
 import com.lowbudgetlcs.domain.series.core.model.types.GameId

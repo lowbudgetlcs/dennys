@@ -2,8 +2,8 @@ package com.lowbudgetlcs.config.modules
 
 import com.lowbudgetlcs.domain.ApiRoute
 import com.lowbudgetlcs.domain.account.adapter.`in`.web.AccountRoutesV1
-import com.lowbudgetlcs.domain.event.adapter.`in`.web.EventGroupRoutesV1
-import com.lowbudgetlcs.domain.event.adapter.`in`.web.EventRoutesV1
+import com.lowbudgetlcs.domain.division.adapter.`in`.web.EventGroupRoutesV1
+import com.lowbudgetlcs.domain.division.adapter.`in`.web.EventRoutesV1
 import com.lowbudgetlcs.domain.player.adapter.`in`.web.PlayerRoutesV1
 import com.lowbudgetlcs.domain.series.adapter.`in`.web.SeriesRoutesV1
 import com.lowbudgetlcs.domain.team.adapter.`in`.web.TeamRoutesV1
