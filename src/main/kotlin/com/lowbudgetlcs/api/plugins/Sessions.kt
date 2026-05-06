@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.plugins
 
-import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserSession
 import com.lowbudgetlcs.config.CookieConfig
+import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserSession
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.sessions.Sessions

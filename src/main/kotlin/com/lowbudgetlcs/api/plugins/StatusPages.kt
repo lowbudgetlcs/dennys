@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.api.plugins
 
-import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.auth.core.UnauthorizedException
+import com.lowbudgetlcs.gateways.GatewayException
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.JsonConvertException
 import io.ktor.server.application.Application

@@ -3,28 +3,20 @@ package com.lowbudgetlcs.config.modules
 import com.lowbudgetlcs.domain.account.core.AccountService
 import com.lowbudgetlcs.domain.account.core.port.IAccountService
 import com.lowbudgetlcs.domain.auth.core.AuthService
+import com.lowbudgetlcs.domain.auth.core.UserService
 import com.lowbudgetlcs.domain.auth.core.port.IAuthService
-import com.lowbudgetlcs.domain.division.core.services.EventGroupService
-import com.lowbudgetlcs.domain.division.core.services.EventService
+import com.lowbudgetlcs.domain.auth.core.port.IUserService
 import com.lowbudgetlcs.domain.player.core.PlayerService
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
-import com.lowbudgetlcs.domain.series.core.SeriesService
-import com.lowbudgetlcs.domain.series.core.port.ISeriesService
 import com.lowbudgetlcs.domain.team.core.TeamService
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
-import com.lowbudgetlcs.domain.auth.core.port.IUserService
-import com.lowbudgetlcs.domain.auth.core.UserService
-import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val serviceModule =
     module {
         single<ITeamService> { TeamService(get(), get()) }
-        singleOf(::EventService)
-        singleOf(::EventGroupService)
         single<IPlayerService> { PlayerService(get(), get(), get()) }
-        single<ISeriesService> { SeriesService(get(), get(), get(), get(), get()) }
         single<IAccountService> { AccountService(get(), get(), get()) }
         single<IAuthService> {
             AuthService(

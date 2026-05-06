@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.domain.auth.core
 
-import com.lowbudgetlcs.domain.auth.core.port.IUserRepository
-import com.lowbudgetlcs.domain.auth.core.port.IUserService
 import com.lowbudgetlcs.domain.auth.core.models.User
 import com.lowbudgetlcs.domain.auth.core.models.types.UserId
+import com.lowbudgetlcs.domain.auth.core.port.IUserRepository
+import com.lowbudgetlcs.domain.auth.core.port.IUserService
 import com.lowbudgetlcs.logger
 
 class UserService(

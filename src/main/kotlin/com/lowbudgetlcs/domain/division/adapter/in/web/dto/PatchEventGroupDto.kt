@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.domain.division.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.division.core.model.EventGroupUpdate
-import com.lowbudgetlcs.domain.division.core.model.types.EventGroupName
+import com.lowbudgetlcs.domain.division.core.event.model.EventGroupUpdate
+import com.lowbudgetlcs.domain.division.core.event.model.types.EventGroupName
 import kotlinx.serialization.Serializable
 
 @Serializable

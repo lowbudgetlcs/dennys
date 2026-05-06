@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.domain.auth.adapter.`in`.web
 
-import com.lowbudgetlcs.domain.auth.core.UnauthorizedException
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserPrincipal
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.UserSession
 import com.lowbudgetlcs.domain.auth.adapter.`in`.web.dto.toSession
+import com.lowbudgetlcs.domain.auth.core.UnauthorizedException
 import com.lowbudgetlcs.domain.auth.core.models.types.toUsername
 import com.lowbudgetlcs.domain.auth.core.port.IAuthService
 import com.lowbudgetlcs.toMasked

@@ -2,13 +2,13 @@ package team
 
 import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlEventRepository
-import com.lowbudgetlcs.domain.division.core.model.Event
-import com.lowbudgetlcs.domain.division.core.model.NewEvent
-import com.lowbudgetlcs.domain.division.core.model.enums.EventStage
-import com.lowbudgetlcs.domain.division.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.division.core.model.toRiotTournamentId
-import com.lowbudgetlcs.domain.division.core.model.types.toEventDescription
-import com.lowbudgetlcs.domain.division.core.model.types.toEventName
+import com.lowbudgetlcs.domain.division.core.event.model.Event
+import com.lowbudgetlcs.domain.division.core.event.model.NewEvent
+import com.lowbudgetlcs.domain.division.core.event.model.enums.EventStage
+import com.lowbudgetlcs.domain.division.core.event.model.enums.EventStatus
+import com.lowbudgetlcs.domain.division.core.event.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventDescription
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventName
 import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import com.lowbudgetlcs.domain.team.core.model.NewTeam
 import com.lowbudgetlcs.domain.team.core.model.Team

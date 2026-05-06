@@ -1,9 +1,9 @@
 package com.lowbudgetlcs.domain.team.adapter.out.persistence
 
-import com.lowbudgetlcs.domain.division.core.model.types.EventId
-import com.lowbudgetlcs.domain.division.core.model.types.toEventId
+import com.lowbudgetlcs.domain.division.core.event.model.types.EventId
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventId
+import com.lowbudgetlcs.domain.division.core.series.model.types.SeriesId
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
-import com.lowbudgetlcs.domain.series.core.model.types.SeriesId
 import com.lowbudgetlcs.domain.team.core.model.NewTeam
 import com.lowbudgetlcs.domain.team.core.model.Team
 import com.lowbudgetlcs.domain.team.core.model.TeamUpdate

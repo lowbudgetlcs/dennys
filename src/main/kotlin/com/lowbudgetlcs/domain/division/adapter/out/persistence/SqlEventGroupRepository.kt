@@ -1,12 +1,12 @@
 package com.lowbudgetlcs.domain.division.adapter.out.persistence
 
-import com.lowbudgetlcs.domain.division.core.model.EventGroup
-import com.lowbudgetlcs.domain.division.core.model.NewEventGroup
-import com.lowbudgetlcs.domain.division.core.model.types.EventGroupId
-import com.lowbudgetlcs.domain.division.core.model.types.EventGroupName
-import com.lowbudgetlcs.domain.division.core.model.types.toEventGroupId
-import com.lowbudgetlcs.domain.division.core.model.types.toEventGroupName
-import com.lowbudgetlcs.domain.division.core.port.IEventGroupRepository
+import com.lowbudgetlcs.domain.division.core.event.model.EventGroup
+import com.lowbudgetlcs.domain.division.core.event.model.NewEventGroup
+import com.lowbudgetlcs.domain.division.core.event.model.types.EventGroupId
+import com.lowbudgetlcs.domain.division.core.event.model.types.EventGroupName
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventGroupId
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventGroupName
+import com.lowbudgetlcs.domain.division.core.event.port.IEventGroupRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jooq.DSLContext

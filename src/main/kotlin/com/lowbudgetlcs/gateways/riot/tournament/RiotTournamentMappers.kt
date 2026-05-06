@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.gateways.riot.tournament
 
-import com.lowbudgetlcs.domain.division.core.model.ShortcodeOptions
+import com.lowbudgetlcs.domain.division.core.event.model.ShortcodeOptions
 
 fun ShortcodeOptions.toShortcodeParametersDto(): RiotShortcodeParametersDto =
     RiotShortcodeParametersDto(

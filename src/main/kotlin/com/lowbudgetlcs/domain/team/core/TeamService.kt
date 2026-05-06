@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.team.core
 
-import com.lowbudgetlcs.domain.division.core.model.types.EventId
+import com.lowbudgetlcs.domain.RepositoryException
+import com.lowbudgetlcs.domain.division.core.event.model.types.EventId
 import com.lowbudgetlcs.domain.player.core.model.Player
 import com.lowbudgetlcs.domain.player.core.model.types.PlayerId
 import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
@@ -16,7 +17,6 @@ import com.lowbudgetlcs.domain.team.core.model.types.TeamName
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.domain.team.core.port.ITeamService
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.domain.RepositoryException
 
 class TeamService(
     private val teamRepository: ITeamRepository,

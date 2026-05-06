@@ -1,18 +1,18 @@
 import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlEventRepository
-import com.lowbudgetlcs.domain.division.core.model.Event
-import com.lowbudgetlcs.domain.division.core.model.NewEvent
-import com.lowbudgetlcs.domain.division.core.model.enums.EventStage
-import com.lowbudgetlcs.domain.division.core.model.enums.EventStatus
-import com.lowbudgetlcs.domain.division.core.model.toRiotTournamentId
-import com.lowbudgetlcs.domain.division.core.model.types.toEventDescription
-import com.lowbudgetlcs.domain.division.core.model.types.toEventName
-import com.lowbudgetlcs.domain.division.core.model.types.toShortcode
-import com.lowbudgetlcs.domain.series.adapter.out.persistence.GameRepository
-import com.lowbudgetlcs.domain.series.adapter.out.persistence.SeriesRepository
-import com.lowbudgetlcs.domain.series.core.model.NewGame
-import com.lowbudgetlcs.domain.series.core.model.NewSeries
-import com.lowbudgetlcs.domain.series.core.model.Series
-import com.lowbudgetlcs.domain.series.core.model.types.toSeriesId
+import com.lowbudgetlcs.domain.division.core.event.model.Event
+import com.lowbudgetlcs.domain.division.core.event.model.NewEvent
+import com.lowbudgetlcs.domain.division.core.event.model.enums.EventStage
+import com.lowbudgetlcs.domain.division.core.event.model.enums.EventStatus
+import com.lowbudgetlcs.domain.division.core.event.model.toRiotTournamentId
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventDescription
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventName
+import com.lowbudgetlcs.domain.division.core.event.model.types.toShortcode
+import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlGameRepository
+import com.lowbudgetlcs.domain.division.adapter.out.persistence.SqlSeriesRepository
+import com.lowbudgetlcs.domain.division.core.series.model.NewGame
+import com.lowbudgetlcs.domain.division.core.series.model.NewSeries
+import com.lowbudgetlcs.domain.division.core.series.model.Series
+import com.lowbudgetlcs.domain.division.core.series.model.types.toSeriesId
 import com.lowbudgetlcs.domain.team.adapter.out.persistence.TeamRepository
 import com.lowbudgetlcs.domain.team.core.model.NewTeam
 import com.lowbudgetlcs.domain.team.core.model.Team
@@ -44,7 +44,7 @@ class GameRepositoryTest :
                 maximumPoolSize = 1
             }
         val dsl = DSL.using(ds, SQLDialect.POSTGRES)
-        val repo = GameRepository(dsl)
+        val repo = SqlGameRepository(dsl)
         lateinit var event: Event
         lateinit var team1: Team
         lateinit var team2: Team
@@ -82,7 +82,7 @@ class GameRepositoryTest :
                     participantIds = Pair(team1.id, team2.id),
                     eventStage = EventStage.REGULAR_SEASON,
                 )
-            val seriesRepository = SeriesRepository(dsl)
+            val seriesRepository = SqlSeriesRepository(dsl)
             series = seriesRepository.insert(newSeries) ?: throw Exception("Failed to insert initial series.")
             newGame =
                 NewGame(

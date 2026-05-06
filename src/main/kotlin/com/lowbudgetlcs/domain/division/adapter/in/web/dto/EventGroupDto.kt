@@ -1,6 +1,6 @@
 package com.lowbudgetlcs.domain.division.adapter.`in`.web.dto
 
-import com.lowbudgetlcs.domain.division.core.model.EventGroup
+import com.lowbudgetlcs.domain.division.core.event.model.EventGroup
 import kotlinx.serialization.Serializable
 
 @Serializable

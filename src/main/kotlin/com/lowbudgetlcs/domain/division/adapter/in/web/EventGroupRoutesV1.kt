@@ -7,9 +7,9 @@ import com.lowbudgetlcs.domain.division.adapter.`in`.web.dto.PatchEventGroupDto
 import com.lowbudgetlcs.domain.division.adapter.`in`.web.dto.toDto
 import com.lowbudgetlcs.domain.division.adapter.`in`.web.dto.toEventGroupUpdate
 import com.lowbudgetlcs.domain.division.adapter.`in`.web.dto.toNewEventGroup
-import com.lowbudgetlcs.domain.division.core.services.EventGroupService
-import com.lowbudgetlcs.domain.division.core.model.types.toEventGroupId
-import com.lowbudgetlcs.domain.division.core.model.types.toEventId
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventGroupId
+import com.lowbudgetlcs.domain.division.core.event.model.types.toEventId
+import com.lowbudgetlcs.domain.division.core.event.services.EventGroupService
 import com.lowbudgetlcs.logger
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive

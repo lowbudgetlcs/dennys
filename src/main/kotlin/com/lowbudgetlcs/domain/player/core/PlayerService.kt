@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.player.core
 
+import com.lowbudgetlcs.domain.RepositoryException
 import com.lowbudgetlcs.domain.account.core.model.types.AccountId
 import com.lowbudgetlcs.domain.account.core.port.IAccountRepository
 import com.lowbudgetlcs.domain.player.core.model.NewPlayer
@@ -12,7 +13,6 @@ import com.lowbudgetlcs.domain.player.core.port.IPlayerRepository
 import com.lowbudgetlcs.domain.player.core.port.IPlayerService
 import com.lowbudgetlcs.domain.team.core.port.ITeamRepository
 import com.lowbudgetlcs.logger
-import com.lowbudgetlcs.domain.RepositoryException
 
 class PlayerService(
     private val playerRepository: IPlayerRepository,

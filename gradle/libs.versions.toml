@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.0"
-ktor = "3.2.3"
+ktor = "3.4.3"
 logback = "1.5.18"
 jooq = "3.19.18"
 kotest = "6.1.0"
