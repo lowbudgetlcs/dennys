@@ -68,11 +68,8 @@ class SeriesService(
         // TODO: Make eventId non-null.
         require(t1.eventId == t2.eventId && t1.eventId != null) { "Teams are not in the same event." }
 
-        val series =
-            seriesRepo
-                .getAllByEventId(eventId)
-                .filter { it.eventStage == eventStage }
-                .filter { it.participants == listOf(teamId1, teamId2) }
+        val series = seriesRepo.getAllByEventId(eventId).filter { it.eventStage == eventStage }
+            .filter { it.participants == listOf(teamId1, teamId2) }
 
         if (series.size > 1) {
             throw DatabaseException("More than one series matched this filter.")
@@ -95,27 +92,20 @@ class SeriesService(
         logger.debug("Creating new game...")
         logger.debug(newGame.toString())
         val series = getSeries(newGame.seriesId) // Throws if not found
-        val blueTeam =
-            teamRepo.getById(newGame.blueTeamId)
-                ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found")
-        val redTeam =
-            teamRepo.getById(newGame.redTeamId)
-                ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
+        val blueTeam = teamRepo.getById(newGame.blueTeamId)
+            ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found")
+        val redTeam = teamRepo.getById(newGame.redTeamId)
+            ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
         require(
-            Pair(
-                redTeam,
-                blueTeam,
-            ).equalsIgnoreOrder(series.participants),
+            (redTeam.id to blueTeam.id).equalsIgnoreOrder(series.participants),
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
-        val event =
-            eventRepo.getById(series.eventId)
-                ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
-        val response =
-            gate.getCode(event.riotTournamentId, ShortcodeOptions())
-                ?: throw GatewayException("Failed to create tournament code.")
+        val event = eventRepo.getById(series.eventId)
+            ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+        val response = gate.getCode(event.riotTournamentId, ShortcodeOptions())
+            ?: throw GatewayException("Failed to create tournament code.")
         val shortcode = response.codes.first()
         return gameRepo.insert(newGame, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
     }
