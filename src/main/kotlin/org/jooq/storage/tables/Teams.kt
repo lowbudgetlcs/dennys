@@ -100,9 +100,9 @@ open class Teams(
     val NAME: TableField<TeamsRecord, String?> = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "")
 
     /**
-     * The column <code>dennys.teams.logo_name</code>.
+     * The column <code>dennys.teams.logo</code>.
      */
-    val LOGO_NAME: TableField<TeamsRecord, String?> = createField(DSL.name("logo_name"), SQLDataType.CLOB, this, "")
+    val LOGO: TableField<TeamsRecord, String?> = createField(DSL.name("logo"), SQLDataType.CLOB, this, "")
 
     /**
      * The column <code>dennys.teams.event_id</code>.

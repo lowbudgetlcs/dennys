@@ -107,15 +107,25 @@ If you are using the [Nix Package Manager](https://github.com/NixOS/nix), there 
     ```
 4. Enter your API key in `.env`
    ```sh
-   RIOT_API_TOKEN = 'ENTER YOUR API TOKEN';
+   riot.key=ENTER YOUR API TOKEN;
    ```
-5. Build a local image
+5. Clone and build the [frontend](https://github.com/lowbudgetlcs/stephen).
    ```sh
-   make build
+   git clone https://github.com/lowbudgetlcs/stephen
+   # Follow README.md instructions.
    ```
-You can now run the project with `make run`. This will also create, instantiate,
-and run a a local postgres database. It also starts an instance of [pgadmin](https://www.pgadmin.org/) 
-for local database inspection.
+6. 
+   ```sh
+   # Linux
+   ln -s PATH_TO_STEPHEN_DIST frontend/
+   # Windows
+   cp PATH_TO_STEPHEN_DIST dist/
+7. Build and run the project 
+   ```sh
+   make 
+   ```
+This will also create, instantiate, and run a a local postgres database. See the
+lblcs/ repo for data seeding.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

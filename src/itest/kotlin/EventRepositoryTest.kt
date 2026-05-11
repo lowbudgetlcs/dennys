@@ -1,6 +1,7 @@
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
@@ -41,7 +42,7 @@ class EventRepositoryTest :
         val newEvent =
             NewEvent(
                 name = "Season 1".toEventName(),
-                description = "The first season",
+                description = "The first season".toEventDescription(),
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,
@@ -50,7 +51,7 @@ class EventRepositoryTest :
         val newEvent2 =
             NewEvent(
                 name = "Season 2".toEventName(),
-                description = "The second season",
+                description = "The second season".toEventDescription(),
                 startDate = now,
                 endDate = now.plusSeconds(604_800L),
                 status = EventStatus.ACTIVE,

@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.EventUpdate
 import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.patch
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventId
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
@@ -40,7 +41,7 @@ class EventRepository(
                 .insertInto(
                     EVENTS,
                 ).set(EVENTS.NAME, newEvent.name.value)
-                .set(EVENTS.DESCRIPTION, newEvent.description)
+                .set(EVENTS.DESCRIPTION, newEvent.description.value)
                 .set(EVENTS.RIOT_TOURNAMENT_ID, riotTournamentId.value)
                 .set(EVENTS.START_DATE, newEvent.startDate)
                 .set(EVENTS.END_DATE, newEvent.endDate)
@@ -62,7 +63,7 @@ class EventRepository(
             dsl
                 .update(EVENTS)
                 .set(EVENTS.NAME, patch.name.value)
-                .set(EVENTS.DESCRIPTION, patch.description)
+                .set(EVENTS.DESCRIPTION, patch.description.value)
                 .set(EVENTS.START_DATE, patch.startDate)
                 .set(EVENTS.END_DATE, patch.endDate)
                 .set(EVENTS.STATUS, patch.status.name)
@@ -109,7 +110,7 @@ class EventRepository(
         return Event(
             id = eventId,
             name = name.toEventName(),
-            description = description,
+            description = description.toEventDescription(),
             riotTournamentId = tournamentId,
             createdAt = createdAt,
             startDate = startDate,

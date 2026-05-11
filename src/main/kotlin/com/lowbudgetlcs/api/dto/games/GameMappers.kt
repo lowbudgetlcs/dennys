@@ -1,7 +1,7 @@
 package com.lowbudgetlcs.api.dto.games
 
-import com.lowbudgetlcs.domain.game.models.Game
-import com.lowbudgetlcs.domain.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.Game
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
 

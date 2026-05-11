@@ -1,8 +1,9 @@
-/*
 package services
 
 import com.lowbudgetlcs.domain.event.models.Event
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -10,6 +11,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.SeriesService
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamId
@@ -43,8 +45,8 @@ class SeriesServiceTest :
         val event =
             Event(
                 id = 0.toEventId(),
-                name = "Test",
-                description = "",
+                name = "Test".toEventName(),
+                description = "Testing 2".toEventDescription(),
                 riotTournamentId = 0.toRiotTournamentId(),
                 createdAt = Instant.now(),
                 startDate = Instant.now(),
@@ -53,27 +55,31 @@ class SeriesServiceTest :
                 eventGroupId = null,
                 eventStages = setOf(EventStage.REGULAR_SEASON),
             )
+        val team1 =
+            Team(
+                id = 1.toTeamId(),
+                name = "testing".toTeamName(),
+                logo = "abcd",
+                eventId = event.id,
+            )
+        val team2 =
+            Team(
+                id = 2.toTeamId(),
+                name = "testing2".toTeamName(),
+                logo = "abcddsa",
+                eventId = event.id,
+            )
         val participatingTeams =
-            listOf(
-                Team(
-                    id = 1.toTeamId(),
-                    name = "Test".toTeamName(),
-                    eventId = event.id,
-                    logoName = null,
-                ),
-                Team(
-                    id = 2.toTeamId(),
-                    name = "Test 2".toTeamName(),
-                    eventId = event.id,
-                    logoName = null,
-                ),
+            Pair(
+                team1.id,
+                team2.id,
             )
         val expectedSeries =
             Series(
-                id = SeriesId(1),
+                id = 1.toSeriesId(),
                 totalGames = 3,
                 eventId = event.id,
-                participants = participatingTeams.map { it.id },
+                participants = participatingTeams,
                 result = null,
                 eventStage = EventStage.REGULAR_SEASON,
             )
@@ -81,15 +87,14 @@ class SeriesServiceTest :
         val newSeries =
             NewSeries(
                 eventId = event.id,
-                participantIds = participatingTeams.map { it.id },
+                participantIds = participatingTeams,
                 totalGames = 3,
                 eventStage = EventStage.REGULAR_SEASON,
             )
         "createSeries succeeds for valid input" {
-
             every { seriesRepo.insert(newSeries) } returns expectedSeries
-            every { teamRepo.getById(participatingTeams[0].id) } returns participatingTeams[0]
-            every { teamRepo.getById(participatingTeams[1].id) } returns participatingTeams[1]
+            every { teamRepo.getById(participatingTeams.first) } returns team1
+            every { teamRepo.getById(participatingTeams.second) } returns team2
 
             service.createSeries(newSeries) shouldBe expectedSeries
 
@@ -113,7 +118,7 @@ class SeriesServiceTest :
                         id = SeriesId(1),
                         eventId = EventId(1),
                         totalGames = 3,
-                        participants = participatingTeams.map { it.id },
+                        participants = participatingTeams,
                         result = null,
                         eventStage = EventStage.REGULAR_SEASON,
                     ),
@@ -121,7 +126,7 @@ class SeriesServiceTest :
                         id = SeriesId(2),
                         eventId = EventId(1),
                         totalGames = 3,
-                        participants = participatingTeams.map { it.id },
+                        participants = participatingTeams,
                         result = null,
                         eventStage = EventStage.REGULAR_SEASON,
                     ),
@@ -145,4 +150,3 @@ class SeriesServiceTest :
             verify(exactly = 1) { seriesRepo.getById(id) }
         }
     })
-*/

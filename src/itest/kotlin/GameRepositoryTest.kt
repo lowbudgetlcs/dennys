@@ -1,11 +1,12 @@
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
-import com.lowbudgetlcs.domain.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.toSeriesId
@@ -55,7 +56,7 @@ class GameRepositoryTest :
             event = e.insert(
                 NewEvent(
                     name = "Test".toEventName(),
-                    description = "Testing series.",
+                    description = "Testing series.".toEventDescription(),
                     startDate = Instant.now(),
                     endDate = Instant.now().plusSeconds(3_600L),
                     status = EventStatus.ACTIVE,

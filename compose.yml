@@ -6,6 +6,8 @@ services:
       target: app
     image: dennys:local
     container_name: dennys-container
+    volumes:
+      - ./frontend:/frontend
     ports:
       - "127.0.0.1:9292:9292"
     env_file: .env
@@ -25,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=admin
     volumes:
       # DB Init Scripts
-      - ./docker/postgres/sql:/docker-entrypoint-initdb.d
+      - ./src/migrations/sql:/docker-entrypoint-initdb.d
       - dennys-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "postgres"]
@@ -45,3 +47,4 @@ services:
 
 volumes:
   dennys-data:
+    name: "dennys-data"

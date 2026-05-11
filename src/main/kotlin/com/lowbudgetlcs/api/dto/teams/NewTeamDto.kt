@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NewTeamDto(
     val name: String,
-    val logoName: String? = null,
+    val eventId: Int? = null,
+    val logo: String? = null,
 )

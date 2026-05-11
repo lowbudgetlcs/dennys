@@ -17,6 +17,7 @@ fun CreateTokenDto.toNewAccessToken(userId: UserId): NewAccessToken =
     NewAccessToken(
         name = name,
         expiresAt = expiresAt,
+        // TODO: Use an enum. Will be implemented alongside stronger RBAC controls.
         scopes = scopes.split(":").toSet(),
         userId = userId,
     )

@@ -1,9 +1,9 @@
 package team
 
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.toTeamName
-import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
@@ -32,7 +32,7 @@ class TeamRepositoryTest :
         val newTeam =
             NewTeam(
                 name = "Golden Guardians".toTeamName(),
-                logoName = null,
+                null,
             )
 
         "getAll returns 0 teams" {
@@ -44,14 +44,13 @@ class TeamRepositoryTest :
             val created = repo.insert(newTeam)
             created.shouldNotBeNull()
             created.name shouldBe newTeam.name
-            created.logoName shouldBe null
 
             val fetched = repo.getById(created.id)
             fetched shouldBe created
         }
 
         "update team name" {
-            val created = repo.insert(NewTeam("Old Name".toTeamName(), null))!!
+            val created = repo.insert(NewTeam("Old Name".toTeamName()))!!
             val updated = repo.update(created, TeamUpdate(name = "New Name".toTeamName()))
 
             updated.shouldNotBeNull()
@@ -59,18 +58,13 @@ class TeamRepositoryTest :
             updated.name.value shouldBe "New Name"
         }
 
-        "update team logo" {
-            val created = repo.insert(NewTeam(TeamName("Logo Team"), null))!!
-            val updated =
-                repo.update(
-                    created,
-                    TeamUpdate(
-                        logoName = "ggs.png"
-                    )
-                )
+        "update logo" {
+            val created = repo.insert(NewTeam("Testing".toTeamName()))!!
+            val updated = repo.update(created, TeamUpdate(logo = PatchField.Value("New Name")))
 
             updated.shouldNotBeNull()
-            updated.logoName shouldBe "ggs.png"
+            updated.id shouldBe created.id
+            updated.logo shouldBe "New Name"
         }
 
         "getAll returns 3 teams" {

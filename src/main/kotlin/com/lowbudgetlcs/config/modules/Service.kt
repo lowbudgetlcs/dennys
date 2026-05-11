@@ -24,7 +24,7 @@ val serviceModule =
         single<ITeamService> { TeamService(get(), get()) }
         single<IEventService> { EventService(get(), get(), get(), get()) }
         single<IEventGroupService> { EventGroupService(get(), get()) }
-        single<IPlayerService> { PlayerService(get(), get()) }
+        single<IPlayerService> { PlayerService(get(), get(), get()) }
         single<ISeriesService> { SeriesService(get(), get(), get(), get(), get()) }
         single<IAccountService> { AccountService(get(), get(), get()) }
         single<IAuthService> {

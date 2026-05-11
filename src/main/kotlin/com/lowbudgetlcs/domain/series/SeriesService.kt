@@ -4,8 +4,8 @@ import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.game.models.Game
-import com.lowbudgetlcs.domain.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.Game
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
@@ -33,15 +33,11 @@ class SeriesService(
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
         logger.debug(series.toString())
-
-        if (series.totalGames < 1) throw IllegalArgumentException("A series must contain at least 1 game.")
-
+        require(series.totalGames > 0) { "A series must contain at least 1 game." }
         val validate = { id: TeamId ->
             logger.debug("Validating team '$id' exists and is participating in event '${series.eventId}'...")
             val team = teamRepo.getById(id) ?: throw NoSuchElementException("Team with id $id not found")
-            if (team.eventId != series.eventId) {
-                throw IllegalArgumentException("Team with id $id is not part of the event")
-            }
+            check(team.eventId == series.eventId) { "Team with id $id is not part of the event" }
         }
         validate(series.participantIds.first)
         validate(series.participantIds.second)
@@ -67,22 +63,13 @@ class SeriesService(
     ): Series {
         logger.debug("Fetching series containing ('$teamId1', '$teamId2') in stage '$eventStage'...")
         eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id ${eventId.value} not found")
-        val t1 =
-            teamRepo.getById(teamId1) ?: throw NoSuchElementException("Team with id '${teamId1.value}' not found")
-        val t2 =
-            teamRepo.getById(teamId2) ?: throw NoSuchElementException("Team with id '${teamId2.value}' not found")
+        val t1 = teamRepo.getById(teamId1) ?: throw NoSuchElementException("Team with id '${teamId1.value}' not found")
+        val t2 = teamRepo.getById(teamId2) ?: throw NoSuchElementException("Team with id '${teamId2.value}' not found")
         // TODO: Make eventId non-null.
-        if (t1.eventId != t2.eventId ||
-            t1.eventId == null
-        ) {
-            throw IllegalArgumentException("Teams are not in the same event.")
-        }
+        require(t1.eventId == t2.eventId && t1.eventId != null) { "Teams are not in the same event." }
 
-        val series =
-            seriesRepo
-                .getAllByEventId(eventId)
-                .filter { it.eventStage == eventStage }
-                .filter { it.participants == listOf(teamId1, teamId2) }
+        val series = seriesRepo.getAllByEventId(eventId).filter { it.eventStage == eventStage }
+            .filter { it.participants == listOf(teamId1, teamId2) }
 
         if (series.size > 1) {
             throw DatabaseException("More than one series matched this filter.")
@@ -105,30 +92,21 @@ class SeriesService(
         logger.debug("Creating new game...")
         logger.debug(newGame.toString())
         val series = getSeries(newGame.seriesId) // Throws if not found
-        val blueTeam =
-            teamRepo.getById(newGame.blueTeamId)
-                ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found")
-        val redTeam =
-            teamRepo.getById(newGame.redTeamId)
-                ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
-        if (listOf(
-                redTeam,
-                blueTeam,
-            ).equalsIgnoreOrder(series.participants)
+        val blueTeam = teamRepo.getById(newGame.blueTeamId)
+            ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found")
+        val redTeam = teamRepo.getById(newGame.redTeamId)
+            ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
+        require(
+            (redTeam.id to blueTeam.id).equalsIgnoreOrder(series.participants),
         ) {
-            throw IllegalArgumentException(
-                "Provided teams are not part of series with id ${series.id.value}.",
-            )
+            "Provided teams are not part of series with id ${series.id.value}."
         }
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
-        val event =
-            eventRepo.getById(series.eventId)
-                ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
-        val response =
-            gate.getCode(event.riotTournamentId, ShortcodeOptions())
-                ?: throw GatewayException("Failed to create tournament code.")
+        val event = eventRepo.getById(series.eventId)
+            ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+        val response = gate.getCode(event.riotTournamentId, ShortcodeOptions())
+            ?: throw GatewayException("Failed to create tournament code.")
         val shortcode = response.codes.first()
-        return gameRepo.insert(newGame, shortcode.toShortcode())
-            ?: throw DatabaseException("Failed to save game.")
+        return gameRepo.insert(newGame, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
     }
 }

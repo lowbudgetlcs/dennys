@@ -1,14 +1,13 @@
-/*
 package services
 
 import com.lowbudgetlcs.domain.team.TeamService
+import com.lowbudgetlcs.domain.PatchField
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
-import com.lowbudgetlcs.domain.team.models.toTeamLogoName
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
-import com.lowbudgetlcs.domain.team.models.types.TeamLogoName
 import com.lowbudgetlcs.domain.team.models.types.TeamName
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
@@ -36,7 +35,7 @@ class TeamServiceTest :
                 Team(
                     id = TeamId(1),
                     name = TeamName("Golden Guardians"),
-                    logoName = null,
+                    logo = null,
                     eventId = null,
                 )
 
@@ -63,8 +62,8 @@ class TeamServiceTest :
         }
 
         "getAllTeams returns teamRepo data" {
-            val t1 = Team(TeamId(1), TeamName("A"), null, null)
-            val t2 = Team(TeamId(2), TeamName("B"), TeamLogoName("b.png"), null)
+            val t1 = Team(TeamId(1), TeamName("abcd"), null, null)
+            val t2 = Team(TeamId(2), TeamName("cdas"), "b.png", null)
 
             every { teamRepo.getAll() } returns listOf(t1, t2)
 
@@ -85,11 +84,13 @@ class TeamServiceTest :
         }
 
         "update() correctly updates name" {
-            val id = TeamId(5)
-            val original = Team(id, TeamName("Original"), null, null)
-            val updated = original.copy(name = "New".toTeamName())
+            val id = 5.toTeamId()
+            val newName = "New".toTeamName()
+            val original = Team(id, "Original".toTeamName(), null, null)
+            val updated = original.copy(name = newName)
 
             every { teamRepo.getById(id) } returns original
+            every { teamRepo.getByName(newName)} returns listOf()
             every { teamRepo.update(any(), any()) } returns updated
 
             service.patchTeam(id, TeamUpdate(name = "New".toTeamName())) shouldBe updated
@@ -97,17 +98,16 @@ class TeamServiceTest :
             verify(exactly = 1) { teamRepo.update(any(), any()) }
         }
 
-        "update correctly sets logo name" {
+        "update() correctly sets logo name" {
             val id = TeamId(7)
             val original = Team(id, "Original".toTeamName(), null, null)
-            val updated = original.copy(logoName = "Logo".toTeamLogoName())
+            val updated = original.copy(logo = "Logo")
 
             every { teamRepo.getById(id) } returns original
             every { teamRepo.update(any(), any()) } returns updated
 
-            service.patchTeam(id, TeamUpdate(logoName = "logo.png".toTeamLogoName())) shouldBe updated
+            service.patchTeam(id, TeamUpdate(logo = PatchField.Value("logo.png"))) shouldBe updated
 
             verify(exactly = 1) { teamRepo.update(any(), any()) }
         }
     })
- */

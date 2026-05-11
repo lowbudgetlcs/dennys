@@ -8,18 +8,11 @@ import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
-import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 
 fun Application.setupStatusPages() {
     install(StatusPages) {
-        exception<RequestValidationException> { call, cause ->
-            logger.warn("⚠️ Request failed validation: ${cause.reasons.joinToString()}")
-            val code = HttpStatusCode.UnprocessableEntity
-            val e = Error(code = code.value, message = cause.reasons.joinToString())
-            call.respond(code, e)
-        }
         exception<BadRequestException> { call, cause ->
             logger.warn("⚠️ Bad request: ${cause.message}")
             val code = HttpStatusCode.BadRequest

@@ -31,6 +31,7 @@ import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.GAMES_PKEY
+import org.jooq.storage.keys.GAMES_SHORTCODE_KEY
 import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAMES__GAMES_SERIES_ID_FKEY
@@ -142,6 +143,7 @@ open class Games(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<GamesRecord, Int?> = super.getIdentity() as Identity<GamesRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<GamesRecord> = GAMES_PKEY
+    override fun getUniqueKeys(): List<UniqueKey<GamesRecord>> = listOf(GAMES_SHORTCODE_KEY)
     override fun getReferences(): List<ForeignKey<GamesRecord, *>> = listOf(GAMES__GAMES_BLUE_TEAM_ID_FKEY, GAMES__GAMES_RED_TEAM_ID_FKEY, GAMES__GAMES_SERIES_ID_FKEY)
 
     private lateinit var _gamesBlueTeamIdFkey: TeamsPath

@@ -1,33 +1,21 @@
 package com.lowbudgetlcs.api.routes
 
-import com.lowbudgetlcs.api.dto.riot.PostMatchDto
-import com.lowbudgetlcs.api.logCall
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
-import com.lowbudgetlcs.api.setCidContext
 import com.lowbudgetlcs.domain.account.IAccountService
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.player.IPlayerService
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.team.ITeamService
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.apiRoutes() {
     val eventService by inject<IEventService>()
@@ -38,16 +26,6 @@ fun Route.apiRoutes() {
     val eventGroupService by inject<IEventGroupService>()
 
     route("/api/v1") {
-        route("/riot-callback") {
-            post {
-                call.setCidContext {
-                    logCall(call)
-                    val dto = call.receive<PostMatchDto>()
-                    logger.debug(dto.toString())
-                    call.respond(HttpStatusCode.OK)
-                }
-            }
-        }
         authenticate("auth-session", "auth-token") {
             eventRoutesV1(eventService = eventService, seriesService = seriesService)
             teamRoutesV1(teamService = teamService)

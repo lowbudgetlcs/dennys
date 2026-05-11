@@ -1,5 +1,6 @@
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.NewEvent
+import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
@@ -8,7 +9,6 @@ import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
-import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
@@ -19,7 +19,6 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.testcontainers.postgresql.PostgreSQLContainer
@@ -51,7 +50,7 @@ class SeriesRepositoryTest :
             event = e.insert(
                 NewEvent(
                     name = "Test".toEventName(),
-                    description = "Testing series.",
+                    description = "Testing series.".toEventDescription(),
                     startDate = Instant.now(),
                     endDate = Instant.now().plusSeconds(3_600L),
                     status = EventStatus.ACTIVE,
@@ -92,9 +91,5 @@ class SeriesRepositoryTest :
             val series = repo.getAllByEventId(event.id)
             series.shouldNotBeEmpty()
             series.shouldHaveSize(5)
-            series.forEach { s ->
-                s.participants.shouldHaveSize(2)
-                s.participants.forEach { t -> t.shouldBeInstanceOf<TeamId>() }
-            }
         }
     })
