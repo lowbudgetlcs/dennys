@@ -1,6 +1,6 @@
 --info:particpants [0]
 
-CREATE TABLE Account_Pings (
+CREATE TABLE account_pings (
 
 riotIdGameName TEXT(90) NOT NULL,
 riotIdTagline TEXT(60),

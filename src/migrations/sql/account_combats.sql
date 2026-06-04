@@ -1,6 +1,6 @@
 --info:particpants [0]
 
-CREATE TABLE Account_Combat (
+CREATE TABLE account_combats (
 
 spell1Casts INTEGER,
 spell2Casts INTEGER,
@@ -27,5 +27,5 @@ objectivesStolen INTEGER,
 dragonKills INTEGER,
 
 damageDealtToTurrets NUMERIC(10,2),
-damageSelfMitigated NUMERIC(10,2),
+damageSelfMitigated NUMERIC(10,2)
 );
