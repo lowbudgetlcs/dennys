@@ -6,6 +6,8 @@ import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.SeriesQuery
+import com.lowbudgetlcs.domain.series.models.filterByCompletion
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
@@ -138,6 +140,69 @@ class SeriesRepositoryTest :
             reopened.reopenedAt shouldBe at
             reopened.result.shouldNotBeNull()
             reopened.result?.winningTeamId shouldBe team1.id
+        }
+
+        test("two series with the same pair and stage keep a stable id order across calls") {
+            val e = EventRepository(dsl)
+            val orderingEvent =
+                e.insert(
+                    NewEvent(
+                        name = "Ordering".toEventName(),
+                        description = "Two series, same pair, same stage.".toEventDescription(),
+                        startDate = Instant.now(),
+                        endDate = Instant.now().plusSeconds(3_600L),
+                        status = EventStatus.ACTIVE,
+                        eventStages = setOf(EventStage.PLAYOFFS),
+                    ),
+                    riotTournamentId = 3.toRiotTournamentId(),
+                ) ?: throw Exception("Failed to insert ordering event.")
+            val repeatPair = newSeries.copy(eventId = orderingEvent.id, eventStage = EventStage.PLAYOFFS)
+            val first = repo.insert(repeatPair) ?: throw Exception("Failed to insert first series.")
+            val second = repo.insert(repeatPair) ?: throw Exception("Failed to insert second series.")
+            val expected = listOf(first.id, second.id).sortedBy { it.value }
+
+            repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
+
+            repo.complete(first.id, Instant.parse("2026-07-14T23:12:04Z"))
+
+            repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
+            repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
+        }
+
+        test("completion filtering splits two series that are otherwise identical") {
+            val e = EventRepository(dsl)
+            val filterEvent =
+                e.insert(
+                    NewEvent(
+                        name = "Filtering".toEventName(),
+                        description = "Two series, one closed.".toEventDescription(),
+                        startDate = Instant.now(),
+                        endDate = Instant.now().plusSeconds(3_600L),
+                        status = EventStatus.ACTIVE,
+                        eventStages = setOf(EventStage.PLAYOFFS),
+                    ),
+                    riotTournamentId = 4.toRiotTournamentId(),
+                ) ?: throw Exception("Failed to insert filtering event.")
+            val repeatPair = newSeries.copy(eventId = filterEvent.id, eventStage = EventStage.PLAYOFFS)
+            val open = repo.insert(repeatPair) ?: throw Exception("Failed to insert open series.")
+            val closed = repo.insert(repeatPair) ?: throw Exception("Failed to insert series to close.")
+            repo.complete(closed.id, Instant.parse("2026-07-14T23:12:04Z"))
+            val all = repo.getAllByEventId(filterEvent.id)
+
+            all
+                .filterByCompletion(
+                    SeriesQuery(teamIds = null, eventStage = null, completed = false),
+                ).map { it.id } shouldBe listOf(open.id)
+
+            all
+                .filterByCompletion(
+                    SeriesQuery(teamIds = null, eventStage = null, completed = true),
+                ).map { it.id } shouldBe listOf(closed.id)
+
+            all
+                .filterByCompletion(
+                    SeriesQuery(teamIds = null, eventStage = null),
+                ).map { it.id } shouldBe listOf(open.id, closed.id)
         }
 
         test("the V011 backfill completes series in ended events and leaves active ones alone") {

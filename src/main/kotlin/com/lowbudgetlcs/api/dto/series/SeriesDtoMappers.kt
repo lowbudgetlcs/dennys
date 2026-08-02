@@ -28,4 +28,5 @@ fun SeriesFilterParams.toQuery(): SeriesQuery =
     SeriesQuery(
         teamIds = teamIds?.map { it.toTeamId() },
         eventStage = stage,
+        completed = completed,
     )

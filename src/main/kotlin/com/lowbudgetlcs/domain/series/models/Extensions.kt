@@ -10,6 +10,9 @@ fun Int.toSeriesId(): SeriesId = SeriesId(this)
 fun List<Series>.filterByStage(query: SeriesQuery?): List<Series> =
     this.filter { if (query?.eventStage == null) true else it.eventStage == query.eventStage }
 
+fun List<Series>.filterByCompletion(query: SeriesQuery?): List<Series> =
+    this.filter { if (query?.completed == null) true else it.completed == query.completed }
+
 fun List<Series>.filterByParticipants(query: SeriesQuery?): List<Series> {
     val participants = query?.teamIds
     return when {

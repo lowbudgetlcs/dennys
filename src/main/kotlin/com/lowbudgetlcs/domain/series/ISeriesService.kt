@@ -1,13 +1,11 @@
 package com.lowbudgetlcs.domain.series
 
 import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import com.lowbudgetlcs.domain.team.models.types.TeamId
 
 interface ISeriesService {
     /**
@@ -34,26 +32,6 @@ interface ISeriesService {
      * @throws com.lowbudgetlcs.repositories.DatabaseException when the underlying repository fails.
      */
     fun getSeries(id: SeriesId): Series
-
-    /**
-     * Return a series given two TeamIds and an event Stage. Will throw if multiple series match.
-     *
-     * @param eventId the event to search.
-     * @param teamId1 the first teamId to filter by.
-     * @param teamId2 the second teamId to filter by.
-     * @param eventStage the event stage to filter by.
-     * @return a series containing both team ids inside the specified event stage.
-     *
-     * @throws NoSuchElementException when no series is found.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException if >1 series is found.
-     * @throws IllegalArgumentException when the teamIds are invalid.
-     */
-    fun findSeries(
-        eventId: EventId,
-        teamId1: TeamId,
-        teamId2: TeamId,
-        eventStage: EventStage,
-    ): Series
 
     /**
      * Remove a series.

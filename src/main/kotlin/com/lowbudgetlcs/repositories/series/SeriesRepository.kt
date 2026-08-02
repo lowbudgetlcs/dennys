@@ -26,7 +26,7 @@ class SeriesRepository(
         selectSeries().where(SERIES.ID.eq(id.value)).fetchOne()?.let(::rowToSeries)
 
     override fun getAllByEventId(id: EventId): List<Series> =
-        selectSeries().where(SERIES.EVENT_ID.eq(id.value)).fetch().mapNotNull(::rowToSeries)
+        selectSeries().where(SERIES.EVENT_ID.eq(id.value)).orderBy(SERIES.ID).fetch().mapNotNull(::rowToSeries)
 
     override fun insert(newSeries: NewSeries): Series? {
         val id =

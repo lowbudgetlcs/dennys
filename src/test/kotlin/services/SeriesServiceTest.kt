@@ -11,6 +11,8 @@ import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.SeriesService
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesQuery
+import com.lowbudgetlcs.domain.series.models.filterByCompletion
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.Team
@@ -157,5 +159,54 @@ class SeriesServiceTest :
             ex.message shouldBe "Series not found"
 
             verify(exactly = 1) { seriesRepo.getById(id) }
+        }
+
+        val openSeries =
+            Series(
+                id = SeriesId(1),
+                eventId = EventId(1),
+                totalGames = 3,
+                participants = participatingTeams,
+                result = null,
+                eventStage = EventStage.PLAYOFFS,
+                completed = false,
+                completedAt = null,
+                reopenedAt = null,
+            )
+        val closedSeries =
+            openSeries.copy(
+                id = SeriesId(2),
+                completed = true,
+                completedAt = Instant.parse("2026-07-14T23:12:04Z"),
+            )
+        val bothSeries = listOf(openSeries, closedSeries)
+
+        "filterByCompletion returns only open series for completed = false" {
+            bothSeries.filterByCompletion(
+                SeriesQuery(teamIds = null, eventStage = null, completed = false),
+            ) shouldContainExactly listOf(openSeries)
+        }
+
+        "filterByCompletion returns only closed series for completed = true" {
+            bothSeries.filterByCompletion(
+                SeriesQuery(teamIds = null, eventStage = null, completed = true),
+            ) shouldContainExactly listOf(closedSeries)
+        }
+
+        "filterByCompletion is unfiltered when completed is omitted" {
+            bothSeries.filterByCompletion(
+                SeriesQuery(teamIds = null, eventStage = null),
+            ) shouldContainExactly bothSeries
+
+            bothSeries.filterByCompletion(null) shouldContainExactly bothSeries
+        }
+
+        "filterByCompletion distinguishes two series with identical participants and stage" {
+            openSeries.participants shouldBe closedSeries.participants
+            openSeries.eventStage shouldBe closedSeries.eventStage
+
+            bothSeries.filterByCompletion(
+                SeriesQuery(teamIds = null, eventStage = null, completed = false),
+            ) shouldContainExactly listOf(openSeries)
         }
     })

@@ -3,7 +3,6 @@ package com.lowbudgetlcs.domain.series
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.models.NewSeries
@@ -53,30 +52,6 @@ class SeriesService(
     override fun getSeries(id: SeriesId): Series {
         logger.debug("Fetching series '$id'...")
         return seriesRepo.getById(id) ?: throw NoSuchElementException("Series not found")
-    }
-
-    override fun findSeries(
-        eventId: EventId,
-        teamId1: TeamId,
-        teamId2: TeamId,
-        eventStage: EventStage,
-    ): Series {
-        logger.debug("Fetching series containing ('$teamId1', '$teamId2') in stage '$eventStage'...")
-        eventRepo.getById(eventId) ?: throw NoSuchElementException("Event with id ${eventId.value} not found")
-        val t1 = teamRepo.getById(teamId1) ?: throw NoSuchElementException("Team with id '${teamId1.value}' not found")
-        val t2 = teamRepo.getById(teamId2) ?: throw NoSuchElementException("Team with id '${teamId2.value}' not found")
-        // TODO: Make eventId non-null.
-        require(t1.eventId == t2.eventId && t1.eventId != null) { "Teams are not in the same event." }
-
-        val series = seriesRepo.getAllByEventId(eventId).filter { it.eventStage == eventStage }
-            .filter { it.participants == listOf(teamId1, teamId2) }
-
-        if (series.size > 1) {
-            throw DatabaseException("More than one series matched this filter.")
-        } else if (series.isEmpty()) {
-            throw NoSuchElementException("No series matched this filter.")
-        }
-        return series.first()
     }
 
     override fun removeSeries(id: SeriesId) {

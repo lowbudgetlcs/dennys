@@ -6,4 +6,5 @@ import com.lowbudgetlcs.domain.team.models.types.TeamId
 data class SeriesQuery(
     val teamIds: List<TeamId>?,
     val eventStage: EventStage?,
+    val completed: Boolean? = null,
 )
