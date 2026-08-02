@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/lowbudgetlcs/dennys/blob/main/LICENSE.txt
-  version: 1.3.1
+  version: 1.4.0
 externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
@@ -64,6 +64,7 @@ paths:
       security: [ ]
   /logout:
     post:
+      summary: End the current session.
       security:
         - cookieAuth: [ ]
       description: Removes the currently active session.
@@ -81,9 +82,12 @@ paths:
                 $ref: "#/components/schemas/Error"
   /createToken:
     post:
+      summary: Issue an API token for the current user.
       security:
         - cookieAuth: [ ]
-      description: Create an API token for the currently logged-in user.
+      description: |
+        Create an API token for the currently logged-in user. The token is
+        returned in plaintext exactly once — only its hash is stored.
       operationId: createToken
       tags:
         - Authentication
@@ -650,15 +654,22 @@ paths:
             type: string
             example: REGULAR_SEASON
           description: Filter only series in this event stage.
+        - in: query
+          name: completed
+          schema:
+            type: boolean
+          description: |
+            Filter on series completion. Omitting the parameter returns both
+            completed and active series, so existing callers are unaffected.
+            Pass `false` to find the series a new tournament code should
+            belong to when two series exist for the same pair of teams.
       responses:
         "200":
-          description: List of series in the event
+          description: The event, with the series matching the filter
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EventWithSeriesDto"
+                $ref: "#/components/schemas/EventWithSeriesDto"
         "404":
           description: Event not found
           content:
@@ -689,8 +700,8 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateSeriesDto"
       responses:
-        "200":
-          description: Team added to event
+        "201":
+          description: Series created
           content:
             application/json:
               schema:
@@ -713,7 +724,9 @@ paths:
 
             Possible reasons:
             - One or more teams are not in this event.
-            - Series already exists between these teams.
+
+            Note that repeat series between the same two teams are supported —
+            two teams may legitimately meet more than once inside one stage.
           content:
             application/json:
               schema:
@@ -748,10 +761,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            The series has tournament codes issued against it and cannot be
+            deleted. A tournament code is a real Riot artifact and may already
+            have player stats keyed on its shortcode. Complete the series
+            instead.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/series/{seriesId}:
+    get:
+      summary: Get a series with its tournament codes and games
+      description: |
+        The status view for a single series. Clients render their status line
+        from this, and read `lastCodeIssuedAt` / `lastGameAt` to detect a game
+        that was played but never reported.
+      operationId: getSeries
+      tags:
+        - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The series, with its tournament codes and games
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesWithGamesDto"
+        "404":
+          description: Series not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/v1/series/{seriesId}/game:
     post:
-      summary: Create a game in a series
+      summary: Issue a tournament code for a series
+      description: |
+        Issues a new Riot tournament code. This is **never** blocked — not by
+        the series being complete, and not by a previous game going
+        unreported. Players must never be prevented from playing, so the worst
+        case here is a wasted code.
+
+        A replacement for a code that did not work is simply another call to
+        this endpoint. There is no void step: a code with no result does not
+        count towards the game number.
       operationId: createGame
       tags:
         - Series (v1)
@@ -769,11 +837,16 @@ paths:
               $ref: "#/components/schemas/CreateGameDto"
       responses:
         "201":
-          description: Game created
+          description: |
+            Tournament code issued.
+
+            Note this replaces the previous `GameDto` response. A freshly
+            issued code has no game number, because no game has been played
+            on it yet.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameDto"
+                $ref: "#/components/schemas/TournamentCodeDto"
         "400":
           description: Invalid input
           content:
@@ -782,6 +855,148 @@ paths:
                 $ref: "#/components/schemas/Error"
         "422":
           description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: |
+            Riot could not issue a code. Retryable — Riot returned 429 or 5xx.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/series/{seriesId}/results:
+    post:
+      summary: Report the result of a game
+      description: |
+        The single result-reporting entry point, used by both self-serve and
+        staff. Recording a result triggers the automatic completion check: if
+        one team has more than `totalGames / 2` wins, the series is closed.
+
+        Idempotent. If the targeted code already has a result, the existing
+        game is returned and nothing is double-counted.
+      operationId: reportSeriesResult
+      tags:
+        - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportResultDto"
+      responses:
+        "201":
+          description: Result recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDto"
+        "200":
+          description: |
+            The target already had a result. The existing game is returned and
+            nothing was written.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameDto"
+        "404":
+          description: Series or tournament code not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            A game with this Riot match id is already recorded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: |
+            Invalid combination of fields.
+
+            Possible reasons:
+            - Both `tournamentCodeId` and `shortcode` were given.
+            - No winner was named and Riot has no record of the game.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/series/{seriesId}/complete:
+    post:
+      summary: Complete a series
+      description: |
+        Manually close a series. Also the forfeit path — a forfeit is a
+        completion with a winner and zero games played.
+      operationId: completeSeries
+      tags:
+        - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteSeriesDto"
+      responses:
+        "200":
+          description: Series completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDto"
+        "404":
+          description: Series not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Invalid input, for example a winner that is not in this series.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Reopen a completed series
+      description: |
+        Staff-only insurance against Denny's closing a series wrongly. Clears
+        `completed` and `completedAt` and stamps a reopen timestamp, which
+        suppresses the automatic completion check so the series does not slam
+        shut again on the next recorded result. Existing results are preserved.
+      operationId: reopenSeries
+      tags:
+        - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Series reopened
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDto"
+        "404":
+          description: Series not found
           content:
             application/json:
               schema:
@@ -1344,44 +1559,109 @@ components:
       properties:
         name:
           type: string
-          example: Test token
+          example: todd-bot
         expiresAt:
           type: string
           format: date-time
-          example: "2025-08-22T15:34:23.105Z"
+          example: "2027-01-01T00:00:00.000Z"
         scopes:
           type: string
-          example: 'user,admin'
+          description: Colon-delimited scope list.
+          example: 'user:admin'
 
 
     # Game Schemas
-    GameDto:
+    TournamentCodeDto:
       type: object
+      description: |
+        A tournament code issued by Riot for a series. A code may back zero
+        games — it can be issued and never played — so codes are counted
+        separately from games.
       required:
         - id
         - shortcode
+        - seriesId
         - blueTeamId
         - redTeamId
-        - seriesId
-        - number
+        - createdAt
       properties:
         id:
           type: integer
+          example: 117
         shortcode:
           type: string
           example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
-        blueTeamId:
-          type: integer
-          example: 2
-        redTeamId:
-          type: integer
-          example: 4
         seriesId:
           type: integer
-          example: 3
+          example: 42
+        blueTeamId:
+          type: integer
+          example: 7
+        redTeamId:
+          type: integer
+          example: 12
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-07-14T22:58:31.204Z"
+
+    GameDto:
+      type: object
+      description: |
+        A game that was actually played. `tournamentCodeId` and `riotMatchId`
+        are null for a custom game played without a code — Riot cannot serve
+        custom match data, so those are recorded from a self-reported result.
+        `number` is derived from the count of games in the series, so a code
+        that is never played does not consume a game number.
+      required:
+        - id
+        - seriesId
+        - number
+        - createdAt
+      properties:
+        id:
+          type: integer
+          example: 88
+        seriesId:
+          type: integer
+          example: 42
+        tournamentCodeId:
+          type: integer
+          nullable: true
+          description: Null when the game was played without a tournament code.
+          example: 117
+        riotMatchId:
+          type: string
+          nullable: true
+          description: "`{platformId}_{gameId}`. Null when there is no Riot record."
+          example: NA1_5102531894
         number:
           type: integer
+          description: Position within the series, derived as games played + 1.
           example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-07-14T23:12:04.318Z"
+        result:
+          type: object
+          nullable: true
+          description: Null until a result has been recorded.
+          allOf:
+            - $ref: "#/components/schemas/GameResultDto"
+
+    GameResultDto:
+      type: object
+      required:
+        - winningTeamId
+        - losingTeamId
+      properties:
+        winningTeamId:
+          type: integer
+          example: 7
+        losingTeamId:
+          type: integer
+          example: 12
 
     CreateGameDto:
       type: object
@@ -1391,8 +1671,10 @@ components:
       properties:
         blueTeamId:
           type: integer
+          example: 7
         redTeamId:
           type: integer
+          example: 12
 
     # Event Group Schemas
     CreateEventGroupDto:
@@ -1402,7 +1684,7 @@ components:
       properties:
         name:
           type: string
-          example: Season 14
+          example: Season 15
         eventIds:
           type: array
           items:
@@ -1418,10 +1700,10 @@ components:
       properties:
         id:
           type: integer
-          example: 0
+          example: 3
         name:
           type: string
-          example: Season 14 Regular Season
+          example: Season 15 Regular Season
 
     EventGroupWithEventsDto:
       type: object
@@ -1431,10 +1713,10 @@ components:
       properties:
         id:
           type: integer
-          example: 1
+          example: 3
         name:
           type: string
-          example: Season 14 Regular Season
+          example: Season 15 Regular Season
         events:
           type: array
           items:
@@ -1446,7 +1728,7 @@ components:
       properties:
         name:
           type: string
-          example: Season 14 But New
+          example: Season 15 Playoffs
 
     EventGroupAddEventDto:
       type: object
@@ -1469,19 +1751,19 @@ components:
       properties:
         name:
           type: string
-          example: Season 14 Commercial
+          example: Season 15 Emerald Division
         description:
           type: string
           description: Describe the event!
-          example: Season 14's plat-emerald league!
+          example: The Season 15 plat-emerald league.
         startDate:
           type: string
           format: date-time
-          example: "2025-08-22T15:34:23.105Z"
+          example: "2026-06-08T00:00:00.000Z"
         endDate:
           type: string
           format: date-time
-          example: "2025-08-27T15:34:23.105Z"
+          example: "2026-08-31T00:00:00.000Z"
         status:
           allOf:
             - description: The intended starting status of the event.
@@ -1510,26 +1792,26 @@ components:
         id:
           type: integer
           format: int64
-          example: 1
+          example: 12
         name:
           type: string
           description: Event name
-          example: Season 14 Commercial
+          example: Season 15 Emerald Division
         description:
           type: string
-          example: Season 14's plat-emerald league!
+          example: The Season 15 plat-emerald league.
         createdAt:
           type: string
           format: date-time
-          example: "2025-08-21T15:34:23.105Z"
+          example: "2026-06-01T18:00:00.000Z"
         startDate:
           type: string
           format: date-time
-          example: "2025-08-22T15:34:23.105Z"
+          example: "2026-06-08T00:00:00.000Z"
         endDate:
           type: string
           format: date-time
-          example: "2025-08-27T15:34:23.105Z"
+          example: "2026-08-31T00:00:00.000Z"
         status:
           allOf:
             - $ref: "#/components/schemas/EventStatus"
@@ -1537,7 +1819,7 @@ components:
             - example: NOT_STARTED
         eventGroupId:
           type: integer
-          example: 1
+          example: 3
           nullable: true
         eventStages:
           type: array
@@ -1560,25 +1842,25 @@ components:
       properties:
         id:
           type: integer
-          example: 1
+          example: 12
         name:
           type: string
-          example: Season 15 Audit
+          example: Season 15 Emerald Division
         description:
           type: string
-          example: The Season 15 plat-emerald league!
+          example: The Season 15 plat-emerald league.
         createdAt:
           type: string
           format: date-time
-          example: "2025-08-21T15:34:23.105Z"
+          example: "2026-06-01T18:00:00.000Z"
         startDate:
           type: string
           format: date-time
-          example: "2025-08-22T15:34:23.105Z"
+          example: "2026-06-08T00:00:00.000Z"
         endDate:
           type: string
           format: date-time
-          example: "2025-08-27T15:34:23.105Z"
+          example: "2026-08-31T00:00:00.000Z"
         status:
           allOf:
             - $ref: "#/components/schemas/EventStatus"
@@ -1586,7 +1868,7 @@ components:
             - example: NOT_STARTED
         eventGroupId:
           type: integer
-          example: 1
+          example: 3
           nullable: true
         teams:
           type: array
@@ -1613,25 +1895,25 @@ components:
       properties:
         id:
           type: integer
-          example: 1
+          example: 12
         name:
           type: string
-          example: Season 15 Audit
+          example: Season 15 Emerald Division
         description:
           type: string
-          example: The Season 15 plat-emerald league!
+          example: The Season 15 plat-emerald league.
         createdAt:
           type: string
           format: date-time
-          example: "2025-08-21T15:34:23.105Z"
+          example: "2026-06-01T18:00:00.000Z"
         startDate:
           type: string
           format: date-time
-          example: "2025-08-22T15:34:23.105Z"
+          example: "2026-06-08T00:00:00.000Z"
         endDate:
           type: string
           format: date-time
-          example: "2025-08-27T15:34:23.105Z"
+          example: "2026-08-31T00:00:00.000Z"
         status:
           allOf:
             - $ref: "#/components/schemas/EventStatus"
@@ -1639,7 +1921,7 @@ components:
             - example: NOT_STARTED
         eventGroupId:
           type: integer
-          example: 1
+          example: 3
           nullable: true
         series:
           type: array
@@ -1656,18 +1938,18 @@ components:
         name:
           type: string
           description: Event name
-          example: Season 14 Commercial
+          example: Season 15 Emerald Division
         description:
           type: string
-          example: Season 14's plat-emerald league!
+          example: The Season 15 plat-emerald league.
         startDate:
           type: string
           format: date-time
-          example: "2025-08-22T15:34:23.105Z"
+          example: "2026-06-08T00:00:00.000Z"
         endDate:
           type: string
           format: date-time
-          example: "2025-08-27T15:34:23.105Z"
+          example: "2026-08-31T00:00:00.000Z"
         status:
           allOf:
             - description: The new event status.
@@ -1693,10 +1975,10 @@ components:
       properties:
         team1Id:
           type: integer
-          example: 1
+          example: 7
         team2Id:
           type: integer
-          example: 1
+          example: 12
         totalGames:
           type: integer
           example: 3
@@ -1868,20 +2150,157 @@ components:
       type: object
       required:
         - id
-        - eventId
-        - teams
+        - teamIds
         - totalGames
+        - eventStage
+        - completed
       properties:
         id:
           type: integer
+          example: 42
         eventId:
           type: integer
-        teams:
+          example: 12
+          nullable: true
+        teamIds:
           type: array
           items:
-            $ref: "#/components/schemas/TeamDto"
+            type: integer
+          example: [ 7, 12 ]
         totalGames:
           type: integer
+          example: 3
+        eventStage:
+          allOf:
+            - $ref: "#/components/schemas/EventStage"
+            - description: The stage of the event this series belongs to.
+            - example: PLAYOFFS
+        completed:
+          type: boolean
+          description: |
+            Whether this series is finished. Denny's sets this automatically
+            when recorded results give one team more than `totalGames / 2`
+            wins. It is a routing flag used to pick between two active series
+            for the same pair of teams — it does not gate code generation.
+          example: false
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the series was completed. Null while `completed` is false.
+          example: null
+
+    SeriesWithGamesDto:
+      type: object
+      description: |
+        A series together with every tournament code issued for it and every
+        game actually played. Codes issued is `tournamentCodes.length`; games
+        played is `games.length`. The two differ whenever a code was issued
+        but never played.
+      required:
+        - id
+        - teamIds
+        - totalGames
+        - eventStage
+        - completed
+        - tournamentCodes
+        - games
+      properties:
+        id:
+          type: integer
+          example: 42
+        eventId:
+          type: integer
+          example: 12
+          nullable: true
+        teamIds:
+          type: array
+          items:
+            type: integer
+          example: [ 7, 12 ]
+        totalGames:
+          type: integer
+          example: 3
+        eventStage:
+          allOf:
+            - $ref: "#/components/schemas/EventStage"
+            - description: The stage of the event this series belongs to.
+            - example: PLAYOFFS
+        completed:
+          type: boolean
+          example: false
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        tournamentCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/TournamentCodeDto"
+        games:
+          type: array
+          items:
+            $ref: "#/components/schemas/GameDto"
+        lastCodeIssuedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp of the most recently issued tournament code.
+          example: "2026-07-14T23:41:09.882Z"
+        lastGameAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: |
+            Timestamp of the most recently recorded game. Clients use this
+            together with `lastCodeIssuedAt` to nag on an unreported game.
+          example: "2026-07-14T23:12:04.318Z"
+
+    ReportResultDto:
+      type: object
+      description: |
+        Report the result of a game. Target a specific tournament code with
+        `tournamentCodeId` **or** `shortcode`, never both. When neither is
+        given, Denny's asks Riot which outstanding code has a game: if Riot
+        attributes one, the game is recorded against that code with Riot's
+        winner; if Riot attributes none, the game is recorded as codeless.
+        A report never guesses which code was played.
+
+        With no winner named, the same pass supplies the winner, and the
+        caller's claim is used only when Riot has no record.
+      properties:
+        winnerTeamId:
+          type: integer
+          description: Ignored when Riot has a record of the game.
+          example: 7
+        loserTeamId:
+          type: integer
+          example: 12
+        tournamentCodeId:
+          type: integer
+          description: Denny's id for the code. Mutually exclusive with `shortcode`.
+          example: 117
+        shortcode:
+          type: string
+          description: |
+            The Riot tournament code itself, as it appears in the game client.
+            Mutually exclusive with `tournamentCodeId`. Exists because a human
+            reporting a result has the code, not a database id.
+          example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
+
+    CompleteSeriesDto:
+      type: object
+      description: |
+        Manually close a series. Also the forfeit path — a winner with zero
+        games played.
+      properties:
+        winnerTeamId:
+          type: integer
+          example: 7
+        loserTeamId:
+          type: integer
+          example: 12
 
     Error:
       type: object
