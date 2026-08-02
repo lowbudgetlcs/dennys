@@ -1,23 +1,23 @@
 package com.lowbudgetlcs.api.dto.games
 
-import com.lowbudgetlcs.domain.series.game.models.Game
-import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
 
-fun CreateGameDto.toNewGame(seriesId: Int): NewGame =
-    NewGame(
+fun CreateGameDto.toNewTournamentCode(seriesId: Int): NewTournamentCode =
+    NewTournamentCode(
         seriesId = seriesId.toSeriesId(),
         blueTeamId = blueTeamId.toTeamId(),
         redTeamId = redTeamId.toTeamId(),
     )
 
-fun Game.toDto(): GameDto =
-    GameDto(
+fun TournamentCode.toDto(): TournamentCodeDto =
+    TournamentCodeDto(
         id = id.value,
         shortcode = shortcode.value,
+        seriesId = seriesId.value,
         blueTeamId = blueTeamId.value,
         redTeamId = redTeamId.value,
-        seriesId = seriesId.value,
-        number = number,
+        createdAt = createdAt,
     )

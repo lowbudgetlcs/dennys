@@ -29,6 +29,7 @@ import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.TournamentCodes
 import org.jooq.storage.tables.Users
 import org.jooq.storage.tables.records.AccessTokensRecord
 import org.jooq.storage.tables.records.EventGroupsRecord
@@ -51,6 +52,7 @@ import org.jooq.storage.tables.records.SeriesResultsRecord
 import org.jooq.storage.tables.records.SessionsRecord
 import org.jooq.storage.tables.records.TeamToSeriesRecord
 import org.jooq.storage.tables.records.TeamsRecord
+import org.jooq.storage.tables.records.TournamentCodesRecord
 import org.jooq.storage.tables.records.UsersRecord
 
 
@@ -66,7 +68,7 @@ val EVENTS_NAME_KEY: UniqueKey<EventsRecord> = Internal.createUniqueKey(Events.E
 val EVENTS_PKEY: UniqueKey<EventsRecord> = Internal.createUniqueKey(Events.EVENTS, DSL.name("events_pkey"), arrayOf(Events.EVENTS.ID), true)
 val GAME_RESULTS_PKEY: UniqueKey<GameResultsRecord> = Internal.createUniqueKey(GameResults.GAME_RESULTS, DSL.name("game_results_pkey"), arrayOf(GameResults.GAME_RESULTS.GAME_ID), true)
 val GAMES_PKEY: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_pkey"), arrayOf(Games.GAMES.ID), true)
-val GAMES_SHORTCODE_KEY: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_shortcode_key"), arrayOf(Games.GAMES.SHORTCODE), true)
+val GAMES_RIOT_MATCH_ID_KEY: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_riot_match_id_key"), arrayOf(Games.GAMES.RIOT_MATCH_ID), true)
 val PLAYER_CHAMP_SELECTS_PKEY: UniqueKey<PlayerChampSelectsRecord> = Internal.createUniqueKey(PlayerChampSelects.PLAYER_CHAMP_SELECTS, DSL.name("player_champ_selects_pkey"), arrayOf(PlayerChampSelects.PLAYER_CHAMP_SELECTS.ID), true)
 val PLAYER_COMBATS_PKEY: UniqueKey<PlayerCombatsRecord> = Internal.createUniqueKey(PlayerCombats.PLAYER_COMBATS, DSL.name("player_combats_pkey"), arrayOf(PlayerCombats.PLAYER_COMBATS.ID), true)
 val PLAYER_FARMING_PKEY: UniqueKey<PlayerFarmingRecord> = Internal.createUniqueKey(PlayerFarming.PLAYER_FARMING, DSL.name("player_farming_pkey"), arrayOf(PlayerFarming.PLAYER_FARMING.ID), true)
@@ -88,6 +90,8 @@ val SESSIONS_PKEY: UniqueKey<SessionsRecord> = Internal.createUniqueKey(Sessions
 val TEAM_TO_SERIES_PKEY: UniqueKey<TeamToSeriesRecord> = Internal.createUniqueKey(TeamToSeries.TEAM_TO_SERIES, DSL.name("team_to_series_pkey"), arrayOf(TeamToSeries.TEAM_TO_SERIES.TEAM_ID, TeamToSeries.TEAM_TO_SERIES.SERIES_ID), true)
 val TEAMS_NAME_EVENT_ID_KEY: UniqueKey<TeamsRecord> = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_name_event_id_key"), arrayOf(Teams.TEAMS.NAME, Teams.TEAMS.EVENT_ID), true)
 val TEAMS_PKEY: UniqueKey<TeamsRecord> = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_pkey"), arrayOf(Teams.TEAMS.ID), true)
+val TOURNAMENT_CODES_PKEY: UniqueKey<TournamentCodesRecord> = Internal.createUniqueKey(TournamentCodes.TOURNAMENT_CODES, DSL.name("tournament_codes_pkey"), arrayOf(TournamentCodes.TOURNAMENT_CODES.ID), true)
+val TOURNAMENT_CODES_SHORTCODE_KEY: UniqueKey<TournamentCodesRecord> = Internal.createUniqueKey(TournamentCodes.TOURNAMENT_CODES, DSL.name("tournament_codes_shortcode_key"), arrayOf(TournamentCodes.TOURNAMENT_CODES.SHORTCODE), true)
 val USERS_PKEY: UniqueKey<UsersRecord> = Internal.createUniqueKey(Users.USERS, DSL.name("users_pkey"), arrayOf(Users.USERS.ID), true)
 val USERS_USERNAME_KEY: UniqueKey<UsersRecord> = Internal.createUniqueKey(Users.USERS, DSL.name("users_username_key"), arrayOf(Users.USERS.USERNAME), true)
 
@@ -100,9 +104,8 @@ val EVENTS__EVENTS_EVENT_GROUP_ID_FKEY: ForeignKey<EventsRecord, EventGroupsReco
 val GAME_RESULTS__GAME_RESULTS_GAME_ID_FKEY: ForeignKey<GameResultsRecord, GamesRecord> = Internal.createForeignKey(GameResults.GAME_RESULTS, DSL.name("game_results_game_id_fkey"), arrayOf(GameResults.GAME_RESULTS.GAME_ID), org.jooq.storage.keys.GAMES_PKEY, arrayOf(Games.GAMES.ID), true)
 val GAME_RESULTS__GAME_RESULTS_LOSER_TEAM_ID_FKEY: ForeignKey<GameResultsRecord, TeamsRecord> = Internal.createForeignKey(GameResults.GAME_RESULTS, DSL.name("game_results_loser_team_id_fkey"), arrayOf(GameResults.GAME_RESULTS.LOSER_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
 val GAME_RESULTS__GAME_RESULTS_WINNER_TEAM_ID_FKEY: ForeignKey<GameResultsRecord, TeamsRecord> = Internal.createForeignKey(GameResults.GAME_RESULTS, DSL.name("game_results_winner_team_id_fkey"), arrayOf(GameResults.GAME_RESULTS.WINNER_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
-val GAMES__GAMES_BLUE_TEAM_ID_FKEY: ForeignKey<GamesRecord, TeamsRecord> = Internal.createForeignKey(Games.GAMES, DSL.name("games_blue_team_id_fkey"), arrayOf(Games.GAMES.BLUE_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
-val GAMES__GAMES_RED_TEAM_ID_FKEY: ForeignKey<GamesRecord, TeamsRecord> = Internal.createForeignKey(Games.GAMES, DSL.name("games_red_team_id_fkey"), arrayOf(Games.GAMES.RED_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
 val GAMES__GAMES_SERIES_ID_FKEY: ForeignKey<GamesRecord, SeriesRecord> = Internal.createForeignKey(Games.GAMES, DSL.name("games_series_id_fkey"), arrayOf(Games.GAMES.SERIES_ID), org.jooq.storage.keys.SERIES_PKEY, arrayOf(Series.SERIES.ID), true)
+val GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY: ForeignKey<GamesRecord, TournamentCodesRecord> = Internal.createForeignKey(Games.GAMES, DSL.name("games_tournament_code_id_fkey"), arrayOf(Games.GAMES.TOURNAMENT_CODE_ID), org.jooq.storage.keys.TOURNAMENT_CODES_PKEY, arrayOf(TournamentCodes.TOURNAMENT_CODES.ID), true)
 val PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_CHAMP_SELECT_ID_FKEY: ForeignKey<PlayerGameFactsRecord, PlayerChampSelectsRecord> = Internal.createForeignKey(PlayerGameFacts.PLAYER_GAME_FACTS, DSL.name("player_game_facts_player_champ_select_id_fkey"), arrayOf(PlayerGameFacts.PLAYER_GAME_FACTS.PLAYER_CHAMP_SELECT_ID), org.jooq.storage.keys.PLAYER_CHAMP_SELECTS_PKEY, arrayOf(PlayerChampSelects.PLAYER_CHAMP_SELECTS.ID), true)
 val PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_COMBATS_ID_FKEY: ForeignKey<PlayerGameFactsRecord, PlayerCombatsRecord> = Internal.createForeignKey(PlayerGameFacts.PLAYER_GAME_FACTS, DSL.name("player_game_facts_player_combats_id_fkey"), arrayOf(PlayerGameFacts.PLAYER_GAME_FACTS.PLAYER_COMBATS_ID), org.jooq.storage.keys.PLAYER_COMBATS_PKEY, arrayOf(PlayerCombats.PLAYER_COMBATS.ID), true)
 val PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_PLAYER_FARMING_ID_FKEY: ForeignKey<PlayerGameFactsRecord, PlayerFarmingRecord> = Internal.createForeignKey(PlayerGameFacts.PLAYER_GAME_FACTS, DSL.name("player_game_facts_player_farming_id_fkey"), arrayOf(PlayerGameFacts.PLAYER_GAME_FACTS.PLAYER_FARMING_ID), org.jooq.storage.keys.PLAYER_FARMING_PKEY, arrayOf(PlayerFarming.PLAYER_FARMING.ID), true)
@@ -123,3 +126,6 @@ val SESSIONS__SESSIONS_USER_ID_FKEY: ForeignKey<SessionsRecord, UsersRecord> = I
 val TEAM_TO_SERIES__TEAM_TO_SERIES_SERIES_ID_FKEY: ForeignKey<TeamToSeriesRecord, SeriesRecord> = Internal.createForeignKey(TeamToSeries.TEAM_TO_SERIES, DSL.name("team_to_series_series_id_fkey"), arrayOf(TeamToSeries.TEAM_TO_SERIES.SERIES_ID), org.jooq.storage.keys.SERIES_PKEY, arrayOf(Series.SERIES.ID), true)
 val TEAM_TO_SERIES__TEAM_TO_SERIES_TEAM_ID_FKEY: ForeignKey<TeamToSeriesRecord, TeamsRecord> = Internal.createForeignKey(TeamToSeries.TEAM_TO_SERIES, DSL.name("team_to_series_team_id_fkey"), arrayOf(TeamToSeries.TEAM_TO_SERIES.TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
 val TEAMS__TEAMS_EVENT_ID_FKEY: ForeignKey<TeamsRecord, EventsRecord> = Internal.createForeignKey(Teams.TEAMS, DSL.name("teams_event_id_fkey"), arrayOf(Teams.TEAMS.EVENT_ID), org.jooq.storage.keys.EVENTS_PKEY, arrayOf(Events.EVENTS.ID), true)
+val TOURNAMENT_CODES__TOURNAMENT_CODES_BLUE_TEAM_ID_FKEY: ForeignKey<TournamentCodesRecord, TeamsRecord> = Internal.createForeignKey(TournamentCodes.TOURNAMENT_CODES, DSL.name("tournament_codes_blue_team_id_fkey"), arrayOf(TournamentCodes.TOURNAMENT_CODES.BLUE_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
+val TOURNAMENT_CODES__TOURNAMENT_CODES_RED_TEAM_ID_FKEY: ForeignKey<TournamentCodesRecord, TeamsRecord> = Internal.createForeignKey(TournamentCodes.TOURNAMENT_CODES, DSL.name("tournament_codes_red_team_id_fkey"), arrayOf(TournamentCodes.TOURNAMENT_CODES.RED_TEAM_ID), org.jooq.storage.keys.TEAMS_PKEY, arrayOf(Teams.TEAMS.ID), true)
+val TOURNAMENT_CODES__TOURNAMENT_CODES_SERIES_ID_FKEY: ForeignKey<TournamentCodesRecord, SeriesRecord> = Internal.createForeignKey(TournamentCodes.TOURNAMENT_CODES, DSL.name("tournament_codes_series_id_fkey"), arrayOf(TournamentCodes.TOURNAMENT_CODES.SERIES_ID), org.jooq.storage.keys.SERIES_PKEY, arrayOf(Series.SERIES.ID), true)

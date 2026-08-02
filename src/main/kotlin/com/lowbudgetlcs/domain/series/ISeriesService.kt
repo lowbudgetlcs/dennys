@@ -1,8 +1,8 @@
 package com.lowbudgetlcs.domain.series
 
 import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.series.game.models.Game
-import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
@@ -46,7 +46,7 @@ interface ISeriesService {
     /**
      * Create a game inside of a series.
      *
-     * @param NewGame the new game parameters.
+     * @param NewTournamentCode the new game parameters.
      */
-    suspend fun createGame(newGame: NewGame): Game
+    suspend fun createGame(newCode: NewTournamentCode): TournamentCode
 }

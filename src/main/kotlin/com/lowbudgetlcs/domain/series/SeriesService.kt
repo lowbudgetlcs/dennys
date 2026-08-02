@@ -3,8 +3,8 @@ package com.lowbudgetlcs.domain.series
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.series.game.models.Game
-import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
@@ -14,14 +14,14 @@ import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
-import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
+import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class SeriesService(
-    private val gameRepo: IGameRepository,
+    private val codeRepo: ITournamentCodeRepository,
     private val seriesRepo: ISeriesRepository,
     private val eventRepo: IEventRepository,
     private val teamRepo: ITeamRepository,
@@ -63,25 +63,29 @@ class SeriesService(
         }
     }
 
-    override suspend fun createGame(newGame: NewGame): Game {
+    override suspend fun createGame(newCode: NewTournamentCode): TournamentCode {
         logger.debug("Creating new game...")
-        logger.debug(newGame.toString())
-        val series = getSeries(newGame.seriesId) // Throws if not found
-        val blueTeam = teamRepo.getById(newGame.blueTeamId)
-            ?: throw NoSuchElementException("Team with id ${newGame.blueTeamId.value} not found")
-        val redTeam = teamRepo.getById(newGame.redTeamId)
-            ?: throw NoSuchElementException("Team with id ${newGame.redTeamId.value} not found")
+        logger.debug(newCode.toString())
+        val series = getSeries(newCode.seriesId) // Throws if not found
+        val blueTeam =
+            teamRepo.getById(newCode.blueTeamId)
+                ?: throw NoSuchElementException("Team with id ${newCode.blueTeamId.value} not found")
+        val redTeam =
+            teamRepo.getById(newCode.redTeamId)
+                ?: throw NoSuchElementException("Team with id ${newCode.redTeamId.value} not found")
         require(
             (redTeam.id to blueTeam.id).equalsIgnoreOrder(series.participants),
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
-        val event = eventRepo.getById(series.eventId)
-            ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
-        val response = gate.getCode(event.riotTournamentId, ShortcodeOptions())
-            ?: throw GatewayException("Failed to create tournament code.")
+        val event =
+            eventRepo.getById(series.eventId)
+                ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+        val response =
+            gate.getCode(event.riotTournamentId, ShortcodeOptions())
+                ?: throw GatewayException("Failed to create tournament code.")
         val shortcode = response.codes.first()
-        return gameRepo.insert(newGame, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
+        return codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
     }
 }

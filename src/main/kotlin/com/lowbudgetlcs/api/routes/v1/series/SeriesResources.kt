@@ -5,7 +5,7 @@ import io.ktor.resources.Resource
 @Resource("/")
 class SeriesResources {
     @Resource("{seriesId}/game")
-    data class Game(
+    data class TournamentCode(
         val parent: SeriesResources = SeriesResources(),
         val seriesId: Int,
     )

@@ -30,6 +30,7 @@ import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.TournamentCodes
 import org.jooq.storage.tables.Users
 
 
@@ -152,6 +153,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val TEAMS: Teams get() = Teams.TEAMS
 
     /**
+     * The table <code>dennys.tournament_codes</code>.
+     */
+    val TOURNAMENT_CODES: TournamentCodes get() = TournamentCodes.TOURNAMENT_CODES
+
+    /**
      * The table <code>dennys.users</code>.
      */
     val USERS: Users get() = Users.USERS
@@ -180,6 +186,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         Sessions.SESSIONS,
         TeamToSeries.TEAM_TO_SERIES,
         Teams.TEAMS,
+        TournamentCodes.TOURNAMENT_CODES,
         Users.USERS
     )
 }

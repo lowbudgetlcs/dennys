@@ -37,11 +37,13 @@ import org.jooq.storage.keys.SERIES_PKEY
 import org.jooq.storage.keys.SERIES_RESULTS__SERIES_RESULTS_SERIES_ID_FKEY
 import org.jooq.storage.keys.SERIES__SERIES_EVENT_ID_FKEY
 import org.jooq.storage.keys.TEAM_TO_SERIES__TEAM_TO_SERIES_SERIES_ID_FKEY
+import org.jooq.storage.keys.TOURNAMENT_CODES__TOURNAMENT_CODES_SERIES_ID_FKEY
 import org.jooq.storage.tables.Events.EventsPath
 import org.jooq.storage.tables.Games.GamesPath
 import org.jooq.storage.tables.SeriesResults.SeriesResultsPath
 import org.jooq.storage.tables.TeamToSeries.TeamToSeriesPath
 import org.jooq.storage.tables.Teams.TeamsPath
+import org.jooq.storage.tables.TournamentCodes.TournamentCodesPath
 import org.jooq.storage.tables.records.SeriesRecord
 
 
@@ -214,6 +216,22 @@ open class Series(
 
     val teamToSeries: TeamToSeriesPath
         get(): TeamToSeriesPath = teamToSeries()
+
+    private lateinit var _tournamentCodes: TournamentCodesPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.tournament_codes</code> table
+     */
+    fun tournamentCodes(): TournamentCodesPath {
+        if (!this::_tournamentCodes.isInitialized)
+            _tournamentCodes = TournamentCodesPath(this, null, TOURNAMENT_CODES__TOURNAMENT_CODES_SERIES_ID_FKEY.inverseKey)
+
+        return _tournamentCodes;
+    }
+
+    val tournamentCodes: TournamentCodesPath
+        get(): TournamentCodesPath = tournamentCodes()
 
     /**
      * Get the implicit many-to-many join path to the <code>dennys.teams</code>

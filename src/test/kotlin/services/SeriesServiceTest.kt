@@ -20,7 +20,7 @@ import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.event.IEventRepository
-import com.lowbudgetlcs.repositories.game.IGameRepository
+import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -35,12 +35,12 @@ import java.time.Instant
 
 class SeriesServiceTest :
     StringSpec({
-        val gameRepo = mockk<IGameRepository>(relaxed = false)
+        val codeRepo = mockk<ITournamentCodeRepository>(relaxed = false)
         val eventRepo = mockk<IEventRepository>(relaxed = false)
         val teamRepo = mockk<ITeamRepository>(relaxed = false)
         val seriesRepo = mockk<ISeriesRepository>(relaxed = false)
         val tournamentGateway = mockk<IRiotTournamentGateway>(relaxed = false)
-        val service = SeriesService(gameRepo, seriesRepo, eventRepo, teamRepo, tournamentGateway)
+        val service = SeriesService(codeRepo, seriesRepo, eventRepo, teamRepo, tournamentGateway)
 
         beforeTest { clearAllMocks() }
 

@@ -2,7 +2,7 @@ package com.lowbudgetlcs.api.routes.v1.series
 
 import com.lowbudgetlcs.api.dto.games.CreateGameDto
 import com.lowbudgetlcs.api.dto.games.toDto
-import com.lowbudgetlcs.api.dto.games.toNewGame
+import com.lowbudgetlcs.api.dto.games.toNewTournamentCode
 import com.lowbudgetlcs.domain.series.ISeriesService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -18,10 +18,10 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.seriesRoutesV1(seriesService: ISeriesService) {
     route("/series") {
-        post<SeriesResources.Game> { route ->
+        post<SeriesResources.TournamentCode> { route ->
             val dto = call.receive<CreateGameDto>()
             logger.debug(dto.toString())
-            val created = seriesService.createGame(dto.toNewGame(route.seriesId))
+            val created = seriesService.createGame(dto.toNewTournamentCode(route.seriesId))
             call.respond(HttpStatusCode.Created, created.toDto())
         }
     }
