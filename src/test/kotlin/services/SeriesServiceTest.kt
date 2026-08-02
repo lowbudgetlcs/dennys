@@ -82,6 +82,9 @@ class SeriesServiceTest :
                 participants = participatingTeams,
                 result = null,
                 eventStage = EventStage.REGULAR_SEASON,
+                completed = false,
+                completedAt = null,
+                reopenedAt = null,
             )
 
         val newSeries =
@@ -121,6 +124,9 @@ class SeriesServiceTest :
                         participants = participatingTeams,
                         result = null,
                         eventStage = EventStage.REGULAR_SEASON,
+                        completed = false,
+                        completedAt = null,
+                        reopenedAt = null,
                     ),
                     Series(
                         id = SeriesId(2),
@@ -129,6 +135,9 @@ class SeriesServiceTest :
                         participants = participatingTeams,
                         result = null,
                         eventStage = EventStage.REGULAR_SEASON,
+                        completed = false,
+                        completedAt = null,
+                        reopenedAt = null,
                     ),
                 )
 

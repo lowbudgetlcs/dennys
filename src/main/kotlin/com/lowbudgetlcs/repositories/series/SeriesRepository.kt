@@ -17,6 +17,7 @@ import org.jooq.impl.DSL.select
 import org.jooq.storage.tables.references.SERIES
 import org.jooq.storage.tables.references.SERIES_RESULTS
 import org.jooq.storage.tables.references.TEAM_TO_SERIES
+import java.time.Instant
 
 class SeriesRepository(
     private val dsl: DSLContext,
@@ -61,6 +62,33 @@ class SeriesRepository(
         dsl.delete(SERIES).where(SERIES.ID.eq(id.value)).execute()
     }
 
+    override fun complete(
+        id: SeriesId,
+        completedAt: Instant,
+    ): Series? {
+        dsl
+            .update(SERIES)
+            .set(SERIES.COMPLETED, true)
+            .set(SERIES.COMPLETED_AT, completedAt)
+            .where(SERIES.ID.eq(id.value))
+            .execute()
+        return getById(id)
+    }
+
+    override fun reopen(
+        id: SeriesId,
+        reopenedAt: Instant,
+    ): Series? {
+        dsl
+            .update(SERIES)
+            .set(SERIES.COMPLETED, false)
+            .setNull(SERIES.COMPLETED_AT)
+            .set(SERIES.REOPENED_AT, reopenedAt)
+            .where(SERIES.ID.eq(id.value))
+            .execute()
+        return getById(id)
+    }
+
     // Typed multiset to select all teams associated with a series.
     val participants by lazy {
         multiset(
@@ -75,6 +103,9 @@ class SeriesRepository(
                 SERIES.TOTAL_GAMES,
                 SERIES.EVENT_ID,
                 SERIES.STAGE,
+                SERIES.COMPLETED,
+                SERIES.COMPLETED_AT,
+                SERIES.REOPENED_AT,
                 participants,
                 SERIES_RESULTS.WINNER_TEAM_ID,
                 SERIES_RESULTS.LOSER_TEAM_ID,
@@ -88,6 +119,7 @@ class SeriesRepository(
         val eventId = row[SERIES.EVENT_ID]?.toEventId() ?: return null
         val eventStage = row[SERIES.STAGE]?.let { EventStage.valueOf(it) } ?: return null
         val totalGames = row[SERIES.TOTAL_GAMES] ?: return null
+        val completed = row[SERIES.COMPLETED] ?: return null
         val p = row[participants].mapNotNull { it.value1()?.toTeamId() }
         val participants = Pair(p[0], p[1])
         // potentially null data
@@ -102,6 +134,9 @@ class SeriesRepository(
                 totalGames = totalGames,
                 participants = participants,
                 result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,
+                completed = completed,
+                completedAt = row[SERIES.COMPLETED_AT],
+                reopenedAt = row[SERIES.REOPENED_AT],
             )
         return s
     }
