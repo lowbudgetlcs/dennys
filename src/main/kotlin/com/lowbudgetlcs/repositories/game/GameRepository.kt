@@ -12,6 +12,7 @@ import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
+import org.jooq.impl.DSL.max
 import org.jooq.storage.tables.references.GAMES
 import org.jooq.storage.tables.references.GAME_RESULTS
 
@@ -29,14 +30,19 @@ class GameRepository(
 
     override fun countBySeries(id: SeriesId): Int = dsl.fetchCount(GAMES, GAMES.SERIES_ID.eq(id.value))
 
-    // The game number is derived rather than stored by a trigger, so a tournament
-    // code that is issued but never played does not consume one.
     override fun insert(newGame: NewGame): Game? {
         val insertedId =
             dsl.transactionResult { t ->
                 val tx = t.dsl()
                 tx.execute("SELECT pg_advisory_xact_lock(?)", newGame.seriesId.value.toLong())
-                val number = tx.fetchCount(GAMES, GAMES.SERIES_ID.eq(newGame.seriesId.value)) + 1
+                val highest =
+                    tx
+                        .select(max(GAMES.NUMBER))
+                        .from(GAMES)
+                        .where(GAMES.SERIES_ID.eq(newGame.seriesId.value))
+                        .fetchOne()
+                        ?.value1() ?: 0
+                val number = highest + 1
                 val gameId =
                     tx
                         .insertInto(GAMES)

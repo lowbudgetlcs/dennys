@@ -30,6 +30,7 @@ import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.impl.DSL
+import org.jooq.storage.tables.references.GAMES
 import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
 import java.time.Instant
@@ -191,6 +192,20 @@ class GameRepositoryTest :
 
             updated.result?.winningTeamId shouldBe team2.id
             updated.number shouldBe game.number
+        }
+
+        test("deleting a game leaves a gap rather than a colliding number") {
+            val series = newSeries()
+            repo.insert(NewGame(series.id, null, null, null)).shouldNotBeNull()
+            val second = repo.insert(NewGame(series.id, null, null, null)).shouldNotBeNull()
+            repo.insert(NewGame(series.id, null, null, null)).shouldNotBeNull()
+
+            dsl.deleteFrom(GAMES).where(GAMES.ID.eq(second.id.value)).execute()
+
+            val next = repo.insert(NewGame(series.id, null, null, null)).shouldNotBeNull()
+
+            next.number shouldBe 4
+            repo.getBySeriesId(series.id).map { it.number } shouldBe listOf(1, 3, 4)
         }
 
         test("counts and reads are scoped to a single series") {
