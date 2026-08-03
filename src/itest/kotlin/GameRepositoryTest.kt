@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.team.models.NewTeam
@@ -118,17 +119,17 @@ class GameRepositoryTest :
             val first =
                 repo
                     .insert(
-                        NewGame(series.id, null, "NA1_1000000001", null),
+                        NewGame(series.id, null, "NA1_1000000001".toRiotMatchId(), null),
                     ).shouldNotBeNull()
             val second =
                 repo
                     .insert(
-                        NewGame(series.id, null, "NA1_1000000002", null),
+                        NewGame(series.id, null, "NA1_1000000002".toRiotMatchId(), null),
                     ).shouldNotBeNull()
             val third =
                 repo
                     .insert(
-                        NewGame(series.id, null, "NA1_1000000003", null),
+                        NewGame(series.id, null, "NA1_1000000003".toRiotMatchId(), null),
                     ).shouldNotBeNull()
 
             first.number shouldBe 1
@@ -153,18 +154,18 @@ class GameRepositoryTest :
             val code = issueCode(series, "CODED-1")
 
             val game =
-                repo.insert(NewGame(series.id, code.id, "NA1_5102531894", null)).shouldNotBeNull()
+                repo.insert(NewGame(series.id, code.id, "NA1_5102531894".toRiotMatchId(), null)).shouldNotBeNull()
 
             game.tournamentCodeId shouldBe code.id
-            game.riotMatchId shouldBe "NA1_5102531894"
+            game.riotMatchId shouldBe "NA1_5102531894".toRiotMatchId()
         }
 
         test("a duplicate riot match id is rejected") {
             val series = newSeries()
-            repo.insert(NewGame(series.id, null, "NA1_DUPLICATE", null)).shouldNotBeNull()
+            repo.insert(NewGame(series.id, null, "NA1_DUPLICATE".toRiotMatchId(), null)).shouldNotBeNull()
 
             shouldThrow<IntegrityConstraintViolationException> {
-                repo.insert(NewGame(series.id, null, "NA1_DUPLICATE", null))
+                repo.insert(NewGame(series.id, null, "NA1_DUPLICATE".toRiotMatchId(), null))
             }
         }
 

@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.toGameId
+import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.game.models.toTournamentCodeId
 import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.series.models.toSeriesId
@@ -40,7 +41,7 @@ class GameRepository(
                         .insertInto(GAMES)
                         .set(GAMES.SERIES_ID, newGame.seriesId.value)
                         .set(GAMES.TOURNAMENT_CODE_ID, newGame.tournamentCodeId?.value)
-                        .set(GAMES.RIOT_MATCH_ID, newGame.riotMatchId)
+                        .set(GAMES.RIOT_MATCH_ID, newGame.riotMatchId?.value)
                         .set(GAMES.NUMBER, number)
                         .returning(GAMES.ID)
                         .fetchOne()
@@ -99,7 +100,7 @@ class GameRepository(
             id = id,
             seriesId = seriesId,
             tournamentCodeId = row[GAMES.TOURNAMENT_CODE_ID]?.toTournamentCodeId(),
-            riotMatchId = row[GAMES.RIOT_MATCH_ID],
+            riotMatchId = row[GAMES.RIOT_MATCH_ID]?.toRiotMatchId(),
             number = number,
             createdAt = createdAt,
             result = if (winner != null && loser != null) GameResult(winner, loser) else null,
