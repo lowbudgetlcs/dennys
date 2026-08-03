@@ -6,6 +6,8 @@ import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.eventgroup.EventGroupRepository
 import com.lowbudgetlcs.repositories.eventgroup.IEventGroupRepository
+import com.lowbudgetlcs.repositories.game.GameRepository
+import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.player.IPlayerRepository
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -25,6 +27,7 @@ import org.koin.dsl.module
 val repositoryModule =
     module {
         single<ITournamentCodeRepository> { TournamentCodeRepository(get()) }
+        single<IGameRepository> { GameRepository(get()) }
         single<ITeamRepository> { TeamRepository(get()) }
         single<IEventRepository> { EventRepository(get()) }
         single<IEventGroupRepository> { EventGroupRepository(get()) }
