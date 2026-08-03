@@ -7,6 +7,7 @@ import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
@@ -14,17 +15,20 @@ import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
+import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Instant
 
 class SeriesService(
     private val codeRepo: ITournamentCodeRepository,
     private val seriesRepo: ISeriesRepository,
     private val eventRepo: IEventRepository,
     private val teamRepo: ITeamRepository,
+    private val gameRepo: IGameRepository,
     private val gate: IRiotTournamentGateway,
 ) : ISeriesService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -52,6 +56,30 @@ class SeriesService(
     override fun getSeries(id: SeriesId): Series {
         logger.debug("Fetching series '$id'...")
         return seriesRepo.getById(id) ?: throw NoSuchElementException("Series not found")
+    }
+
+    override fun evaluateCompletion(id: SeriesId): Series {
+        val series = getSeries(id)
+        if (series.completed || series.reopenedAt != null) {
+            logger.debug("Series '$id' is not eligible for auto-close, skipping evaluation.")
+            return series
+        }
+        val wins =
+            gameRepo
+                .getBySeriesId(id)
+                .mapNotNull { it.result }
+                .groupingBy { it.winningTeamId }
+                .eachCount()
+        val leader = wins.maxByOrNull { it.value } ?: return series
+        // Wins, not games played: a 2-0 Bo3 is over after two games.
+        if (leader.value <= series.totalGames / 2) {
+            logger.debug("Series '$id' at ${leader.value} win(s) of ${series.totalGames}, still open.")
+            return series
+        }
+        val loser = series.participants.toList().firstOrNull { it != leader.key } ?: return series
+        logger.debug("Series '$id' won by '${leader.key}', closing.")
+        return seriesRepo.complete(id, Instant.now(), SeriesResult(leader.key, loser))
+            ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
     }
 
     override fun removeSeries(id: SeriesId) {

@@ -34,6 +34,13 @@ interface ISeriesService {
     fun getSeries(id: SeriesId): Series
 
     /**
+     * Re-evaluate whether a series is finished and close it if so. Run on every
+     * result write, whichever source it came from. No-op when the series is
+     * already complete or was deliberately reopened.
+     */
+    fun evaluateCompletion(id: SeriesId): Series
+
+    /**
      * Remove a series.
      *
      * @param SeriesId the target series.

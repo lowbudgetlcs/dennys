@@ -65,13 +65,29 @@ class SeriesRepository(
     override fun complete(
         id: SeriesId,
         completedAt: Instant,
+        result: SeriesResult?,
     ): Series? {
-        dsl
-            .update(SERIES)
-            .set(SERIES.COMPLETED, true)
-            .set(SERIES.COMPLETED_AT, completedAt)
-            .where(SERIES.ID.eq(id.value))
-            .execute()
+        dsl.transaction { t ->
+            val tx = t.dsl()
+            tx
+                .update(SERIES)
+                .set(SERIES.COMPLETED, true)
+                .set(SERIES.COMPLETED_AT, completedAt)
+                .where(SERIES.ID.eq(id.value))
+                .execute()
+            result?.let {
+                tx
+                    .insertInto(SERIES_RESULTS)
+                    .set(SERIES_RESULTS.SERIES_ID, id.value)
+                    .set(SERIES_RESULTS.WINNER_TEAM_ID, it.winningTeamId.value)
+                    .set(SERIES_RESULTS.LOSER_TEAM_ID, it.losingTeamId.value)
+                    .onConflict(SERIES_RESULTS.SERIES_ID)
+                    .doUpdate()
+                    .set(SERIES_RESULTS.WINNER_TEAM_ID, it.winningTeamId.value)
+                    .set(SERIES_RESULTS.LOSER_TEAM_ID, it.losingTeamId.value)
+                    .execute()
+            }
+        }
         return getById(id)
     }
 
