@@ -69,6 +69,7 @@ val EVENTS_PKEY: UniqueKey<EventsRecord> = Internal.createUniqueKey(Events.EVENT
 val GAME_RESULTS_PKEY: UniqueKey<GameResultsRecord> = Internal.createUniqueKey(GameResults.GAME_RESULTS, DSL.name("game_results_pkey"), arrayOf(GameResults.GAME_RESULTS.GAME_ID), true)
 val GAMES_PKEY: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_pkey"), arrayOf(Games.GAMES.ID), true)
 val GAMES_RIOT_MATCH_ID_KEY: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_riot_match_id_key"), arrayOf(Games.GAMES.RIOT_MATCH_ID), true)
+val GAMES_SERIES_NUMBER_UNIQUE: UniqueKey<GamesRecord> = Internal.createUniqueKey(Games.GAMES, DSL.name("games_series_number_unique"), arrayOf(Games.GAMES.SERIES_ID, Games.GAMES.NUMBER), true)
 val PLAYER_CHAMP_SELECTS_PKEY: UniqueKey<PlayerChampSelectsRecord> = Internal.createUniqueKey(PlayerChampSelects.PLAYER_CHAMP_SELECTS, DSL.name("player_champ_selects_pkey"), arrayOf(PlayerChampSelects.PLAYER_CHAMP_SELECTS.ID), true)
 val PLAYER_COMBATS_PKEY: UniqueKey<PlayerCombatsRecord> = Internal.createUniqueKey(PlayerCombats.PLAYER_COMBATS, DSL.name("player_combats_pkey"), arrayOf(PlayerCombats.PLAYER_COMBATS.ID), true)
 val PLAYER_FARMING_PKEY: UniqueKey<PlayerFarmingRecord> = Internal.createUniqueKey(PlayerFarming.PLAYER_FARMING, DSL.name("player_farming_pkey"), arrayOf(PlayerFarming.PLAYER_FARMING.ID), true)

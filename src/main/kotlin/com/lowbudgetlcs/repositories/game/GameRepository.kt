@@ -35,6 +35,7 @@ class GameRepository(
         val insertedId =
             dsl.transactionResult { t ->
                 val tx = t.dsl()
+                tx.execute("SELECT pg_advisory_xact_lock(?)", newGame.seriesId.value.toLong())
                 val number = tx.fetchCount(GAMES, GAMES.SERIES_ID.eq(newGame.seriesId.value)) + 1
                 val gameId =
                     tx

@@ -34,6 +34,7 @@ import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.GAMES_PKEY
 import org.jooq.storage.keys.GAMES_RIOT_MATCH_ID_KEY
+import org.jooq.storage.keys.GAMES_SERIES_NUMBER_UNIQUE
 import org.jooq.storage.keys.GAMES__GAMES_SERIES_ID_FKEY
 import org.jooq.storage.keys.GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_GAME_ID_FKEY
@@ -144,7 +145,7 @@ open class Games(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<GamesRecord, Int?> = super.getIdentity() as Identity<GamesRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<GamesRecord> = GAMES_PKEY
-    override fun getUniqueKeys(): List<UniqueKey<GamesRecord>> = listOf(GAMES_RIOT_MATCH_ID_KEY)
+    override fun getUniqueKeys(): List<UniqueKey<GamesRecord>> = listOf(GAMES_RIOT_MATCH_ID_KEY, GAMES_SERIES_NUMBER_UNIQUE)
     override fun getReferences(): List<ForeignKey<GamesRecord, *>> = listOf(GAMES__GAMES_SERIES_ID_FKEY, GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY)
 
     private lateinit var _series: SeriesPath

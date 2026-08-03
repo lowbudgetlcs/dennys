@@ -23,7 +23,9 @@ CREATE TABLE games (
   tournament_code_id INTEGER REFERENCES tournament_codes(id),
   riot_match_id      TEXT UNIQUE,
   number             INTEGER NOT NULL,
-  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT games_series_number_unique UNIQUE (series_id, number)
 );
 
 ALTER TABLE game_results
