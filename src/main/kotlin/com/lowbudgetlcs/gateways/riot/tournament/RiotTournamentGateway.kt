@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.gateways.riot.tournament
 
 import com.lowbudgetlcs.domain.event.models.RiotTournament
+import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventName
@@ -8,6 +9,7 @@ import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -82,6 +84,21 @@ class RiotTournamentGateway(
                 logger.warn("Failed to create codes.")
                 throw RiotApiException("Unexpected Riot API error: ${res.status}")
             }
+        }
+    }
+
+    override suspend fun getGames(shortcode: Shortcode): List<RiotTournamentGamesV5Dto> {
+        logger.debug("Fetching games for shortcode '${shortcode.value}'...")
+        val res: HttpResponse =
+            client.get("$url/games/by-code/${shortcode.value}") {
+                headers {
+                    append("X-Riot-Token", apiKey)
+                }
+            }
+        return when (res.status) {
+            HttpStatusCode.OK -> res.body<List<RiotTournamentGamesV5Dto>>()
+            HttpStatusCode.NotFound -> emptyList()
+            else -> throw RiotApiException("Unexpected Riot API error: ${res.status}")
         }
     }
 }

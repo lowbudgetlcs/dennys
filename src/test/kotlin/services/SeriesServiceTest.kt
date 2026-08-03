@@ -45,9 +45,9 @@ class SeriesServiceTest :
         val eventRepo = mockk<IEventRepository>(relaxed = false)
         val teamRepo = mockk<ITeamRepository>(relaxed = false)
         val seriesRepo = mockk<ISeriesRepository>(relaxed = false)
-        val tournamentGateway = mockk<IRiotTournamentGateway>(relaxed = false)
+        val gameGateway = mockk<IRiotTournamentGateway>(relaxed = false)
         val gameRepo = mockk<IGameRepository>(relaxed = false)
-        val service = SeriesService(codeRepo, seriesRepo, eventRepo, teamRepo, gameRepo, tournamentGateway)
+        val service = SeriesService(codeRepo, seriesRepo, eventRepo, teamRepo, gameRepo, gameGateway)
 
         beforeTest { clearAllMocks() }
 
@@ -250,8 +250,8 @@ class SeriesServiceTest :
             series: Series,
             winners: List<TeamId> = emptyList(),
         ) {
-            every { seriesRepo.getById(series.id) } returns series
-            every { gameRepo.getBySeriesId(series.id) } returns gamesWon(winners)
+            every { seriesRepo.getById(any()) } returns series
+            every { gameRepo.getBySeriesId(any()) } returns gamesWon(winners)
             every { seriesRepo.complete(series.id, any(), any()) } returns series.copy(completed = true)
         }
 

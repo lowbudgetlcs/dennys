@@ -7,6 +7,7 @@ import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.toTournamentCodeId
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
 import com.lowbudgetlcs.domain.series.models.toSeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Record
@@ -17,6 +18,13 @@ class TournamentCodeRepository(
 ) : ITournamentCodeRepository {
     override fun getById(id: TournamentCodeId) =
         selectCodes().where(TOURNAMENT_CODES.ID.eq(id.value)).fetchOne()?.let(::rowToTournamentCode)
+
+    override fun getBySeriesId(id: SeriesId): List<TournamentCode> =
+        selectCodes()
+            .where(TOURNAMENT_CODES.SERIES_ID.eq(id.value))
+            .orderBy(TOURNAMENT_CODES.ID)
+            .fetch()
+            .mapNotNull(::rowToTournamentCode)
 
     override fun insert(
         newCode: NewTournamentCode,

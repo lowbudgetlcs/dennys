@@ -1,17 +1,27 @@
 package com.lowbudgetlcs.domain.series
 
+import com.lowbudgetlcs.domain.account.models.types.Puuid
+import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.series.game.models.GameResult
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
+import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
+import com.lowbudgetlcs.domain.series.game.models.types.RiotMatchId
 import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
+import com.lowbudgetlcs.gateways.riot.RiotApiException
+import com.lowbudgetlcs.gateways.riot.tournament.RiotRegion
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
@@ -82,6 +92,93 @@ class SeriesService(
             ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
     }
 
+    override suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome {
+        val series = getSeries(id)
+        val recordedCodeIds = gameRepo.getBySeriesId(id).mapNotNull { it.tournamentCodeId }.toSet()
+        val outstanding = codeRepo.getBySeriesId(id).filter { it.id !in recordedCodeIds }
+        if (outstanding.isEmpty()) {
+            logger.debug("Series '$id' has no outstanding tournament codes.")
+            return RefreshOutcome.ANSWERED_EMPTY
+        }
+
+        var attributed = false
+        val unverified = mutableListOf<Shortcode>()
+        for (code in outstanding) {
+            val riotGames =
+                try {
+                    gate.getGames(code.shortcode)
+                } catch (e: RiotApiException) {
+                    logger.warn("Could not reach Riot for shortcode '${code.shortcode.value}': ${e.message}")
+                    unverified += code.shortcode
+                    continue
+                }
+            riotGames.forEach { riotGame ->
+                val result = resolveWinner(series, riotGame)
+                if (result != null) {
+                    gameRepo.insert(
+                        NewGame(
+                            seriesId = id,
+                            tournamentCodeId = code.id,
+                            riotMatchId = riotMatchIdOf(riotGame),
+                            result = result,
+                        ),
+                    )
+                    attributed = true
+                }
+            }
+        }
+
+        if (attributed) evaluateCompletion(id)
+        return when {
+            attributed -> RefreshOutcome.ATTRIBUTED
+            unverified.isNotEmpty() -> {
+                logger.warn(
+                    "Series '$id' could not be verified against Riot for codes " +
+                        unverified.joinToString { it.value },
+                )
+                RefreshOutcome.UNREACHABLE
+            }
+
+            else -> RefreshOutcome.ANSWERED_EMPTY
+        }
+    }
+
+    private fun seriesMetadata(id: SeriesId): String = """{"seriesId":${id.value}}"""
+
+    private fun riotMatchIdOf(riotGame: RiotTournamentGamesV5Dto): RiotMatchId? {
+        val platformId = RiotRegion.platformIdOf(riotGame.region)
+        if (platformId == null) {
+            logger.warn("Unknown Riot region '${riotGame.region}' on shortcode '${riotGame.shortCode}'.")
+            return null
+        }
+        return "${platformId}_${riotGame.gameId}".toRiotMatchId()
+    }
+
+    private fun resolveWinner(
+        series: Series,
+        riotGame: RiotTournamentGamesV5Dto,
+    ): GameResult? {
+        val puuids = riotGame.winningTeam.mapNotNull { runCatching { Puuid(it.puuid) }.getOrNull() }
+        val resolved = teamRepo.getTeamIdsByPuuids(puuids)
+        if (resolved.size < puuids.size) {
+            logger.warn(
+                "Series '${series.id}' shortcode '${riotGame.shortCode}': " +
+                    "${puuids.size - resolved.size} of ${puuids.size} winning puuids are unregistered.",
+            )
+        }
+        val counts = resolved.groupingBy { it }.eachCount()
+        val (first, second) = series.participants
+        val winner = listOf(first, second).maxByOrNull { counts[it] ?: 0 }
+        if (winner == null || (counts[winner] ?: 0) == 0) {
+            logger.warn(
+                "Series '${series.id}' shortcode '${riotGame.shortCode}': " +
+                    "no winning puuid resolved to either roster, leaving it for self-serve reporting.",
+            )
+            return null
+        }
+        return GameResult(winner, if (winner == first) second else first)
+    }
+
     override fun removeSeries(id: SeriesId) {
         logger.debug("Deleting series '$id'...")
         try {
@@ -106,12 +203,17 @@ class SeriesService(
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
+        try {
+            refreshFromRiot(series.id)
+        } catch (e: Throwable) {
+            logger.warn("Could not refresh series '${series.id}' from Riot before issuing a code: ${e.message}")
+        }
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
         val event =
             eventRepo.getById(series.eventId)
                 ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
         val response =
-            gate.getCode(event.riotTournamentId, ShortcodeOptions())
+            gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
                 ?: throw GatewayException("Failed to create tournament code.")
         val shortcode = response.codes.first()
         return codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")

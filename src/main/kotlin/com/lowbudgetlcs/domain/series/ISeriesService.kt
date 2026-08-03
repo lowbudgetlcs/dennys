@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 
@@ -39,6 +40,8 @@ interface ISeriesService {
      * already complete or was deliberately reopened.
      */
     fun evaluateCompletion(id: SeriesId): Series
+
+    suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome
 
     /**
      * Remove a series.
