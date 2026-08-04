@@ -205,24 +205,54 @@ class SeriesService(
         return game
     }
 
+    override fun completeSeries(
+        id: SeriesId,
+        winningTeamId: TeamId?,
+        losingTeamId: TeamId?,
+    ): Series {
+        val series = getSeries(id)
+        check(!series.completed) {
+            "Series '${id.value}' is already complete. Reopen it before completing it again."
+        }
+        val result = winnerAndLoser(series, winningTeamId, losingTeamId)?.let { SeriesResult(it.first, it.second) }
+        logger.info("Closing series '$id' manually, winner '${result?.winningTeamId}'.")
+        return seriesRepo.complete(id, Instant.now(), result)
+            ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
+    }
+
+    override fun reopenSeries(id: SeriesId): Series {
+        val series = getSeries(id)
+        check(series.completed) { "Series '${id.value}' is not complete, so it cannot be reopened." }
+        logger.info("Reopening series '$id'.")
+        return seriesRepo.reopen(id, Instant.now())
+            ?: throw DatabaseException("Failed to reopen series with id '${id.value}'.")
+    }
+
     private fun declaredResult(
         series: Series,
         report: ReportedResult,
-    ): GameResult? {
-        val winner = report.winningTeamId
-        if (winner == null) {
-            require(report.losingTeamId == null) { "A losing team cannot be given without a winning team." }
+    ): GameResult? =
+        winnerAndLoser(series, report.winningTeamId, report.losingTeamId)
+            ?.let { GameResult(it.first, it.second) }
+
+    private fun winnerAndLoser(
+        series: Series,
+        winningTeamId: TeamId?,
+        losingTeamId: TeamId?,
+    ): Pair<TeamId, TeamId>? {
+        if (winningTeamId == null) {
+            require(losingTeamId == null) { "A losing team cannot be given without a winning team." }
             return null
         }
         val (first, second) = series.participants
-        require(winner == first || winner == second) {
-            "Team '${winner.value}' is not a participant in series '${series.id.value}'."
+        require(winningTeamId == first || winningTeamId == second) {
+            "Team '${winningTeamId.value}' is not a participant in series '${series.id.value}'."
         }
-        val loser = if (winner == first) second else first
-        report.losingTeamId?.let {
+        val loser = if (winningTeamId == first) second else first
+        losingTeamId?.let {
             require(it == loser) { "Team '${it.value}' is not the losing participant in series '${series.id.value}'." }
         }
-        return GameResult(winner, loser)
+        return winningTeamId to loser
     }
 
     private fun resolveTarget(

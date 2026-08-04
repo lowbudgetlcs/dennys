@@ -14,6 +14,9 @@ fun Series.toDto(): SeriesDto =
         teamIds = participants.toList().map { it.value },
         totalGames = totalGames,
         eventStage = eventStage,
+        completed = completed,
+        completedAt = completedAt,
+        reopenedAt = reopenedAt,
     )
 
 fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =

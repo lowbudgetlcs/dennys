@@ -7,6 +7,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
+import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.filterByCompletion
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
@@ -24,6 +25,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
+import org.jooq.storage.tables.references.GAMES
 import org.jooq.storage.tables.references.SERIES_RESULTS
 import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.MountableFile
@@ -118,6 +120,42 @@ class SeriesRepositoryTest :
             completed.completedAt shouldBe at
             completed.reopenedAt.shouldBeNull()
             repo.getById(created.id)?.completed shouldBe true
+        }
+
+        test("a forfeit writes series_results with no games played") {
+            val created = repo.insert(newSeries)
+            created.shouldNotBeNull()
+
+            val completed =
+                repo.complete(
+                    created.id,
+                    Instant.parse("2026-07-14T23:12:04Z"),
+                    SeriesResult(team1.id, team2.id),
+                )
+            completed.shouldNotBeNull()
+
+            completed.completed shouldBe true
+            completed.result?.winningTeamId shouldBe team1.id
+            completed.result?.losingTeamId shouldBe team2.id
+            dsl.fetchCount(GAMES, GAMES.SERIES_ID.eq(created.id.value)) shouldBe 0
+            dsl.fetchCount(SERIES_RESULTS, SERIES_RESULTS.SERIES_ID.eq(created.id.value)) shouldBe 1
+        }
+
+        test("completing twice overwrites the result rather than duplicating the row") {
+            val created = repo.insert(newSeries)
+            created.shouldNotBeNull()
+            repo.complete(created.id, Instant.parse("2026-07-14T23:12:04Z"), SeriesResult(team1.id, team2.id))
+
+            val corrected =
+                repo.complete(
+                    created.id,
+                    Instant.parse("2026-07-15T10:00:00Z"),
+                    SeriesResult(team2.id, team1.id),
+                )
+            corrected.shouldNotBeNull()
+
+            corrected.result?.winningTeamId shouldBe team2.id
+            dsl.fetchCount(SERIES_RESULTS, SERIES_RESULTS.SERIES_ID.eq(created.id.value)) shouldBe 1
         }
 
         test("reopen clears completion, stamps reopenedAt and preserves series_results") {

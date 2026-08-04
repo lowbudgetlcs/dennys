@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.series.models.ReportOutcome
 import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.team.models.types.TeamId
 
 interface ISeriesService {
     /**
@@ -49,6 +50,14 @@ interface ISeriesService {
         id: SeriesId,
         report: ReportedResult,
     ): ReportOutcome
+
+    fun completeSeries(
+        id: SeriesId,
+        winningTeamId: TeamId?,
+        losingTeamId: TeamId?,
+    ): Series
+
+    fun reopenSeries(id: SeriesId): Series
 
     /**
      * Remove a series.

@@ -970,6 +970,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            The series is already complete. Reopen it with `DELETE` before
+            completing it again, so the reopen is recorded rather than the
+            previous result being silently overwritten.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "422":
           description: Invalid input, for example a winner that is not in this series.
           content:
@@ -1001,6 +1010,12 @@ paths:
                 $ref: "#/components/schemas/SeriesDto"
         "404":
           description: Series not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: The series is not complete, so there is nothing to reopen.
           content:
             application/json:
               schema:
@@ -2192,6 +2207,17 @@ components:
           format: date-time
           nullable: true
           description: When the series was completed. Null while `completed` is false.
+          example: null
+        reopenedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: |
+            When staff last reopened this series. Once stamped it is never
+            cleared, and it permanently suppresses automatic completion for
+            this series — otherwise a series that already meets the win
+            threshold would slam shut again on the next recorded result.
+            Manual completion still works.
           example: null
 
     SeriesWithGamesDto:
