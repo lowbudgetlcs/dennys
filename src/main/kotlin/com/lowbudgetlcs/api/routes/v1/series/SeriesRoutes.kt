@@ -1,9 +1,12 @@
 package com.lowbudgetlcs.api.routes.v1.series
 
 import com.lowbudgetlcs.api.dto.games.CreateGameDto
+import com.lowbudgetlcs.api.dto.games.ReportResultDto
 import com.lowbudgetlcs.api.dto.games.toDto
 import com.lowbudgetlcs.api.dto.games.toNewTournamentCode
+import com.lowbudgetlcs.api.dto.games.toReportedResult
 import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.models.toSeriesId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
@@ -23,6 +26,15 @@ fun Route.seriesRoutesV1(seriesService: ISeriesService) {
             logger.debug(dto.toString())
             val created = seriesService.createGame(dto.toNewTournamentCode(route.seriesId))
             call.respond(HttpStatusCode.Created, created.toDto())
+        }
+        post<SeriesResources.Results> { route ->
+            val dto = call.receive<ReportResultDto>()
+            logger.debug(dto.toString())
+            val outcome = seriesService.reportResult(route.seriesId.toSeriesId(), dto.toReportedResult())
+            call.respond(
+                if (outcome.recorded) HttpStatusCode.Created else HttpStatusCode.OK,
+                outcome.game.toDto(),
+            )
         }
     }
 }

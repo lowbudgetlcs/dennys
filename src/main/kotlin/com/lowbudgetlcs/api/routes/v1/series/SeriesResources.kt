@@ -9,4 +9,10 @@ class SeriesResources {
         val parent: SeriesResources = SeriesResources(),
         val seriesId: Int,
     )
+
+    @Resource("{seriesId}/results")
+    data class Results(
+        val parent: SeriesResources = SeriesResources(),
+        val seriesId: Int,
+    )
 }

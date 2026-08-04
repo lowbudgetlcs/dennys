@@ -11,6 +11,8 @@ interface ITournamentCodeRepository {
 
     fun getBySeriesId(id: SeriesId): List<TournamentCode>
 
+    fun getByShortcode(shortcode: Shortcode): TournamentCode?
+
     fun insert(
         newCode: NewTournamentCode,
         shortcode: Shortcode,

@@ -5,14 +5,18 @@ import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.game.models.types.RiotMatchId
+import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
+import com.lowbudgetlcs.domain.series.models.ReportOutcome
+import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
@@ -20,9 +24,9 @@ import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.RiotApiException
+import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotRegion
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
-import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
@@ -143,6 +147,110 @@ class SeriesService(
         }
     }
 
+    override suspend fun reportResult(
+        id: SeriesId,
+        report: ReportedResult,
+    ): ReportOutcome {
+        val series = getSeries(id)
+        require(report.tournamentCodeId == null || report.shortcode == null) {
+            "Provide either tournamentCodeId or shortcode, not both."
+        }
+        val declared = declaredResult(series, report)
+        val target = resolveTarget(series, report)
+
+        val before = gameRepo.getBySeriesId(id)
+        if (target != null) {
+            before.firstOrNull { it.tournamentCodeId == target.id && it.result != null }?.let {
+                logger.info("Code '${target.shortcode.value}' already has a result, returning game '${it.id.value}'.")
+                return ReportOutcome(it, recorded = false)
+            }
+        }
+        val outstanding = codeRepo.getBySeriesId(id).filter { code -> before.none { it.tournamentCodeId == code.id } }
+
+        refreshQuietly(id)
+        val pulled =
+            gameRepo.getBySeriesId(id).filter { game ->
+                game.result != null && before.none { it.id == game.id }
+            }
+
+        if (target != null) {
+            pulled.firstOrNull { it.tournamentCodeId == target.id }?.let { return ReportOutcome(it, recorded = true) }
+            return ReportOutcome(record(id, target.id, declared ?: noWinner(id)), recorded = true)
+        }
+        pulled.firstOrNull()?.let { return ReportOutcome(it, recorded = true) }
+
+        if (declared == null && outstanding.isEmpty()) {
+            before.lastOrNull { it.result != null }?.let {
+                logger.info("Series '$id' has no outstanding codes, returning recorded game '${it.id.value}'.")
+                return ReportOutcome(it, recorded = false)
+            }
+        }
+        return ReportOutcome(record(id, null, declared ?: noWinner(id)), recorded = true)
+    }
+
+    private fun noWinner(id: SeriesId): Nothing =
+        throw IllegalArgumentException(
+            "No winner was named and Riot has no record of a game for series '${id.value}'.",
+        )
+
+    private fun record(
+        id: SeriesId,
+        codeId: TournamentCodeId?,
+        result: GameResult,
+    ): Game {
+        val game =
+            gameRepo.insert(NewGame(id, codeId, null, result))
+                ?: throw DatabaseException("Failed to record a result for series '${id.value}'.")
+        evaluateCompletion(id)
+        return game
+    }
+
+    private fun declaredResult(
+        series: Series,
+        report: ReportedResult,
+    ): GameResult? {
+        val winner = report.winningTeamId
+        if (winner == null) {
+            require(report.losingTeamId == null) { "A losing team cannot be given without a winning team." }
+            return null
+        }
+        val (first, second) = series.participants
+        require(winner == first || winner == second) {
+            "Team '${winner.value}' is not a participant in series '${series.id.value}'."
+        }
+        val loser = if (winner == first) second else first
+        report.losingTeamId?.let {
+            require(it == loser) { "Team '${it.value}' is not the losing participant in series '${series.id.value}'." }
+        }
+        return GameResult(winner, loser)
+    }
+
+    private fun resolveTarget(
+        series: Series,
+        report: ReportedResult,
+    ): TournamentCode? {
+        val code =
+            report.tournamentCodeId?.let {
+                codeRepo.getById(it) ?: throw NoSuchElementException("Tournament code with id ${it.value} not found")
+            } ?: report.shortcode?.let {
+                codeRepo.getByShortcode(it) ?: throw NoSuchElementException("Tournament code '${it.value}' not found")
+            } ?: return null
+        if (code.seriesId != series.id) {
+            throw NoSuchElementException(
+                "Tournament code '${code.shortcode.value}' does not belong to series '${series.id.value}'",
+            )
+        }
+        return code
+    }
+
+    private suspend fun refreshQuietly(id: SeriesId) {
+        try {
+            refreshFromRiot(id)
+        } catch (e: Throwable) {
+            logger.warn("Could not refresh series '$id' from Riot: ${e.message}")
+        }
+    }
+
     private fun seriesMetadata(id: SeriesId): String = """{"seriesId":${id.value}}"""
 
     private fun riotMatchIdOf(riotGame: RiotTournamentGamesV5Dto): RiotMatchId? {
@@ -203,11 +311,7 @@ class SeriesService(
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
-        try {
-            refreshFromRiot(series.id)
-        } catch (e: Throwable) {
-            logger.warn("Could not refresh series '${series.id}' from Riot before issuing a code: ${e.message}")
-        }
+        refreshQuietly(series.id)
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
         val event =
             eventRepo.getById(series.eventId)

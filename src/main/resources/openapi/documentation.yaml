@@ -901,7 +901,9 @@ paths:
                 $ref: "#/components/schemas/GameDto"
         "200":
           description: |
-            The target already had a result. The existing game is returned and
+            The game was already recorded — either the targeted code already had
+            a result, or a bare report arrived after the callback had landed and
+            no code is still outstanding. The existing game is returned and
             nothing was written.
           content:
             application/json:
@@ -927,6 +929,8 @@ paths:
             Possible reasons:
             - Both `tournamentCodeId` and `shortcode` were given.
             - No winner was named and Riot has no record of the game.
+            - `winnerTeamId` is not a participant in the series.
+            - `loserTeamId` was given without `winnerTeamId`, or contradicts it.
           content:
             application/json:
               schema:
@@ -1611,8 +1615,8 @@ components:
         A game that was actually played. `tournamentCodeId` and `riotMatchId`
         are null for a custom game played without a code — Riot cannot serve
         custom match data, so those are recorded from a self-reported result.
-        `number` is derived from the count of games in the series, so a code
-        that is never played does not consume a game number.
+        `number` is derived as one past the highest number in the series, so a
+        code that is never played does not consume a game number.
       required:
         - id
         - seriesId
@@ -1637,7 +1641,7 @@ components:
           example: NA1_5102531894
         number:
           type: integer
-          description: Position within the series, derived as games played + 1.
+          description: Position within the series.
           example: 1
         createdAt:
           type: string

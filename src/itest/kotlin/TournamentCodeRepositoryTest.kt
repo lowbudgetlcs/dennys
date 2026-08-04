@@ -142,4 +142,18 @@ class TournamentCodeRepositoryTest :
                 repo.insert(newCode, shortcode = "ABCD".toShortcode())
             }
         }
+
+        "A code can be looked up by the shortcode a human reads off their client" {
+            val shortcode = "NA04eff-lookup".toShortcode()
+            val inserted = repo.insert(newCode, shortcode = shortcode).shouldNotBeNull()
+
+            val found = repo.getByShortcode(shortcode).shouldNotBeNull()
+
+            found.id shouldBe inserted.id
+            found.seriesId shouldBe series.id
+        }
+
+        "An unknown shortcode resolves to null rather than an arbitrary code" {
+            repo.getByShortcode("NOT-A-REAL-CODE".toShortcode()) shouldBe null
+        }
     })

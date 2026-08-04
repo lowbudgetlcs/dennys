@@ -26,6 +26,9 @@ class TournamentCodeRepository(
             .fetch()
             .mapNotNull(::rowToTournamentCode)
 
+    override fun getByShortcode(shortcode: Shortcode) =
+        selectCodes().where(TOURNAMENT_CODES.SHORTCODE.eq(shortcode.value)).fetchOne()?.let(::rowToTournamentCode)
+
     override fun insert(
         newCode: NewTournamentCode,
         shortcode: Shortcode,
