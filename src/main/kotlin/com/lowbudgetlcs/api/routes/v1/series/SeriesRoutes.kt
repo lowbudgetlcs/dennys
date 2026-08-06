@@ -14,6 +14,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
 import io.ktor.server.resources.delete
+import io.ktor.server.resources.get
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -30,6 +31,10 @@ fun Route.seriesRoutesV1(seriesService: ISeriesService) {
             logger.debug(dto.toString())
             val created = seriesService.createGame(dto.toNewTournamentCode(route.seriesId))
             call.respond(HttpStatusCode.Created, created.toDto())
+        }
+        get<SeriesResources.ById> { route ->
+            val series = seriesService.getSeriesWithGames(route.seriesId.toSeriesId())
+            call.respond(series.toDto())
         }
         post<SeriesResources.Complete> { route ->
             val dto = call.receive<CompleteSeriesDto>()

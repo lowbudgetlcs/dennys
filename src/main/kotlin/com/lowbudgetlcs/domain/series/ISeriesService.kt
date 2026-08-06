@@ -8,6 +8,7 @@ import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportOutcome
 import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
@@ -58,6 +59,8 @@ interface ISeriesService {
     ): Series
 
     fun reopenSeries(id: SeriesId): Series
+
+    fun getSeriesWithGames(id: SeriesId): SeriesWithGames
 
     /**
      * Remove a series.

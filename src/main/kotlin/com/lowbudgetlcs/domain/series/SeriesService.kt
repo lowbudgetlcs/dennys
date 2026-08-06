@@ -19,6 +19,8 @@ import com.lowbudgetlcs.domain.series.models.ReportOutcome
 import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
+import com.lowbudgetlcs.domain.series.models.SeriesWithGames
+import com.lowbudgetlcs.domain.series.models.toSeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
@@ -70,6 +72,12 @@ class SeriesService(
     override fun getSeries(id: SeriesId): Series {
         logger.debug("Fetching series '$id'...")
         return seriesRepo.getById(id) ?: throw NoSuchElementException("Series not found")
+    }
+
+    override fun getSeriesWithGames(id: SeriesId): SeriesWithGames {
+        logger.debug("Fetching series '$id' with codes and games...")
+        val series = getSeries(id)
+        return series.toSeriesWithGames(codeRepo.getBySeriesId(id), gameRepo.getBySeriesId(id))
     }
 
     override fun evaluateCompletion(id: SeriesId): Series {

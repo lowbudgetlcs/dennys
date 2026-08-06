@@ -1,5 +1,7 @@
 package com.lowbudgetlcs.domain.series.models
 
+import com.lowbudgetlcs.domain.series.game.models.Game
+import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.equalsIgnoreOrder
 
@@ -22,3 +24,21 @@ fun List<Series>.filterByParticipants(query: SeriesQuery?): List<Series> {
         else -> this.filter { s -> s.participants.toList().equalsIgnoreOrder(participants) }
     }
 }
+
+fun Series.toSeriesWithGames(
+    tournamentCodes: List<TournamentCode>,
+    games: List<Game>,
+): SeriesWithGames =
+    SeriesWithGames(
+        id = id,
+        eventId = eventId,
+        eventStage = eventStage,
+        totalGames = totalGames,
+        participants = participants,
+        result = result,
+        completed = completed,
+        completedAt = completedAt,
+        reopenedAt = reopenedAt,
+        tournamentCodes = tournamentCodes,
+        games = games,
+    )
