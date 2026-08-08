@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.series
 
+import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
@@ -46,6 +47,8 @@ interface ISeriesService {
     fun evaluateCompletion(id: SeriesId): Series
 
     suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome
+
+    suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome?
 
     suspend fun reportResult(
         id: SeriesId,

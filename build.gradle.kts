@@ -147,4 +147,6 @@ dependencies {
     testImplementation(libs.bundles.ktor.client.plugins)
     testImplementation(libs.ktor.serialization.json)
     testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.bundles.ktor.server.plugins)
 }

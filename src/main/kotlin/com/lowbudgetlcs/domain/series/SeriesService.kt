@@ -39,6 +39,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
+private const val RELAY_METADATA_TAG = "LBLCS"
+
 class SeriesService(
     private val codeRepo: ITournamentCodeRepository,
     private val seriesRepo: ISeriesRepository,
@@ -296,7 +298,16 @@ class SeriesService(
         }
     }
 
-    private fun seriesMetadata(id: SeriesId): String = """{"seriesId":${id.value}}"""
+    override suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome? {
+        val code = codeRepo.getByShortcode(shortcode)
+        if (code == null) {
+            logger.warn("Callback for unknown shortcode '${shortcode.value}', ignoring.")
+            return null
+        }
+        return refreshFromRiot(code.seriesId)
+    }
+
+    private fun seriesMetadata(id: SeriesId): String = """{"tag":"$RELAY_METADATA_TAG","seriesId":${id.value}}"""
 
     private fun riotMatchIdOf(riotGame: RiotTournamentGamesV5Dto): RiotMatchId? {
         val platformId = RiotRegion.platformIdOf(riotGame.region)
