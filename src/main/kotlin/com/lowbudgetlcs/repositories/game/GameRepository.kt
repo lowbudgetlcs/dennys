@@ -35,6 +35,18 @@ class GameRepository(
             dsl.transactionResult { t ->
                 val tx = t.dsl()
                 tx.execute("SELECT pg_advisory_xact_lock(?)", newGame.seriesId.value.toLong())
+                newGame.riotMatchId?.let { matchId ->
+                    val existing =
+                        tx
+                            .select(GAMES.ID)
+                            .from(GAMES)
+                            .where(GAMES.RIOT_MATCH_ID.eq(matchId.value))
+                            .fetchOne()
+                            ?.get(GAMES.ID)
+                    check(existing == null) {
+                        "Riot match '${matchId.value}' is already recorded as game '$existing'."
+                    }
+                }
                 val highest =
                     tx
                         .select(max(GAMES.NUMBER))

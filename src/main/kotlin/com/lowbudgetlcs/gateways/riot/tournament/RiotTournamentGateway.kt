@@ -49,7 +49,7 @@ class RiotTournamentGateway(
             )
 
             else -> {
-                throw RiotApiException("Unexpected Riot API error: ${res.status}")
+                throw RiotApiException("Unexpected Riot API error: ${res.status}", res.status.value)
             }
         }
     }
@@ -82,7 +82,7 @@ class RiotTournamentGateway(
 
             else -> {
                 logger.warn("Failed to create codes.")
-                throw RiotApiException("Unexpected Riot API error: ${res.status}")
+                throw RiotApiException("Unexpected Riot API error: ${res.status}", res.status.value)
             }
         }
     }
@@ -98,7 +98,7 @@ class RiotTournamentGateway(
         return when (res.status) {
             HttpStatusCode.OK -> res.body<List<RiotTournamentGamesV5Dto>>()
             HttpStatusCode.NotFound -> emptyList()
-            else -> throw RiotApiException("Unexpected Riot API error: ${res.status}")
+            else -> throw RiotApiException("Unexpected Riot API error: ${res.status}", res.status.value)
         }
     }
 }

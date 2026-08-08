@@ -177,6 +177,19 @@ class SeriesRefreshFromRiotTest :
             coVerify(exactly = 0) { f.gateway.getGames(any()) }
         }
 
+        "a match already recorded in the series is skipped rather than recorded twice" {
+            val f = Fixture()
+            coEvery { f.gateway.getGames(any()) } returns listOf(f.riotGame(listOf(PUUID_A)))
+            val alreadyRecorded =
+                f.playedGame(1).copy(riotMatchId = "NA1_5102531894".toRiotMatchId())
+            f.withSeries(listOf(f.code(2, "SHORT-B")), recorded = listOf(alreadyRecorded))
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(TEAM_1)
+
+            f.service.refreshFromRiot(SERIES_ID) shouldBe RefreshOutcome.ANSWERED_EMPTY
+
+            verify(exactly = 0) { f.gameRepo.insert(any()) }
+        }
+
         "a winning roster with unregistered puuids still resolves via overlap" {
             val f = Fixture()
             coEvery { f.gateway.getGames(any()) } returns

@@ -38,7 +38,7 @@ class RiotAccountGateway(
             HttpStatusCode.NotFound -> throw NoSuchElementException("Riot account not found for PUUID")
             else -> {
                 logger.warn("Failed to fetch account.")
-                throw RiotApiException("Unexpected Riot API error: ${response.status}")
+                throw RiotApiException("Unexpected Riot API error: ${response.status}", response.status.value)
             }
         }
     }

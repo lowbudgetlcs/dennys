@@ -27,8 +27,8 @@ import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.jooq.SQLDialect
-import org.jooq.exception.IntegrityConstraintViolationException
 import org.jooq.impl.DSL
 import org.jooq.storage.tables.references.GAMES
 import org.testcontainers.postgresql.PostgreSQLContainer
@@ -161,12 +161,26 @@ class GameRepositoryTest :
             game.riotMatchId shouldBe "NA1_5102531894".toRiotMatchId()
         }
 
-        test("a duplicate riot match id is rejected") {
+        test("a duplicate riot match id is rejected as a conflict naming the existing game") {
             val series = newSeries()
-            repo.insert(NewGame(series.id, null, "NA1_DUPLICATE".toRiotMatchId(), null)).shouldNotBeNull()
+            val first = repo.insert(NewGame(series.id, null, "NA1_DUPLICATE".toRiotMatchId(), null)).shouldNotBeNull()
 
-            shouldThrow<IntegrityConstraintViolationException> {
-                repo.insert(NewGame(series.id, null, "NA1_DUPLICATE".toRiotMatchId(), null))
+            val ex =
+                shouldThrow<IllegalStateException> {
+                    repo.insert(NewGame(series.id, null, "NA1_DUPLICATE".toRiotMatchId(), null))
+                }
+
+            ex.message.toString() shouldContain "NA1_DUPLICATE"
+            ex.message.toString() shouldContain first.id.value.toString()
+        }
+
+        test("the riot match id conflict spans series, not just one") {
+            val a = newSeries()
+            val b = newSeries()
+            repo.insert(NewGame(a.id, null, "NA1_CROSSSERIES".toRiotMatchId(), null)).shouldNotBeNull()
+
+            shouldThrow<IllegalStateException> {
+                repo.insert(NewGame(b.id, null, "NA1_CROSSSERIES".toRiotMatchId(), null))
             }
         }
 

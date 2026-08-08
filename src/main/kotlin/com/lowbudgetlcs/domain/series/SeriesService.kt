@@ -106,7 +106,9 @@ class SeriesService(
 
     override suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome {
         val series = getSeries(id)
-        val recordedCodeIds = gameRepo.getBySeriesId(id).mapNotNull { it.tournamentCodeId }.toSet()
+        val recorded = gameRepo.getBySeriesId(id)
+        val recordedCodeIds = recorded.mapNotNull { it.tournamentCodeId }.toSet()
+        val recordedMatchIds = recorded.mapNotNull { it.riotMatchId }.toSet()
         val outstanding = codeRepo.getBySeriesId(id).filter { it.id !in recordedCodeIds }
         if (outstanding.isEmpty()) {
             logger.debug("Series '$id' has no outstanding tournament codes.")
@@ -125,13 +127,18 @@ class SeriesService(
                     continue
                 }
             riotGames.forEach { riotGame ->
+                val matchId = riotMatchIdOf(riotGame)
+                if (matchId != null && matchId in recordedMatchIds) {
+                    logger.warn("Riot match '${matchId.value}' is already recorded for series '$id', skipping.")
+                    return@forEach
+                }
                 val result = resolveWinner(series, riotGame)
                 if (result != null) {
                     gameRepo.insert(
                         NewGame(
                             seriesId = id,
                             tournamentCodeId = code.id,
-                            riotMatchId = riotMatchIdOf(riotGame),
+                            riotMatchId = matchId,
                             result = result,
                         ),
                     )
@@ -327,6 +334,13 @@ class SeriesService(
 
     override fun removeSeries(id: SeriesId) {
         logger.debug("Deleting series '$id'...")
+        getSeries(id)
+        val codes = codeRepo.getBySeriesId(id).size
+        val games = gameRepo.getBySeriesId(id).size
+        check(codes == 0 && games == 0) {
+            "Series '${id.value}' has $codes tournament code(s) and $games game(s) recorded against it and " +
+                "cannot be deleted. Complete the series instead."
+        }
         try {
             return seriesRepo.delete(id)
         } catch (e: Throwable) {
@@ -354,10 +368,10 @@ class SeriesService(
         val event =
             eventRepo.getById(series.eventId)
                 ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
-        val response =
-            gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
-                ?: throw GatewayException("Failed to create tournament code.")
-        val shortcode = response.codes.first()
+        val response = gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
+        val shortcode =
+            response.codes.firstOrNull()
+                ?: throw GatewayException("Riot returned no tournament codes for event '${event.id.value}'.")
         return codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
     }
 }

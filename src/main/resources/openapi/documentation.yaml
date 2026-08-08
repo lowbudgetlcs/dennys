@@ -859,9 +859,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "404":
+          description: Series or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "502":
           description: |
-            Riot could not issue a code. Retryable — Riot returned 429 or 5xx.
+            Riot rejected the request in a way that will not succeed on a
+            retry, for example a bad or unauthorised API key. Do not retry;
+            fall back to a custom game if a code is needed to play.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: |
+            Riot could not be reached, or rate-limited us (429 or 5xx). The
+            request is worth retrying shortly.
           content:
             application/json:
               schema:

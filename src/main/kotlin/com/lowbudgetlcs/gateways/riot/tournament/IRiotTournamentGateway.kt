@@ -12,7 +12,7 @@ interface IRiotTournamentGateway {
     suspend fun getCode(
         riotTournamentId: RiotTournamentId,
         options: ShortcodeOptions,
-    ): RiotShortcodeDto?
+    ): RiotShortcodeDto
 
     suspend fun getGames(shortcode: Shortcode): List<RiotTournamentGamesV5Dto>
 }
