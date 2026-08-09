@@ -1,11 +1,15 @@
 package com.lowbudgetlcs.domain.series
 
+import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
-import com.lowbudgetlcs.domain.event.models.types.EventStage
-import com.lowbudgetlcs.domain.series.game.models.Game
-import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.NewSeries
+import com.lowbudgetlcs.domain.series.models.RefreshOutcome
+import com.lowbudgetlcs.domain.series.models.ReportOutcome
+import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
+import com.lowbudgetlcs.domain.series.models.SeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
@@ -36,24 +40,30 @@ interface ISeriesService {
     fun getSeries(id: SeriesId): Series
 
     /**
-     * Return a series given two TeamIds and an event Stage. Will throw if multiple series match.
-     *
-     * @param eventId the event to search.
-     * @param teamId1 the first teamId to filter by.
-     * @param teamId2 the second teamId to filter by.
-     * @param eventStage the event stage to filter by.
-     * @return a series containing both team ids inside the specified event stage.
-     *
-     * @throws NoSuchElementException when no series is found.
-     * @throws com.lowbudgetlcs.repositories.DatabaseException if >1 series is found.
-     * @throws IllegalArgumentException when the teamIds are invalid.
+     * Re-evaluate whether a series is finished and close it if so. Run on every
+     * result write, whichever source it came from. No-op when the series is
+     * already complete or was deliberately reopened.
      */
-    fun findSeries(
-        eventId: EventId,
-        teamId1: TeamId,
-        teamId2: TeamId,
-        eventStage: EventStage,
+    fun evaluateCompletion(id: SeriesId): Series
+
+    suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome
+
+    suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome?
+
+    suspend fun reportResult(
+        id: SeriesId,
+        report: ReportedResult,
+    ): ReportOutcome
+
+    fun completeSeries(
+        id: SeriesId,
+        winningTeamId: TeamId?,
+        losingTeamId: TeamId?,
     ): Series
+
+    fun reopenSeries(id: SeriesId): Series
+
+    fun getSeriesWithGames(id: SeriesId): SeriesWithGames
 
     /**
      * Remove a series.
@@ -68,7 +78,7 @@ interface ISeriesService {
     /**
      * Create a game inside of a series.
      *
-     * @param NewGame the new game parameters.
+     * @param NewTournamentCode the new game parameters.
      */
-    suspend fun createGame(newGame: NewGame): Game
+    suspend fun createGame(newCode: NewTournamentCode): TournamentCode
 }

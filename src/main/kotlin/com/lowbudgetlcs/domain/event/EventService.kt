@@ -14,6 +14,7 @@ import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
+import com.lowbudgetlcs.domain.series.models.filterByCompletion
 import com.lowbudgetlcs.domain.series.models.filterByParticipants
 import com.lowbudgetlcs.domain.series.models.filterByStage
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
@@ -60,7 +61,12 @@ class EventService(
         logger.debug("Getting event by '$id' (with series)...")
         query?.run { logger.debug("(Query: '$query')") }
         val event = getEvent(id)
-        val series = seriesRepo.getAllByEventId(id).filterByStage(query).filterByParticipants(query)
+        val series =
+            seriesRepo
+                .getAllByEventId(id)
+                .filterByStage(query)
+                .filterByParticipants(query)
+                .filterByCompletion(query)
         return event.toEventWithSeries(series)
     }
 

@@ -4,6 +4,8 @@
 package org.jooq.storage.tables
 
 
+import java.time.Instant
+
 import kotlin.collections.Collection
 import kotlin.collections.List
 
@@ -31,14 +33,14 @@ import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
 import org.jooq.storage.keys.GAMES_PKEY
-import org.jooq.storage.keys.GAMES_SHORTCODE_KEY
-import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
+import org.jooq.storage.keys.GAMES_RIOT_MATCH_ID_KEY
+import org.jooq.storage.keys.GAMES_SERIES_NUMBER_UNIQUE
 import org.jooq.storage.keys.GAMES__GAMES_SERIES_ID_FKEY
+import org.jooq.storage.keys.GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_GAME_ID_FKEY
 import org.jooq.storage.tables.GameResults.GameResultsPath
 import org.jooq.storage.tables.Series.SeriesPath
-import org.jooq.storage.tables.Teams.TeamsPath
+import org.jooq.storage.tables.TournamentCodes.TournamentCodesPath
 import org.jooq.storage.tables.records.GamesRecord
 
 
@@ -85,29 +87,29 @@ open class Games(
     val ID: TableField<GamesRecord, Int?> = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "")
 
     /**
-     * The column <code>dennys.games.shortcode</code>.
-     */
-    val SHORTCODE: TableField<GamesRecord, String?> = createField(DSL.name("shortcode"), SQLDataType.CLOB.nullable(false), this, "")
-
-    /**
-     * The column <code>dennys.games.blue_team_id</code>.
-     */
-    val BLUE_TEAM_ID: TableField<GamesRecord, Int?> = createField(DSL.name("blue_team_id"), SQLDataType.INTEGER, this, "")
-
-    /**
-     * The column <code>dennys.games.red_team_id</code>.
-     */
-    val RED_TEAM_ID: TableField<GamesRecord, Int?> = createField(DSL.name("red_team_id"), SQLDataType.INTEGER, this, "")
-
-    /**
      * The column <code>dennys.games.series_id</code>.
      */
-    val SERIES_ID: TableField<GamesRecord, Int?> = createField(DSL.name("series_id"), SQLDataType.INTEGER, this, "")
+    val SERIES_ID: TableField<GamesRecord, Int?> = createField(DSL.name("series_id"), SQLDataType.INTEGER.nullable(false), this, "")
+
+    /**
+     * The column <code>dennys.games.tournament_code_id</code>.
+     */
+    val TOURNAMENT_CODE_ID: TableField<GamesRecord, Int?> = createField(DSL.name("tournament_code_id"), SQLDataType.INTEGER, this, "")
+
+    /**
+     * The column <code>dennys.games.riot_match_id</code>.
+     */
+    val RIOT_MATCH_ID: TableField<GamesRecord, String?> = createField(DSL.name("riot_match_id"), SQLDataType.CLOB, this, "")
 
     /**
      * The column <code>dennys.games.number</code>.
      */
     val NUMBER: TableField<GamesRecord, Int?> = createField(DSL.name("number"), SQLDataType.INTEGER.nullable(false), this, "")
+
+    /**
+     * The column <code>dennys.games.created_at</code>.
+     */
+    val CREATED_AT: TableField<GamesRecord, Instant?> = createField(DSL.name("created_at"), SQLDataType.INSTANT.nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.INSTANT)), this, "")
 
     private constructor(alias: Name, aliased: Table<GamesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<GamesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
@@ -143,40 +145,8 @@ open class Games(
     override fun getSchema(): Schema? = if (aliased()) null else Dennys.DENNYS
     override fun getIdentity(): Identity<GamesRecord, Int?> = super.getIdentity() as Identity<GamesRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<GamesRecord> = GAMES_PKEY
-    override fun getUniqueKeys(): List<UniqueKey<GamesRecord>> = listOf(GAMES_SHORTCODE_KEY)
-    override fun getReferences(): List<ForeignKey<GamesRecord, *>> = listOf(GAMES__GAMES_BLUE_TEAM_ID_FKEY, GAMES__GAMES_RED_TEAM_ID_FKEY, GAMES__GAMES_SERIES_ID_FKEY)
-
-    private lateinit var _gamesBlueTeamIdFkey: TeamsPath
-
-    /**
-     * Get the implicit join path to the <code>dennys.teams</code> table, via
-     * the <code>games_blue_team_id_fkey</code> key.
-     */
-    fun gamesBlueTeamIdFkey(): TeamsPath {
-        if (!this::_gamesBlueTeamIdFkey.isInitialized)
-            _gamesBlueTeamIdFkey = TeamsPath(this, GAMES__GAMES_BLUE_TEAM_ID_FKEY, null)
-
-        return _gamesBlueTeamIdFkey;
-    }
-
-    val gamesBlueTeamIdFkey: TeamsPath
-        get(): TeamsPath = gamesBlueTeamIdFkey()
-
-    private lateinit var _gamesRedTeamIdFkey: TeamsPath
-
-    /**
-     * Get the implicit join path to the <code>dennys.teams</code> table, via
-     * the <code>games_red_team_id_fkey</code> key.
-     */
-    fun gamesRedTeamIdFkey(): TeamsPath {
-        if (!this::_gamesRedTeamIdFkey.isInitialized)
-            _gamesRedTeamIdFkey = TeamsPath(this, GAMES__GAMES_RED_TEAM_ID_FKEY, null)
-
-        return _gamesRedTeamIdFkey;
-    }
-
-    val gamesRedTeamIdFkey: TeamsPath
-        get(): TeamsPath = gamesRedTeamIdFkey()
+    override fun getUniqueKeys(): List<UniqueKey<GamesRecord>> = listOf(GAMES_RIOT_MATCH_ID_KEY, GAMES_SERIES_NUMBER_UNIQUE)
+    override fun getReferences(): List<ForeignKey<GamesRecord, *>> = listOf(GAMES__GAMES_SERIES_ID_FKEY, GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY)
 
     private lateinit var _series: SeriesPath
 
@@ -192,6 +162,22 @@ open class Games(
 
     val series: SeriesPath
         get(): SeriesPath = series()
+
+    private lateinit var _tournamentCodes: TournamentCodesPath
+
+    /**
+     * Get the implicit join path to the <code>dennys.tournament_codes</code>
+     * table.
+     */
+    fun tournamentCodes(): TournamentCodesPath {
+        if (!this::_tournamentCodes.isInitialized)
+            _tournamentCodes = TournamentCodesPath(this, GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY, null)
+
+        return _tournamentCodes;
+    }
+
+    val tournamentCodes: TournamentCodesPath
+        get(): TournamentCodesPath = tournamentCodes()
 
     private lateinit var _gameResults: GameResultsPath
 

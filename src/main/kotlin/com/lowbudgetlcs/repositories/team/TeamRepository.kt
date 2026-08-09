@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.repositories.team
 
 import com.lowbudgetlcs.domain.event.models.toEventId
+import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
@@ -15,6 +16,7 @@ import com.lowbudgetlcs.domain.team.models.types.TeamName
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.storage.tables.references.PLAYERS_TO_TEAM
+import org.jooq.storage.tables.references.RIOT_ACCOUNTS
 import org.jooq.storage.tables.references.TEAMS
 import org.jooq.storage.tables.references.TEAM_TO_SERIES
 
@@ -36,6 +38,18 @@ class TeamRepository(
         dsl.select(TEAMS.ID, TEAMS.NAME, TEAMS.LOGO, TEAMS.EVENT_ID)
             .from(TEAMS.innerJoin(TEAM_TO_SERIES).on(TEAMS.ID.eq(TEAM_TO_SERIES.TEAM_ID)))
             .where(TEAM_TO_SERIES.SERIES_ID.eq(seriesId.value)).fetch().mapNotNull(::rowToTeam)
+
+    override fun getTeamIdsByPuuids(puuids: List<Puuid>): List<TeamId> {
+        if (puuids.isEmpty()) return emptyList()
+        return dsl
+            .select(PLAYERS_TO_TEAM.TEAM_ID)
+            .from(RIOT_ACCOUNTS)
+            .innerJoin(PLAYERS_TO_TEAM)
+            .on(RIOT_ACCOUNTS.PLAYER_ID.eq(PLAYERS_TO_TEAM.PLAYER_ID))
+            .where(RIOT_ACCOUNTS.RIOT_PUUID.`in`(puuids.map { it.value }))
+            .fetch()
+            .mapNotNull { it[PLAYERS_TO_TEAM.TEAM_ID]?.toTeamId() }
+    }
 
     override fun getByName(name: TeamName): List<Team> =
         selectTeams().where(TEAMS.NAME.eq(name.value)).fetch().mapNotNull(::rowToTeam)

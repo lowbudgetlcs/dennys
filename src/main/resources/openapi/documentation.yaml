@@ -859,9 +859,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "404":
+          description: Series or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "502":
           description: |
-            Riot could not issue a code. Retryable — Riot returned 429 or 5xx.
+            Riot rejected the request in a way that will not succeed on a
+            retry, for example a bad or unauthorised API key. Do not retry;
+            fall back to a custom game if a code is needed to play.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: |
+            Riot could not be reached, or rate-limited us (429 or 5xx). The
+            request is worth retrying shortly.
           content:
             application/json:
               schema:
@@ -901,7 +917,9 @@ paths:
                 $ref: "#/components/schemas/GameDto"
         "200":
           description: |
-            The target already had a result. The existing game is returned and
+            The game was already recorded — either the targeted code already had
+            a result, or a bare report arrived after the callback had landed and
+            no code is still outstanding. The existing game is returned and
             nothing was written.
           content:
             application/json:
@@ -927,6 +945,8 @@ paths:
             Possible reasons:
             - Both `tournamentCodeId` and `shortcode` were given.
             - No winner was named and Riot has no record of the game.
+            - `winnerTeamId` is not a participant in the series.
+            - `loserTeamId` was given without `winnerTeamId`, or contradicts it.
           content:
             application/json:
               schema:
@@ -966,6 +986,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            The series is already complete. Reopen it with `DELETE` before
+            completing it again, so the reopen is recorded rather than the
+            previous result being silently overwritten.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "422":
           description: Invalid input, for example a winner that is not in this series.
           content:
@@ -997,6 +1026,12 @@ paths:
                 $ref: "#/components/schemas/SeriesDto"
         "404":
           description: Series not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: The series is not complete, so there is nothing to reopen.
           content:
             application/json:
               schema:
@@ -1611,8 +1646,8 @@ components:
         A game that was actually played. `tournamentCodeId` and `riotMatchId`
         are null for a custom game played without a code — Riot cannot serve
         custom match data, so those are recorded from a self-reported result.
-        `number` is derived from the count of games in the series, so a code
-        that is never played does not consume a game number.
+        `number` is derived as one past the highest number in the series, so a
+        code that is never played does not consume a game number.
       required:
         - id
         - seriesId
@@ -1637,7 +1672,7 @@ components:
           example: NA1_5102531894
         number:
           type: integer
-          description: Position within the series, derived as games played + 1.
+          description: Position within the series.
           example: 1
         createdAt:
           type: string
@@ -2189,6 +2224,17 @@ components:
           nullable: true
           description: When the series was completed. Null while `completed` is false.
           example: null
+        reopenedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: |
+            When staff last reopened this series. Once stamped it is never
+            cleared, and it permanently suppresses automatic completion for
+            this series — otherwise a series that already meets the win
+            threshold would slam shut again on the next recorded result.
+            Manual completion still works.
+          example: null
 
     SeriesWithGamesDto:
       type: object
@@ -2233,6 +2279,14 @@ components:
           type: string
           format: date-time
           nullable: true
+          example: null
+        reopenedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: |
+            When staff last reopened this series. Never cleared once stamped,
+            and permanently suppresses automatic completion.
           example: null
         tournamentCodes:
           type: array

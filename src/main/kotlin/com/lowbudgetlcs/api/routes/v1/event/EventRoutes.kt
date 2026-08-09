@@ -79,6 +79,7 @@ fun Route.eventRoutesV1(
                 SeriesFilterParams(
                     teamIds = route.teamIds,
                     stage = route.stage,
+                    completed = route.completed,
                 )
             val event = eventService.getEventWithSeries(route.eventId.toEventId(), filter.toQuery())
 

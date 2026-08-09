@@ -25,6 +25,7 @@ import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
+import org.jooq.storage.tables.TournamentCodes
 import org.jooq.storage.tables.Users
 
 
@@ -133,6 +134,11 @@ val TEAM_TO_SERIES: TeamToSeries = TeamToSeries.TEAM_TO_SERIES
  * The table <code>dennys.teams</code>.
  */
 val TEAMS: Teams = Teams.TEAMS
+
+/**
+ * The table <code>dennys.tournament_codes</code>.
+ */
+val TOURNAMENT_CODES: TournamentCodes = TournamentCodes.TOURNAMENT_CODES
 
 /**
  * The table <code>dennys.users</code>.

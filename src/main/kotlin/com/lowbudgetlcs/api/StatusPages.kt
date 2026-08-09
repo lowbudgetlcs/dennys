@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
+import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.repositories.DatabaseException
 import io.ktor.http.*
 import io.ktor.serialization.*
@@ -47,6 +48,13 @@ fun Application.setupStatusPages() {
             logger.error("⚠️ Database Exception: $call", cause)
             val code = HttpStatusCode.InternalServerError
             val e = Error(code = code.value, message = cause.message ?: "Internal server error")
+            call.respond(code, e)
+        }
+        exception<RiotApiException> { call, cause ->
+            val code =
+                if (cause.retryable) HttpStatusCode.ServiceUnavailable else HttpStatusCode.BadGateway
+            logger.error("⚠️ Riot API Exception (status ${cause.status}, retryable=${cause.retryable})", cause)
+            val e = Error(code = code.value, message = cause.message ?: "Riot API request failed")
             call.respond(code, e)
         }
         exception<GatewayException> { call, cause ->

@@ -18,12 +18,15 @@ import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import com.lowbudgetlcs.repositories.tokens.AccessTokenRepository
 import com.lowbudgetlcs.repositories.tokens.IAccessTokenRepository
+import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
+import com.lowbudgetlcs.repositories.tournamentcode.TournamentCodeRepository
 import com.lowbudgetlcs.repositories.user.IUserRepository
 import com.lowbudgetlcs.repositories.user.UserRepostitory
 import org.koin.dsl.module
 
 val repositoryModule =
     module {
+        single<ITournamentCodeRepository> { TournamentCodeRepository(get()) }
         single<IGameRepository> { GameRepository(get()) }
         single<ITeamRepository> { TeamRepository(get()) }
         single<IEventRepository> { EventRepository(get()) }

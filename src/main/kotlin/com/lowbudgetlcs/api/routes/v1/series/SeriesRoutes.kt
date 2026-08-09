@@ -1,12 +1,20 @@
 package com.lowbudgetlcs.api.routes.v1.series
 
 import com.lowbudgetlcs.api.dto.games.CreateGameDto
+import com.lowbudgetlcs.api.dto.games.ReportResultDto
 import com.lowbudgetlcs.api.dto.games.toDto
-import com.lowbudgetlcs.api.dto.games.toNewGame
+import com.lowbudgetlcs.api.dto.games.toNewTournamentCode
+import com.lowbudgetlcs.api.dto.games.toReportedResult
+import com.lowbudgetlcs.api.dto.series.CompleteSeriesDto
+import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.models.toSeriesId
+import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
+import io.ktor.server.resources.delete
+import io.ktor.server.resources.get
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -18,11 +26,39 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Route.seriesRoutesV1(seriesService: ISeriesService) {
     route("/series") {
-        post<SeriesResources.Game> { route ->
+        post<SeriesResources.TournamentCode> { route ->
             val dto = call.receive<CreateGameDto>()
             logger.debug(dto.toString())
-            val created = seriesService.createGame(dto.toNewGame(route.seriesId))
+            val created = seriesService.createGame(dto.toNewTournamentCode(route.seriesId))
             call.respond(HttpStatusCode.Created, created.toDto())
+        }
+        get<SeriesResources.ById> { route ->
+            val series = seriesService.getSeriesWithGames(route.seriesId.toSeriesId())
+            call.respond(series.toDto())
+        }
+        post<SeriesResources.Complete> { route ->
+            val dto = call.receive<CompleteSeriesDto>()
+            logger.debug(dto.toString())
+            val series =
+                seriesService.completeSeries(
+                    route.seriesId.toSeriesId(),
+                    dto.winnerTeamId?.toTeamId(),
+                    dto.loserTeamId?.toTeamId(),
+                )
+            call.respond(HttpStatusCode.OK, series.toDto())
+        }
+        delete<SeriesResources.Complete> { route ->
+            val series = seriesService.reopenSeries(route.seriesId.toSeriesId())
+            call.respond(HttpStatusCode.OK, series.toDto())
+        }
+        post<SeriesResources.Results> { route ->
+            val dto = call.receive<ReportResultDto>()
+            logger.debug(dto.toString())
+            val outcome = seriesService.reportResult(route.seriesId.toSeriesId(), dto.toReportedResult())
+            call.respond(
+                if (outcome.recorded) HttpStatusCode.Created else HttpStatusCode.OK,
+                outcome.game.toDto(),
+            )
         }
     }
 }
