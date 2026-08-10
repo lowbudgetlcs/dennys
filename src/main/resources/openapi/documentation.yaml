@@ -756,7 +756,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/EventWithSeriesDto"
         "404":
-          description: Event or series not found
+          description: |
+            Event not found, series not found, or the series is not part of
+            this event. A series may only be deleted through the event it
+            belongs to.
           content:
             application/json:
               schema:

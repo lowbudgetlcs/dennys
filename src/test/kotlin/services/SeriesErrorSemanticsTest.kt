@@ -149,7 +149,7 @@ class SeriesErrorSemanticsTest :
             val f = ErrorFixture()
             f.withContents(codes = listOf(f.code(1)))
 
-            val ex = shouldThrow<IllegalStateException> { f.service.removeSeries(ERR_SERIES_ID) }
+            val ex = shouldThrow<IllegalStateException> { f.service.removeSeries(ERR_EVENT_ID, ERR_SERIES_ID) }
 
             ex.message.toString() shouldContain "Complete the series instead"
             verify(exactly = 0) { f.seriesRepo.delete(any()) }
@@ -159,7 +159,7 @@ class SeriesErrorSemanticsTest :
             val f = ErrorFixture()
             f.withContents(games = listOf(f.game(10)))
 
-            shouldThrow<IllegalStateException> { f.service.removeSeries(ERR_SERIES_ID) }
+            shouldThrow<IllegalStateException> { f.service.removeSeries(ERR_EVENT_ID, ERR_SERIES_ID) }
 
             verify(exactly = 0) { f.seriesRepo.delete(any()) }
         }
@@ -168,7 +168,7 @@ class SeriesErrorSemanticsTest :
             val f = ErrorFixture()
             f.withContents()
 
-            f.service.removeSeries(ERR_SERIES_ID)
+            f.service.removeSeries(ERR_EVENT_ID, ERR_SERIES_ID)
 
             verify(exactly = 1) { f.seriesRepo.delete(ERR_SERIES_ID) }
         }
@@ -177,7 +177,20 @@ class SeriesErrorSemanticsTest :
             val f = ErrorFixture()
             every { f.seriesRepo.getById(ERR_SERIES_ID) } returns null
 
-            shouldThrow<NoSuchElementException> { f.service.removeSeries(ERR_SERIES_ID) }
+            shouldThrow<NoSuchElementException> { f.service.removeSeries(ERR_EVENT_ID, ERR_SERIES_ID) }
+        }
+
+        "a series cannot be deleted through another event's id" {
+            val f = ErrorFixture()
+            f.withContents()
+
+            val ex =
+                shouldThrow<NoSuchElementException> {
+                    f.service.removeSeries(EventId(ERR_EVENT_ID.value + 1), ERR_SERIES_ID)
+                }
+
+            ex.message.toString() shouldContain "is not part of event"
+            verify(exactly = 0) { f.seriesRepo.delete(any()) }
         }
 
         "a Riot failure while issuing a code propagates rather than collapsing to a gateway error" {
