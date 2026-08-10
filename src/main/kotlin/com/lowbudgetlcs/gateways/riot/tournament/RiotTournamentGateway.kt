@@ -89,15 +89,19 @@ class RiotTournamentGateway(
 
     override suspend fun getGames(shortcode: Shortcode): List<RiotTournamentGamesV5Dto> {
         logger.debug("Fetching games for shortcode '${shortcode.value}'...")
+        val endpoint = "$url/games/by-code/${shortcode.value}"
         val res: HttpResponse =
-            client.get("$url/games/by-code/${shortcode.value}") {
+            client.get(endpoint) {
                 headers {
                     append("X-Riot-Token", apiKey)
                 }
             }
         return when (res.status) {
             HttpStatusCode.OK -> res.body<List<RiotTournamentGamesV5Dto>>()
-            HttpStatusCode.NotFound -> emptyList()
+            HttpStatusCode.NotFound -> {
+                logger.warn("Riot returned 404 for '$endpoint'; treating as no game played yet.")
+                emptyList()
+            }
             else -> throw RiotApiException("Unexpected Riot API error: ${res.status}", res.status.value)
         }
     }
