@@ -707,11 +707,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/SeriesDto"
         "400":
-          description: Request body is invalid.
+          description: The request body is not valid JSON.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           description: Event or team not found
           content:
@@ -727,6 +729,19 @@ paths:
 
             Note that repeat series between the same two teams are supported —
             two teams may legitimately meet more than once inside one stage.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "422":
+          description: |
+            Validation failed.
+
+            Possible reasons:
+            - `totalGames` is not greater than zero.
+            - `stage` is not a valid `EventStage`.
           content:
             application/json:
               schema:
@@ -755,6 +770,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventWithSeriesDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           description: |
             Event not found, series not found, or the series is not part of
@@ -766,10 +783,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         "409":
           description: |
-            The series has tournament codes issued against it and cannot be
-            deleted. A tournament code is a real Riot artifact and may already
-            have player stats keyed on its shortcode. Complete the series
-            instead.
+            The series has tournament codes or games recorded against it and
+            cannot be deleted. A tournament code is a real Riot artifact and
+            may already have player stats keyed on its shortcode. Complete the
+            series instead.
           content:
             application/json:
               schema:
@@ -885,6 +902,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          description: |
+            The series has no parent event, Riot returned an empty list of
+            codes, or the code could not be persisted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/v1/series/{seriesId}/results:
     post:
@@ -928,19 +957,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Series or tournament code not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
           description: |
-            A game with this Riot match id is already recorded.
+            Series not found, the tournament code was not found, or the code
+            belongs to a different series.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
         "422":
           description: |
             Invalid combination of fields.
@@ -1549,6 +1577,23 @@ paths:
           description: Unexpected error
 
 components:
+  responses:
+    Unauthorized:
+      description: |
+        No valid session cookie or bearer token was supplied. Applies to every
+        operation under `/api/v1`.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    UnsupportedMediaType:
+      description: |
+        The request carried a body without `Content-Type: application/json`.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
   securitySchemes:
     cookieAuth:
       type: apiKey
@@ -1572,7 +1617,6 @@ components:
       enum:
         - REGULAR_SEASON
         - PLAYOFFS
-        - PROMOTION_RELEGATION
 
     # Auth Schemas
     LoginDto:
