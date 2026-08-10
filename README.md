@@ -154,6 +154,25 @@ The `Makefile` contains many useful commands to build/run this application local
 * `make format` - Manual format (this is done automatically by the pre-commit hook if installed)
 * `make check` - Checks lints from detekt and ktlint
 
+### Database migrations
+
+Migrations live in `src/migrations/sql` and are applied to production by Flyway from
+`deploy-production.yml`, between stopping the old app and starting the new one. The ledger is
+`dennys.flyway_schema_history`, baselined at V010 — everything up to and including V010 predates
+the ledger and is never replayed.
+
+* New migrations are named `V0NN__short_description.sql`. Do **not** add the `_LOCKED` suffix;
+  the existing files keep theirs because Flyway records the description and `validate` compares it.
+* Never edit an applied migration. Flyway checksums them and a changed file fails the next
+  `migrate`. This is what the old `prevent-changes-to-locked-migrations.yml` was reaching for.
+* `V001__LOCKED.sql` opens with `DROP SCHEMA IF EXISTS dennys CASCADE`, so `scripts/flyway.sh`
+  refuses to `migrate` against a database with no baseline row.
+* `./scripts/rehearsal/run.sh prod-shape` rehearses the upgrade against a database seeded to
+  production's row counts; `fk-tripwire` asserts the migration fails when it should. CI runs both
+  before any production deploy. Staging only ever exercises the fresh-install path, so this is the
+  only place an upgrade is tested.
+* `./scripts/flyway.sh info` and the **Production database** workflow read the live ledger.
+
 Below are example post-match callbacks Riot will send when a tournament game completes:
 
 Game 1:

@@ -53,3 +53,31 @@ jobs:
 
       - name: Test project
         run: ./gradlew itest --no-daemon
+
+  migration-rehearsal:
+    name: Rehearse the upgrade against production-shaped data
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        leg:
+          - prod-shape
+          - fk-tripwire
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Rehearse ${{ matrix.leg }}
+        run: ./scripts/rehearsal/run.sh ${{ matrix.leg }}
