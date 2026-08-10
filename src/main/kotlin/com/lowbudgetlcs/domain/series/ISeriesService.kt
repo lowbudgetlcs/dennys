@@ -66,14 +66,19 @@ interface ISeriesService {
     fun getSeriesWithGames(id: SeriesId): SeriesWithGames
 
     /**
-     * Remove a series.
+     * Remove a series belonging to an event.
      *
-     * @param SeriesId the target series.
+     * @param eventId the event the series must belong to.
+     * @param id the target series.
      *
-     * @throws NoSuchElementException if the specified event or team doesn't exist
+     * @throws NoSuchElementException if the series doesn't exist or isn't part of the event
+     * @throws IllegalStateException if the series has codes or games recorded against it
      * @throws com.lowbudgetlcs.repositories.DatabaseException if the delete operation fails
      */
-    fun removeSeries(id: SeriesId)
+    fun removeSeries(
+        eventId: EventId,
+        id: SeriesId,
+    )
 
     /**
      * Create a game inside of a series.

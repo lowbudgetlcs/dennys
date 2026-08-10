@@ -92,7 +92,7 @@ fun Route.eventRoutesV1(
             call.respond(HttpStatusCode.Created, series.toDto())
         }
         delete<EventResources.ByIdSeriesId> { route ->
-            seriesService.removeSeries(route.seriesId.toSeriesId())
+            seriesService.removeSeries(route.eventId.toEventId(), route.seriesId.toSeriesId())
             val event = eventService.getEventWithSeries(route.eventId.toEventId())
             call.respond(event.toDto())
         }

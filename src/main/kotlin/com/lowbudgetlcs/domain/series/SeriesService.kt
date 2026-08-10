@@ -343,9 +343,15 @@ class SeriesService(
         return GameResult(winner, if (winner == first) second else first)
     }
 
-    override fun removeSeries(id: SeriesId) {
-        logger.debug("Deleting series '$id'...")
-        getSeries(id)
+    override fun removeSeries(
+        eventId: EventId,
+        id: SeriesId,
+    ) {
+        logger.debug("Deleting series '$id' from event '$eventId'...")
+        val series = getSeries(id)
+        if (series.eventId != eventId) {
+            throw NoSuchElementException("Series '${id.value}' is not part of event '${eventId.value}'.")
+        }
         val codes = codeRepo.getBySeriesId(id).size
         val games = gameRepo.getBySeriesId(id).size
         check(codes == 0 && games == 0) {
