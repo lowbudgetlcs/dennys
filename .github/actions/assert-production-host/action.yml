@@ -1,0 +1,70 @@
+name: Assert production host
+description: >-
+  Read-only check that the SSH secrets reach the production deployment and that the app running
+  there is connected to the production Supabase project. Staging and production share a host and
+  the same SSH secrets, so the deployment directory alone does not identify the target.
+
+inputs:
+  host:
+    required: true
+    description: SSH host
+  port:
+    required: true
+    description: SSH port
+  username:
+    required: true
+    description: SSH username
+  key:
+    required: true
+    description: SSH private key
+  db-ref:
+    required: true
+    description: Supabase project ref the running app must reference
+  deploy-dir:
+    required: false
+    default: /lblcs/docker/dennys
+    description: Production compose directory
+
+runs:
+  using: composite
+  steps:
+    - uses: appleboy/ssh-action@v1.0.3
+      env:
+        DB_REF: ${{ inputs.db-ref }}
+        DEPLOY_DIR: ${{ inputs.deploy-dir }}
+      with:
+        host: ${{ inputs.host }}
+        port: ${{ inputs.port }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
+        envs: DB_REF,DEPLOY_DIR
+        script: |
+          set -e
+          echo "host     : $(hostname)"
+          echo "ssh user : $(whoami)"
+          echo "deploy   : $DEPLOY_DIR"
+
+          if [ ! -d "$DEPLOY_DIR" ]; then
+            echo "ERROR: $DEPLOY_DIR does not exist - the SSH secrets do not reach the production deployment"
+            exit 1
+          fi
+          cd "$DEPLOY_DIR"
+
+          cid=$(docker compose ps -q | head -1)
+          if [ -z "$cid" ]; then
+            echo "ERROR: no containers in $DEPLOY_DIR"
+            exit 1
+          fi
+          echo "container: $(docker inspect --format '{{.Name}} {{.Config.Image}} {{.State.Status}}' "$cid")"
+
+          if { docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$cid" 2>/dev/null || true; cat .env 2>/dev/null || true; } | grep -q "$DB_REF"; then
+            echo "OK: the running app references Supabase project $DB_REF"
+          else
+            echo "ERROR: the running app does not reference Supabase project $DB_REF"
+            echo "Refusing to touch this environment."
+            exit 1
+          fi
+
+          if [ -d /lblcs/scripts/dennys ]; then
+            echo "note: staging tooling is also on this host at /lblcs/scripts/dennys and is not touched"
+          fi
