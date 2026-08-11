@@ -41,6 +41,10 @@ import java.time.Instant
 
 private const val RELAY_METADATA_TAG = "LBLCS"
 
+/** Tournament codes a series may be issued for one game before a result has to be recorded. */
+const val DEFAULT_MAX_CODES_PER_GAME = 3
+
+@Suppress("LongParameterList")
 class SeriesService(
     private val codeRepo: ITournamentCodeRepository,
     private val seriesRepo: ISeriesRepository,
@@ -48,6 +52,7 @@ class SeriesService(
     private val teamRepo: ITeamRepository,
     private val gameRepo: IGameRepository,
     private val gate: IRiotTournamentGateway,
+    private val maxCodesPerGame: Int = DEFAULT_MAX_CODES_PER_GAME,
 ) : ISeriesService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -309,6 +314,15 @@ class SeriesService(
 
     private fun seriesMetadata(id: SeriesId): String = """{"tag":"$RELAY_METADATA_TAG","seriesId":${id.value}}"""
 
+    /**
+     * Codes issued since the most recent recorded game, coded or codeless. Recording a result ends
+     * the current game, so the allowance resets rather than accumulating across a long series.
+     */
+    private fun codesIssuedForCurrentGame(id: SeriesId): Int {
+        val since = gameRepo.getBySeriesId(id).maxOfOrNull { it.createdAt }
+        return codeRepo.getBySeriesId(id).count { since == null || it.createdAt > since }
+    }
+
     private fun riotMatchIdOf(riotGame: RiotTournamentGamesV5Dto): RiotMatchId? {
         val platformId = RiotRegion.platformIdOf(riotGame.region)
         if (platformId == null) {
@@ -381,6 +395,14 @@ class SeriesService(
             "Provided teams are not part of series with id ${series.id.value}."
         }
         refreshQuietly(series.id)
+        val issued = codesIssuedForCurrentGame(series.id)
+        if (issued >= maxCodesPerGame) {
+            logger.warn("Series '${series.id}' has $issued code(s) for the current game, refusing to issue another.")
+            throw IllegalStateException(
+                "Series '${series.id.value}' has already been issued $issued tournament code(s) for this game. " +
+                    "Report the result of the game that was played, or play a custom game and report the winner.",
+            )
+        }
         logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
         val event =
             eventRepo.getById(series.eventId)
