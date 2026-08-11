@@ -1,0 +1,68 @@
+name: Production database.
+
+# Read and repair operations on the production Flyway ledger. There is deliberately no migrate
+# here: migrations only ever run inside deploy-production.yml, between stopping the old app and
+# starting the new one, so a schema change can never land while an app is serving against it.
+
+env:
+  PROD_DB_REF: zaukjwuivusndarulkua
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: Flyway command
+        type: choice
+        default: info
+        options:
+          - info
+          - validate
+          - baseline
+          - repair
+      baseline-version:
+        description: Version to baseline at (baseline only)
+        type: string
+        default: '010'
+
+jobs:
+  flyway:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      FLYWAY_URL: ${{ secrets.PROD_FLYWAY_URL }}
+      FLYWAY_USER: ${{ secrets.PROD_FLYWAY_USER }}
+      FLYWAY_PASSWORD: ${{ secrets.PROD_FLYWAY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Assert the migration target is production
+        run: |
+          if [ -z "$FLYWAY_URL" ]; then
+            echo "ERROR: PROD_FLYWAY_URL is not set"
+            exit 1
+          fi
+          case "${FLYWAY_URL}${FLYWAY_USER}" in
+            *"$PROD_DB_REF"*) echo "OK: Flyway targets Supabase project $PROD_DB_REF" ;;
+            *) echo "ERROR: neither PROD_FLYWAY_URL nor PROD_FLYWAY_USER references $PROD_DB_REF"; exit 1 ;;
+          esac
+          case "$FLYWAY_URL" in
+            *:6543/*)
+              echo "ERROR: that is the transaction pooler. Flyway needs the session pooler on 5432 for DDL and advisory locks"
+              exit 1 ;;
+          esac
+
+      - name: flyway ${{ inputs.command }}
+        run: |
+          if [ "${{ inputs.command }}" = "baseline" ]; then
+            ./scripts/flyway.sh baseline -baselineVersion=${{ inputs.baseline-version }}
+          else
+            ./scripts/flyway.sh ${{ inputs.command }}
+          fi
+
+      - name: Ledger after
+        if: always()
+        run: ./scripts/flyway.sh info

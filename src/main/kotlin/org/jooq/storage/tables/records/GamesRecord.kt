@@ -4,6 +4,8 @@
 package org.jooq.storage.tables.records
 
 
+import java.time.Instant
+
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 import org.jooq.storage.tables.Games
@@ -19,25 +21,25 @@ open class GamesRecord() : UpdatableRecordImpl<GamesRecord>(Games.GAMES) {
         set(value): Unit = set(0, value)
         get(): Int? = get(0) as Int?
 
-    open var shortcode: String?
+    open var seriesId: Int?
         set(value): Unit = set(1, value)
-        get(): String? = get(1) as String?
+        get(): Int? = get(1) as Int?
 
-    open var blueTeamId: Int?
+    open var tournamentCodeId: Int?
         set(value): Unit = set(2, value)
         get(): Int? = get(2) as Int?
 
-    open var redTeamId: Int?
+    open var riotMatchId: String?
         set(value): Unit = set(3, value)
-        get(): Int? = get(3) as Int?
+        get(): String? = get(3) as String?
 
-    open var seriesId: Int?
+    open var number: Int?
         set(value): Unit = set(4, value)
         get(): Int? = get(4) as Int?
 
-    open var number: Int?
+    open var createdAt: Instant?
         set(value): Unit = set(5, value)
-        get(): Int? = get(5) as Int?
+        get(): Instant? = get(5) as Instant?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -48,13 +50,13 @@ open class GamesRecord() : UpdatableRecordImpl<GamesRecord>(Games.GAMES) {
     /**
      * Create a detached, initialised GamesRecord
      */
-    constructor(id: Int? = null, shortcode: String? = null, blueTeamId: Int? = null, redTeamId: Int? = null, seriesId: Int? = null, number: Int? = null): this() {
+    constructor(id: Int? = null, seriesId: Int? = null, tournamentCodeId: Int? = null, riotMatchId: String? = null, number: Int? = null, createdAt: Instant? = null): this() {
         this.id = id
-        this.shortcode = shortcode
-        this.blueTeamId = blueTeamId
-        this.redTeamId = redTeamId
         this.seriesId = seriesId
+        this.tournamentCodeId = tournamentCodeId
+        this.riotMatchId = riotMatchId
         this.number = number
+        this.createdAt = createdAt
         resetChangedOnNotNull()
     }
 }

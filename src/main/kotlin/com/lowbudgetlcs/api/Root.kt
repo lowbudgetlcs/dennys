@@ -1,12 +1,9 @@
 package com.lowbudgetlcs.api
 
-import com.lowbudgetlcs.api.dto.auth.UserSession
-import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.api.routes.apiRoutes
 import com.lowbudgetlcs.api.routes.authRoutes
-import com.lowbudgetlcs.config.CookieConfig
-import com.lowbudgetlcs.domain.auth.IAuthService
-import com.lowbudgetlcs.domain.user.IUserService
+import com.lowbudgetlcs.api.routes.riotCallbackRoutes
+import com.lowbudgetlcs.domain.series.ISeriesService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -14,17 +11,12 @@ import io.ktor.server.http.content.singlePageApplication
 import io.ktor.server.http.content.vue
 import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.swagger.swaggerUI
-import io.ktor.server.request.receive
 import io.ktor.server.resources.Resources
-import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import io.ktor.server.sessions.Sessions
-import io.ktor.server.sessions.cookie
-import io.ktor.server.sessions.sameSite
+import org.jooq.DSLContext
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,6 +24,8 @@ import org.slf4j.LoggerFactory
 val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Application.routes() {
+    val seriesService by inject<ISeriesService>()
+    val dsl by inject<DSLContext>()
 
     routing {
         setupLogging()
@@ -51,16 +45,16 @@ fun Application.routes() {
         }
         route("/health") {
             get {
-                call.respondText("OK")
+                try {
+                    dsl.selectOne().execute()
+                    call.respondText("OK")
+                } catch (e: Throwable) {
+                    logger.error("Health check could not reach the database: ${e.message}")
+                    call.respondText("DATABASE UNREACHABLE", status = HttpStatusCode.ServiceUnavailable)
+                }
             }
         }
-        route("/riot-callback") {
-            post {
-                val dto = call.receive<PostMatchDto>()
-                logger.debug(dto.toString())
-                call.respond(HttpStatusCode.OK)
-            }
-        }
+        riotCallbackRoutes(seriesService)
         authRoutes()
         apiRoutes()
     }

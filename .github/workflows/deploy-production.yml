@@ -2,7 +2,12 @@ name: Deploy production application.
 
 env:
   REGISTRY_NAME: lblcs/dennys
-  
+  PROD_DB_REF: zaukjwuivusndarulkua
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 on:
   push:
     paths-ignore:
@@ -174,11 +179,76 @@ jobs:
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<<"$DOCKER_METADATA_OUTPUT_JSON") \
           $(printf '${{ env.REGISTRY_NAME }}@sha256:%s ' *)
 
-  deploy:
-    needs: merge-platforms
+  migration-rehearsal:
+    name: Rehearse the upgrade against production-shaped data
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        leg:
+          - prod-shape
+          - fk-tripwire
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
-      - name: Execute docker compose on prod server
+      - uses: actions/checkout@v6
+
+      - name: Rehearse ${{ matrix.leg }}
+        run: ./scripts/rehearsal/run.sh ${{ matrix.leg }}
+
+  deploy:
+    needs:
+      - merge-platforms
+      - migration-rehearsal
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      FLYWAY_URL: ${{ secrets.PROD_FLYWAY_URL }}
+      FLYWAY_USER: ${{ secrets.PROD_FLYWAY_USER }}
+      FLYWAY_PASSWORD: ${{ secrets.PROD_FLYWAY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Assert the migration target is production
+        run: |
+          if [ -z "$FLYWAY_URL" ]; then
+            echo "ERROR: PROD_FLYWAY_URL is not set"
+            exit 1
+          fi
+          case "${FLYWAY_URL}${FLYWAY_USER}" in
+            *"$PROD_DB_REF"*) echo "OK: Flyway targets Supabase project $PROD_DB_REF" ;;
+            *) echo "ERROR: neither PROD_FLYWAY_URL nor PROD_FLYWAY_USER references $PROD_DB_REF"; exit 1 ;;
+          esac
+          case "$FLYWAY_URL" in
+            *:6543/*)
+              echo "ERROR: that is the transaction pooler. Flyway needs the session pooler on 5432 for DDL and advisory locks"
+              exit 1 ;;
+          esac
+
+      - name: Assert the SSH target is production
+        uses: ./.github/actions/assert-production-host
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          db-ref: ${{ env.PROD_DB_REF }}
+
+      - name: Ledger before
+        run: ./scripts/flyway.sh info
+
+      - name: Stop the production app
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -186,7 +256,70 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            set -e
             cd /lblcs/docker/dennys
+            docker image inspect ${{ env.REGISTRY_NAME }}:latest --format '{{.Id}}' > /tmp/dennys-rollback-image.id
+            cat /tmp/dennys-rollback-image.id
             docker compose down
+
+      - name: Apply pending migrations
+        run: ./scripts/flyway.sh migrate
+
+      - name: Ledger after
+        run: ./scripts/flyway.sh info
+
+      - name: Start the production app
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            cd /lblcs/docker/dennys
             docker compose pull
             docker compose up -d
+
+      - name: Wait for /health
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://dennys.lowbudgetlcs.com/health || true)
+            if [ "$code" = "200" ]; then
+              echo "healthy after ${i} attempt(s)"
+              exit 0
+            fi
+            echo "attempt ${i}: ${code}"
+            sleep 10
+          done
+          echo "ERROR: /health never returned 200"
+          exit 1
+
+      - name: Clear the rollback marker
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: rm -f /tmp/dennys-rollback-image.id
+
+      - name: Restore the previous image
+        if: failure()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            if [ ! -f /tmp/dennys-rollback-image.id ]; then
+              echo "no rollback marker - the app was never stopped, nothing to restore"
+              exit 0
+            fi
+            cd /lblcs/docker/dennys
+            docker tag "$(cat /tmp/dennys-rollback-image.id)" ${{ env.REGISTRY_NAME }}:latest
+            docker compose up -d
+            rm -f /tmp/dennys-rollback-image.id
+            echo "restored the pre-deploy image; the schema may be ahead of it, check the ledger"

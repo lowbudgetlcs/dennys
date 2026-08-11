@@ -34,6 +34,7 @@ class EventResources(
         val eventId: Int,
         val teamIds: List<Int>? = null,
         val stage: EventStage? = null,
+        val completed: Boolean? = null,
     )
 
     @Resource("{eventId}/series/{seriesId}")

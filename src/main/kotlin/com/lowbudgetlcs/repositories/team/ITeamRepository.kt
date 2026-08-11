@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.repositories.team
 
+import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
@@ -23,6 +24,8 @@ interface ITeamRepository {
     fun getBySeriesId(seriesId: SeriesId): List<Team>
 
     fun getByName(name: TeamName): List<Team>
+
+    fun getTeamIdsByPuuids(puuids: List<Puuid>): List<TeamId>
 
     fun update(
         team: Team,

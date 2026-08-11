@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.lowbudgetlcs"
-version = "1.3.1"
+version = "1.4.0"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -143,4 +143,10 @@ dependencies {
     testImplementation(libs.bundles.kotest.unit)
     testImplementation(libs.reflect.core)
     testImplementation(libs.argon2.impl)
+    testImplementation(libs.bundles.ktor.client)
+    testImplementation(libs.bundles.ktor.client.plugins)
+    testImplementation(libs.ktor.serialization.json)
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.bundles.ktor.server.plugins)
 }

@@ -1,0 +1,31 @@
+name: Verify production target.
+
+# Read-only. Answers "do the deployment secrets actually reach production?" without touching
+# anything, which the workflow files alone cannot: staging and production share a host and the
+# same SSH_HOST/SSH_PORT/SSH_USERNAME/SSH_KEY secrets.
+
+env:
+  PROD_DB_REF: zaukjwuivusndarulkua
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Assert the SSH target is production
+        uses: ./.github/actions/assert-production-host
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          db-ref: ${{ env.PROD_DB_REF }}
+
+      - name: Check the public endpoint
+        run: |
+          echo "health : $(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://dennys.lowbudgetlcs.com/health)"
+          echo "swagger: $(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://dennys.lowbudgetlcs.com/swagger)"

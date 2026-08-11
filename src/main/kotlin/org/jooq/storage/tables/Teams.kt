@@ -30,8 +30,6 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.GAMES__GAMES_BLUE_TEAM_ID_FKEY
-import org.jooq.storage.keys.GAMES__GAMES_RED_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_LOSER_TEAM_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_WINNER_TEAM_ID_FKEY
 import org.jooq.storage.keys.PLAYERS_TO_TEAM__PLAYERS_TO_TEAM_TEAM_FKEY
@@ -41,14 +39,16 @@ import org.jooq.storage.keys.TEAMS_NAME_EVENT_ID_KEY
 import org.jooq.storage.keys.TEAMS_PKEY
 import org.jooq.storage.keys.TEAMS__TEAMS_EVENT_ID_FKEY
 import org.jooq.storage.keys.TEAM_TO_SERIES__TEAM_TO_SERIES_TEAM_ID_FKEY
+import org.jooq.storage.keys.TOURNAMENT_CODES__TOURNAMENT_CODES_BLUE_TEAM_ID_FKEY
+import org.jooq.storage.keys.TOURNAMENT_CODES__TOURNAMENT_CODES_RED_TEAM_ID_FKEY
 import org.jooq.storage.tables.Events.EventsPath
 import org.jooq.storage.tables.GameResults.GameResultsPath
-import org.jooq.storage.tables.Games.GamesPath
 import org.jooq.storage.tables.Players.PlayersPath
 import org.jooq.storage.tables.PlayersToTeam.PlayersToTeamPath
 import org.jooq.storage.tables.Series.SeriesPath
 import org.jooq.storage.tables.SeriesResults.SeriesResultsPath
 import org.jooq.storage.tables.TeamToSeries.TeamToSeriesPath
+import org.jooq.storage.tables.TournamentCodes.TournamentCodesPath
 import org.jooq.storage.tables.records.TeamsRecord
 
 
@@ -195,38 +195,6 @@ open class Teams(
     val gameResultsWinnerTeamIdFkey: GameResultsPath
         get(): GameResultsPath = gameResultsWinnerTeamIdFkey()
 
-    private lateinit var _gamesBlueTeamIdFkey: GamesPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.games</code>
-     * table, via the <code>games_blue_team_id_fkey</code> key
-     */
-    fun gamesBlueTeamIdFkey(): GamesPath {
-        if (!this::_gamesBlueTeamIdFkey.isInitialized)
-            _gamesBlueTeamIdFkey = GamesPath(this, null, GAMES__GAMES_BLUE_TEAM_ID_FKEY.inverseKey)
-
-        return _gamesBlueTeamIdFkey;
-    }
-
-    val gamesBlueTeamIdFkey: GamesPath
-        get(): GamesPath = gamesBlueTeamIdFkey()
-
-    private lateinit var _gamesRedTeamIdFkey: GamesPath
-
-    /**
-     * Get the implicit to-many join path to the <code>dennys.games</code>
-     * table, via the <code>games_red_team_id_fkey</code> key
-     */
-    fun gamesRedTeamIdFkey(): GamesPath {
-        if (!this::_gamesRedTeamIdFkey.isInitialized)
-            _gamesRedTeamIdFkey = GamesPath(this, null, GAMES__GAMES_RED_TEAM_ID_FKEY.inverseKey)
-
-        return _gamesRedTeamIdFkey;
-    }
-
-    val gamesRedTeamIdFkey: GamesPath
-        get(): GamesPath = gamesRedTeamIdFkey()
-
     private lateinit var _playersToTeam: PlayersToTeamPath
 
     /**
@@ -292,6 +260,40 @@ open class Teams(
 
     val teamToSeries: TeamToSeriesPath
         get(): TeamToSeriesPath = teamToSeries()
+
+    private lateinit var _tournamentCodesBlueTeamIdFkey: TournamentCodesPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.tournament_codes</code> table, via the
+     * <code>tournament_codes_blue_team_id_fkey</code> key
+     */
+    fun tournamentCodesBlueTeamIdFkey(): TournamentCodesPath {
+        if (!this::_tournamentCodesBlueTeamIdFkey.isInitialized)
+            _tournamentCodesBlueTeamIdFkey = TournamentCodesPath(this, null, TOURNAMENT_CODES__TOURNAMENT_CODES_BLUE_TEAM_ID_FKEY.inverseKey)
+
+        return _tournamentCodesBlueTeamIdFkey;
+    }
+
+    val tournamentCodesBlueTeamIdFkey: TournamentCodesPath
+        get(): TournamentCodesPath = tournamentCodesBlueTeamIdFkey()
+
+    private lateinit var _tournamentCodesRedTeamIdFkey: TournamentCodesPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.tournament_codes</code> table, via the
+     * <code>tournament_codes_red_team_id_fkey</code> key
+     */
+    fun tournamentCodesRedTeamIdFkey(): TournamentCodesPath {
+        if (!this::_tournamentCodesRedTeamIdFkey.isInitialized)
+            _tournamentCodesRedTeamIdFkey = TournamentCodesPath(this, null, TOURNAMENT_CODES__TOURNAMENT_CODES_RED_TEAM_ID_FKEY.inverseKey)
+
+        return _tournamentCodesRedTeamIdFkey;
+    }
+
+    val tournamentCodesRedTeamIdFkey: TournamentCodesPath
+        get(): TournamentCodesPath = tournamentCodesRedTeamIdFkey()
 
     /**
      * Get the implicit many-to-many join path to the
