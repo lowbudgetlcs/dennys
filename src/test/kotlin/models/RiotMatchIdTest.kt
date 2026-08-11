@@ -16,8 +16,6 @@ class RiotMatchIdTest :
             shouldThrow<IllegalArgumentException> { RiotMatchId("   ") }
         }
 
-        // games/by-code returns the tournament region enum (NA) rather than a
-        // platformId (NA1), so the pull path has to map it before building an id.
         "rejects an id with no separator" {
             shouldThrow<IllegalArgumentException> { RiotMatchId("NA15102531894") }
         }
