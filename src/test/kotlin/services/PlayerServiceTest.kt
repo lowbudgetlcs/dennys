@@ -15,7 +15,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 
@@ -26,7 +26,7 @@ class PlayerServiceTest : StringSpec({
     val teamRepo = mockk<ITeamRepository>()
     val service = PlayerService(playerRepo, accountRepo, teamRepo)
 
-    beforeEach { clearAllMocks() }
+    beforeEach { clearMocks(playerRepo, accountRepo, teamRepo) }
 
     "getAllPlayers() should return empty list when no players exist" {
         every { playerRepo.getAll() } returns listOf()

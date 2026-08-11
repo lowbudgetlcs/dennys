@@ -15,7 +15,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -27,7 +27,7 @@ class TeamServiceTest :
         val playerRepo = mockk<IPlayerRepository>(relaxed = false)
         val service = TeamService(teamRepo, playerRepo)
 
-        beforeTest { clearAllMocks() }
+        beforeTest { clearMocks(teamRepo, playerRepo) }
 
         "createTeam succeeds for valid input" {
             val newTeam = NewTeam(TeamName("Golden Guardians"), null)
