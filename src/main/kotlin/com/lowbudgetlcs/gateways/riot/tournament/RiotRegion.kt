@@ -18,7 +18,10 @@ enum class RiotRegion(
     ;
 
     companion object {
+        /** Riot returns the region enum on some payloads and the platformId on others. */
         fun platformIdOf(region: String): String? =
-            entries.firstOrNull { it.name.equals(region, ignoreCase = true) }?.platformId
+            entries.firstOrNull {
+                it.name.equals(region, ignoreCase = true) || it.platformId.equals(region, ignoreCase = true)
+            }?.platformId
     }
 }
