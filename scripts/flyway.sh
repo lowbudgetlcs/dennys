@@ -32,6 +32,8 @@ flyway() {
     -executeInTransaction=false \
     -outOfOrder=false \
     -validateMigrationNaming=true \
+    -connectRetries=10 \
+    -connectRetriesInterval=5 \
     "$@"
 }
 
