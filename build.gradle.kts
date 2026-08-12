@@ -57,6 +57,10 @@ tasks.register<Test>("itest") {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    // Kotest runs specs and tests concurrently, and mockk's inline agent instruments classes on
+    // those threads. The default 512k thread stack overflows during transformation once enough
+    // specs mock concurrently, surfacing as StackOverflowError in unrelated specs.
+    jvmArgs("-Xss4m")
 }
 
 tasks.withType<Detekt>().configureEach {
