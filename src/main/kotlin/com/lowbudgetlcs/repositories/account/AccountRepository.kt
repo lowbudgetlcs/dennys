@@ -21,6 +21,12 @@ class AccountRepository(
     override fun getAccountByPuuid(puuid: Puuid): Account? =
         selectAccounts().where(RIOT_ACCOUNTS.RIOT_PUUID.eq(puuid.value)).fetchOne()?.let(::rowToAccount)
 
+    override fun getByPlayerId(playerId: PlayerId): List<Account> =
+        selectAccounts()
+            .where(RIOT_ACCOUNTS.PLAYER_ID.eq(playerId.value))
+            .fetch()
+            .mapNotNull(::rowToAccount)
+
     override fun insert(newAccount: NewAccount): Account? {
         val insertedId =
             dsl

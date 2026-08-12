@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.player.models
 
+import com.lowbudgetlcs.domain.account.models.Account
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.player.models.types.PlayerName
 import com.lowbudgetlcs.domain.team.models.Team
@@ -16,8 +17,15 @@ fun NewPlayer.toPlayer(id: PlayerId): Player =
         name = name,
     )
 
-fun Player.toPlayerWithTeams(player: Player, teams: List<Team>): PlayerWithTeams = PlayerWithTeams(
+fun Player.toPlayerWithTeams(accounts: List<Account>, teams: List<Team>): PlayerWithTeams = PlayerWithTeams(
     id = id,
     name = name,
+    accounts = accounts,
     teams = teams
+)
+
+fun Player.toPlayerWithAccounts(accounts: List<Account>): PlayerWithAccounts = PlayerWithAccounts(
+    id = id,
+    name = name,
+    accounts = accounts
 )

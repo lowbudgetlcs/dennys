@@ -14,6 +14,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -91,5 +94,23 @@ class AccountAndPlayerRepositoryTest :
             shouldThrow<IntegrityConstraintViolationException> {
                 accountRepo.insert(NewAccount(puuid, id))
             }
+        }
+
+        // Runs on the state the cases above leave behind: account (…794) belongs to player, and
+        // (…791) to player2.
+        "getByPlayerId returns only that player's accounts." {
+            val forPlayer = accountRepo.getByPlayerId(player.id)
+
+            forPlayer.shouldHaveSize(1)
+            forPlayer.single().id shouldBe account.id
+            forPlayer.single().playerId shouldBe player.id
+        }
+
+        "getByPlayerId does not return another player's accounts." {
+            accountRepo.getByPlayerId(player2.id).map { it.id } shouldNotContain account.id
+        }
+
+        "getByPlayerId returns empty for a player with no accounts." {
+            accountRepo.getByPlayerId((-1).toPlayerId()).shouldBeEmpty()
         }
     })
