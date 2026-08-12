@@ -33,7 +33,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -49,7 +49,7 @@ class SeriesServiceTest :
         val gameRepo = mockk<IGameRepository>(relaxed = false)
         val service = SeriesService(codeRepo, seriesRepo, eventRepo, teamRepo, gameRepo, gameGateway)
 
-        beforeTest { clearAllMocks() }
+        beforeTest { clearMocks(codeRepo, eventRepo, teamRepo, seriesRepo, gameGateway, gameRepo) }
 
         val event =
             Event(
@@ -292,7 +292,7 @@ class SeriesServiceTest :
                 listOf(team1.id, team2.id, team1.id, team1.id),
                 listOf(team1.id, team2.id, team1.id, team2.id, team1.id),
             ).forEach { winners ->
-                clearAllMocks()
+                clearMocks(codeRepo, eventRepo, teamRepo, seriesRepo, gameGateway, gameRepo)
                 val series = seriesOf(5)
                 arrange(series, winners)
 
@@ -303,7 +303,7 @@ class SeriesServiceTest :
                 }
             }
 
-            clearAllMocks()
+            clearMocks(codeRepo, eventRepo, teamRepo, seriesRepo, gameGateway, gameRepo)
             val drawn = seriesOf(5)
             arrange(drawn, listOf(team1.id, team2.id, team1.id, team2.id))
 

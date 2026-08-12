@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/lowbudgetlcs/dennys/blob/main/LICENSE.txt
-  version: 1.4.0
+  version: 1.4.1
 externalDocs:
   description: Find out more about Dennys
   url: https://github.com/lowbudgetlcs/dennys
@@ -832,14 +832,25 @@ paths:
     post:
       summary: Issue a tournament code for a series
       description: |
-        Issues a new Riot tournament code. This is **never** blocked — not by
-        the series being complete, and not by a previous game going
-        unreported. Players must never be prevented from playing, so the worst
-        case here is a wasted code.
+        Issues a new Riot tournament code.
 
-        A replacement for a code that did not work is simply another call to
-        this endpoint. There is no void step: a code with no result does not
-        count towards the game number.
+        A series may be issued at most **2 codes per game**, counted since the
+        most recent recorded game. Recording a result ends the current game and
+        grants a fresh 2 for the next; unused allowance does not roll over. The
+        limit exists to bound calls to Riot, not to control play — a refused
+        request never reaches Riot at all.
+
+        Being at the limit does not prevent anyone from playing. Report the
+        result of the game that was played, or play a custom game and report
+        the winner; either records a game, which resets the allowance. A
+        codeless result from a custom game resets it just as a coded one does.
+
+        Issuance is still not blocked by the series being complete, and a
+        replacement for a code that did not work is simply another call to this
+        endpoint. There is no void step: a code with no result does not count
+        towards the game number, though it does count towards the limit — so a
+        replacement for a bum code spends the second of the two, and the next
+        step after that is a custom game.
       operationId: createGame
       tags:
         - Series (v1)
@@ -881,6 +892,17 @@ paths:
                 $ref: "#/components/schemas/Error"
         "404":
           description: Series or team not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: |
+            The series already holds the maximum of 2 tournament codes for the
+            current game. Riot was not called.
+
+            Record a result to reset the allowance — either report the game
+            that was played, or play a custom game and report the winner.
           content:
             application/json:
               schema:
@@ -1544,7 +1566,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/RiotAccountDto"
         "400":
-          description: Invalid PUUID format
+          description: Malformed request body
+        "422":
+          description: |
+            Invalid PUUID. A PUUID must be exactly 78 base64url characters
+            (letters, digits, '-' and '_'); anything else is rejected before
+            Riot is called. Riot rejecting the value also surfaces here.
         "404":
           description: Riot account not found from Riot API
         "409":
