@@ -27,4 +27,10 @@ class SeriesResources {
         val parent: SeriesResources = SeriesResources(),
         val seriesId: Int,
     )
+
+    @Resource("{seriesId}/refresh")
+    data class Refresh(
+        val parent: SeriesResources = SeriesResources(),
+        val seriesId: Int,
+    )
 }

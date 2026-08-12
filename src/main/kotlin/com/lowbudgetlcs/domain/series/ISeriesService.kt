@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
+import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportOutcome
@@ -49,6 +50,24 @@ interface ISeriesService {
     suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome
 
     suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome?
+
+    /**
+     * Re-check Riot for a single tournament code and record a game if one is found.
+     *
+     * Exactly one of [tournamentCodeId] or [shortcode] must be supplied — unlike
+     * [reportResult], neither is not allowed, because this operation is defined by the code it
+     * targets. A code that already has a game recorded is left untouched and reports
+     * [RefreshOutcome.ANSWERED_EMPTY].
+     *
+     * @throws IllegalArgumentException if both or neither identifier is supplied.
+     * @throws NoSuchElementException if the series or code does not exist, or the code belongs to
+     *   another series.
+     */
+    suspend fun refreshFromCode(
+        id: SeriesId,
+        tournamentCodeId: TournamentCodeId?,
+        shortcode: Shortcode?,
+    ): RefreshOutcome
 
     suspend fun reportResult(
         id: SeriesId,

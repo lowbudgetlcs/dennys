@@ -6,8 +6,12 @@ import com.lowbudgetlcs.api.dto.games.toDto
 import com.lowbudgetlcs.api.dto.games.toNewTournamentCode
 import com.lowbudgetlcs.api.dto.games.toReportedResult
 import com.lowbudgetlcs.api.dto.series.CompleteSeriesDto
+import com.lowbudgetlcs.api.dto.series.RefreshSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto
+import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.game.models.toTournamentCodeId
+import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
@@ -59,6 +63,26 @@ fun Route.seriesRoutesV1(seriesService: ISeriesService) {
                 if (outcome.recorded) HttpStatusCode.Created else HttpStatusCode.OK,
                 outcome.game.toDto(),
             )
+        }
+        post<SeriesResources.Refresh> { route ->
+            val dto = call.receive<RefreshSeriesDto>()
+            logger.debug(dto.toString())
+            val seriesId = route.seriesId.toSeriesId()
+            val outcome =
+                seriesService.refreshFromCode(
+                    seriesId,
+                    dto.tournamentCodeId?.toTournamentCodeId(),
+                    dto.shortcode?.toShortcode(),
+                )
+            // The status carries the outcome so a caller can tell "Riot had nothing" (don't retry)
+            // from "Riot was unreachable" (do), without a wrapper type. Body is always the series.
+            val status =
+                when (outcome) {
+                    RefreshOutcome.ATTRIBUTED -> HttpStatusCode.Created
+                    RefreshOutcome.ANSWERED_EMPTY -> HttpStatusCode.OK
+                    RefreshOutcome.UNREACHABLE -> HttpStatusCode.ServiceUnavailable
+                }
+            call.respond(status, seriesService.getSeriesWithGames(seriesId).toDto())
         }
     }
 }

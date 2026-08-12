@@ -1005,6 +1005,88 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/series/{seriesId}/refresh:
+    post:
+      summary: Re-check Riot for one tournament code
+      description: |
+        Asks Riot about a single tournament code and records the game if one is
+        found, updating the series' `games` array. Use it when a callback was
+        missed or arrived before the game was queryable, instead of issuing a
+        fresh code — a refresh costs nothing against the per-game code limit.
+
+        Exactly **one** of `tournamentCodeId` or `shortcode` must be given.
+        Unlike `/results`, omitting both is rejected: this operation is defined
+        by the code it targets.
+
+        A code that already has a game recorded is left alone and answers 200.
+        That is deliberate — re-asking Riot would record a second game for the
+        same match whenever the existing result was self-reported, because such
+        a game carries no `riotMatchId` to recognise Riot's copy by.
+
+        Recording a game triggers the usual completion check.
+      operationId: refreshSeriesFromCode
+      tags:
+        - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshSeriesDto"
+      responses:
+        "201":
+          description: |
+            Riot had a game and it was recorded. The returned series includes it
+            in `games`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesWithGamesDto"
+        "200":
+          description: |
+            Nothing to add — **not** a failure. Either Riot has no game for this
+            code yet, or the code already had a result recorded. The series is
+            returned unchanged; do not retry on a timer without a reason to
+            think the game has since finished.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesWithGamesDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: |
+            Series not found, the tournament code was not found, or the code
+            belongs to a different series.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "422":
+          description: |
+            Both `tournamentCodeId` and `shortcode` were given, or neither was.
+            Exactly one is required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: |
+            Riot could not be reached, so nothing could be confirmed. Distinct
+            from 200: this one is worth retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/series/{seriesId}/complete:
     post:
       summary: Complete a series
@@ -2415,6 +2497,24 @@ components:
             The Riot tournament code itself, as it appears in the game client.
             Mutually exclusive with `tournamentCodeId`. Exists because a human
             reporting a result has the code, not a database id.
+          example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
+
+    RefreshSeriesDto:
+      type: object
+      description: |
+        Identifies the one tournament code to re-check against Riot. Exactly one
+        of these must be set — unlike `ReportResultDto`, omitting both is a 422
+        rather than "let Riot decide".
+      properties:
+        tournamentCodeId:
+          type: integer
+          description: Denny's id for the code. Mutually exclusive with `shortcode`.
+          example: 117
+        shortcode:
+          type: string
+          description: |
+            The Riot tournament code itself. Mutually exclusive with
+            `tournamentCodeId`.
           example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
 
     CompleteSeriesDto:

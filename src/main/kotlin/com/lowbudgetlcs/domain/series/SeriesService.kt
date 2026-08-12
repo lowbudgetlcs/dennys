@@ -125,32 +125,10 @@ class SeriesService(
         var attributed = false
         val unverified = mutableListOf<Shortcode>()
         for (code in outstanding) {
-            val riotGames =
-                try {
-                    gate.getGames(code.shortcode)
-                } catch (e: RiotApiException) {
-                    logger.warn("Could not reach Riot for shortcode '${code.shortcode.value}': ${e.message}")
-                    unverified += code.shortcode
-                    continue
-                }
-            riotGames.forEach { riotGame ->
-                val matchId = riotMatchIdOf(riotGame)
-                if (matchId != null && matchId in recordedMatchIds) {
-                    logger.warn("Riot match '${matchId.value}' is already recorded for series '$id', skipping.")
-                    return@forEach
-                }
-                val result = resolveWinner(series, riotGame)
-                if (result != null) {
-                    gameRepo.insert(
-                        NewGame(
-                            seriesId = id,
-                            tournamentCodeId = code.id,
-                            riotMatchId = matchId,
-                            result = result,
-                        ),
-                    )
-                    attributed = true
-                }
+            when (refreshCode(series, code, recordedMatchIds)) {
+                RefreshOutcome.ATTRIBUTED -> attributed = true
+                RefreshOutcome.UNREACHABLE -> unverified += code.shortcode
+                RefreshOutcome.ANSWERED_EMPTY -> Unit
             }
         }
 
@@ -169,6 +147,78 @@ class SeriesService(
         }
     }
 
+    /**
+     * Ask Riot about one tournament code and record whatever it returns.
+     *
+     * Shared by the bulk refresh, the Riot callback and the targeted refresh endpoint so all three
+     * attribute games identically. Does not evaluate completion — the caller does that once, after
+     * however many codes it walked.
+     *
+     * @param recordedMatchIds matches already stored for this series, so a match Riot reports under
+     *   a second code is not recorded twice.
+     */
+    private suspend fun refreshCode(
+        series: Series,
+        code: TournamentCode,
+        recordedMatchIds: Set<RiotMatchId>,
+    ): RefreshOutcome {
+        val riotGames =
+            try {
+                gate.getGames(code.shortcode)
+            } catch (e: RiotApiException) {
+                logger.warn("Could not reach Riot for shortcode '${code.shortcode.value}': ${e.message}")
+                return RefreshOutcome.UNREACHABLE
+            }
+        var attributed = false
+        riotGames.forEach { riotGame ->
+            val matchId = riotMatchIdOf(riotGame)
+            if (matchId != null && matchId in recordedMatchIds) {
+                logger.warn("Riot match '${matchId.value}' is already recorded for series '${series.id}', skipping.")
+                return@forEach
+            }
+            val result = resolveWinner(series, riotGame)
+            if (result != null) {
+                gameRepo.insert(
+                    NewGame(
+                        seriesId = series.id,
+                        tournamentCodeId = code.id,
+                        riotMatchId = matchId,
+                        result = result,
+                    ),
+                )
+                attributed = true
+            }
+        }
+        return if (attributed) RefreshOutcome.ATTRIBUTED else RefreshOutcome.ANSWERED_EMPTY
+    }
+
+    override suspend fun refreshFromCode(
+        id: SeriesId,
+        tournamentCodeId: TournamentCodeId?,
+        shortcode: Shortcode?,
+    ): RefreshOutcome {
+        require((tournamentCodeId == null) != (shortcode == null)) {
+            "Provide exactly one of tournamentCodeId or shortcode."
+        }
+        val series = getSeries(id)
+        val code =
+            resolveTarget(series, tournamentCodeId, shortcode)
+                ?: throw NoSuchElementException("No tournament code was identified for series '${id.value}'.")
+
+        val recorded = gameRepo.getBySeriesId(id)
+        // A code that already has a game is left alone. Re-asking Riot would insert a second row for
+        // the same match whenever the existing game was self-reported, because such a game carries no
+        // riotMatchId for the dedupe below to match on.
+        if (recorded.any { it.tournamentCodeId == code.id }) {
+            logger.info("Code '${code.shortcode.value}' already has a game recorded, nothing to refresh.")
+            return RefreshOutcome.ANSWERED_EMPTY
+        }
+
+        val outcome = refreshCode(series, code, recorded.mapNotNull { it.riotMatchId }.toSet())
+        if (outcome == RefreshOutcome.ATTRIBUTED) evaluateCompletion(id)
+        return outcome
+    }
+
     override suspend fun reportResult(
         id: SeriesId,
         report: ReportedResult,
@@ -178,7 +228,7 @@ class SeriesService(
             "Provide either tournamentCodeId or shortcode, not both."
         }
         val declared = declaredResult(series, report)
-        val target = resolveTarget(series, report)
+        val target = resolveTarget(series, report.tournamentCodeId, report.shortcode)
 
         val before = gameRepo.getBySeriesId(id)
         if (target != null) {
@@ -277,14 +327,20 @@ class SeriesService(
         return winningTeamId to loser
     }
 
+    /**
+     * Resolve a code by id or by shortcode, whichever was supplied, and refuse one that belongs to a
+     * different series. Returns null when neither was supplied — which `reportResult` treats as "let
+     * Riot decide", and `refreshFromCode` rejects up front.
+     */
     private fun resolveTarget(
         series: Series,
-        report: ReportedResult,
+        tournamentCodeId: TournamentCodeId?,
+        shortcode: Shortcode?,
     ): TournamentCode? {
         val code =
-            report.tournamentCodeId?.let {
+            tournamentCodeId?.let {
                 codeRepo.getById(it) ?: throw NoSuchElementException("Tournament code with id ${it.value} not found")
-            } ?: report.shortcode?.let {
+            } ?: shortcode?.let {
                 codeRepo.getByShortcode(it) ?: throw NoSuchElementException("Tournament code '${it.value}' not found")
             } ?: return null
         if (code.seriesId != series.id) {

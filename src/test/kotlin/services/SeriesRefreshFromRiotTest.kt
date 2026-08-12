@@ -24,6 +24,7 @@ import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -223,5 +224,124 @@ class SeriesRefreshFromRiotTest :
             f.service.refreshFromRiot(SERIES_ID) shouldBe RefreshOutcome.ATTRIBUTED
 
             verify(exactly = 1) { f.gameRepo.insert(match { it.riotMatchId == null }) }
+        }
+
+        // ---- refreshFromCode: the targeted refresh behind POST /series/{id}/refresh ----
+
+        "refreshFromCode resolves the code by id and attributes the game" {
+            val f = Fixture()
+            val code = f.code(1, "SHORT-A")
+            coEvery { f.gateway.getGames(code.shortcode) } returns listOf(f.riotGame(listOf(PUUID_A)))
+            f.withSeries(listOf(code))
+            every { f.codeRepo.getById(TournamentCodeId(1)) } returns code
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(TEAM_1)
+
+            f.service.refreshFromCode(SERIES_ID, TournamentCodeId(1), null) shouldBe RefreshOutcome.ATTRIBUTED
+
+            verify(exactly = 1) { f.gameRepo.insert(match { it.tournamentCodeId == TournamentCodeId(1) }) }
+        }
+
+        "refreshFromCode resolves the same code by shortcode, to the same outcome" {
+            val f = Fixture()
+            val code = f.code(1, "SHORT-A")
+            coEvery { f.gateway.getGames(code.shortcode) } returns listOf(f.riotGame(listOf(PUUID_A)))
+            f.withSeries(listOf(code))
+            every { f.codeRepo.getByShortcode(Shortcode("SHORT-A")) } returns code
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(TEAM_1)
+
+            f.service.refreshFromCode(SERIES_ID, null, Shortcode("SHORT-A")) shouldBe RefreshOutcome.ATTRIBUTED
+
+            verify(exactly = 1) { f.gameRepo.insert(match { it.tournamentCodeId == TournamentCodeId(1) }) }
+        }
+
+        "refreshFromCode refuses both identifiers, without calling Riot" {
+            val f = Fixture()
+
+            shouldThrow<IllegalArgumentException> {
+                f.service.refreshFromCode(SERIES_ID, TournamentCodeId(1), Shortcode("SHORT-A"))
+            }
+
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+        }
+
+        "refreshFromCode refuses neither identifier, without calling Riot" {
+            val f = Fixture()
+
+            shouldThrow<IllegalArgumentException> { f.service.refreshFromCode(SERIES_ID, null, null) }
+
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+        }
+
+        "refreshFromCode refuses a code belonging to another series, without calling Riot" {
+            val f = Fixture()
+            val foreign = f.code(9, "SHORT-FOREIGN").copy(seriesId = SeriesId(999))
+            f.withSeries(listOf())
+            every { f.codeRepo.getById(TournamentCodeId(9)) } returns foreign
+
+            shouldThrow<NoSuchElementException> { f.service.refreshFromCode(SERIES_ID, TournamentCodeId(9), null) }
+
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+        }
+
+        "refreshFromCode reports not-found for an unknown code, without calling Riot" {
+            val f = Fixture()
+            f.withSeries(listOf())
+            every { f.codeRepo.getById(TournamentCodeId(404)) } returns null
+
+            shouldThrow<NoSuchElementException> { f.service.refreshFromCode(SERIES_ID, TournamentCodeId(404), null) }
+
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+        }
+
+        "refreshFromCode leaves a code that already has a game alone, without calling Riot" {
+            val f = Fixture()
+            val code = f.code(1, "SHORT-A")
+            f.withSeries(listOf(code), recorded = listOf(f.playedGame(1)))
+            every { f.codeRepo.getById(TournamentCodeId(1)) } returns code
+
+            f.service.refreshFromCode(SERIES_ID, TournamentCodeId(1), null) shouldBe RefreshOutcome.ANSWERED_EMPTY
+
+            // Re-asking Riot would insert a second row for the same match whenever the existing game
+            // was self-reported, since such a game carries no riotMatchId to dedupe against.
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+            verify(exactly = 0) { f.gameRepo.insert(any()) }
+        }
+
+        "refreshFromCode reports ANSWERED_EMPTY when Riot has nothing yet" {
+            val f = Fixture()
+            val code = f.code(1, "SHORT-A")
+            coEvery { f.gateway.getGames(code.shortcode) } returns emptyList()
+            f.withSeries(listOf(code))
+            every { f.codeRepo.getById(TournamentCodeId(1)) } returns code
+
+            f.service.refreshFromCode(SERIES_ID, TournamentCodeId(1), null) shouldBe RefreshOutcome.ANSWERED_EMPTY
+
+            verify(exactly = 0) { f.gameRepo.insert(any()) }
+        }
+
+        "refreshFromCode reports UNREACHABLE when Riot cannot be reached" {
+            val f = Fixture()
+            val code = f.code(1, "SHORT-A")
+            coEvery { f.gateway.getGames(code.shortcode) } throws RiotApiException("503", 503)
+            f.withSeries(listOf(code))
+            every { f.codeRepo.getById(TournamentCodeId(1)) } returns code
+
+            f.service.refreshFromCode(SERIES_ID, TournamentCodeId(1), null) shouldBe RefreshOutcome.UNREACHABLE
+
+            verify(exactly = 0) { f.gameRepo.insert(any()) }
+        }
+
+        "refreshFromCode does not record a match already stored under a different code" {
+            val f = Fixture()
+            val code = f.code(2, "SHORT-B")
+            coEvery { f.gateway.getGames(code.shortcode) } returns listOf(f.riotGame(listOf(PUUID_A)))
+            val already = f.playedGame(1).copy(riotMatchId = "NA1_5102531894".toRiotMatchId())
+            f.withSeries(listOf(code), recorded = listOf(already))
+            every { f.codeRepo.getById(TournamentCodeId(2)) } returns code
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(TEAM_1)
+
+            f.service.refreshFromCode(SERIES_ID, TournamentCodeId(2), null) shouldBe RefreshOutcome.ANSWERED_EMPTY
+
+            verify(exactly = 0) { f.gameRepo.insert(any()) }
         }
     })
