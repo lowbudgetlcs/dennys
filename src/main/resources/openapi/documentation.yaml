@@ -834,9 +834,9 @@ paths:
       description: |
         Issues a new Riot tournament code.
 
-        A series may be issued at most **3 codes per game**, counted since the
+        A series may be issued at most **2 codes per game**, counted since the
         most recent recorded game. Recording a result ends the current game and
-        grants a fresh 3 for the next; unused allowance does not roll over. The
+        grants a fresh 2 for the next; unused allowance does not roll over. The
         limit exists to bound calls to Riot, not to control play — a refused
         request never reaches Riot at all.
 
@@ -848,7 +848,9 @@ paths:
         Issuance is still not blocked by the series being complete, and a
         replacement for a code that did not work is simply another call to this
         endpoint. There is no void step: a code with no result does not count
-        towards the game number, though it does count towards the limit.
+        towards the game number, though it does count towards the limit — so a
+        replacement for a bum code spends the second of the two, and the next
+        step after that is a custom game.
       operationId: createGame
       tags:
         - Series (v1)
@@ -896,7 +898,7 @@ paths:
                 $ref: "#/components/schemas/Error"
         "409":
           description: |
-            The series already holds the maximum of 3 tournament codes for the
+            The series already holds the maximum of 2 tournament codes for the
             current game. Riot was not called.
 
             Record a result to reset the allowance — either report the game

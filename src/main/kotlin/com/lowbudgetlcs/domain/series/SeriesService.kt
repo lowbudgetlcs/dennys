@@ -42,7 +42,7 @@ import java.time.Instant
 private const val RELAY_METADATA_TAG = "LBLCS"
 
 /** Tournament codes a series may be issued for one game before a result has to be recorded. */
-const val DEFAULT_MAX_CODES_PER_GAME = 3
+const val DEFAULT_MAX_CODES_PER_GAME = 2
 
 @Suppress("LongParameterList")
 class SeriesService(

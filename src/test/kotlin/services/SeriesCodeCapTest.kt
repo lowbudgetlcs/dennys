@@ -133,25 +133,25 @@ class SeriesCodeCapTest :
     StringSpec({
         "a code is issued while the series is under the limit" {
             val f = CapFixture()
-            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
+            f.holding(codes = listOf(f.code(1, f.at(10))))
 
             f.service.createGame(f.newCode).seriesId shouldBe CAP_SERIES_ID
 
             coVerify(exactly = 1) { f.gateway.getCode(any(), any()) }
         }
 
-        "the fourth code for one game is refused" {
+        "the third code for one game is refused" {
             val f = CapFixture()
-            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20)), f.code(3, f.at(30))))
+            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
 
             val ex = shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
 
-            ex.message.toString() shouldContain "already been issued 3 tournament code(s) for this game"
+            ex.message.toString() shouldContain "already been issued 2 tournament code(s) for this game"
         }
 
         "a refused request never reaches Riot" {
             val f = CapFixture()
-            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20)), f.code(3, f.at(30))))
+            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
 
             shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
 
@@ -160,7 +160,7 @@ class SeriesCodeCapTest :
 
         "the refusal names both remedies" {
             val f = CapFixture()
-            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20)), f.code(3, f.at(30))))
+            f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
 
             val ex = shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
 
@@ -171,8 +171,8 @@ class SeriesCodeCapTest :
         "recording a game grants a fresh allowance" {
             val f = CapFixture()
             f.holding(
-                codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20)), f.code(3, f.at(30))),
-                games = listOf(f.game(1, f.at(40), TournamentCodeId(3))),
+                codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))),
+                games = listOf(f.game(1, f.at(40), TournamentCodeId(2))),
             )
 
             f.service.createGame(f.newCode)
@@ -183,7 +183,7 @@ class SeriesCodeCapTest :
         "a codeless game from a custom resets the allowance just as a coded one does" {
             val f = CapFixture()
             f.holding(
-                codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20)), f.code(3, f.at(30))),
+                codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))),
                 games = listOf(f.game(1, f.at(40), tournamentCodeId = null)),
             )
 
@@ -199,11 +199,9 @@ class SeriesCodeCapTest :
                     listOf(
                         f.code(1, f.at(10)),
                         f.code(2, f.at(20)),
-                        f.code(3, f.at(30)),
-                        f.code(4, f.at(50)),
-                        f.code(5, f.at(60)),
+                        f.code(3, f.at(50)),
                     ),
-                games = listOf(f.game(1, f.at(40), TournamentCodeId(3))),
+                games = listOf(f.game(1, f.at(40), TournamentCodeId(2))),
             )
 
             f.service.createGame(f.newCode)
@@ -219,7 +217,6 @@ class SeriesCodeCapTest :
                         f.code(1, f.at(10)),
                         f.code(4, f.at(50)),
                         f.code(5, f.at(60)),
-                        f.code(6, f.at(70)),
                     ),
                 games = listOf(f.game(1, f.at(40), TournamentCodeId(1))),
             )
