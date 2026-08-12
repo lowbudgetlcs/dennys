@@ -27,7 +27,7 @@ private val logger: Logger = LoggerFactory.getLogger(Application::class.java)
 fun Route.playerRoutesV1(playerService: IPlayerService) {
     route("/player") {
         get<PlayerResources> {
-            val players = playerService.getAllPlayers()
+            val players = playerService.getAllPlayersWithAccounts()
             call.respond(players.map { it.toDto() })
         }
 
@@ -38,7 +38,7 @@ fun Route.playerRoutesV1(playerService: IPlayerService) {
             call.respond(HttpStatusCode.Created, created.toDto())
         }
         get<PlayerResources.ById> { route ->
-            val player = playerService.getPlayer(route.playerId.toPlayerId())
+            val player = playerService.getPlayerWithAccounts(route.playerId.toPlayerId())
             call.respond(player.toDto())
         }
 
@@ -46,7 +46,7 @@ fun Route.playerRoutesV1(playerService: IPlayerService) {
             val dto = call.receive<PatchPlayerDto>()
             logger.debug(dto.toString())
             val updated = playerService.renamePlayer(route.playerId.toPlayerId(), dto.name.toPlayerName())
-            call.respond(updated.toDto())
+            call.respond(playerService.getPlayerWithAccounts(updated.id).toDto())
         }
 
         get<PlayerResources.ByIdTeams> { route ->
@@ -62,7 +62,7 @@ fun Route.playerRoutesV1(playerService: IPlayerService) {
                     route.playerId.toPlayerId(),
                     dto.accountId.toAccountId(),
                 )
-            call.respond(updated.toDto())
+            call.respond(playerService.getPlayerWithAccounts(updated.id).toDto())
         }
 
         delete<PlayerResources.AccountById> { route ->
@@ -71,7 +71,7 @@ fun Route.playerRoutesV1(playerService: IPlayerService) {
                     route.playerId.toPlayerId(),
                     route.accountId.toAccountId(),
                 )
-            call.respond(updated.toDto())
+            call.respond(playerService.getPlayerWithAccounts(updated.id).toDto())
         }
     }
 }

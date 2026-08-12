@@ -3,7 +3,9 @@ package com.lowbudgetlcs.domain.player
 import com.lowbudgetlcs.domain.account.models.types.AccountId
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.player.models.PlayerWithTeams
+import com.lowbudgetlcs.domain.player.models.toPlayerWithAccounts
 import com.lowbudgetlcs.domain.player.models.toPlayerWithTeams
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.player.models.types.PlayerName
@@ -36,13 +38,32 @@ class PlayerService(
         return player
     }
 
+    override fun getAllPlayersWithAccounts(): List<PlayerWithAccounts> {
+        logger.info("Fetching all players with accounts...")
+        val players = playerRepository.getAll()
+        // One query for every account rather than one per player: this endpoint is unpaginated, so
+        // a per-player lookup would grow with the roster.
+        val accountsByPlayer = accountRepository.getAll().groupBy { it.playerId }
+        logger.debug("Fetched ${players.size} players.")
+        return players.map { it.toPlayerWithAccounts(accountsByPlayer[it.id].orEmpty()) }
+    }
+
+    override fun getPlayerWithAccounts(id: PlayerId): PlayerWithAccounts {
+        logger.info("Fetching player '$id' with accounts...")
+        val player = getPlayer(id)
+        val accounts = accountRepository.getByPlayerId(player.id)
+        logger.debug("Fetched ${accounts.size} accounts.")
+        return player.toPlayerWithAccounts(accounts)
+    }
+
     override fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams {
         logger.info("Fetching player '$id' with teams...")
         val player = getPlayer(id)
         val teams = teamRepository.getByPlayerId(player.id)
-        logger.debug("Fetched ${teams.size} teams.")
+        val accounts = accountRepository.getByPlayerId(player.id)
+        logger.debug("Fetched ${teams.size} teams and ${accounts.size} accounts.")
         logger.debug(teams.toString())
-        return player.toPlayerWithTeams(player, teams)
+        return player.toPlayerWithTeams(accounts, teams)
     }
 
     override fun createPlayer(player: NewPlayer): Player {

@@ -3,6 +3,7 @@ package com.lowbudgetlcs.domain.player
 import com.lowbudgetlcs.domain.account.models.types.AccountId
 import com.lowbudgetlcs.domain.player.models.NewPlayer
 import com.lowbudgetlcs.domain.player.models.Player
+import com.lowbudgetlcs.domain.player.models.PlayerWithAccounts
 import com.lowbudgetlcs.domain.player.models.PlayerWithTeams
 import com.lowbudgetlcs.domain.player.models.types.PlayerId
 import com.lowbudgetlcs.domain.player.models.types.PlayerName
@@ -11,6 +12,12 @@ interface IPlayerService {
     fun getAllPlayers(): List<Player>
 
     fun getPlayer(id: PlayerId): Player
+
+    /** Every player with their linked accounts attached. */
+    fun getAllPlayersWithAccounts(): List<PlayerWithAccounts>
+
+    /** A single player with their linked accounts attached. */
+    fun getPlayerWithAccounts(id: PlayerId): PlayerWithAccounts
 
     fun getPlayerWithTeams(id: PlayerId): PlayerWithTeams
 

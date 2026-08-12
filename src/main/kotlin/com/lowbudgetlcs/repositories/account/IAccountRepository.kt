@@ -13,6 +13,9 @@ interface IAccountRepository {
 
     fun getAccountByPuuid(puuid: Puuid): Account?
 
+    /** Every account linked to [playerId], empty when the player has none. */
+    fun getByPlayerId(playerId: PlayerId): List<Account>
+
     fun insert(newAccount: NewAccount): Account?
 
     fun updatePlayerId(
