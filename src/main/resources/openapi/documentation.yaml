@@ -1566,7 +1566,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/RiotAccountDto"
         "400":
-          description: Invalid PUUID format
+          description: Malformed request body
+        "422":
+          description: |
+            Invalid PUUID. A PUUID must be exactly 78 base64url characters
+            (letters, digits, '-' and '_'); anything else is rejected before
+            Riot is called. Riot rejecting the value also surfaces here.
         "404":
           description: Riot account not found from Riot API
         "409":
