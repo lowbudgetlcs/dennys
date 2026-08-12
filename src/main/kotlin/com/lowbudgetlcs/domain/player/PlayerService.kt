@@ -75,7 +75,11 @@ class PlayerService(
         logger.info("Linking account '$accountId' to player '$playerId'...")
         this.getPlayer(playerId) // throws if not found
         val account = accountRepository.getById(accountId) ?: throw NoSuchElementException("Account does not exist")
-        checkNotNull(account.playerId) { "Account already owned." }
+        // Free to claim, or already this player's — re-linking an account to its current owner is a
+        // no-op rather than a conflict, so a retried link does not fail. Only another player's
+        // account is refused, which is what the spec documents for this 409.
+        val owner = account.playerId
+        check(owner == null || owner == playerId) { "Account already owned by player ${owner?.value}." }
         accountRepository.updatePlayerId(accountId, playerId)
             ?: throw DatabaseException("Failed to link account to player.")
         val player = playerRepository.getById(playerId) ?: throw NoSuchElementException("Player not found.")
