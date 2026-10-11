@@ -12,8 +12,8 @@ fun Int.toSeriesId(): SeriesId = SeriesId(this)
 fun List<Series>.filterByStage(query: SeriesQuery?): List<Series> =
     this.filter { if (query?.eventStage == null) true else it.eventStage == query.eventStage }
 
-fun List<Series>.filterByCompletion(query: SeriesQuery?): List<Series> =
-    this.filter { if (query?.completed == null) true else it.completed == query.completed }
+fun List<Series>.filterByStatus(query: SeriesQuery?): List<Series> =
+    this.filter { if (query?.status == null) true else it.status == query.status }
 
 fun List<Series>.filterByParticipants(query: SeriesQuery?): List<Series> {
     val participants = query?.teamIds
@@ -36,9 +36,7 @@ fun Series.toSeriesWithGames(
         totalGames = totalGames,
         participants = participants,
         result = result,
-        completed = completed,
-        completedAt = completedAt,
-        reopenedAt = reopenedAt,
+        status = status,
         tournamentCodes = tournamentCodes,
         games = games,
     )

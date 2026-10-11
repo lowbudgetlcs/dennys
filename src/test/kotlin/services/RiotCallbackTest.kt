@@ -23,6 +23,7 @@ import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
@@ -111,7 +112,7 @@ private class CallbackFixture {
             eventStages = setOf(EventStage.PLAYOFFS),
         )
 
-    fun series(completed: Boolean = false) =
+    fun series(status: SeriesStatus = SeriesStatus.NOT_STARTED) =
         Series(
             id = CB_SERIES_ID,
             eventId = CB_EVENT_ID,
@@ -119,9 +120,7 @@ private class CallbackFixture {
             totalGames = 3,
             participants = Pair(CB_BLUE, CB_RED),
             result = null,
-            completed = completed,
-            completedAt = if (completed) CB_AT else null,
-            reopenedAt = null,
+            status = status,
         )
 
     fun riotGame() =
@@ -154,7 +153,7 @@ private class CallbackFixture {
         every { codeRepo.getBySeriesId(CB_SERIES_ID) } returns listOf(code)
         every { gameRepo.getBySeriesId(CB_SERIES_ID) } answers { games.toList() }
         every { teamRepo.getTeamIdsByPuuids(any()) } returns listOf(CB_BLUE)
-        every { seriesRepo.complete(any(), any(), any()) } returns series.copy(completed = true)
+        every { seriesRepo.complete(any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
         every { gameRepo.insert(any()) } answers {
             val new = firstArg<NewGame>()
             val game =
@@ -253,12 +252,12 @@ class RiotCallbackTest :
         "a late callback for a closed series records the game and leaves it closed" {
             val f = CallbackFixture()
             coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
-            f.withSeries(series = f.series(completed = true))
+            f.withSeries(series = f.series(SeriesStatus.COMPLETE))
 
             f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ATTRIBUTED
 
             f.games.size shouldBe 1
-            verify(exactly = 0) { f.seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { f.seriesRepo.complete(any(), any()) }
         }
 
         "a callback for an unknown shortcode writes nothing" {

@@ -42,8 +42,8 @@ interface ISeriesService {
 
     /**
      * Re-evaluate whether a series is finished and close it if so. Run on every
-     * result write, whichever source it came from. No-op when the series is
-     * already complete or was deliberately reopened.
+     * result write, whichever source it came from. No-op unless the series is
+     * NOT_STARTED or IN_PROGRESS.
      */
     fun evaluateCompletion(id: SeriesId): Series
 

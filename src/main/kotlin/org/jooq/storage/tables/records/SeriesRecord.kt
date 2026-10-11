@@ -4,8 +4,6 @@
 package org.jooq.storage.tables.records
 
 
-import java.time.Instant
-
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 import org.jooq.storage.tables.Series
@@ -33,17 +31,9 @@ open class SeriesRecord() : UpdatableRecordImpl<SeriesRecord>(Series.SERIES) {
         set(value): Unit = set(3, value)
         get(): String? = get(3) as String?
 
-    open var completed: Boolean?
+    open var status: String?
         set(value): Unit = set(4, value)
-        get(): Boolean? = get(4) as Boolean?
-
-    open var completedAt: Instant?
-        set(value): Unit = set(5, value)
-        get(): Instant? = get(5) as Instant?
-
-    open var reopenedAt: Instant?
-        set(value): Unit = set(6, value)
-        get(): Instant? = get(6) as Instant?
+        get(): String? = get(4) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -54,14 +44,12 @@ open class SeriesRecord() : UpdatableRecordImpl<SeriesRecord>(Series.SERIES) {
     /**
      * Create a detached, initialised SeriesRecord
      */
-    constructor(id: Int? = null, eventId: Int? = null, totalGames: Int? = null, stage: String? = null, completed: Boolean? = null, completedAt: Instant? = null, reopenedAt: Instant? = null): this() {
+    constructor(id: Int? = null, eventId: Int? = null, totalGames: Int? = null, stage: String? = null, status: String? = null): this() {
         this.id = id
         this.eventId = eventId
         this.totalGames = totalGames
         this.stage = stage
-        this.completed = completed
-        this.completedAt = completedAt
-        this.reopenedAt = reopenedAt
+        this.status = status
         resetChangedOnNotNull()
     }
 }

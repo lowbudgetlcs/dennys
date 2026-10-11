@@ -14,9 +14,9 @@ import com.lowbudgetlcs.domain.event.models.toEventWithTeams
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
-import com.lowbudgetlcs.domain.series.models.filterByCompletion
 import com.lowbudgetlcs.domain.series.models.filterByParticipants
 import com.lowbudgetlcs.domain.series.models.filterByStage
+import com.lowbudgetlcs.domain.series.models.filterByStatus
 import com.lowbudgetlcs.domain.team.models.TeamUpdate
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.GatewayException
@@ -66,7 +66,7 @@ class EventService(
                 .getAllByEventId(id)
                 .filterByStage(query)
                 .filterByParticipants(query)
-                .filterByCompletion(query)
+                .filterByStatus(query)
         return event.toEventWithSeries(series)
     }
 

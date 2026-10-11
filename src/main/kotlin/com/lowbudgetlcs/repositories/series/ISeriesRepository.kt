@@ -5,7 +5,6 @@ import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import java.time.Instant
 
 interface ISeriesRepository {
     fun insert(newSeries: NewSeries): Series?
@@ -18,12 +17,8 @@ interface ISeriesRepository {
 
     fun complete(
         id: SeriesId,
-        completedAt: Instant,
         result: SeriesResult? = null,
     ): Series?
 
-    fun reopen(
-        id: SeriesId,
-        reopenedAt: Instant,
-    ): Series?
+    fun reopen(id: SeriesId): Series?
 }
