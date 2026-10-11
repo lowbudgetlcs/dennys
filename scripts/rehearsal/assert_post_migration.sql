@@ -7,26 +7,28 @@ BEGIN
   SELECT count(*) INTO n FROM information_schema.columns
     WHERE table_schema = 'dennys' AND table_name = 'series'
       AND column_name IN ('completed', 'completed_at', 'reopened_at');
-  IF n <> 3 THEN RAISE EXCEPTION 'series is missing V011 columns (found %/3)', n; END IF;
+  IF n <> 0 THEN RAISE EXCEPTION 'series still carries % of the V011 columns', n; END IF;
 
-  SELECT count(*) INTO n FROM series WHERE completed;
-  IF n <> 1308 THEN RAISE EXCEPTION 'expected 1308 backfilled series, found %', n; END IF;
+  SELECT count(*) INTO n FROM information_schema.columns
+    WHERE table_schema = 'dennys' AND table_name = 'series'
+      AND column_name = 'status' AND is_nullable = 'NO';
+  IF n <> 1 THEN RAISE EXCEPTION 'series.status is missing or nullable'; END IF;
 
-  SELECT count(*) INTO n FROM series WHERE NOT completed;
-  IF n <> 12 THEN RAISE EXCEPTION 'expected 12 open series in the unfinished event, found %', n; END IF;
+  SELECT count(*) INTO n FROM series WHERE status = 'COMPLETE';
+  IF n <> 1308 THEN RAISE EXCEPTION 'expected 1308 COMPLETE series, found %', n; END IF;
 
-  SELECT count(*) INTO n FROM series WHERE completed AND completed_at IS NULL;
-  IF n <> 0 THEN RAISE EXCEPTION '% backfilled series have a null completed_at', n; END IF;
+  SELECT count(*) INTO n FROM series WHERE status = 'IN_PROGRESS';
+  IF n <> 2 THEN RAISE EXCEPTION 'expected 2 IN_PROGRESS series with codes issued, found %', n; END IF;
 
-  SELECT count(*) INTO n FROM series s JOIN events e ON e.id = s.event_id
-    WHERE s.completed AND s.completed_at <> e.end_date;
-  IF n <> 0 THEN RAISE EXCEPTION '% series were not stamped with their event end_date', n; END IF;
+  SELECT count(*) INTO n FROM series WHERE status = 'NOT_STARTED';
+  IF n <> 10 THEN RAISE EXCEPTION 'expected 10 NOT_STARTED series, found %', n; END IF;
 
-  SELECT count(*) INTO n FROM series WHERE reopened_at IS NOT NULL;
-  IF n <> 0 THEN RAISE EXCEPTION 'backfill wrote reopened_at on % series', n; END IF;
+  SELECT count(*) INTO n FROM pg_constraint
+    WHERE conrelid = 'dennys.series'::regclass AND conname = 'series_status_check';
+  IF n <> 1 THEN RAISE EXCEPTION 'series_status_check is missing'; END IF;
 
   SELECT count(*) INTO n FROM tournament_codes;
-  IF n <> 2178 THEN RAISE EXCEPTION 'expected 2178 tournament codes, found %', n; END IF;
+  IF n <> 2180 THEN RAISE EXCEPTION 'expected 2180 tournament codes, found %', n; END IF;
 
   SELECT count(*) INTO n FROM information_schema.columns
     WHERE table_schema = 'dennys' AND table_name = 'tournament_codes' AND column_name = 'number';
@@ -82,8 +84,8 @@ BEGIN
   SELECT count(*) INTO n FROM player_game_facts;
   IF n <> 50 THEN RAISE EXCEPTION 'player_game_facts lost rows (% of 50)', n; END IF;
 
-  SELECT count(*) INTO n FROM flyway_schema_history WHERE success AND version IN ('011', '012');
-  IF n <> 2 THEN RAISE EXCEPTION 'ledger does not record V011 and V012 as applied (found %/2)', n; END IF;
+  SELECT count(*) INTO n FROM flyway_schema_history WHERE success AND version IN ('011', '012', '013', '014');
+  IF n <> 4 THEN RAISE EXCEPTION 'ledger does not record V011-V014 as applied (found %/4)', n; END IF;
 
   SELECT count(*) INTO n FROM flyway_schema_history WHERE type = 'BASELINE' AND version = '010';
   IF n <> 1 THEN RAISE EXCEPTION 'ledger has no baseline row at V010'; END IF;
