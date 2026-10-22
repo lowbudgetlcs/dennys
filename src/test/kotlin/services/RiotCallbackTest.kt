@@ -244,7 +244,8 @@ class RiotCallbackTest :
             f.withSeries()
 
             f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE))
-            val outcome = f.service.reportResult(CB_SERIES_ID, ReportedResult(null, null, null, null))
+            val report = ReportedResult(CB_BLUE, null, null, Shortcode(CB_SHORTCODE))
+            val outcome = f.service.reportResult(CB_SERIES_ID, report)
 
             outcome.recorded shouldBe false
             f.games.size shouldBe 1

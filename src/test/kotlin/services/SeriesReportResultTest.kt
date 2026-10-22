@@ -16,10 +16,7 @@ import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
-import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
-import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
-import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentTeamV5Dto
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -28,7 +25,7 @@ import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -39,8 +36,6 @@ private val AWAY = TeamId(2)
 private val OUTSIDER = TeamId(3)
 private val REPORT_SERIES_ID = SeriesId(50)
 private val REPORT_CREATED_AT = Instant.parse("2026-07-14T23:12:04Z")
-
-private const val REPORT_PUUID = "aa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 private class ReportFixture {
     val codeRepo = mockk<ITournamentCodeRepository>(relaxed = false)
@@ -76,14 +71,6 @@ private class ReportFixture {
         seriesId = REPORT_SERIES_ID,
         createdAt = Instant.parse("2026-07-14T22:58:31Z"),
     )
-
-    fun riotGame(shortCode: String = "SHORT-A") =
-        RiotTournamentGamesV5Dto(
-            winningTeam = listOf(RiotTournamentTeamV5Dto(REPORT_PUUID)),
-            shortCode = shortCode,
-            gameId = 5102531894L,
-            region = "NA",
-        )
 
     fun recordedGame(
         codeId: Int?,
@@ -147,7 +134,6 @@ class SeriesReportResultTest :
     StringSpec({
         "targeting by tournamentCodeId attaches to that exact code" {
             val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns emptyList()
             f.withSeries(listOf(f.code(1, "SHORT-A"), f.code(2, "SHORT-B")))
 
             val outcome = f.service.reportResult(REPORT_SERIES_ID, reported(HOME, codeId = 2))
@@ -159,7 +145,6 @@ class SeriesReportResultTest :
 
         "targeting by shortcode attaches to that exact code" {
             val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns emptyList()
             f.withSeries(listOf(f.code(1, "SHORT-A"), f.code(2, "SHORT-B")))
 
             val outcome = f.service.reportResult(REPORT_SERIES_ID, reported(AWAY, shortcode = "SHORT-A"))
@@ -180,25 +165,8 @@ class SeriesReportResultTest :
             verify(exactly = 0) { f.gameRepo.insert(any()) }
         }
 
-        "with no code given the game is recorded against whichever code Riot names" {
+        "a report with no code is recorded codeless without asking Riot" {
             val f = ReportFixture()
-            val older = f.code(1, "SHORT-OLDER")
-            val newer = f.code(2, "SHORT-NEWER")
-            coEvery { f.gateway.getGames(older.shortcode) } returns listOf(f.riotGame("SHORT-OLDER"))
-            coEvery { f.gateway.getGames(newer.shortcode) } returns emptyList()
-            f.withSeries(listOf(older, newer))
-            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(HOME)
-
-            val outcome = f.service.reportResult(REPORT_SERIES_ID, reported())
-
-            outcome.recorded shouldBe true
-            outcome.game.tournamentCodeId shouldBe TournamentCodeId(1)
-            f.games.size shouldBe 1
-        }
-
-        "a report Riot cannot account for is recorded codeless, leaving every code outstanding" {
-            val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns emptyList()
             f.withSeries(listOf(f.code(1, "SHORT-A"), f.code(2, "SHORT-B")))
 
             val outcome = f.service.reportResult(REPORT_SERIES_ID, reported(HOME))
@@ -207,17 +175,7 @@ class SeriesReportResultTest :
             outcome.game.tournamentCodeId shouldBe null
             outcome.game.riotMatchId shouldBe null
             f.games.count { it.tournamentCodeId != null } shouldBe 0
-        }
-
-        "Riot being unreachable still records a codeless game" {
-            val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } throws RiotApiException("503")
-            f.withSeries(listOf(f.code(1, "SHORT-A")))
-
-            val outcome = f.service.reportResult(REPORT_SERIES_ID, reported(HOME))
-
-            outcome.recorded shouldBe true
-            outcome.game.tournamentCodeId shouldBe null
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
         }
 
         "reporting a code that already has a result returns the existing game" {
@@ -232,37 +190,14 @@ class SeriesReportResultTest :
             verify(exactly = 0) { f.gameRepo.insert(any()) }
         }
 
-        "with no winner named Riot's winner is used" {
+        "a report with no winner is rejected" {
             val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns listOf(f.riotGame())
-            f.withSeries(listOf(f.code(1, "SHORT-A")))
-            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(AWAY)
-
-            val outcome = f.service.reportResult(REPORT_SERIES_ID, reported())
-
-            outcome.recorded shouldBe true
-            outcome.game.result shouldBe GameResult(AWAY, HOME)
-        }
-
-        "with no winner named anywhere the report is rejected rather than silently dropped" {
-            val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns emptyList()
             f.withSeries(listOf(f.code(1, "SHORT-A")))
 
-            shouldThrow<IllegalArgumentException> { f.service.reportResult(REPORT_SERIES_ID, reported()) }
+            shouldThrow<IllegalArgumentException> {
+                f.service.reportResult(REPORT_SERIES_ID, reported(codeId = 1))
+            }
 
-            verify(exactly = 0) { f.gameRepo.insert(any()) }
-        }
-
-        "a bare report after the callback already landed is a no-op, not a duplicate" {
-            val f = ReportFixture()
-            val existing = f.recordedGame(codeId = 1)
-            f.withSeries(listOf(f.code(1, "SHORT-A")), recorded = listOf(existing))
-
-            val outcome = f.service.reportResult(REPORT_SERIES_ID, reported())
-
-            outcome.recorded shouldBe false
-            outcome.game shouldBe existing
             verify(exactly = 0) { f.gameRepo.insert(any()) }
         }
 
@@ -314,7 +249,6 @@ class SeriesReportResultTest :
 
         "a report that clinches the series closes it" {
             val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns emptyList()
             f.withSeries(listOf(f.code(1, "SHORT-A")), recorded = listOf(f.recordedGame(codeId = 1)))
 
             f.service.reportResult(REPORT_SERIES_ID, reported(HOME))
@@ -326,12 +260,39 @@ class SeriesReportResultTest :
 
         "a mixed series counts coded and codeless games alike" {
             val f = ReportFixture()
-            coEvery { f.gateway.getGames(any()) } returns emptyList()
             f.withSeries(listOf(f.code(1, "SHORT-A")), recorded = listOf(f.recordedGame(codeId = 1)))
 
             f.service.reportResult(REPORT_SERIES_ID, reported(HOME))
 
             f.games.map { it.tournamentCodeId } shouldBe listOf(TournamentCodeId(1), null)
             f.games.mapNotNull { it.result?.winningTeamId } shouldBe listOf(HOME, HOME)
+        }
+
+        "a report on a double-loss series records the game and keeps the double loss" {
+            val f = ReportFixture()
+            f.withSeries(listOf(f.code(1, "SHORT-A")))
+            every { f.seriesRepo.getById(REPORT_SERIES_ID) } returns
+                f.series.copy(status = SeriesStatus.COMPLETE, doubleLoss = true)
+
+            val outcome = f.service.reportResult(REPORT_SERIES_ID, reported(HOME, codeId = 1))
+
+            outcome.recorded shouldBe true
+            verify(exactly = 1) { f.gameRepo.insert(any()) }
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
+        "a report that loses the insert race returns the game that won it" {
+            val f = ReportFixture()
+            f.withSeries(listOf(f.code(1, "SHORT-A")))
+            val winner = f.recordedGame(codeId = 1)
+            every { f.gameRepo.insert(any()) } answers {
+                f.games += winner
+                throw IllegalStateException("Tournament code '1' already has a game recorded.")
+            }
+
+            val outcome = f.service.reportResult(REPORT_SERIES_ID, reported(HOME, codeId = 1))
+
+            outcome.recorded shouldBe false
+            outcome.game shouldBe winner
         }
     })
