@@ -19,6 +19,7 @@ data class SeriesWithGames(
     val status: SeriesStatus,
     val tournamentCodes: List<TournamentCode>,
     val games: List<Game>,
+    val doubleLoss: Boolean = false,
 ) {
     val lastCodeIssuedAt: Instant? get() = tournamentCodes.maxOfOrNull { it.createdAt }
     val lastGameAt: Instant? get() = games.maxOfOrNull { it.createdAt }

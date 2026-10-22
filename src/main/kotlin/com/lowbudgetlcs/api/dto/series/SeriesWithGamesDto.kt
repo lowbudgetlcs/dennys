@@ -22,4 +22,6 @@ data class SeriesWithGamesDto(
     val lastCodeIssuedAt: Instant? = null,
     @Contextual
     val lastGameAt: Instant? = null,
+    val winnerTeamId: Int? = null,
+    val doubleLoss: Boolean = false,
 )

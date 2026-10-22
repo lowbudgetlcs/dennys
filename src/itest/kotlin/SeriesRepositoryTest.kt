@@ -106,15 +106,16 @@ class SeriesRepositoryTest :
             created.status shouldBe SeriesStatus.NOT_STARTED
         }
 
-        test("complete sets the status to complete") {
+        test("setStatus to complete with no result leaves no series_results row") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
 
-            val completed = repo.complete(created.id)
+            val completed = repo.setStatus(created.id, SeriesStatus.COMPLETE)
             completed.shouldNotBeNull()
 
             completed.status shouldBe SeriesStatus.COMPLETE
-            repo.getById(created.id)?.status shouldBe SeriesStatus.COMPLETE
+            completed.result shouldBe null
+            completed.doubleLoss shouldBe false
         }
 
         test("a forfeit writes series_results with no games played") {
@@ -122,7 +123,7 @@ class SeriesRepositoryTest :
             created.shouldNotBeNull()
 
             val completed =
-                repo.complete(created.id, SeriesResult(team1.id, team2.id))
+                repo.setStatus(created.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id))
             completed.shouldNotBeNull()
 
             completed.status shouldBe SeriesStatus.COMPLETE
@@ -135,33 +136,58 @@ class SeriesRepositoryTest :
         test("completing twice overwrites the result rather than duplicating the row") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            repo.complete(created.id, SeriesResult(team1.id, team2.id))
+            repo.setStatus(created.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id))
 
             val corrected =
-                repo.complete(created.id, SeriesResult(team2.id, team1.id))
+                repo.setStatus(created.id, SeriesStatus.COMPLETE, SeriesResult(team2.id, team1.id))
             corrected.shouldNotBeNull()
 
             corrected.result?.winningTeamId shouldBe team2.id
             dsl.fetchCount(SERIES_RESULTS, SERIES_RESULTS.SERIES_ID.eq(created.id.value)) shouldBe 1
         }
 
-        test("reopen moves the series back to in progress and preserves series_results") {
+        test("a double loss reads back with no winner, and a later winner replaces it") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            dsl
-                .insertInto(SERIES_RESULTS)
-                .set(SERIES_RESULTS.SERIES_ID, created.id.value)
-                .set(SERIES_RESULTS.WINNER_TEAM_ID, team1.id.value)
-                .set(SERIES_RESULTS.LOSER_TEAM_ID, team2.id.value)
-                .execute()
-            repo.complete(created.id)
 
-            val reopened = repo.reopen(created.id)
-            reopened.shouldNotBeNull()
+            val doubleLoss = repo.setStatus(created.id, SeriesStatus.COMPLETE, doubleLoss = true)
+            doubleLoss.shouldNotBeNull()
+            doubleLoss.doubleLoss shouldBe true
+            doubleLoss.result shouldBe null
 
-            reopened.status shouldBe SeriesStatus.IN_PROGRESS
-            reopened.result.shouldNotBeNull()
-            reopened.result?.winningTeamId shouldBe team1.id
+            val won = repo.setStatus(created.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id))
+            won.shouldNotBeNull()
+            won.doubleLoss shouldBe false
+            won.result?.winningTeamId shouldBe team1.id
+        }
+
+        test("a status other than complete clears the result") {
+            val created = repo.insert(newSeries)
+            created.shouldNotBeNull()
+            repo.setStatus(created.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id))
+
+            val cancelled = repo.setStatus(created.id, SeriesStatus.CANCELLED)
+            cancelled.shouldNotBeNull()
+
+            cancelled.status shouldBe SeriesStatus.CANCELLED
+            cancelled.result shouldBe null
+            dsl.fetchCount(SERIES_RESULTS, SERIES_RESULTS.SERIES_ID.eq(created.id.value)) shouldBe 0
+        }
+
+        test("markInProgress starts a not-started series and leaves every other status alone") {
+            val created = repo.insert(newSeries)
+            created.shouldNotBeNull()
+
+            repo.markInProgress(created.id)
+            repo.getById(created.id)?.status shouldBe SeriesStatus.IN_PROGRESS
+            repo.markInProgress(created.id)
+            repo.getById(created.id)?.status shouldBe SeriesStatus.IN_PROGRESS
+
+            listOf(SeriesStatus.COMPLETE, SeriesStatus.CANCELLED).forEach { status ->
+                repo.setStatus(created.id, status)
+                repo.markInProgress(created.id)
+                repo.getById(created.id)?.status shouldBe status
+            }
         }
 
         test("two series with the same pair and stage keep a stable id order across calls") {
@@ -185,7 +211,7 @@ class SeriesRepositoryTest :
 
             repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
 
-            repo.complete(first.id)
+            repo.setStatus(first.id, SeriesStatus.COMPLETE)
 
             repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
             repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
@@ -208,7 +234,7 @@ class SeriesRepositoryTest :
             val repeatPair = newSeries.copy(eventId = filterEvent.id, eventStage = EventStage.PLAYOFFS)
             val open = repo.insert(repeatPair) ?: throw Exception("Failed to insert open series.")
             val closed = repo.insert(repeatPair) ?: throw Exception("Failed to insert series to close.")
-            repo.complete(closed.id)
+            repo.setStatus(closed.id, SeriesStatus.COMPLETE)
             val all = repo.getAllByEventId(filterEvent.id)
 
             all

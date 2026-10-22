@@ -37,6 +37,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import java.time.Instant
 
 private val CAP_BLUE = TeamId(1)
@@ -113,8 +114,10 @@ private class CapFixture(
     fun holding(
         codes: List<TournamentCode> = emptyList(),
         games: List<Game> = emptyList(),
+        status: SeriesStatus = SeriesStatus.NOT_STARTED,
     ) {
-        every { seriesRepo.getById(CAP_SERIES_ID) } returns series
+        every { seriesRepo.getById(CAP_SERIES_ID) } returns series.copy(status = status)
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { codeRepo.getBySeriesId(CAP_SERIES_ID) } returns codes
         every { gameRepo.getBySeriesId(CAP_SERIES_ID) } returns games
         every { teamRepo.getById(CAP_BLUE) } returns Team(CAP_BLUE, "Blue".toTeamName(), null, CAP_EVENT_ID)
@@ -137,6 +140,14 @@ class SeriesCodeCapTest :
             f.service.createGame(f.newCode).seriesId shouldBe CAP_SERIES_ID
 
             coVerify(exactly = 1) { f.gateway.getCode(any(), any()) }
+            verify(exactly = 1) { f.seriesRepo.markInProgress(CAP_SERIES_ID) }
+        }
+
+        "a code is issued for a series that is already in progress" {
+            val f = CapFixture()
+            f.holding(codes = listOf(f.code(1, f.at(10))), status = SeriesStatus.IN_PROGRESS)
+
+            f.service.createGame(f.newCode).seriesId shouldBe CAP_SERIES_ID
         }
 
         "the third code for one game is refused" {

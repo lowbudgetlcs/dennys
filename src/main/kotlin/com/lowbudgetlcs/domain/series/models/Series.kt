@@ -14,4 +14,9 @@ data class Series(
     val participants: Pair<TeamId, TeamId>,
     val result: SeriesResult?,
     val status: SeriesStatus,
-)
+    val doubleLoss: Boolean = false,
+) {
+    init {
+        require(result == null || !doubleLoss) { "A double-loss series cannot have a winner." }
+    }
+}

@@ -105,6 +105,7 @@ private class ReportFixture {
         games.clear()
         games += recorded
         every { seriesRepo.getById(REPORT_SERIES_ID) } returns series
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { gameRepo.getBySeriesId(REPORT_SERIES_ID) } answers { games.toList() }
         every { codeRepo.getBySeriesId(REPORT_SERIES_ID) } returns codes
         codes.forEach {
@@ -126,7 +127,7 @@ private class ReportFixture {
             games += game
             game
         }
-        every { seriesRepo.complete(any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
+        every { seriesRepo.setStatus(any(), any(), any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
     }
 }
 
@@ -319,7 +320,7 @@ class SeriesReportResultTest :
             f.service.reportResult(REPORT_SERIES_ID, reported(HOME))
 
             verify(exactly = 1) {
-                f.seriesRepo.complete(REPORT_SERIES_ID, SeriesResult(HOME, AWAY))
+                f.seriesRepo.setStatus(REPORT_SERIES_ID, SeriesStatus.COMPLETE, SeriesResult(HOME, AWAY), false)
             }
         }
 

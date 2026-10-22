@@ -102,10 +102,11 @@ private class Fixture {
         recorded: List<Game> = emptyList(),
     ) {
         every { seriesRepo.getById(SERIES_ID) } returns series
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { gameRepo.getBySeriesId(SERIES_ID) } returns recorded
         every { codeRepo.getBySeriesId(SERIES_ID) } returns codes
         every { gameRepo.insert(any()) } returns null
-        every { seriesRepo.complete(any(), any()) } returns series
+        every { seriesRepo.setStatus(any(), any(), any(), any()) } returns series
     }
 }
 

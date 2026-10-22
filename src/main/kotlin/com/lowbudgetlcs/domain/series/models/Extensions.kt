@@ -39,4 +39,5 @@ fun Series.toSeriesWithGames(
         status = status,
         tournamentCodes = tournamentCodes,
         games = games,
+        doubleLoss = doubleLoss,
     )

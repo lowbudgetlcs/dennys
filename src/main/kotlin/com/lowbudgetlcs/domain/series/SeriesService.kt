@@ -93,21 +93,23 @@ class SeriesService(
             logger.debug("Series '$id' is not eligible for auto-close, skipping evaluation.")
             return series
         }
+        if (series.status == SeriesStatus.NOT_STARTED) seriesRepo.markInProgress(id)
+        val open = series.copy(status = SeriesStatus.IN_PROGRESS)
         val wins =
             gameRepo
                 .getBySeriesId(id)
                 .mapNotNull { it.result }
                 .groupingBy { it.winningTeamId }
                 .eachCount()
-        val leader = wins.maxByOrNull { it.value } ?: return series
+        val leader = wins.maxByOrNull { it.value } ?: return open
         // Wins, not games played: a 2-0 Bo3 is over after two games.
         if (leader.value <= series.totalGames / 2) {
             logger.debug("Series '$id' at ${leader.value} win(s) of ${series.totalGames}, still open.")
-            return series
+            return open
         }
-        val loser = series.participants.toList().firstOrNull { it != leader.key } ?: return series
+        val loser = series.participants.toList().firstOrNull { it != leader.key } ?: return open
         logger.debug("Series '$id' won by '${leader.key}', closing.")
-        return seriesRepo.complete(id, SeriesResult(leader.key, loser))
+        return seriesRepo.setStatus(id, SeriesStatus.COMPLETE, SeriesResult(leader.key, loser))
             ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
     }
 
@@ -277,29 +279,21 @@ class SeriesService(
         return game
     }
 
-    override fun completeSeries(
+    override fun patchSeries(
         id: SeriesId,
+        status: SeriesStatus,
         winningTeamId: TeamId?,
-        losingTeamId: TeamId?,
+        doubleLoss: Boolean,
     ): Series {
-        val series = getSeries(id)
-        check(series.status != SeriesStatus.COMPLETE) {
-            "Series '${id.value}' is already complete. Reopen it before completing it again."
+        require(winningTeamId == null || !doubleLoss) { "A double-loss series cannot have a winner." }
+        require(status == SeriesStatus.COMPLETE || (winningTeamId == null && !doubleLoss)) {
+            "Only a COMPLETE series can have a winner or a double loss."
         }
-        val result = winnerAndLoser(series, winningTeamId, losingTeamId)?.let { SeriesResult(it.first, it.second) }
-        logger.info("Closing series '$id' manually, winner '${result?.winningTeamId}'.")
-        return seriesRepo.complete(id, result)
-            ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
-    }
-
-    override fun reopenSeries(id: SeriesId): Series {
         val series = getSeries(id)
-        check(
-            series.status == SeriesStatus.COMPLETE,
-        ) { "Series '${id.value}' is not complete, so it cannot be reopened." }
-        logger.info("Reopening series '$id'.")
-        return seriesRepo.reopen(id)
-            ?: throw DatabaseException("Failed to reopen series with id '${id.value}'.")
+        val result = winnerAndLoser(series, winningTeamId, null)?.let { SeriesResult(it.first, it.second) }
+        logger.info("Setting series '$id' to $status, winner '${result?.winningTeamId}', double loss $doubleLoss.")
+        return seriesRepo.setStatus(id, status, result, doubleLoss)
+            ?: throw DatabaseException("Failed to update series with id '${id.value}'.")
     }
 
     private fun declaredResult(
@@ -469,6 +463,8 @@ class SeriesService(
         val shortcode =
             response.codes.firstOrNull()
                 ?: throw GatewayException("Riot returned no tournament codes for event '${event.id.value}'.")
-        return codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
+        val code = codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
+        seriesRepo.markInProgress(series.id)
+        return code
     }
 }
