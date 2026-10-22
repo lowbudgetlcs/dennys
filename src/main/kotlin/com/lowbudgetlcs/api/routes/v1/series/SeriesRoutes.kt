@@ -33,8 +33,8 @@ fun Route.seriesRoutesV1(seriesService: ISeriesService) {
         post<SeriesResources.TournamentCode> { route ->
             val dto = call.receive<CreateGameDto>()
             logger.debug(dto.toString())
-            val created = seriesService.createGame(dto.toNewTournamentCode(route.seriesId))
-            call.respond(HttpStatusCode.Created, created.toDto())
+            val outcome = seriesService.createGame(dto.toNewTournamentCode(route.seriesId), dto.newCode)
+            call.respond(if (outcome.issued) HttpStatusCode.Created else HttpStatusCode.OK, outcome.code.toDto())
         }
         get<SeriesResources.ById> { route ->
             val series = seriesService.getSeriesWithGames(route.seriesId.toSeriesId())

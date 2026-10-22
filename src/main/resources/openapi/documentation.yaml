@@ -886,7 +886,13 @@ paths:
     post:
       summary: Issue a tournament code for a series
       description: |
-        Issues a new Riot tournament code.
+        Issues a Riot tournament code for the series' current game.
+
+        Idempotent by default: if a code has already been issued since the
+        most recent recorded game, that code is returned with `200` and Riot is
+        not called, so two captains pressing at once share one code. Send
+        `newCode: true` to issue another one deliberately, for example to
+        replace a code that did not work.
 
         A series may be issued at most **2 codes per game**, counted since the
         most recent recorded game. Recording a result ends the current game and
@@ -901,8 +907,8 @@ paths:
 
         The first code issued moves a `NOT_STARTED` series to `IN_PROGRESS`.
         Issuance is still not blocked by the series being complete, and a
-        replacement for a code that did not work is simply another call to this
-        endpoint. There is no void step: a code with no result does not count
+        replacement for a code that did not work is another call to this
+        endpoint with `newCode: true`. There is no void step: a code with no result does not count
         towards the game number, though it does count towards the limit — so a
         replacement for a bum code spends the second of the two, and the next
         step after that is a custom game.
@@ -922,6 +928,14 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateGameDto"
       responses:
+        "200":
+          description: |
+            A code was already issued since the most recent recorded game, and
+            `newCode` was not set. That code is returned; Riot was not called.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TournamentCodeDto"
         "201":
           description: |
             Tournament code issued.
@@ -954,7 +968,8 @@ paths:
         "409":
           description: |
             The series already holds the maximum of 2 tournament codes for the
-            current game. Riot was not called.
+            current game. Riot was not called. The body's `reason` is
+            `CODE_LIMIT`.
 
             Record a result to reset the allowance — either report the game
             that was played, or play a custom game and report the winner.
@@ -1845,6 +1860,12 @@ components:
         redTeamId:
           type: integer
           example: 12
+        newCode:
+          type: boolean
+          default: false
+          description: |
+            Issue a new code even if one is already open for the current game.
+            Still subject to the per-game limit.
 
     # Event Group Schemas
     CreateEventGroupDto:
@@ -2506,6 +2527,13 @@ components:
           type: integer
         message:
           type: string
+        reason:
+          type: string
+          nullable: true
+          description: |
+            Identifies which conflict a `409` is, where a client needs to tell
+            them apart. `CODE_LIMIT`: the per-game tournament code limit.
+          example: CODE_LIMIT
       required:
         - code
         - message
