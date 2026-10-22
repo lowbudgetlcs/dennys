@@ -149,11 +149,12 @@ private class CallbackFixture {
         games.clear()
         games += recorded
         every { seriesRepo.getById(CB_SERIES_ID) } returns series
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { codeRepo.getByShortcode(Shortcode(CB_SHORTCODE)) } returns code
         every { codeRepo.getBySeriesId(CB_SERIES_ID) } returns listOf(code)
         every { gameRepo.getBySeriesId(CB_SERIES_ID) } answers { games.toList() }
         every { teamRepo.getTeamIdsByPuuids(any()) } returns listOf(CB_BLUE)
-        every { seriesRepo.complete(any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
+        every { seriesRepo.setStatus(any(), any(), any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
         every { gameRepo.insert(any()) } answers {
             val new = firstArg<NewGame>()
             val game =
@@ -257,7 +258,7 @@ class RiotCallbackTest :
             f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ATTRIBUTED
 
             f.games.size shouldBe 1
-            verify(exactly = 0) { f.seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
         }
 
         "a callback for an unknown shortcode writes nothing" {

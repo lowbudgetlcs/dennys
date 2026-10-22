@@ -12,4 +12,6 @@ data class SeriesDto(
     val totalGames: Int,
     val eventStage: EventStage,
     val status: SeriesStatus,
+    val winnerTeamId: Int? = null,
+    val doubleLoss: Boolean = false,
 )

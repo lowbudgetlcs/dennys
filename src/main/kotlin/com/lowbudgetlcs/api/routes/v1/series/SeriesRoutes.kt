@@ -5,7 +5,7 @@ import com.lowbudgetlcs.api.dto.games.ReportResultDto
 import com.lowbudgetlcs.api.dto.games.toDto
 import com.lowbudgetlcs.api.dto.games.toNewTournamentCode
 import com.lowbudgetlcs.api.dto.games.toReportedResult
-import com.lowbudgetlcs.api.dto.series.CompleteSeriesDto
+import com.lowbudgetlcs.api.dto.series.PatchSeriesDto
 import com.lowbudgetlcs.api.dto.series.RefreshSeriesDto
 import com.lowbudgetlcs.api.dto.series.toDto
 import com.lowbudgetlcs.domain.event.models.toShortcode
@@ -17,8 +17,8 @@ import com.lowbudgetlcs.domain.team.models.toTeamId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
-import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
+import io.ktor.server.resources.patch
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -40,19 +40,16 @@ fun Route.seriesRoutesV1(seriesService: ISeriesService) {
             val series = seriesService.getSeriesWithGames(route.seriesId.toSeriesId())
             call.respond(series.toDto())
         }
-        post<SeriesResources.Complete> { route ->
-            val dto = call.receive<CompleteSeriesDto>()
+        patch<SeriesResources.ById> { route ->
+            val dto = call.receive<PatchSeriesDto>()
             logger.debug(dto.toString())
             val series =
-                seriesService.completeSeries(
+                seriesService.patchSeries(
                     route.seriesId.toSeriesId(),
+                    dto.status,
                     dto.winnerTeamId?.toTeamId(),
-                    dto.loserTeamId?.toTeamId(),
+                    dto.doubleLoss,
                 )
-            call.respond(HttpStatusCode.OK, series.toDto())
-        }
-        delete<SeriesResources.Complete> { route ->
-            val series = seriesService.reopenSeries(route.seriesId.toSeriesId())
             call.respond(HttpStatusCode.OK, series.toDto())
         }
         post<SeriesResources.Results> { route ->

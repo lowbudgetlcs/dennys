@@ -16,7 +16,6 @@ import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -48,127 +47,87 @@ private class CompletionFixture {
 
     fun withSeries(series: Series) {
         every { seriesRepo.getById(COMPLETION_SERIES_ID) } returns series
-        every { seriesRepo.complete(any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
-        every { seriesRepo.reopen(any()) } returns series.copy(status = SeriesStatus.IN_PROGRESS)
+        every { seriesRepo.setStatus(any(), any(), any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
     }
 }
 
 class SeriesCompletionTest :
     StringSpec({
-        "completing an open series sets the flags and records the result" {
+        "patching to complete with a winner records the result" {
             val f = CompletionFixture()
             f.withSeries(f.series())
 
-            f.service.completeSeries(COMPLETION_SERIES_ID, WINNER, LOSER)
+            f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, WINNER, false)
 
             verify(exactly = 1) {
-                f.seriesRepo.complete(COMPLETION_SERIES_ID, SeriesResult(WINNER, LOSER))
-            }
-        }
-
-        "a forfeit closes a series with zero games played" {
-            val f = CompletionFixture()
-            f.withSeries(f.series())
-
-            f.service.completeSeries(COMPLETION_SERIES_ID, WINNER, null)
-
-            verify(exactly = 1) {
-                f.seriesRepo.complete(COMPLETION_SERIES_ID, SeriesResult(WINNER, LOSER))
+                f.seriesRepo.setStatus(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, SeriesResult(WINNER, LOSER), false)
             }
             verify(exactly = 0) { f.gameRepo.getBySeriesId(any()) }
         }
 
-        "closing with no winner named sets the flags without writing a result" {
+        "a double loss records no winner" {
             val f = CompletionFixture()
             f.withSeries(f.series())
 
-            f.service.completeSeries(COMPLETION_SERIES_ID, null, null)
+            f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, null, true)
 
-            verify(exactly = 1) { f.seriesRepo.complete(COMPLETION_SERIES_ID, null) }
+            verify(exactly = 1) { f.seriesRepo.setStatus(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, null, true) }
         }
 
-        "completing an already-complete series is a conflict, not a silent overwrite" {
+        "a winner and a double loss together are rejected" {
+            val f = CompletionFixture()
+            f.withSeries(f.series())
+
+            shouldThrow<IllegalArgumentException> {
+                f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, WINNER, true)
+            }
+
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
+        "a winner or double loss on a status other than complete is rejected" {
+            val f = CompletionFixture()
+            f.withSeries(f.series())
+
+            shouldThrow<IllegalArgumentException> {
+                f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.IN_PROGRESS, WINNER, false)
+            }
+            shouldThrow<IllegalArgumentException> {
+                f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.CANCELLED, null, true)
+            }
+
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
+        "a winner outside the series is rejected" {
+            val f = CompletionFixture()
+            f.withSeries(f.series())
+
+            shouldThrow<IllegalArgumentException> {
+                f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, STRANGER, false)
+            }
+
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
+        "a complete series can be patched again to correct its result" {
             val f = CompletionFixture()
             f.withSeries(f.series(SeriesStatus.COMPLETE))
 
-            shouldThrow<IllegalStateException> {
-                f.service.completeSeries(COMPLETION_SERIES_ID, LOSER, WINNER)
-            }
+            f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, LOSER, false)
 
-            verify(exactly = 0) { f.seriesRepo.complete(any(), any()) }
-        }
-
-        "a winner outside the series is rejected on its own, not via the loser check" {
-            val f = CompletionFixture()
-            f.withSeries(f.series())
-
-            shouldThrow<IllegalArgumentException> {
-                f.service.completeSeries(COMPLETION_SERIES_ID, STRANGER, null)
-            }
-
-            verify(exactly = 0) { f.seriesRepo.complete(any(), any()) }
-        }
-
-        "a winner outside the series is rejected when a loser is named too" {
-            val f = CompletionFixture()
-            f.withSeries(f.series())
-
-            shouldThrow<IllegalArgumentException> {
-                f.service.completeSeries(COMPLETION_SERIES_ID, STRANGER, LOSER)
+            verify(exactly = 1) {
+                f.seriesRepo.setStatus(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, SeriesResult(LOSER, WINNER), false)
             }
         }
 
-        "a loser that contradicts the winner is rejected" {
-            val f = CompletionFixture()
-            f.withSeries(f.series())
-
-            shouldThrow<IllegalArgumentException> {
-                f.service.completeSeries(COMPLETION_SERIES_ID, WINNER, WINNER)
-            }
-        }
-
-        "a loser without a winner is rejected" {
-            val f = CompletionFixture()
-            f.withSeries(f.series())
-
-            shouldThrow<IllegalArgumentException> {
-                f.service.completeSeries(COMPLETION_SERIES_ID, null, LOSER)
-            }
-        }
-
-        "completing an unknown series is not found" {
+        "patching an unknown series is not found" {
             val f = CompletionFixture()
             every { f.seriesRepo.getById(COMPLETION_SERIES_ID) } returns null
 
             shouldThrow<NoSuchElementException> {
-                f.service.completeSeries(COMPLETION_SERIES_ID, WINNER, LOSER)
+                f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, WINNER, false)
             }
-        }
-
-        "reopening a complete series moves it back to in progress" {
-            val f = CompletionFixture()
-            f.withSeries(f.series(SeriesStatus.COMPLETE))
-
-            val reopened = f.service.reopenSeries(COMPLETION_SERIES_ID)
-
-            verify(exactly = 1) { f.seriesRepo.reopen(COMPLETION_SERIES_ID) }
-            reopened.status shouldBe SeriesStatus.IN_PROGRESS
-        }
-
-        "reopening a series that is not complete is a conflict" {
-            val f = CompletionFixture()
-            f.withSeries(f.series())
-
-            shouldThrow<IllegalStateException> { f.service.reopenSeries(COMPLETION_SERIES_ID) }
-
-            verify(exactly = 0) { f.seriesRepo.reopen(any()) }
-        }
-
-        "reopening an unknown series is not found" {
-            val f = CompletionFixture()
-            every { f.seriesRepo.getById(COMPLETION_SERIES_ID) } returns null
-
-            shouldThrow<NoSuchElementException> { f.service.reopenSeries(COMPLETION_SERIES_ID) }
         }
 
         "a cancelled series is not closed by a later result" {
@@ -177,18 +136,13 @@ class SeriesCompletionTest :
 
             f.service.evaluateCompletion(COMPLETION_SERIES_ID)
 
-            verify(exactly = 0) { f.seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
             verify(exactly = 0) { f.gameRepo.getBySeriesId(any()) }
         }
 
-        "manual completion works on a cancelled series" {
-            val f = CompletionFixture()
-            f.withSeries(f.series(SeriesStatus.CANCELLED))
-
-            f.service.completeSeries(COMPLETION_SERIES_ID, WINNER, LOSER)
-
-            verify(exactly = 1) {
-                f.seriesRepo.complete(COMPLETION_SERIES_ID, SeriesResult(WINNER, LOSER))
+        "a series cannot hold both a winner and a double loss" {
+            shouldThrow<IllegalArgumentException> {
+                CompletionFixture().series().copy(result = SeriesResult(WINNER, LOSER), doubleLoss = true)
             }
         }
     })

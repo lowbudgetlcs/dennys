@@ -12,6 +12,7 @@ import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
 interface ISeriesService {
@@ -43,7 +44,7 @@ interface ISeriesService {
     /**
      * Re-evaluate whether a series is finished and close it if so. Run on every
      * result write, whichever source it came from. No-op unless the series is
-     * NOT_STARTED or IN_PROGRESS.
+     * NOT_STARTED or IN_PROGRESS; a NOT_STARTED series moves to IN_PROGRESS.
      */
     fun evaluateCompletion(id: SeriesId): Series
 
@@ -74,13 +75,20 @@ interface ISeriesService {
         report: ReportedResult,
     ): ReportOutcome
 
-    fun completeSeries(
+    /**
+     * Set a series' status by hand. A winner records a COMPLETE result (a forfeit when no games
+     * were played); [doubleLoss] records a loss for both teams with no winner.
+     *
+     * @throws IllegalArgumentException if a winner and [doubleLoss] are both given, either is given
+     *   with a status other than COMPLETE, or the winner is not a participant.
+     * @throws NoSuchElementException if the series does not exist.
+     */
+    fun patchSeries(
         id: SeriesId,
+        status: SeriesStatus,
         winningTeamId: TeamId?,
-        losingTeamId: TeamId?,
+        doubleLoss: Boolean,
     ): Series
-
-    fun reopenSeries(id: SeriesId): Series
 
     fun getSeriesWithGames(id: SeriesId): SeriesWithGames
 

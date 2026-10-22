@@ -17,6 +17,8 @@ fun Series.toDto(): SeriesDto =
         totalGames = totalGames,
         eventStage = eventStage,
         status = status,
+        winnerTeamId = result?.winningTeamId?.value,
+        doubleLoss = doubleLoss,
     )
 
 fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
@@ -46,4 +48,6 @@ fun SeriesWithGames.toDto(): SeriesWithGamesDto =
         games = games.map { it.toDto() },
         lastCodeIssuedAt = lastCodeIssuedAt,
         lastGameAt = lastGameAt,
+        winnerTeamId = result?.winningTeamId?.value,
+        doubleLoss = doubleLoss,
     )

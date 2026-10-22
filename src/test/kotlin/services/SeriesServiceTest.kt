@@ -240,8 +240,10 @@ class SeriesServiceTest :
             winners: List<TeamId> = emptyList(),
         ) {
             every { seriesRepo.getById(any()) } returns series
+            every { seriesRepo.markInProgress(any()) } returns Unit
             every { gameRepo.getBySeriesId(any()) } returns gamesWon(winners)
-            every { seriesRepo.complete(series.id, any()) } returns series.copy(status = SeriesStatus.COMPLETE)
+            every { seriesRepo.setStatus(series.id, any(), any(), any()) } returns
+                series.copy(status = SeriesStatus.COMPLETE)
         }
 
         "Bo3 closes at 2-0" {
@@ -251,7 +253,7 @@ class SeriesServiceTest :
             service.evaluateCompletion(series.id)
 
             verify(exactly = 1) {
-                seriesRepo.complete(series.id, SeriesResult(team1.id, team2.id))
+                seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id), false)
             }
         }
 
@@ -262,7 +264,7 @@ class SeriesServiceTest :
             service.evaluateCompletion(series.id)
 
             verify(exactly = 1) {
-                seriesRepo.complete(series.id, SeriesResult(team1.id, team2.id))
+                seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id), false)
             }
         }
 
@@ -272,7 +274,16 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
+        "the first game on a not-started series starts it" {
+            val series = seriesOf(3, status = SeriesStatus.NOT_STARTED)
+            arrange(series, listOf(team1.id))
+
+            service.evaluateCompletion(series.id).status shouldBe SeriesStatus.IN_PROGRESS
+
+            verify(exactly = 1) { seriesRepo.markInProgress(series.id) }
         }
 
         "Bo5 closes at 3-0, 3-1 and 3-2 but not 2-2" {
@@ -288,7 +299,7 @@ class SeriesServiceTest :
                 service.evaluateCompletion(series.id)
 
                 verify(exactly = 1) {
-                    seriesRepo.complete(series.id, SeriesResult(team1.id, team2.id))
+                    seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id), false)
                 }
             }
 
@@ -298,7 +309,7 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(drawn.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
         }
 
         "the winner recorded is the team with more wins" {
@@ -308,7 +319,7 @@ class SeriesServiceTest :
             service.evaluateCompletion(series.id)
 
             verify(exactly = 1) {
-                seriesRepo.complete(series.id, SeriesResult(team2.id, team1.id))
+                seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team2.id, team1.id), false)
             }
         }
 
@@ -318,7 +329,7 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
             verify(exactly = 0) { gameRepo.getBySeriesId(any()) }
         }
 
@@ -328,7 +339,7 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
             verify(exactly = 0) { gameRepo.getBySeriesId(any()) }
         }
 
@@ -338,6 +349,6 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
         }
     })

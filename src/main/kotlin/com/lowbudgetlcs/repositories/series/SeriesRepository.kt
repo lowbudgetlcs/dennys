@@ -62,40 +62,50 @@ class SeriesRepository(
         dsl.delete(SERIES).where(SERIES.ID.eq(id.value)).execute()
     }
 
-    override fun complete(
+    override fun setStatus(
         id: SeriesId,
+        status: SeriesStatus,
         result: SeriesResult?,
+        doubleLoss: Boolean,
     ): Series? {
         dsl.transaction { t ->
             val tx = t.dsl()
             tx
                 .update(SERIES)
-                .set(SERIES.STATUS, SeriesStatus.COMPLETE.name)
+                .set(SERIES.STATUS, status.name)
                 .where(SERIES.ID.eq(id.value))
                 .execute()
-            result?.let {
-                tx
-                    .insertInto(SERIES_RESULTS)
-                    .set(SERIES_RESULTS.SERIES_ID, id.value)
-                    .set(SERIES_RESULTS.WINNER_TEAM_ID, it.winningTeamId.value)
-                    .set(SERIES_RESULTS.LOSER_TEAM_ID, it.losingTeamId.value)
-                    .onConflict(SERIES_RESULTS.SERIES_ID)
-                    .doUpdate()
-                    .set(SERIES_RESULTS.WINNER_TEAM_ID, it.winningTeamId.value)
-                    .set(SERIES_RESULTS.LOSER_TEAM_ID, it.losingTeamId.value)
-                    .execute()
+            when {
+                status != SeriesStatus.COMPLETE ->
+                    tx.deleteFrom(SERIES_RESULTS).where(SERIES_RESULTS.SERIES_ID.eq(id.value)).execute()
+
+                result != null || doubleLoss -> {
+                    // A row with no winner and no loser is a double loss.
+                    val winner = result?.winningTeamId?.value
+                    val loser = result?.losingTeamId?.value
+                    tx
+                        .insertInto(SERIES_RESULTS)
+                        .set(SERIES_RESULTS.SERIES_ID, id.value)
+                        .set(SERIES_RESULTS.WINNER_TEAM_ID, winner)
+                        .set(SERIES_RESULTS.LOSER_TEAM_ID, loser)
+                        .onConflict(SERIES_RESULTS.SERIES_ID)
+                        .doUpdate()
+                        .set(SERIES_RESULTS.WINNER_TEAM_ID, winner)
+                        .set(SERIES_RESULTS.LOSER_TEAM_ID, loser)
+                        .execute()
+                }
             }
         }
         return getById(id)
     }
 
-    override fun reopen(id: SeriesId): Series? {
+    override fun markInProgress(id: SeriesId) {
         dsl
             .update(SERIES)
             .set(SERIES.STATUS, SeriesStatus.IN_PROGRESS.name)
             .where(SERIES.ID.eq(id.value))
+            .and(SERIES.STATUS.eq(SeriesStatus.NOT_STARTED.name))
             .execute()
-        return getById(id)
     }
 
     // Typed multiset to select all teams associated with a series.
@@ -114,6 +124,7 @@ class SeriesRepository(
                 SERIES.STAGE,
                 SERIES.STATUS,
                 participants,
+                SERIES_RESULTS.SERIES_ID,
                 SERIES_RESULTS.WINNER_TEAM_ID,
                 SERIES_RESULTS.LOSER_TEAM_ID,
             ).from(SERIES)
@@ -142,6 +153,7 @@ class SeriesRepository(
                 participants = participants,
                 result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,
                 status = status,
+                doubleLoss = row[SERIES_RESULTS.SERIES_ID] != null && winner == null,
             )
         return s
     }
