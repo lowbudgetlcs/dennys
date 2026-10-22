@@ -70,6 +70,17 @@ interface ISeriesService {
         shortcode: Shortcode?,
     ): RefreshOutcome
 
+    /**
+     * Record the winner a captain reported, without asking Riot. A report naming a code is
+     * idempotent: a code that already has a result returns that game with `recorded = false`.
+     * A report on a series that is not NOT_STARTED or IN_PROGRESS records the game but does not
+     * change the series' status or result.
+     *
+     * @throws IllegalArgumentException if no winner is given, the winner is not a participant, or
+     *   both a tournamentCodeId and a shortcode are given.
+     * @throws NoSuchElementException if the series or code does not exist, or the code belongs to
+     *   another series.
+     */
     suspend fun reportResult(
         id: SeriesId,
         report: ReportedResult,

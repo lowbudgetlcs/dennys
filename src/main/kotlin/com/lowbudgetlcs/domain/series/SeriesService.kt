@@ -229,43 +229,27 @@ class SeriesService(
         require(report.tournamentCodeId == null || report.shortcode == null) {
             "Provide either tournamentCodeId or shortcode, not both."
         }
-        val declared = declaredResult(series, report)
-        val target = resolveTarget(series, report.tournamentCodeId, report.shortcode)
+        val declared = declaredResult(series, report) ?: throw IllegalArgumentException("winnerTeamId is required.")
+        val target =
+            resolveTarget(series, report.tournamentCodeId, report.shortcode)
+                ?: return ReportOutcome(record(id, null, declared), recorded = true)
 
-        val before = gameRepo.getBySeriesId(id)
-        if (target != null) {
-            before.firstOrNull { it.tournamentCodeId == target.id && it.result != null }?.let {
-                logger.info("Code '${target.shortcode.value}' already has a result, returning game '${it.id.value}'.")
-                return ReportOutcome(it, recorded = false)
-            }
+        existingGame(id, target)?.let {
+            logger.info("Code '${target.shortcode.value}' already has a result, returning game '${it.id.value}'.")
+            return ReportOutcome(it, recorded = false)
         }
-        val outstanding = codeRepo.getBySeriesId(id).filter { code -> before.none { it.tournamentCodeId == code.id } }
-
-        refreshQuietly(id)
-        val pulled =
-            gameRepo.getBySeriesId(id).filter { game ->
-                game.result != null && before.none { it.id == game.id }
-            }
-
-        if (target != null) {
-            pulled.firstOrNull { it.tournamentCodeId == target.id }?.let { return ReportOutcome(it, recorded = true) }
-            return ReportOutcome(record(id, target.id, declared ?: noWinner(id)), recorded = true)
+        return try {
+            ReportOutcome(record(id, target.id, declared), recorded = true)
+        } catch (e: IllegalStateException) {
+            // A concurrent report for this code won the insert.
+            ReportOutcome(existingGame(id, target) ?: throw e, recorded = false)
         }
-        pulled.firstOrNull()?.let { return ReportOutcome(it, recorded = true) }
-
-        if (declared == null && outstanding.isEmpty()) {
-            before.lastOrNull { it.result != null }?.let {
-                logger.info("Series '$id' has no outstanding codes, returning recorded game '${it.id.value}'.")
-                return ReportOutcome(it, recorded = false)
-            }
-        }
-        return ReportOutcome(record(id, null, declared ?: noWinner(id)), recorded = true)
     }
 
-    private fun noWinner(id: SeriesId): Nothing =
-        throw IllegalArgumentException(
-            "No winner was named and Riot has no record of a game for series '${id.value}'.",
-        )
+    private fun existingGame(
+        id: SeriesId,
+        code: TournamentCode,
+    ): Game? = gameRepo.getBySeriesId(id).firstOrNull { it.tournamentCodeId == code.id && it.result != null }
 
     private fun record(
         id: SeriesId,
@@ -325,8 +309,8 @@ class SeriesService(
 
     /**
      * Resolve a code by id or by shortcode, whichever was supplied, and refuse one that belongs to a
-     * different series. Returns null when neither was supplied — which `reportResult` treats as "let
-     * Riot decide", and `refreshFromCode` rejects up front.
+     * different series. Returns null when neither was supplied — which `reportResult` records as a
+     * codeless game, and `refreshFromCode` rejects up front.
      */
     private fun resolveTarget(
         series: Series,

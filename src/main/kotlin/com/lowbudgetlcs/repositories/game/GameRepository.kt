@@ -47,6 +47,13 @@ class GameRepository(
                         "Riot match '${matchId.value}' is already recorded as game '$existing'."
                     }
                 }
+                if (newGame.riotMatchId == null) {
+                    newGame.tournamentCodeId?.let { codeId ->
+                        check(tx.fetchCount(GAMES, GAMES.TOURNAMENT_CODE_ID.eq(codeId.value)) == 0) {
+                            "Tournament code '${codeId.value}' already has a game recorded."
+                        }
+                    }
+                }
                 val highest =
                     tx
                         .select(max(GAMES.NUMBER))
