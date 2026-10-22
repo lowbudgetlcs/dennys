@@ -3,8 +3,8 @@ package com.lowbudgetlcs.domain.series
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
-import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
+import com.lowbudgetlcs.domain.series.models.IssueOutcome
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportOutcome
@@ -119,9 +119,15 @@ interface ISeriesService {
     )
 
     /**
-     * Create a game inside of a series.
+     * Issue a tournament code for the series' current game. Without [forceNew], a code already
+     * issued since the last recorded game is returned instead, with `issued = false`, so a repeated
+     * or concurrent request does not spend a second Riot code.
      *
-     * @param NewTournamentCode the new game parameters.
+     * @throws com.lowbudgetlcs.repositories.ConflictException with reason `CODE_LIMIT` when a new
+     *   code would exceed the per-game allowance.
      */
-    suspend fun createGame(newCode: NewTournamentCode): TournamentCode
+    suspend fun createGame(
+        newCode: NewTournamentCode,
+        forceNew: Boolean = false,
+    ): IssueOutcome
 }

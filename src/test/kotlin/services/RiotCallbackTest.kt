@@ -196,7 +196,7 @@ class RiotCallbackTest :
             every { f.eventRepo.getById(CB_EVENT_ID) } returns f.event
             every { f.codeRepo.insert(any(), any()) } returns f.code
 
-            f.service.createGame(NewTournamentCode(CB_SERIES_ID, CB_BLUE, CB_RED))
+            f.service.createGame(NewTournamentCode(CB_SERIES_ID, CB_BLUE, CB_RED), forceNew = true)
 
             val metadata = Json.parseToJsonElement(options.captured.metadata).jsonObject
             metadata["tag"]?.jsonPrimitive?.content shouldBe "LBLCS"

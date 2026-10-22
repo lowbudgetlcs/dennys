@@ -13,6 +13,7 @@ import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.game.models.types.RiotMatchId
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
+import com.lowbudgetlcs.domain.series.models.IssueOutcome
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportOutcome
@@ -30,14 +31,18 @@ import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotRegion
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
+import com.lowbudgetlcs.repositories.ConflictException
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
 
 private const val RELAY_METADATA_TAG = "LBLCS"
 
@@ -55,6 +60,9 @@ class SeriesService(
     private val maxCodesPerGame: Int = DEFAULT_MAX_CODES_PER_GAME,
 ) : ISeriesService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
+    // shortcut: in-process lock, Denny's runs as one container; move to a DB lock if it ever scales out.
+    private val issuing = ConcurrentHashMap<SeriesId, Mutex>()
 
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
@@ -354,9 +362,9 @@ class SeriesService(
      * Codes issued since the most recent recorded game, coded or codeless. Recording a result ends
      * the current game, so the allowance resets rather than accumulating across a long series.
      */
-    private fun codesIssuedForCurrentGame(id: SeriesId): Int {
+    private fun codesForCurrentGame(id: SeriesId): List<TournamentCode> {
         val since = gameRepo.getBySeriesId(id).maxOfOrNull { it.createdAt }
-        return codeRepo.getBySeriesId(id).count { since == null || it.createdAt > since }
+        return codeRepo.getBySeriesId(id).filter { since == null || it.createdAt > since }
     }
 
     private fun riotMatchIdOf(riotGame: RiotTournamentGamesV5Dto): RiotMatchId? {
@@ -415,7 +423,10 @@ class SeriesService(
         }
     }
 
-    override suspend fun createGame(newCode: NewTournamentCode): TournamentCode {
+    override suspend fun createGame(
+        newCode: NewTournamentCode,
+        forceNew: Boolean,
+    ): IssueOutcome {
         logger.debug("Creating new game...")
         logger.debug(newCode.toString())
         val series = getSeries(newCode.seriesId) // Throws if not found
@@ -430,25 +441,34 @@ class SeriesService(
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
-        refreshQuietly(series.id)
-        val issued = codesIssuedForCurrentGame(series.id)
-        if (issued >= maxCodesPerGame) {
-            logger.warn("Series '${series.id}' has $issued code(s) for the current game, refusing to issue another.")
-            throw IllegalStateException(
-                "Series '${series.id.value}' has already been issued $issued tournament code(s) for this game. " +
-                    "Report the result of the game that was played, or play a custom game and report the winner.",
-            )
+        return issuing.computeIfAbsent(series.id) { Mutex() }.withLock {
+            refreshQuietly(series.id)
+            val current = codesForCurrentGame(series.id)
+            if (!forceNew) {
+                current.maxByOrNull { it.createdAt }?.let { return@withLock IssueOutcome(it, issued = false) }
+            }
+            if (current.size >= maxCodesPerGame) {
+                logger.warn(
+                    "Series '${series.id}' has ${current.size} code(s) for the current game, refusing to issue another.",
+                )
+                throw ConflictException(
+                    "Series '${series.id.value}' has already been issued ${current.size} tournament code(s) for this " +
+                        "game. Report the result of the game that was played, or play a custom game and report the " +
+                        "winner.",
+                    reason = "CODE_LIMIT",
+                )
+            }
+            val event =
+                eventRepo.getById(series.eventId)
+                    ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+            val response = gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
+            val shortcode =
+                response.codes.firstOrNull()
+                    ?: throw GatewayException("Riot returned no tournament codes for event '${event.id.value}'.")
+            val code =
+                codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
+            seriesRepo.markInProgress(series.id)
+            IssueOutcome(code, issued = true)
         }
-        logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
-        val event =
-            eventRepo.getById(series.eventId)
-                ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
-        val response = gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
-        val shortcode =
-            response.codes.firstOrNull()
-                ?: throw GatewayException("Riot returned no tournament codes for event '${event.id.value}'.")
-        val code = codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
-        seriesRepo.markInProgress(series.id)
-        return code
     }
 }
