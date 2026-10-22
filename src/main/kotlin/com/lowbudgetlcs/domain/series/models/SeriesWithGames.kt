@@ -5,6 +5,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import java.time.Instant
 
@@ -15,9 +16,7 @@ data class SeriesWithGames(
     val totalGames: Int,
     val participants: Pair<TeamId, TeamId>,
     val result: SeriesResult?,
-    val completed: Boolean,
-    val completedAt: Instant?,
-    val reopenedAt: Instant?,
+    val status: SeriesStatus,
     val tournamentCodes: List<TournamentCode>,
     val games: List<Game>,
 ) {

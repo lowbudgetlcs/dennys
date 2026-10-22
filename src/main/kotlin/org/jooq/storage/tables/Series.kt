@@ -4,11 +4,10 @@
 package org.jooq.storage.tables
 
 
-import java.time.Instant
-
 import kotlin.collections.Collection
 import kotlin.collections.List
 
+import org.jooq.Check
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
@@ -105,19 +104,9 @@ open class Series(
     val STAGE: TableField<SeriesRecord, String?> = createField(DSL.name("stage"), SQLDataType.CLOB.nullable(false).defaultValue(DSL.field(DSL.raw("'REGULAR_SEASON'::text"), SQLDataType.CLOB)), this, "")
 
     /**
-     * The column <code>dennys.series.completed</code>.
+     * The column <code>dennys.series.status</code>.
      */
-    val COMPLETED: TableField<SeriesRecord, Boolean?> = createField(DSL.name("completed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("false"), SQLDataType.BOOLEAN)), this, "")
-
-    /**
-     * The column <code>dennys.series.completed_at</code>.
-     */
-    val COMPLETED_AT: TableField<SeriesRecord, Instant?> = createField(DSL.name("completed_at"), SQLDataType.INSTANT, this, "")
-
-    /**
-     * The column <code>dennys.series.reopened_at</code>.
-     */
-    val REOPENED_AT: TableField<SeriesRecord, Instant?> = createField(DSL.name("reopened_at"), SQLDataType.INSTANT, this, "")
+    val STATUS: TableField<SeriesRecord, String?> = createField(DSL.name("status"), SQLDataType.CLOB.nullable(false).defaultValue(DSL.field(DSL.raw("'NOT_STARTED'::text"), SQLDataType.CLOB)), this, "")
 
     private constructor(alias: Name, aliased: Table<SeriesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<SeriesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
@@ -239,6 +228,9 @@ open class Series(
      */
     val teams: TeamsPath
         get(): TeamsPath = teamToSeries().teams()
+    override fun getChecks(): List<Check<SeriesRecord>> = listOf(
+        Internal.createCheck(this, DSL.name("series_status_check"), "((status = ANY (ARRAY['NOT_STARTED'::text, 'IN_PROGRESS'::text, 'COMPLETE'::text, 'CANCELLED'::text])))", true)
+    )
     override fun `as`(alias: String): Series = Series(DSL.name(alias), this)
     override fun `as`(alias: Name): Series = Series(alias, this)
     override fun `as`(alias: Table<*>): Series = Series(alias.qualifiedName, this)

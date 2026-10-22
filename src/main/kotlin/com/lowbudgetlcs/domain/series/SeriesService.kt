@@ -22,6 +22,7 @@ import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.SeriesWithGames
 import com.lowbudgetlcs.domain.series.models.toSeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
@@ -37,7 +38,6 @@ import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.Instant
 
 private const val RELAY_METADATA_TAG = "LBLCS"
 
@@ -89,7 +89,7 @@ class SeriesService(
 
     override fun evaluateCompletion(id: SeriesId): Series {
         val series = getSeries(id)
-        if (series.completed || series.reopenedAt != null) {
+        if (series.status != SeriesStatus.NOT_STARTED && series.status != SeriesStatus.IN_PROGRESS) {
             logger.debug("Series '$id' is not eligible for auto-close, skipping evaluation.")
             return series
         }
@@ -107,7 +107,7 @@ class SeriesService(
         }
         val loser = series.participants.toList().firstOrNull { it != leader.key } ?: return series
         logger.debug("Series '$id' won by '${leader.key}', closing.")
-        return seriesRepo.complete(id, Instant.now(), SeriesResult(leader.key, loser))
+        return seriesRepo.complete(id, SeriesResult(leader.key, loser))
             ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
     }
 
@@ -283,20 +283,22 @@ class SeriesService(
         losingTeamId: TeamId?,
     ): Series {
         val series = getSeries(id)
-        check(!series.completed) {
+        check(series.status != SeriesStatus.COMPLETE) {
             "Series '${id.value}' is already complete. Reopen it before completing it again."
         }
         val result = winnerAndLoser(series, winningTeamId, losingTeamId)?.let { SeriesResult(it.first, it.second) }
         logger.info("Closing series '$id' manually, winner '${result?.winningTeamId}'.")
-        return seriesRepo.complete(id, Instant.now(), result)
+        return seriesRepo.complete(id, result)
             ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
     }
 
     override fun reopenSeries(id: SeriesId): Series {
         val series = getSeries(id)
-        check(series.completed) { "Series '${id.value}' is not complete, so it cannot be reopened." }
+        check(
+            series.status == SeriesStatus.COMPLETE,
+        ) { "Series '${id.value}' is not complete, so it cannot be reopened." }
         logger.info("Reopening series '$id'.")
-        return seriesRepo.reopen(id, Instant.now())
+        return seriesRepo.reopen(id)
             ?: throw DatabaseException("Failed to reopen series with id '${id.value}'.")
     }
 

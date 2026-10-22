@@ -14,6 +14,7 @@ import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
@@ -61,9 +62,7 @@ private class ReportFixture {
             totalGames = 3,
             participants = Pair(HOME, AWAY),
             result = null,
-            completed = false,
-            completedAt = null,
-            reopenedAt = null,
+            status = SeriesStatus.NOT_STARTED,
         )
 
     fun code(
@@ -127,7 +126,7 @@ private class ReportFixture {
             games += game
             game
         }
-        every { seriesRepo.complete(any(), any(), any()) } returns series.copy(completed = true)
+        every { seriesRepo.complete(any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
     }
 }
 
@@ -320,7 +319,7 @@ class SeriesReportResultTest :
             f.service.reportResult(REPORT_SERIES_ID, reported(HOME))
 
             verify(exactly = 1) {
-                f.seriesRepo.complete(REPORT_SERIES_ID, any(), SeriesResult(HOME, AWAY))
+                f.seriesRepo.complete(REPORT_SERIES_ID, SeriesResult(HOME, AWAY))
             }
         }
 

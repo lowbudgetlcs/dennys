@@ -8,6 +8,7 @@ import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import org.jooq.DSLContext
@@ -17,7 +18,6 @@ import org.jooq.impl.DSL.select
 import org.jooq.storage.tables.references.SERIES
 import org.jooq.storage.tables.references.SERIES_RESULTS
 import org.jooq.storage.tables.references.TEAM_TO_SERIES
-import java.time.Instant
 
 class SeriesRepository(
     private val dsl: DSLContext,
@@ -64,15 +64,13 @@ class SeriesRepository(
 
     override fun complete(
         id: SeriesId,
-        completedAt: Instant,
         result: SeriesResult?,
     ): Series? {
         dsl.transaction { t ->
             val tx = t.dsl()
             tx
                 .update(SERIES)
-                .set(SERIES.COMPLETED, true)
-                .set(SERIES.COMPLETED_AT, completedAt)
+                .set(SERIES.STATUS, SeriesStatus.COMPLETE.name)
                 .where(SERIES.ID.eq(id.value))
                 .execute()
             result?.let {
@@ -91,15 +89,10 @@ class SeriesRepository(
         return getById(id)
     }
 
-    override fun reopen(
-        id: SeriesId,
-        reopenedAt: Instant,
-    ): Series? {
+    override fun reopen(id: SeriesId): Series? {
         dsl
             .update(SERIES)
-            .set(SERIES.COMPLETED, false)
-            .setNull(SERIES.COMPLETED_AT)
-            .set(SERIES.REOPENED_AT, reopenedAt)
+            .set(SERIES.STATUS, SeriesStatus.IN_PROGRESS.name)
             .where(SERIES.ID.eq(id.value))
             .execute()
         return getById(id)
@@ -119,9 +112,7 @@ class SeriesRepository(
                 SERIES.TOTAL_GAMES,
                 SERIES.EVENT_ID,
                 SERIES.STAGE,
-                SERIES.COMPLETED,
-                SERIES.COMPLETED_AT,
-                SERIES.REOPENED_AT,
+                SERIES.STATUS,
                 participants,
                 SERIES_RESULTS.WINNER_TEAM_ID,
                 SERIES_RESULTS.LOSER_TEAM_ID,
@@ -135,7 +126,7 @@ class SeriesRepository(
         val eventId = row[SERIES.EVENT_ID]?.toEventId() ?: return null
         val eventStage = row[SERIES.STAGE]?.let { EventStage.valueOf(it) } ?: return null
         val totalGames = row[SERIES.TOTAL_GAMES] ?: return null
-        val completed = row[SERIES.COMPLETED] ?: return null
+        val status = row[SERIES.STATUS]?.let { SeriesStatus.valueOf(it) } ?: return null
         val p = row[participants].mapNotNull { it.value1()?.toTeamId() }
         val participants = Pair(p[0], p[1])
         // potentially null data
@@ -150,9 +141,7 @@ class SeriesRepository(
                 totalGames = totalGames,
                 participants = participants,
                 result = if (winner != null && loser != null) SeriesResult(winner, loser) else null,
-                completed = completed,
-                completedAt = row[SERIES.COMPLETED_AT],
-                reopenedAt = row[SERIES.REOPENED_AT],
+                status = status,
             )
         return s
     }

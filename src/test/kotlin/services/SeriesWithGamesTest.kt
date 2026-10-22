@@ -11,6 +11,7 @@ import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.repositories.event.IEventRepository
@@ -52,9 +53,7 @@ private class ViewFixture {
             totalGames = 3,
             participants = Pair(BLUE, RED),
             result = null,
-            completed = false,
-            completedAt = null,
-            reopenedAt = null,
+            status = SeriesStatus.NOT_STARTED,
         )
 
     fun code(
@@ -179,7 +178,7 @@ class SeriesWithGamesTest :
             view.totalGames shouldBe 3
             view.eventStage shouldBe EventStage.PLAYOFFS
             view.participants shouldBe Pair(BLUE, RED)
-            view.completed shouldBe false
+            view.status shouldBe SeriesStatus.NOT_STARTED
         }
 
         "an unknown series id is not found" {

@@ -14,6 +14,7 @@ import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
@@ -59,9 +60,7 @@ private class Fixture {
             totalGames = 3,
             participants = Pair(TEAM_1, TEAM_2),
             result = null,
-            completed = false,
-            completedAt = null,
-            reopenedAt = null,
+            status = SeriesStatus.NOT_STARTED,
         )
 
     fun code(
@@ -106,7 +105,7 @@ private class Fixture {
         every { gameRepo.getBySeriesId(SERIES_ID) } returns recorded
         every { codeRepo.getBySeriesId(SERIES_ID) } returns codes
         every { gameRepo.insert(any()) } returns null
-        every { seriesRepo.complete(any(), any(), any()) } returns series
+        every { seriesRepo.complete(any(), any()) } returns series
     }
 }
 

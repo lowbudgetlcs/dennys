@@ -8,7 +8,8 @@ import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
 import com.lowbudgetlcs.domain.series.models.SeriesResult
-import com.lowbudgetlcs.domain.series.models.filterByCompletion
+import com.lowbudgetlcs.domain.series.models.filterByStatus
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
@@ -20,7 +21,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.collections.shouldNotBeEmpty
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
@@ -99,27 +99,22 @@ class SeriesRepositoryTest :
             series.shouldHaveSize(5)
         }
 
-        test("a newly inserted series is not completed") {
+        test("a newly inserted series is not started") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
 
-            created.completed shouldBe false
-            created.completedAt.shouldBeNull()
-            created.reopenedAt.shouldBeNull()
+            created.status shouldBe SeriesStatus.NOT_STARTED
         }
 
-        test("complete sets the flag and stamps completedAt") {
+        test("complete sets the status to complete") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            val at = Instant.parse("2026-07-14T23:12:04Z")
 
-            val completed = repo.complete(created.id, at)
+            val completed = repo.complete(created.id)
             completed.shouldNotBeNull()
 
-            completed.completed shouldBe true
-            completed.completedAt shouldBe at
-            completed.reopenedAt.shouldBeNull()
-            repo.getById(created.id)?.completed shouldBe true
+            completed.status shouldBe SeriesStatus.COMPLETE
+            repo.getById(created.id)?.status shouldBe SeriesStatus.COMPLETE
         }
 
         test("a forfeit writes series_results with no games played") {
@@ -127,14 +122,10 @@ class SeriesRepositoryTest :
             created.shouldNotBeNull()
 
             val completed =
-                repo.complete(
-                    created.id,
-                    Instant.parse("2026-07-14T23:12:04Z"),
-                    SeriesResult(team1.id, team2.id),
-                )
+                repo.complete(created.id, SeriesResult(team1.id, team2.id))
             completed.shouldNotBeNull()
 
-            completed.completed shouldBe true
+            completed.status shouldBe SeriesStatus.COMPLETE
             completed.result?.winningTeamId shouldBe team1.id
             completed.result?.losingTeamId shouldBe team2.id
             dsl.fetchCount(GAMES, GAMES.SERIES_ID.eq(created.id.value)) shouldBe 0
@@ -144,21 +135,17 @@ class SeriesRepositoryTest :
         test("completing twice overwrites the result rather than duplicating the row") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
-            repo.complete(created.id, Instant.parse("2026-07-14T23:12:04Z"), SeriesResult(team1.id, team2.id))
+            repo.complete(created.id, SeriesResult(team1.id, team2.id))
 
             val corrected =
-                repo.complete(
-                    created.id,
-                    Instant.parse("2026-07-15T10:00:00Z"),
-                    SeriesResult(team2.id, team1.id),
-                )
+                repo.complete(created.id, SeriesResult(team2.id, team1.id))
             corrected.shouldNotBeNull()
 
             corrected.result?.winningTeamId shouldBe team2.id
             dsl.fetchCount(SERIES_RESULTS, SERIES_RESULTS.SERIES_ID.eq(created.id.value)) shouldBe 1
         }
 
-        test("reopen clears completion, stamps reopenedAt and preserves series_results") {
+        test("reopen moves the series back to in progress and preserves series_results") {
             val created = repo.insert(newSeries)
             created.shouldNotBeNull()
             dsl
@@ -167,15 +154,12 @@ class SeriesRepositoryTest :
                 .set(SERIES_RESULTS.WINNER_TEAM_ID, team1.id.value)
                 .set(SERIES_RESULTS.LOSER_TEAM_ID, team2.id.value)
                 .execute()
-            repo.complete(created.id, Instant.parse("2026-07-14T23:12:04Z"))
-            val at = Instant.parse("2026-07-15T09:00:00Z")
+            repo.complete(created.id)
 
-            val reopened = repo.reopen(created.id, at)
+            val reopened = repo.reopen(created.id)
             reopened.shouldNotBeNull()
 
-            reopened.completed shouldBe false
-            reopened.completedAt.shouldBeNull()
-            reopened.reopenedAt shouldBe at
+            reopened.status shouldBe SeriesStatus.IN_PROGRESS
             reopened.result.shouldNotBeNull()
             reopened.result?.winningTeamId shouldBe team1.id
         }
@@ -201,13 +185,13 @@ class SeriesRepositoryTest :
 
             repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
 
-            repo.complete(first.id, Instant.parse("2026-07-14T23:12:04Z"))
+            repo.complete(first.id)
 
             repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
             repo.getAllByEventId(orderingEvent.id).map { it.id } shouldBe expected
         }
 
-        test("completion filtering splits two series that are otherwise identical") {
+        test("status filtering splits two series that are otherwise identical") {
             val e = EventRepository(dsl)
             val filterEvent =
                 e.insert(
@@ -224,56 +208,22 @@ class SeriesRepositoryTest :
             val repeatPair = newSeries.copy(eventId = filterEvent.id, eventStage = EventStage.PLAYOFFS)
             val open = repo.insert(repeatPair) ?: throw Exception("Failed to insert open series.")
             val closed = repo.insert(repeatPair) ?: throw Exception("Failed to insert series to close.")
-            repo.complete(closed.id, Instant.parse("2026-07-14T23:12:04Z"))
+            repo.complete(closed.id)
             val all = repo.getAllByEventId(filterEvent.id)
 
             all
-                .filterByCompletion(
-                    SeriesQuery(teamIds = null, eventStage = null, completed = false),
+                .filterByStatus(
+                    SeriesQuery(teamIds = null, eventStage = null, status = SeriesStatus.NOT_STARTED),
                 ).map { it.id } shouldBe listOf(open.id)
 
             all
-                .filterByCompletion(
-                    SeriesQuery(teamIds = null, eventStage = null, completed = true),
+                .filterByStatus(
+                    SeriesQuery(teamIds = null, eventStage = null, status = SeriesStatus.COMPLETE),
                 ).map { it.id } shouldBe listOf(closed.id)
 
             all
-                .filterByCompletion(
+                .filterByStatus(
                     SeriesQuery(teamIds = null, eventStage = null),
                 ).map { it.id } shouldBe listOf(open.id, closed.id)
-        }
-
-        test("the V011 backfill completes series in ended events and leaves active ones alone") {
-            val e = EventRepository(dsl)
-            val endedEvent =
-                e.insert(
-                    NewEvent(
-                        name = "Ended".toEventName(),
-                        description = "An event that has already finished.".toEventDescription(),
-                        startDate = Instant.now().minusSeconds(7_200L),
-                        endDate = Instant.now().minusSeconds(3_600L),
-                        status = EventStatus.COMPLETED,
-                        eventStages = setOf(EventStage.REGULAR_SEASON),
-                    ),
-                    riotTournamentId = 2.toRiotTournamentId(),
-                ) ?: throw Exception("Failed to insert ended event.")
-            val stale =
-                repo.insert(newSeries.copy(eventId = endedEvent.id))
-                    ?: throw Exception("Failed to insert series in ended event.")
-            val active =
-                repo.insert(newSeries)
-                    ?: throw Exception("Failed to insert series in active event.")
-
-            dsl.execute(
-                """
-                UPDATE dennys.series s SET completed = true, completed_at = e.end_date
-                  FROM dennys.events e WHERE e.id = s.event_id AND e.end_date < now()
-                """.trimIndent(),
-            )
-
-            repo.getById(stale.id)?.completed shouldBe true
-            repo.getById(stale.id)?.completedAt shouldBe endedEvent.endDate
-            repo.getById(active.id)?.completed shouldBe false
-            repo.getById(active.id)?.completedAt.shouldBeNull()
         }
     })
