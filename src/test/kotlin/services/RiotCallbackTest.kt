@@ -262,6 +262,17 @@ class RiotCallbackTest :
             verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
         }
 
+        "a late callback for a double-loss series records the game and keeps the double loss" {
+            val f = CallbackFixture()
+            coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
+            f.withSeries(series = f.series(SeriesStatus.COMPLETE).copy(doubleLoss = true))
+
+            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ATTRIBUTED
+
+            f.games.size shouldBe 1
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
         "a callback for an unknown shortcode writes nothing" {
             val f = CallbackFixture()
             every { f.codeRepo.getByShortcode(Shortcode("NOT-OURS")) } returns null
