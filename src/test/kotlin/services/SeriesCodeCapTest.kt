@@ -12,6 +12,7 @@ import com.lowbudgetlcs.domain.series.DEFAULT_MAX_CODES_PER_GAME
 import com.lowbudgetlcs.domain.series.SeriesService
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.GameResult
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.types.GameId
@@ -24,6 +25,8 @@ import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotShortcodeDto
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentTeamV5Dto
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -35,6 +38,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -45,6 +49,7 @@ private val CAP_RED = TeamId(2)
 private val CAP_SERIES_ID = SeriesId(70)
 private val CAP_EVENT_ID = EventId(1)
 private val CAP_AT = Instant.parse("2026-08-11T12:00:00Z")
+private const val CAP_PUUID = "aa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 private class CapFixture(
     maxCodesPerGame: Int = DEFAULT_MAX_CODES_PER_GAME,
@@ -148,6 +153,30 @@ class SeriesCodeCapTest :
             f.holding(codes = listOf(f.code(1, f.at(10))), status = SeriesStatus.IN_PROGRESS)
 
             f.service.createGame(f.newCode).seriesId shouldBe CAP_SERIES_ID
+        }
+
+        "the next code request pulls a game Riot has for an outstanding code" {
+            val f = CapFixture()
+            val outstanding = f.code(1, f.at(10))
+            f.holding(codes = listOf(outstanding))
+            coEvery { f.gateway.getGames(outstanding.shortcode) } returns
+                listOf(
+                    RiotTournamentGamesV5Dto(
+                        winningTeam = listOf(RiotTournamentTeamV5Dto(CAP_PUUID)),
+                        shortCode = outstanding.shortcode.value,
+                        gameId = 5102531894L,
+                        region = "NA",
+                    ),
+                )
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(CAP_BLUE)
+            every { f.gameRepo.insert(any()) } returns f.game(1, f.at(20), outstanding.id)
+
+            f.service.createGame(f.newCode)
+
+            coVerifyOrder {
+                f.gameRepo.insert(match<NewGame> { it.tournamentCodeId == outstanding.id && it.riotMatchId != null })
+                f.gateway.getCode(any(), any())
+            }
         }
 
         "the third code for one game is refused" {
