@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.series
 
+import com.lowbudgetlcs.domain.ConflictException
 import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
@@ -31,7 +32,6 @@ import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotRegion
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
-import com.lowbudgetlcs.repositories.ConflictException
 import com.lowbudgetlcs.repositories.DatabaseException
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
@@ -62,6 +62,7 @@ class SeriesService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     // shortcut: in-process lock, Denny's runs as one container; move to a DB lock if it ever scales out.
+    // Entries are never removed, one small Mutex per series ever issued a code.
     private val issuing = ConcurrentHashMap<SeriesId, Mutex>()
 
     override fun createSeries(series: NewSeries): Series {
@@ -445,8 +446,9 @@ class SeriesService(
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
+        // Outside the lock so a slow Riot answer only delays this press; the count below is what needs it.
+        refreshQuietly(series.id)
         return issuing.computeIfAbsent(series.id) { Mutex() }.withLock {
-            refreshQuietly(series.id)
             val current = codesForCurrentGame(series.id)
             if (!forceNew) {
                 current.maxByOrNull { it.createdAt }?.let { return@withLock IssueOutcome(it, issued = false) }

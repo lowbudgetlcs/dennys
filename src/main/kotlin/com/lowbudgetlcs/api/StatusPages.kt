@@ -1,10 +1,10 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
+import com.lowbudgetlcs.domain.ConflictException
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.RiotApiException
-import com.lowbudgetlcs.repositories.ConflictException
 import com.lowbudgetlcs.repositories.DatabaseException
 import io.ktor.http.*
 import io.ktor.serialization.*

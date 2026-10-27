@@ -123,7 +123,7 @@ interface ISeriesService {
      * issued since the last recorded game is returned instead, with `issued = false`, so a repeated
      * or concurrent request does not spend a second Riot code.
      *
-     * @throws com.lowbudgetlcs.repositories.ConflictException with reason `CODE_LIMIT` when a new
+     * @throws com.lowbudgetlcs.domain.ConflictException with reason `CODE_LIMIT` when a new
      *   code would exceed the per-game allowance.
      */
     suspend fun createGame(
