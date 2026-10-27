@@ -42,9 +42,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
 private const val RELAY_METADATA_TAG = "LBLCS"
+
+/** No game finishes sooner, so a younger code is not worth asking Riot about. */
+private val MIN_CODE_AGE = Duration.ofMinutes(15)
+
+/** Past this, a code is most likely dead or saved for another day, so it is polled less often. */
+private val STALE_CODE_AGE = Duration.ofHours(6)
 
 /** Tournament codes a series may be issued for one game before a result has to be recorded. */
 const val DEFAULT_MAX_CODES_PER_GAME = 2
@@ -351,13 +359,19 @@ class SeriesService(
         }
     }
 
-    override suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome? {
-        val code = codeRepo.getByShortcode(shortcode)
-        if (code == null) {
-            logger.warn("Callback for unknown shortcode '${shortcode.value}', ignoring.")
-            return null
-        }
-        return refreshFromRiot(code.seriesId)
+    override suspend fun pollRiot(includeStale: Boolean) {
+        val now = Instant.now()
+        val staleBefore = now.minus(STALE_CODE_AGE)
+        codeRepo
+            .getOpenForPolling(issuedBefore = now.minus(MIN_CODE_AGE))
+            .filter { includeStale || it.createdAt >= staleBefore }
+            .forEach { code ->
+                try {
+                    refreshFromCode(code.seriesId, code.id, null)
+                } catch (e: Throwable) {
+                    logger.warn("Could not poll Riot for code '${code.shortcode.value}': ${e.message}")
+                }
+            }
     }
 
     private fun seriesMetadata(id: SeriesId): String = """{"tag":"$RELAY_METADATA_TAG","seriesId":${id.value}}"""

@@ -50,7 +50,12 @@ interface ISeriesService {
 
     suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome
 
-    suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome?
+    /**
+     * Ask Riot about every open tournament code, recording and closing whatever it finds. Codes
+     * older than six hours are skipped unless [includeStale] is set, so a caller can poll them
+     * less often. A failure on one code is logged and does not stop the rest.
+     */
+    suspend fun pollRiot(includeStale: Boolean)
 
     /**
      * Re-check Riot for a single tournament code and record a game if one is found.

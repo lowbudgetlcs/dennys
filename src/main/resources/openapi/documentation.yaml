@@ -1083,9 +1083,10 @@ paths:
       summary: Re-check Riot for one tournament code
       description: |
         Asks Riot about a single tournament code and records the game if one is
-        found, updating the series' `games` array. Use it when a callback was
-        missed or arrived before the game was queryable, instead of issuing a
-        fresh code — a refresh costs nothing against the per-game code limit.
+        found, updating the series' `games` array. Denny's already polls Riot
+        for open codes every few minutes; use this to check one now instead of
+        issuing a fresh code — a refresh costs nothing against the per-game code
+        limit.
 
         Exactly **one** of `tournamentCodeId` or `shortcode` must be given.
         Unlike `/results`, omitting both is rejected: this operation is defined
