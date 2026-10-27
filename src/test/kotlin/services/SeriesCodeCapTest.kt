@@ -1,5 +1,6 @@
 package services
 
+import com.lowbudgetlcs.domain.ConflictException
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
@@ -31,7 +32,6 @@ import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotShortcodeDto
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
 import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentTeamV5Dto
-import com.lowbudgetlcs.repositories.ConflictException
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
