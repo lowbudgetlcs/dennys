@@ -1,6 +1,5 @@
 package services
 
-import com.lowbudgetlcs.api.dto.riot.PostMatchDto
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
@@ -23,6 +22,7 @@ import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
@@ -36,7 +36,6 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -47,6 +46,7 @@ import io.mockk.verify
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import java.time.Duration
 import java.time.Instant
 
 private val CB_BLUE = TeamId(1)
@@ -58,24 +58,7 @@ private val CB_AT = Instant.parse("2026-07-14T23:12:04Z")
 private const val CB_PUUID = "aa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 private const val CB_SHORTCODE = "NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae"
 
-/** The body relay forwards byte-for-byte from Riot, per lowbudgetlcs/relay main.go RiotPayload. */
-private const val RELAY_PAYLOAD = """
-{
-  "startTime": 1752534724000,
-  "shortCode": "$CB_SHORTCODE",
-  "metaData": "{\"tag\":\"LBLCS\",\"seriesId\":90}",
-  "gameId": 5102531894,
-  "gameName": "cb0b0b1e-0000-0000-0000-000000000000",
-  "gameType": "Practice",
-  "gameMap": 11,
-  "gameMode": "CLASSIC",
-  "region": "NA1"
-}
-"""
-
-private val callbackJson = Json { ignoreUnknownKeys = true }
-
-private class CallbackFixture {
+private class PollFixture {
     val codeRepo = mockk<ITournamentCodeRepository>(relaxed = false)
     val seriesRepo = mockk<ISeriesRepository>(relaxed = false)
     val eventRepo = mockk<IEventRepository>(relaxed = false)
@@ -94,7 +77,7 @@ private class CallbackFixture {
             blueTeamId = CB_BLUE,
             redTeamId = CB_RED,
             seriesId = CB_SERIES_ID,
-            createdAt = CB_AT,
+            createdAt = Instant.now().minus(Duration.ofHours(1)),
         )
 
     val event =
@@ -111,7 +94,7 @@ private class CallbackFixture {
             eventStages = setOf(EventStage.PLAYOFFS),
         )
 
-    fun series(completed: Boolean = false) =
+    fun series(status: SeriesStatus = SeriesStatus.NOT_STARTED) =
         Series(
             id = CB_SERIES_ID,
             eventId = CB_EVENT_ID,
@@ -119,9 +102,7 @@ private class CallbackFixture {
             totalGames = 3,
             participants = Pair(CB_BLUE, CB_RED),
             result = null,
-            completed = completed,
-            completedAt = if (completed) CB_AT else null,
-            reopenedAt = null,
+            status = status,
         )
 
     fun riotGame() =
@@ -150,11 +131,14 @@ private class CallbackFixture {
         games.clear()
         games += recorded
         every { seriesRepo.getById(CB_SERIES_ID) } returns series
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { codeRepo.getByShortcode(Shortcode(CB_SHORTCODE)) } returns code
+        every { codeRepo.getById(code.id) } returns code
+        every { codeRepo.getOpenForPolling(any()) } returns listOf(code)
         every { codeRepo.getBySeriesId(CB_SERIES_ID) } returns listOf(code)
         every { gameRepo.getBySeriesId(CB_SERIES_ID) } answers { games.toList() }
         every { teamRepo.getTeamIdsByPuuids(any()) } returns listOf(CB_BLUE)
-        every { seriesRepo.complete(any(), any(), any()) } returns series.copy(completed = true)
+        every { seriesRepo.setStatus(any(), any(), any(), any()) } returns series.copy(status = SeriesStatus.COMPLETE)
         every { gameRepo.insert(any()) } answers {
             val new = firstArg<NewGame>()
             val game =
@@ -173,20 +157,10 @@ private class CallbackFixture {
     }
 }
 
-class RiotCallbackTest :
+class SeriesRiotPollingTest :
     StringSpec({
-        "the payload relay forwards deserializes into PostMatchDto unchanged" {
-            val dto = callbackJson.decodeFromString<PostMatchDto>(RELAY_PAYLOAD)
-
-            dto.shortCode shouldBe CB_SHORTCODE
-            dto.gameId shouldBe 5102531894L
-            dto.region shouldBe "NA1"
-            dto.gameMap shouldBe 11
-            dto.startTime shouldBe 1752534724000L
-        }
-
-        "the metadata Denny's stamps carries the tag relay requires to forward at all" {
-            val f = CallbackFixture()
+        "the metadata Denny's stamps carries the tag and series id" {
+            val f = PollFixture()
             val options = slot<ShortcodeOptions>()
             coEvery { f.gateway.getGames(any()) } returns emptyList()
             coEvery { f.gateway.getCode(any(), capture(options)) } returns RiotShortcodeDto(listOf(CB_SHORTCODE))
@@ -196,19 +170,19 @@ class RiotCallbackTest :
             every { f.eventRepo.getById(CB_EVENT_ID) } returns f.event
             every { f.codeRepo.insert(any(), any()) } returns f.code
 
-            f.service.createGame(NewTournamentCode(CB_SERIES_ID, CB_BLUE, CB_RED))
+            f.service.createGame(NewTournamentCode(CB_SERIES_ID, CB_BLUE, CB_RED), forceNew = true)
 
             val metadata = Json.parseToJsonElement(options.captured.metadata).jsonObject
             metadata["tag"]?.jsonPrimitive?.content shouldBe "LBLCS"
             metadata["seriesId"]?.jsonPrimitive?.content shouldBe "90"
         }
 
-        "a callback records the game and its result" {
-            val f = CallbackFixture()
+        "a poll records the game and its result" {
+            val f = PollFixture()
             coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
             f.withSeries()
 
-            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ATTRIBUTED
+            f.service.pollRiot(includeStale = false)
 
             f.games.size shouldBe 1
             f.games.single().tournamentCodeId shouldBe TournamentCodeId(1)
@@ -216,58 +190,98 @@ class RiotCallbackTest :
             f.games.single().result shouldBe GameResult(CB_BLUE, CB_RED)
         }
 
-        "the same callback twice records one game" {
-            val f = CallbackFixture()
+        "a poll that records the deciding game closes the series" {
+            val f = PollFixture()
+            coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
+            f.withSeries(recorded = listOf(f.recordedGame(codeId = null).copy(riotMatchId = null)))
+
+            f.service.pollRiot(includeStale = false)
+
+            verify(exactly = 1) { f.seriesRepo.setStatus(CB_SERIES_ID, SeriesStatus.COMPLETE, any(), false) }
+        }
+
+        "polling twice records one game" {
+            val f = PollFixture()
             coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
             f.withSeries()
 
-            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE))
-            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ANSWERED_EMPTY
+            f.service.pollRiot(includeStale = false)
+            f.service.pollRiot(includeStale = false)
 
             f.games.size shouldBe 1
         }
 
-        "a report followed by the callback for that code records one game" {
-            val f = CallbackFixture()
-            coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
-            f.withSeries(recorded = listOf(f.recordedGame(codeId = 1)))
+        "a code older than six hours is polled only when stale codes are included" {
+            val f = PollFixture()
+            val stale = f.code.copy(createdAt = Instant.now().minus(Duration.ofHours(7)))
+            coEvery { f.gateway.getGames(any()) } returns emptyList()
+            f.withSeries()
+            every { f.codeRepo.getOpenForPolling(any()) } returns listOf(stale)
+            every { f.codeRepo.getById(stale.id) } returns stale
 
-            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ANSWERED_EMPTY
+            f.service.pollRiot(includeStale = false)
+            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+
+            f.service.pollRiot(includeStale = true)
+            coVerify(exactly = 1) { f.gateway.getGames(Shortcode(CB_SHORTCODE)) }
+        }
+
+        "a code that fails does not stop the rest of the poll" {
+            val f = PollFixture()
+            val broken = f.code.copy(id = TournamentCodeId(2), shortcode = Shortcode("BROKEN"))
+            coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
+            f.withSeries()
+            every { f.codeRepo.getOpenForPolling(any()) } returns listOf(broken, f.code)
+            every { f.codeRepo.getById(broken.id) } throws IllegalStateException("boom")
+
+            f.service.pollRiot(includeStale = false)
+
+            f.games.size shouldBe 1
+        }
+
+        "a report followed by a poll for that code records one game" {
+            val f = PollFixture()
+            coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
+            f.withSeries(recorded = listOf(f.recordedGame(codeId = 1).copy(riotMatchId = null)))
+
+            f.service.pollRiot(includeStale = false)
 
             f.games.size shouldBe 1
             coVerify(exactly = 0) { f.gateway.getGames(any()) }
         }
 
-        "the callback followed by the same report records one game" {
-            val f = CallbackFixture()
+        "a poll followed by the same report records one game" {
+            val f = PollFixture()
             coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
             f.withSeries()
 
-            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE))
-            val outcome = f.service.reportResult(CB_SERIES_ID, ReportedResult(null, null, null, null))
+            f.service.pollRiot(includeStale = false)
+            val report = ReportedResult(CB_BLUE, null, null, Shortcode(CB_SHORTCODE))
+            val outcome = f.service.reportResult(CB_SERIES_ID, report)
 
             outcome.recorded shouldBe false
             f.games.size shouldBe 1
         }
 
-        "a late callback for a closed series records the game and leaves it closed" {
-            val f = CallbackFixture()
+        "a late Riot result for a closed series records the game and leaves it closed" {
+            val f = PollFixture()
             coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
-            f.withSeries(series = f.series(completed = true))
+            f.withSeries(series = f.series(SeriesStatus.COMPLETE))
 
-            f.service.refreshFromShortcode(Shortcode(CB_SHORTCODE)) shouldBe RefreshOutcome.ATTRIBUTED
+            f.service.refreshFromCode(CB_SERIES_ID, f.code.id, null) shouldBe RefreshOutcome.ATTRIBUTED
 
             f.games.size shouldBe 1
-            verify(exactly = 0) { f.seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
         }
 
-        "a callback for an unknown shortcode writes nothing" {
-            val f = CallbackFixture()
-            every { f.codeRepo.getByShortcode(Shortcode("NOT-OURS")) } returns null
+        "a late Riot result for a double-loss series records the game and keeps the double loss" {
+            val f = PollFixture()
+            coEvery { f.gateway.getGames(Shortcode(CB_SHORTCODE)) } returns listOf(f.riotGame())
+            f.withSeries(series = f.series(SeriesStatus.COMPLETE).copy(doubleLoss = true))
 
-            f.service.refreshFromShortcode(Shortcode("NOT-OURS")).shouldBeNull()
+            f.service.refreshFromCode(CB_SERIES_ID, f.code.id, null) shouldBe RefreshOutcome.ATTRIBUTED
 
-            verify(exactly = 0) { f.gameRepo.insert(any()) }
-            coVerify(exactly = 0) { f.gateway.getGames(any()) }
+            f.games.size shouldBe 1
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
         }
     })

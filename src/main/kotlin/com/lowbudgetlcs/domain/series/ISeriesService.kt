@@ -3,8 +3,8 @@ package com.lowbudgetlcs.domain.series
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
-import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
+import com.lowbudgetlcs.domain.series.models.IssueOutcome
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportOutcome
@@ -12,6 +12,7 @@ import com.lowbudgetlcs.domain.series.models.ReportedResult
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 
 interface ISeriesService {
@@ -42,14 +43,19 @@ interface ISeriesService {
 
     /**
      * Re-evaluate whether a series is finished and close it if so. Run on every
-     * result write, whichever source it came from. No-op when the series is
-     * already complete or was deliberately reopened.
+     * result write, whichever source it came from. No-op unless the series is
+     * NOT_STARTED or IN_PROGRESS; a NOT_STARTED series moves to IN_PROGRESS.
      */
     fun evaluateCompletion(id: SeriesId): Series
 
     suspend fun refreshFromRiot(id: SeriesId): RefreshOutcome
 
-    suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome?
+    /**
+     * Ask Riot about every open tournament code, recording and closing whatever it finds. Codes
+     * older than six hours are skipped unless [includeStale] is set, so a caller can poll them
+     * less often. A failure on one code is logged and does not stop the rest.
+     */
+    suspend fun pollRiot(includeStale: Boolean)
 
     /**
      * Re-check Riot for a single tournament code and record a game if one is found.
@@ -69,18 +75,36 @@ interface ISeriesService {
         shortcode: Shortcode?,
     ): RefreshOutcome
 
+    /**
+     * Record the winner a captain reported, without asking Riot. A report naming a code is
+     * idempotent: a code that already has a result returns that game with `recorded = false`.
+     * A report on a series that is not NOT_STARTED or IN_PROGRESS records the game but does not
+     * change the series' status or result.
+     *
+     * @throws IllegalArgumentException if no winner is given, the winner is not a participant, or
+     *   both a tournamentCodeId and a shortcode are given.
+     * @throws NoSuchElementException if the series or code does not exist, or the code belongs to
+     *   another series.
+     */
     suspend fun reportResult(
         id: SeriesId,
         report: ReportedResult,
     ): ReportOutcome
 
-    fun completeSeries(
+    /**
+     * Set a series' status by hand. A winner records a COMPLETE result (a forfeit when no games
+     * were played); [doubleLoss] records a loss for both teams with no winner.
+     *
+     * @throws IllegalArgumentException if a winner and [doubleLoss] are both given, either is given
+     *   with a status other than COMPLETE, or the winner is not a participant.
+     * @throws NoSuchElementException if the series does not exist.
+     */
+    fun patchSeries(
         id: SeriesId,
+        status: SeriesStatus,
         winningTeamId: TeamId?,
-        losingTeamId: TeamId?,
+        doubleLoss: Boolean,
     ): Series
-
-    fun reopenSeries(id: SeriesId): Series
 
     fun getSeriesWithGames(id: SeriesId): SeriesWithGames
 
@@ -100,9 +124,15 @@ interface ISeriesService {
     )
 
     /**
-     * Create a game inside of a series.
+     * Issue a tournament code for the series' current game. Without [forceNew], a code already
+     * issued since the last recorded game is returned instead, with `issued = false`, so a repeated
+     * or concurrent request does not spend a second Riot code.
      *
-     * @param NewTournamentCode the new game parameters.
+     * @throws com.lowbudgetlcs.domain.ConflictException with reason `CODE_LIMIT` when a new
+     *   code would exceed the per-game allowance.
      */
-    suspend fun createGame(newCode: NewTournamentCode): TournamentCode
+    suspend fun createGame(
+        newCode: NewTournamentCode,
+        forceNew: Boolean = false,
+    ): IssueOutcome
 }

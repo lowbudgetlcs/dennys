@@ -1,28 +1,37 @@
 package services
 
+import com.lowbudgetlcs.domain.ConflictException
 import com.lowbudgetlcs.domain.event.models.Event
 import com.lowbudgetlcs.domain.event.models.Shortcode
+import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
 import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.types.EventId
+import com.lowbudgetlcs.domain.event.models.types.EventName
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.event.models.types.RiotTournamentId
 import com.lowbudgetlcs.domain.series.DEFAULT_MAX_CODES_PER_GAME
 import com.lowbudgetlcs.domain.series.SeriesService
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.GameResult
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
+import com.lowbudgetlcs.domain.series.models.IssueOutcome
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
 import com.lowbudgetlcs.gateways.riot.tournament.RiotShortcodeDto
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentGamesV5Dto
+import com.lowbudgetlcs.gateways.riot.tournament.RiotTournamentTeamV5Dto
 import com.lowbudgetlcs.repositories.event.IEventRepository
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
@@ -34,15 +43,24 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 
 private val CAP_BLUE = TeamId(1)
 private val CAP_RED = TeamId(2)
 private val CAP_SERIES_ID = SeriesId(70)
 private val CAP_EVENT_ID = EventId(1)
 private val CAP_AT = Instant.parse("2026-08-11T12:00:00Z")
+private const val CAP_PUUID = "aa-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 private class CapFixture(
     maxCodesPerGame: Int = DEFAULT_MAX_CODES_PER_GAME,
@@ -65,9 +83,7 @@ private class CapFixture(
             totalGames = 5,
             participants = Pair(CAP_BLUE, CAP_RED),
             result = null,
-            completed = false,
-            completedAt = null,
-            reopenedAt = null,
+            status = SeriesStatus.NOT_STARTED,
         )
 
     private val event =
@@ -114,8 +130,10 @@ private class CapFixture(
     fun holding(
         codes: List<TournamentCode> = emptyList(),
         games: List<Game> = emptyList(),
+        status: SeriesStatus = SeriesStatus.NOT_STARTED,
     ) {
-        every { seriesRepo.getById(CAP_SERIES_ID) } returns series
+        every { seriesRepo.getById(CAP_SERIES_ID) } returns series.copy(status = status)
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { codeRepo.getBySeriesId(CAP_SERIES_ID) } returns codes
         every { gameRepo.getBySeriesId(CAP_SERIES_ID) } returns games
         every { teamRepo.getById(CAP_BLUE) } returns Team(CAP_BLUE, "Blue".toTeamName(), null, CAP_EVENT_ID)
@@ -135,25 +153,60 @@ class SeriesCodeCapTest :
             val f = CapFixture()
             f.holding(codes = listOf(f.code(1, f.at(10))))
 
-            f.service.createGame(f.newCode).seriesId shouldBe CAP_SERIES_ID
+            f.service.createGame(f.newCode, forceNew = true).issued shouldBe true
 
             coVerify(exactly = 1) { f.gateway.getCode(any(), any()) }
+            verify(exactly = 1) { f.seriesRepo.markInProgress(CAP_SERIES_ID) }
+        }
+
+        "a code is issued for a series that is already in progress" {
+            val f = CapFixture()
+            f.holding(codes = listOf(f.code(1, f.at(10))), status = SeriesStatus.IN_PROGRESS)
+
+            f.service.createGame(f.newCode, forceNew = true).issued shouldBe true
+        }
+
+        "the next code request pulls a game Riot has for an outstanding code" {
+            val f = CapFixture()
+            val outstanding = f.code(1, f.at(10))
+            f.holding(codes = listOf(outstanding))
+            coEvery { f.gateway.getGames(outstanding.shortcode) } returns
+                listOf(
+                    RiotTournamentGamesV5Dto(
+                        winningTeam = listOf(RiotTournamentTeamV5Dto(CAP_PUUID)),
+                        shortCode = outstanding.shortcode.value,
+                        gameId = 5102531894L,
+                        region = "NA",
+                    ),
+                )
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(CAP_BLUE)
+            val recorded = mutableListOf<Game>()
+            every { f.gameRepo.getBySeriesId(CAP_SERIES_ID) } answers { recorded.toList() }
+            every { f.gameRepo.insert(any()) } answers { f.game(1, f.at(20), outstanding.id).also { recorded += it } }
+
+            f.service.createGame(f.newCode).issued shouldBe true
+
+            coVerifyOrder {
+                f.gameRepo.insert(match<NewGame> { it.tournamentCodeId == outstanding.id && it.riotMatchId != null })
+                f.gateway.getCode(any(), any())
+            }
         }
 
         "the third code for one game is refused" {
             val f = CapFixture()
             f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
 
-            val ex = shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
+            val ex = shouldThrow<ConflictException> { f.service.createGame(f.newCode, forceNew = true) }
 
             ex.message.toString() shouldContain "already been issued 2 tournament code(s) for this game"
+            ex.reason shouldBe "CODE_LIMIT"
         }
 
         "a refused request never reaches Riot" {
             val f = CapFixture()
             f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
 
-            shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
+            shouldThrow<IllegalStateException> { f.service.createGame(f.newCode, forceNew = true) }
 
             coVerify(exactly = 0) { f.gateway.getCode(any(), any()) }
         }
@@ -162,7 +215,7 @@ class SeriesCodeCapTest :
             val f = CapFixture()
             f.holding(codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))))
 
-            val ex = shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
+            val ex = shouldThrow<IllegalStateException> { f.service.createGame(f.newCode, forceNew = true) }
 
             ex.message.toString() shouldContain "Report the result"
             ex.message.toString() shouldContain "custom game"
@@ -180,15 +233,17 @@ class SeriesCodeCapTest :
             coVerify(exactly = 1) { f.gateway.getCode(any(), any()) }
         }
 
-        "a codeless game from a custom resets the allowance just as a coded one does" {
+        "a custom game reported after a dead code gets a new code, not the dead one" {
             val f = CapFixture()
             f.holding(
                 codes = listOf(f.code(1, f.at(10)), f.code(2, f.at(20))),
                 games = listOf(f.game(1, f.at(40), tournamentCodeId = null)),
             )
 
-            f.service.createGame(f.newCode)
+            val outcome = f.service.createGame(f.newCode)
 
+            outcome.issued shouldBe true
+            outcome.code.id shouldBe TournamentCodeId(99)
             coVerify(exactly = 1) { f.gateway.getCode(any(), any()) }
         }
 
@@ -204,7 +259,7 @@ class SeriesCodeCapTest :
                 games = listOf(f.game(1, f.at(40), TournamentCodeId(2))),
             )
 
-            f.service.createGame(f.newCode)
+            f.service.createGame(f.newCode, forceNew = true)
 
             coVerify(exactly = 1) { f.gateway.getCode(any(), any()) }
         }
@@ -221,7 +276,7 @@ class SeriesCodeCapTest :
                 games = listOf(f.game(1, f.at(40), TournamentCodeId(1))),
             )
 
-            shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
+            shouldThrow<IllegalStateException> { f.service.createGame(f.newCode, forceNew = true) }
 
             coVerify(exactly = 0) { f.gateway.getCode(any(), any()) }
         }
@@ -230,8 +285,55 @@ class SeriesCodeCapTest :
             val f = CapFixture(maxCodesPerGame = 1)
             f.holding(codes = listOf(f.code(1, f.at(10))))
 
-            shouldThrow<IllegalStateException> { f.service.createGame(f.newCode) }
+            shouldThrow<IllegalStateException> { f.service.createGame(f.newCode, forceNew = true) }
 
             coVerify(exactly = 0) { f.gateway.getCode(any(), any()) }
+        }
+
+        "a repeat request returns the open code without calling Riot" {
+            val f = CapFixture()
+            val open = f.code(1, f.at(10))
+            f.holding(codes = listOf(open))
+
+            val outcome = f.service.createGame(f.newCode)
+
+            outcome shouldBe IssueOutcome(open, issued = false)
+            coVerify(exactly = 0) { f.gateway.getCode(any(), any()) }
+        }
+
+        "two captains requesting at once get one code" {
+            val f = CapFixture()
+            f.holding()
+            val issued = mutableListOf<TournamentCode>()
+            every { f.codeRepo.getBySeriesId(CAP_SERIES_ID) } answers { issued.toList() }
+            every { f.codeRepo.insert(any(), any()) } answers { f.code(99, f.at(999)).also { issued += it } }
+            // A fake, not a mock: suspending inside a MockK answer corrupts its thread-local state
+            // while other specs run concurrently.
+            val riotCalls = AtomicInteger()
+            val slowRiot =
+                object : IRiotTournamentGateway {
+                    override suspend fun create(tournamentName: EventName) = null
+
+                    override suspend fun getCode(
+                        riotTournamentId: RiotTournamentId,
+                        options: ShortcodeOptions,
+                    ): RiotShortcodeDto {
+                        riotCalls.incrementAndGet()
+                        delay(50)
+                        return RiotShortcodeDto(listOf("SHORT-NEW"))
+                    }
+
+                    override suspend fun getGames(shortcode: Shortcode) = emptyList<RiotTournamentGamesV5Dto>()
+                }
+            val service = SeriesService(f.codeRepo, f.seriesRepo, f.eventRepo, f.teamRepo, f.gameRepo, slowRiot)
+
+            val outcomes =
+                coroutineScope {
+                    List(2) { async(Dispatchers.Default) { service.createGame(f.newCode) } }.awaitAll()
+                }
+
+            outcomes.map { it.code.id }.toSet() shouldBe setOf(TournamentCodeId(99))
+            outcomes.count { it.issued } shouldBe 1
+            riotCalls.get() shouldBe 1
         }
     })

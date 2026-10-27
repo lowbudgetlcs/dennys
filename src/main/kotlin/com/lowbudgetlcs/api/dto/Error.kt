@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class Error(
     val code: Int,
     val message: String = "An error has occured.",
+    val reason: String? = null,
 )

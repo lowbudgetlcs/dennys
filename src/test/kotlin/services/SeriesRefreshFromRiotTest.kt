@@ -14,6 +14,7 @@ import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.gateways.riot.RiotApiException
 import com.lowbudgetlcs.gateways.riot.tournament.IRiotTournamentGateway
@@ -59,9 +60,7 @@ private class Fixture {
             totalGames = 3,
             participants = Pair(TEAM_1, TEAM_2),
             result = null,
-            completed = false,
-            completedAt = null,
-            reopenedAt = null,
+            status = SeriesStatus.NOT_STARTED,
         )
 
     fun code(
@@ -103,10 +102,11 @@ private class Fixture {
         recorded: List<Game> = emptyList(),
     ) {
         every { seriesRepo.getById(SERIES_ID) } returns series
+        every { seriesRepo.markInProgress(any()) } returns Unit
         every { gameRepo.getBySeriesId(SERIES_ID) } returns recorded
         every { codeRepo.getBySeriesId(SERIES_ID) } returns codes
         every { gameRepo.insert(any()) } returns null
-        every { seriesRepo.complete(any(), any(), any()) } returns series
+        every { seriesRepo.setStatus(any(), any(), any(), any()) } returns series
     }
 }
 
@@ -189,6 +189,19 @@ class SeriesRefreshFromRiotTest :
             f.service.refreshFromRiot(SERIES_ID) shouldBe RefreshOutcome.ANSWERED_EMPTY
 
             verify(exactly = 0) { f.gameRepo.insert(any()) }
+        }
+
+        "a game the repository refuses because the code was reported meanwhile is skipped" {
+            val f = Fixture()
+            coEvery { f.gateway.getGames(any()) } returns listOf(f.riotGame(listOf(PUUID_A)))
+            f.withSeries(listOf(f.code(1, "SHORT-A")))
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(TEAM_1)
+            every { f.gameRepo.insert(any()) } throws
+                IllegalStateException("Tournament code '1' already has a game recorded.")
+
+            f.service.refreshFromRiot(SERIES_ID) shouldBe RefreshOutcome.ANSWERED_EMPTY
+
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
         }
 
         "a winning roster with unregistered puuids still resolves via overlap" {

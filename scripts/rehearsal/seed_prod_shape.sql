@@ -1,6 +1,7 @@
 -- Reproduces production's shape as audited 2026-08-10: 1308 series whose events have
 -- all ended, 2178 tournament codes, 0 game_results. Series 1309-1320 sit in an event
--- that has not ended and must survive V011's backfill as completed = false.
+-- that has not ended and must survive V011's backfill as completed = false; codes for
+-- 1309-1310 let V014 backfill them as IN_PROGRESS and the rest as NOT_STARTED.
 
 SET search_path = dennys;
 
@@ -38,6 +39,10 @@ SELECT n,
 FROM generate_series(1, 2178) AS n
 JOIN series s ON s.id = ((n - 1) % 1308) + 1;
 
+INSERT INTO games (id, shortcode, blue_team_id, red_team_id, series_id) VALUES
+  (2179, 'REH-00002179', 31, 36, 1309),
+  (2180, 'REH-00002180', 31, 36, 1310);
+
 INSERT INTO player_game_facts (side, shortcode)
 SELECT CASE WHEN n % 2 = 0 THEN 100 ELSE 200 END, 'REH-' || lpad(n::text, 8, '0')
 FROM generate_series(1, 50) AS n;
@@ -45,4 +50,4 @@ FROM generate_series(1, 50) AS n;
 SELECT setval(pg_get_serial_sequence('dennys.events', 'id'), 4);
 SELECT setval(pg_get_serial_sequence('dennys.teams', 'id'), 40);
 SELECT setval(pg_get_serial_sequence('dennys.series', 'id'), 1320);
-SELECT setval(pg_get_serial_sequence('dennys.games', 'id'), 2178);
+SELECT setval(pg_get_serial_sequence('dennys.games', 'id'), 2180);

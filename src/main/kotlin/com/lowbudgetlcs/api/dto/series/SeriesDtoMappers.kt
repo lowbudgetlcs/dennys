@@ -16,9 +16,9 @@ fun Series.toDto(): SeriesDto =
         teamIds = participants.toList().map { it.value },
         totalGames = totalGames,
         eventStage = eventStage,
-        completed = completed,
-        completedAt = completedAt,
-        reopenedAt = reopenedAt,
+        status = status,
+        winnerTeamId = result?.winningTeamId?.value,
+        doubleLoss = doubleLoss,
     )
 
 fun NewSeriesDto.toNewSeries(eventId: Int): NewSeries =
@@ -33,7 +33,7 @@ fun SeriesFilterParams.toQuery(): SeriesQuery =
     SeriesQuery(
         teamIds = teamIds?.map { it.toTeamId() },
         eventStage = stage,
-        completed = completed,
+        status = status,
     )
 
 fun SeriesWithGames.toDto(): SeriesWithGamesDto =
@@ -43,11 +43,11 @@ fun SeriesWithGames.toDto(): SeriesWithGamesDto =
         teamIds = participants.toList().map { it.value },
         totalGames = totalGames,
         eventStage = eventStage,
-        completed = completed,
-        completedAt = completedAt,
-        reopenedAt = reopenedAt,
+        status = status,
         tournamentCodes = tournamentCodes.map { it.toDto() },
         games = games.map { it.toDto() },
         lastCodeIssuedAt = lastCodeIssuedAt,
         lastGameAt = lastGameAt,
+        winnerTeamId = result?.winningTeamId?.value,
+        doubleLoss = doubleLoss,
     )

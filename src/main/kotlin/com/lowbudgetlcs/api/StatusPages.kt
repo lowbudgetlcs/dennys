@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
+import com.lowbudgetlcs.domain.ConflictException
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.RiotApiException
@@ -35,7 +36,12 @@ fun Application.setupStatusPages() {
         exception<IllegalStateException> { call, cause ->
             logger.warn("⚠️ Conflict: ${cause.message}")
             val code = HttpStatusCode.Conflict
-            val e = Error(code = code.value, message = cause.message ?: "Conflict occurred")
+            val e =
+                Error(
+                    code = code.value,
+                    message = cause.message ?: "Conflict occurred",
+                    reason = (cause as? ConflictException)?.reason,
+                )
             call.respond(code, e)
         }
         exception<NoSuchElementException> { call, cause ->

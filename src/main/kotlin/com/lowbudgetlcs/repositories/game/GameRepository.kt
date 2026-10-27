@@ -47,6 +47,15 @@ class GameRepository(
                         "Riot match '${matchId.value}' is already recorded as game '$existing'."
                     }
                 }
+                newGame.tournamentCodeId?.let { codeId ->
+                    // A self-reported game has no match id to dedupe on, so it claims its code outright.
+                    // Riot games can share a code (remakes), so they only block a self-report.
+                    val onCode = GAMES.TOURNAMENT_CODE_ID.eq(codeId.value)
+                    val blocking = if (newGame.riotMatchId == null) onCode else onCode.and(GAMES.RIOT_MATCH_ID.isNull)
+                    check(tx.fetchCount(GAMES, blocking) == 0) {
+                        "Tournament code '${codeId.value}' already has a game recorded."
+                    }
+                }
                 val highest =
                     tx
                         .select(max(GAMES.NUMBER))

@@ -3,9 +3,13 @@ import com.lowbudgetlcs.domain.event.models.NewEvent
 import com.lowbudgetlcs.domain.event.models.toEventDescription
 import com.lowbudgetlcs.domain.event.models.toEventName
 import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
+import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
+import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.team.models.NewTeam
@@ -15,6 +19,7 @@ import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
+import com.lowbudgetlcs.repositories.tournamentcode.TournamentCodeRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
@@ -112,5 +117,52 @@ class GameNumberConcurrencyTest :
 
             repo.getBySeriesId(a.id).map { it.number } shouldBe listOf(1, 2, 3, 4)
             repo.getBySeriesId(b.id).map { it.number } shouldBe listOf(1, 2, 3, 4)
+        }
+
+        test("concurrent reports for one code record exactly one game") {
+            val series = newSeries()
+            val code =
+                TournamentCodeRepository(dsl).insert(
+                    NewTournamentCode(seriesId = series.id, blueTeamId = team1.id, redTeamId = team2.id),
+                    shortcode = "RACE".toShortcode(),
+                ) ?: throw Exception("Failed to issue code.")
+            val report = NewGame(series.id, code.id, null, GameResult(team1.id, team2.id))
+
+            val outcomes =
+                coroutineScope {
+                    (1..CONCURRENT_WRITERS)
+                        .map { async(Dispatchers.IO) { runCatching { repo.insert(report) } } }
+                        .awaitAll()
+                }
+
+            repo.getBySeriesId(series.id).size shouldBe 1
+            outcomes.count { it.isSuccess } shouldBe 1
+            outcomes.mapNotNull { it.exceptionOrNull() }.all { it is IllegalStateException } shouldBe true
+        }
+
+        test("a report racing a riot attribution for one code records exactly one game") {
+            val series = newSeries()
+            val code =
+                TournamentCodeRepository(dsl).insert(
+                    NewTournamentCode(seriesId = series.id, blueTeamId = team1.id, redTeamId = team2.id),
+                    shortcode = "RACE-RIOT".toShortcode(),
+                ) ?: throw Exception("Failed to issue code.")
+            val result = GameResult(team1.id, team2.id)
+            val writes =
+                (1..CONCURRENT_WRITERS).map {
+                    if (it % 2 == 0) {
+                        NewGame(series.id, code.id, null, result)
+                    } else {
+                        NewGame(series.id, code.id, "NA1_RACE".toRiotMatchId(), result)
+                    }
+                }
+
+            val outcomes =
+                coroutineScope {
+                    writes.map { async(Dispatchers.IO) { runCatching { repo.insert(it) } } }.awaitAll()
+                }
+
+            repo.getBySeriesId(series.id).size shouldBe 1
+            outcomes.count { it.isSuccess } shouldBe 1
         }
     })

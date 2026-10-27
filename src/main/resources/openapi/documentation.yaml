@@ -655,14 +655,12 @@ paths:
             example: REGULAR_SEASON
           description: Filter only series in this event stage.
         - in: query
-          name: completed
+          name: status
           schema:
-            type: boolean
+            $ref: "#/components/schemas/SeriesStatus"
           description: |
-            Filter on series completion. Omitting the parameter returns both
-            completed and active series, so existing callers are unaffected.
-            Pass `false` to find the series a new tournament code should
-            belong to when two series exist for the same pair of teams.
+            Filter on series status. Omitting the parameter returns series in
+            every status.
       responses:
         "200":
           description: The event, with the series matching the filter
@@ -827,12 +825,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    patch:
+      summary: Set a series' status and result
+      description: |
+        Sets the status by hand, and for `COMPLETE` the result.
+
+        - A winner records the result. With no games played, that is a forfeit.
+        - `doubleLoss: true` records a loss for both teams with no winner
+          (rulebook §5.5.2). A series can never have both.
+        - `COMPLETE` with neither keeps any result already stored.
+        - Any other status clears the stored result.
+
+        A complete series can be patched again to correct its result.
+      operationId: patchSeries
+      tags:
+        - Series (v1)
+      parameters:
+        - name: seriesId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchSeriesDto"
+      responses:
+        "200":
+          description: Series updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Series not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "422":
+          description: |
+            Invalid combination of fields.
+
+            Possible reasons:
+            - Both `winnerTeamId` and `doubleLoss: true` were given.
+            - `winnerTeamId` or `doubleLoss` was given with a status other than `COMPLETE`.
+            - `winnerTeamId` is not a participant in the series.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/v1/series/{seriesId}/game:
     post:
       summary: Issue a tournament code for a series
       description: |
-        Issues a new Riot tournament code.
+        Issues a Riot tournament code for the series' current game.
+
+        Idempotent by default: if a code has already been issued since the
+        most recent recorded game, that code is returned with `200` and Riot is
+        not called, so two captains pressing at once share one code. Send
+        `newCode: true` to issue another one deliberately, for example to
+        replace a code that did not work.
 
         A series may be issued at most **2 codes per game**, counted since the
         most recent recorded game. Recording a result ends the current game and
@@ -845,9 +905,10 @@ paths:
         the winner; either records a game, which resets the allowance. A
         codeless result from a custom game resets it just as a coded one does.
 
+        The first code issued moves a `NOT_STARTED` series to `IN_PROGRESS`.
         Issuance is still not blocked by the series being complete, and a
-        replacement for a code that did not work is simply another call to this
-        endpoint. There is no void step: a code with no result does not count
+        replacement for a code that did not work is another call to this
+        endpoint with `newCode: true`. There is no void step: a code with no result does not count
         towards the game number, though it does count towards the limit — so a
         replacement for a bum code spends the second of the two, and the next
         step after that is a custom game.
@@ -867,6 +928,14 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateGameDto"
       responses:
+        "200":
+          description: |
+            A code was already issued since the most recent recorded game, and
+            `newCode` was not set. That code is returned; Riot was not called.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TournamentCodeDto"
         "201":
           description: |
             Tournament code issued.
@@ -899,7 +968,8 @@ paths:
         "409":
           description: |
             The series already holds the maximum of 2 tournament codes for the
-            current game. Riot was not called.
+            current game. Riot was not called. The body's `reason` is
+            `CODE_LIMIT`.
 
             Record a result to reset the allowance — either report the game
             that was played, or play a custom game and report the winner.
@@ -942,11 +1012,16 @@ paths:
       summary: Report the result of a game
       description: |
         The single result-reporting entry point, used by both self-serve and
-        staff. Recording a result triggers the automatic completion check: if
-        one team has more than `totalGames / 2` wins, the series is closed.
+        staff. Records the reported winner; Riot is never called. Recording a
+        result triggers the automatic completion check: if one team has more
+        than `totalGames / 2` wins, the series is closed.
 
-        Idempotent. If the targeted code already has a result, the existing
-        game is returned and nothing is double-counted.
+        Idempotent per tournament code, including concurrent reports. If the
+        targeted code already has a result, the existing game is returned and
+        nothing is double-counted.
+
+        A report on a `COMPLETE` or `CANCELLED` series, including a double
+        loss, records the game and leaves the series' status and result alone.
       operationId: reportSeriesResult
       tags:
         - Series (v1)
@@ -971,10 +1046,8 @@ paths:
                 $ref: "#/components/schemas/GameDto"
         "200":
           description: |
-            The game was already recorded — either the targeted code already had
-            a result, or a bare report arrived after the callback had landed and
-            no code is still outstanding. The existing game is returned and
-            nothing was written.
+            The targeted code already had a result. The existing game is
+            returned and nothing was written.
           content:
             application/json:
               schema:
@@ -997,9 +1070,9 @@ paths:
 
             Possible reasons:
             - Both `tournamentCodeId` and `shortcode` were given.
-            - No winner was named and Riot has no record of the game.
+            - `winnerTeamId` is missing.
             - `winnerTeamId` is not a participant in the series.
-            - `loserTeamId` was given without `winnerTeamId`, or contradicts it.
+            - `loserTeamId` contradicts `winnerTeamId`.
           content:
             application/json:
               schema:
@@ -1010,9 +1083,10 @@ paths:
       summary: Re-check Riot for one tournament code
       description: |
         Asks Riot about a single tournament code and records the game if one is
-        found, updating the series' `games` array. Use it when a callback was
-        missed or arrived before the game was queryable, instead of issuing a
-        fresh code — a refresh costs nothing against the per-game code limit.
+        found, updating the series' `games` array. Denny's already polls Riot
+        for open codes every few minutes; use this to check one now instead of
+        issuing a fresh code — a refresh costs nothing against the per-game code
+        limit.
 
         Exactly **one** of `tournamentCodeId` or `shortcode` must be given.
         Unlike `/results`, omitting both is rejected: this operation is defined
@@ -1087,92 +1161,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/series/{seriesId}/complete:
-    post:
-      summary: Complete a series
-      description: |
-        Manually close a series. Also the forfeit path — a forfeit is a
-        completion with a winner and zero games played.
-      operationId: completeSeries
-      tags:
-        - Series (v1)
-      parameters:
-        - name: seriesId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CompleteSeriesDto"
-      responses:
-        "200":
-          description: Series completed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SeriesDto"
-        "404":
-          description: Series not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
-          description: |
-            The series is already complete. Reopen it with `DELETE` before
-            completing it again, so the reopen is recorded rather than the
-            previous result being silently overwritten.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "422":
-          description: Invalid input, for example a winner that is not in this series.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    delete:
-      summary: Reopen a completed series
-      description: |
-        Staff-only insurance against Denny's closing a series wrongly. Clears
-        `completed` and `completedAt` and stamps a reopen timestamp, which
-        suppresses the automatic completion check so the series does not slam
-        shut again on the next recorded result. Existing results are preserved.
-      operationId: reopenSeries
-      tags:
-        - Series (v1)
-      parameters:
-        - name: seriesId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Series reopened
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SeriesDto"
-        "404":
-          description: Series not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "409":
-          description: The series is not complete, so there is nothing to reopen.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  # Team Endpoints
   /api/v1/team:
     get:
       summary: Get all teams
@@ -1726,6 +1714,13 @@ components:
       enum:
         - REGULAR_SEASON
         - PLAYOFFS
+    SeriesStatus:
+      type: string
+      enum:
+        - NOT_STARTED
+        - IN_PROGRESS
+        - COMPLETE
+        - CANCELLED
 
     # Auth Schemas
     LoginDto:
@@ -1866,6 +1861,12 @@ components:
         redTeamId:
           type: integer
           example: 12
+        newCode:
+          type: boolean
+          default: false
+          description: |
+            Issue a new code even if one is already open for the current game.
+            Still subject to the per-game limit.
 
     # Event Group Schemas
     CreateEventGroupDto:
@@ -2344,7 +2345,7 @@ components:
         - teamIds
         - totalGames
         - eventStage
-        - completed
+        - status
       properties:
         id:
           type: integer
@@ -2366,31 +2367,26 @@ components:
             - $ref: "#/components/schemas/EventStage"
             - description: The stage of the event this series belongs to.
             - example: PLAYOFFS
-        completed:
+        status:
+          allOf:
+            - $ref: "#/components/schemas/SeriesStatus"
+            - description: |
+                Denny's moves a `NOT_STARTED` or `IN_PROGRESS` series to
+                `COMPLETE` when recorded results give one team more than
+                `totalGames / 2` wins. It never auto-completes a series in any
+                other status. The first code issued or game recorded moves a
+                `NOT_STARTED` series to `IN_PROGRESS`. Status does not gate code
+                generation.
+            - example: IN_PROGRESS
+        winnerTeamId:
+          type: integer
+          nullable: true
+          description: The winner, when a result is recorded. Null on a double loss.
+          example: 7
+        doubleLoss:
           type: boolean
-          description: |
-            Whether this series is finished. Denny's sets this automatically
-            when recorded results give one team more than `totalGames / 2`
-            wins. It is a routing flag used to pick between two active series
-            for the same pair of teams — it does not gate code generation.
+          description: A loss for both teams with no winner (rulebook §5.5.2).
           example: false
-        completedAt:
-          type: string
-          format: date-time
-          nullable: true
-          description: When the series was completed. Null while `completed` is false.
-          example: null
-        reopenedAt:
-          type: string
-          format: date-time
-          nullable: true
-          description: |
-            When staff last reopened this series. Once stamped it is never
-            cleared, and it permanently suppresses automatic completion for
-            this series — otherwise a series that already meets the win
-            threshold would slam shut again on the next recorded result.
-            Manual completion still works.
-          example: null
 
     SeriesWithGamesDto:
       type: object
@@ -2404,7 +2400,7 @@ components:
         - teamIds
         - totalGames
         - eventStage
-        - completed
+        - status
         - tournamentCodes
         - games
       properties:
@@ -2428,22 +2424,19 @@ components:
             - $ref: "#/components/schemas/EventStage"
             - description: The stage of the event this series belongs to.
             - example: PLAYOFFS
-        completed:
+        status:
+          allOf:
+            - $ref: "#/components/schemas/SeriesStatus"
+            - example: IN_PROGRESS
+        winnerTeamId:
+          type: integer
+          nullable: true
+          description: The winner, when a result is recorded. Null on a double loss.
+          example: 7
+        doubleLoss:
           type: boolean
+          description: A loss for both teams with no winner (rulebook §5.5.2).
           example: false
-        completedAt:
-          type: string
-          format: date-time
-          nullable: true
-          example: null
-        reopenedAt:
-          type: string
-          format: date-time
-          nullable: true
-          description: |
-            When staff last reopened this series. Never cleared once stamped,
-            and permanently suppresses automatic completion.
-          example: null
         tournamentCodes:
           type: array
           items:
@@ -2472,17 +2465,12 @@ components:
       description: |
         Report the result of a game. Target a specific tournament code with
         `tournamentCodeId` **or** `shortcode`, never both. When neither is
-        given, Denny's asks Riot which outstanding code has a game: if Riot
-        attributes one, the game is recorded against that code with Riot's
-        winner; if Riot attributes none, the game is recorded as codeless.
-        A report never guesses which code was played.
-
-        With no winner named, the same pass supplies the winner, and the
-        caller's claim is used only when Riot has no record.
+        given, the game is recorded as codeless, as for a custom game.
+      required:
+        - winnerTeamId
       properties:
         winnerTeamId:
           type: integer
-          description: Ignored when Riot has a record of the game.
           example: 7
         loserTeamId:
           type: integer
@@ -2504,7 +2492,7 @@ components:
       description: |
         Identifies the one tournament code to re-check against Riot. Exactly one
         of these must be set — unlike `ReportResultDto`, omitting both is a 422
-        rather than "let Riot decide".
+        rather than a codeless game.
       properties:
         tournamentCodeId:
           type: integer
@@ -2517,18 +2505,21 @@ components:
             `tournamentCodeId`.
           example: NA04eff-c5b0b774-c049-47cf-88f4-eee05c8d83ae
 
-    CompleteSeriesDto:
+    PatchSeriesDto:
       type: object
-      description: |
-        Manually close a series. Also the forfeit path — a winner with zero
-        games played.
+      required:
+        - status
       properties:
+        status:
+          $ref: "#/components/schemas/SeriesStatus"
         winnerTeamId:
           type: integer
+          description: Only with `status` `COMPLETE`. The loser is derived.
           example: 7
-        loserTeamId:
-          type: integer
-          example: 12
+        doubleLoss:
+          type: boolean
+          default: false
+          description: Only with `status` `COMPLETE`, and never with `winnerTeamId`.
 
     Error:
       type: object
@@ -2537,6 +2528,13 @@ components:
           type: integer
         message:
           type: string
+        reason:
+          type: string
+          nullable: true
+          description: |
+            Identifies which conflict a `409` is, where a client needs to tell
+            them apart. `CODE_LIMIT`: the per-game tournament code limit.
+          example: CODE_LIMIT
       required:
         - code
         - message

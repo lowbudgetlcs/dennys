@@ -5,7 +5,7 @@ import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
-import java.time.Instant
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 
 interface ISeriesRepository {
     fun insert(newSeries: NewSeries): Series?
@@ -16,14 +16,17 @@ interface ISeriesRepository {
 
     fun delete(id: SeriesId)
 
-    fun complete(
+    /**
+     * Set the status and, for COMPLETE, the result. A [result] or [doubleLoss] replaces the stored
+     * result; COMPLETE with neither keeps it; any other status clears it.
+     */
+    fun setStatus(
         id: SeriesId,
-        completedAt: Instant,
+        status: SeriesStatus,
         result: SeriesResult? = null,
+        doubleLoss: Boolean = false,
     ): Series?
 
-    fun reopen(
-        id: SeriesId,
-        reopenedAt: Instant,
-    ): Series?
+    /** Move a NOT_STARTED series to IN_PROGRESS. Does nothing in any other status. */
+    fun markInProgress(id: SeriesId)
 }

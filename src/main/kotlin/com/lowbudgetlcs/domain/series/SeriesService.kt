@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.series
 
+import com.lowbudgetlcs.domain.ConflictException
 import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
@@ -13,6 +14,7 @@ import com.lowbudgetlcs.domain.series.game.models.TournamentCode
 import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.game.models.types.RiotMatchId
 import com.lowbudgetlcs.domain.series.game.models.types.TournamentCodeId
+import com.lowbudgetlcs.domain.series.models.IssueOutcome
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.RefreshOutcome
 import com.lowbudgetlcs.domain.series.models.ReportOutcome
@@ -22,6 +24,7 @@ import com.lowbudgetlcs.domain.series.models.SeriesResult
 import com.lowbudgetlcs.domain.series.models.SeriesWithGames
 import com.lowbudgetlcs.domain.series.models.toSeriesWithGames
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
 import com.lowbudgetlcs.equalsIgnoreOrder
 import com.lowbudgetlcs.gateways.GatewayException
@@ -35,11 +38,21 @@ import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 
 private const val RELAY_METADATA_TAG = "LBLCS"
+
+/** No game finishes sooner, so a younger code is not worth asking Riot about. */
+private val MIN_CODE_AGE = Duration.ofMinutes(15)
+
+/** Past this, a code is most likely dead or saved for another day, so it is polled less often. */
+private val STALE_CODE_AGE = Duration.ofHours(6)
 
 /** Tournament codes a series may be issued for one game before a result has to be recorded. */
 const val DEFAULT_MAX_CODES_PER_GAME = 2
@@ -55,6 +68,10 @@ class SeriesService(
     private val maxCodesPerGame: Int = DEFAULT_MAX_CODES_PER_GAME,
 ) : ISeriesService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
+    // shortcut: in-process lock, Denny's runs as one container; move to a DB lock if it ever scales out.
+    // Entries are never removed, one small Mutex per series ever issued a code.
+    private val issuing = ConcurrentHashMap<SeriesId, Mutex>()
 
     override fun createSeries(series: NewSeries): Series {
         logger.debug("Creating new series...")
@@ -89,25 +106,27 @@ class SeriesService(
 
     override fun evaluateCompletion(id: SeriesId): Series {
         val series = getSeries(id)
-        if (series.completed || series.reopenedAt != null) {
+        if (series.status != SeriesStatus.NOT_STARTED && series.status != SeriesStatus.IN_PROGRESS) {
             logger.debug("Series '$id' is not eligible for auto-close, skipping evaluation.")
             return series
         }
+        if (series.status == SeriesStatus.NOT_STARTED) seriesRepo.markInProgress(id)
+        val open = series.copy(status = SeriesStatus.IN_PROGRESS)
         val wins =
             gameRepo
                 .getBySeriesId(id)
                 .mapNotNull { it.result }
                 .groupingBy { it.winningTeamId }
                 .eachCount()
-        val leader = wins.maxByOrNull { it.value } ?: return series
+        val leader = wins.maxByOrNull { it.value } ?: return open
         // Wins, not games played: a 2-0 Bo3 is over after two games.
         if (leader.value <= series.totalGames / 2) {
             logger.debug("Series '$id' at ${leader.value} win(s) of ${series.totalGames}, still open.")
-            return series
+            return open
         }
-        val loser = series.participants.toList().firstOrNull { it != leader.key } ?: return series
+        val loser = series.participants.toList().firstOrNull { it != leader.key } ?: return open
         logger.debug("Series '$id' won by '${leader.key}', closing.")
-        return seriesRepo.complete(id, Instant.now(), SeriesResult(leader.key, loser))
+        return seriesRepo.setStatus(id, SeriesStatus.COMPLETE, SeriesResult(leader.key, loser))
             ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
     }
 
@@ -178,15 +197,20 @@ class SeriesService(
             }
             val result = resolveWinner(series, riotGame)
             if (result != null) {
-                gameRepo.insert(
-                    NewGame(
-                        seriesId = series.id,
-                        tournamentCodeId = code.id,
-                        riotMatchId = matchId,
-                        result = result,
-                    ),
-                )
-                attributed = true
+                try {
+                    gameRepo.insert(
+                        NewGame(
+                            seriesId = series.id,
+                            tournamentCodeId = code.id,
+                            riotMatchId = matchId,
+                            result = result,
+                        ),
+                    )
+                    attributed = true
+                } catch (e: IllegalStateException) {
+                    // A captain's report or another refresh recorded this code after it was read above.
+                    logger.info("Skipping Riot game for code '${code.shortcode.value}': ${e.message}")
+                }
             }
         }
         return if (attributed) RefreshOutcome.ATTRIBUTED else RefreshOutcome.ANSWERED_EMPTY
@@ -227,77 +251,54 @@ class SeriesService(
         require(report.tournamentCodeId == null || report.shortcode == null) {
             "Provide either tournamentCodeId or shortcode, not both."
         }
-        val declared = declaredResult(series, report)
-        val target = resolveTarget(series, report.tournamentCodeId, report.shortcode)
+        val declared = declaredResult(series, report) ?: throw IllegalArgumentException("winnerTeamId is required.")
+        val target =
+            resolveTarget(series, report.tournamentCodeId, report.shortcode)
+                ?: return ReportOutcome(record(id, null, declared), recorded = true).also { evaluateCompletion(id) }
 
-        val before = gameRepo.getBySeriesId(id)
-        if (target != null) {
-            before.firstOrNull { it.tournamentCodeId == target.id && it.result != null }?.let {
-                logger.info("Code '${target.shortcode.value}' already has a result, returning game '${it.id.value}'.")
-                return ReportOutcome(it, recorded = false)
-            }
+        existingGame(id, target)?.let {
+            logger.info("Code '${target.shortcode.value}' already has a result, returning game '${it.id.value}'.")
+            return ReportOutcome(it, recorded = false)
         }
-        val outstanding = codeRepo.getBySeriesId(id).filter { code -> before.none { it.tournamentCodeId == code.id } }
-
-        refreshQuietly(id)
-        val pulled =
-            gameRepo.getBySeriesId(id).filter { game ->
-                game.result != null && before.none { it.id == game.id }
+        val game =
+            try {
+                record(id, target.id, declared)
+            } catch (e: IllegalStateException) {
+                // A concurrent report or Riot refresh for this code won the insert.
+                return ReportOutcome(existingGame(id, target) ?: throw e, recorded = false)
             }
-
-        if (target != null) {
-            pulled.firstOrNull { it.tournamentCodeId == target.id }?.let { return ReportOutcome(it, recorded = true) }
-            return ReportOutcome(record(id, target.id, declared ?: noWinner(id)), recorded = true)
-        }
-        pulled.firstOrNull()?.let { return ReportOutcome(it, recorded = true) }
-
-        if (declared == null && outstanding.isEmpty()) {
-            before.lastOrNull { it.result != null }?.let {
-                logger.info("Series '$id' has no outstanding codes, returning recorded game '${it.id.value}'.")
-                return ReportOutcome(it, recorded = false)
-            }
-        }
-        return ReportOutcome(record(id, null, declared ?: noWinner(id)), recorded = true)
+        evaluateCompletion(id)
+        return ReportOutcome(game, recorded = true)
     }
 
-    private fun noWinner(id: SeriesId): Nothing =
-        throw IllegalArgumentException(
-            "No winner was named and Riot has no record of a game for series '${id.value}'.",
-        )
+    private fun existingGame(
+        id: SeriesId,
+        code: TournamentCode,
+    ): Game? = gameRepo.getBySeriesId(id).firstOrNull { it.tournamentCodeId == code.id && it.result != null }
 
     private fun record(
         id: SeriesId,
         codeId: TournamentCodeId?,
         result: GameResult,
-    ): Game {
-        val game =
-            gameRepo.insert(NewGame(id, codeId, null, result))
-                ?: throw DatabaseException("Failed to record a result for series '${id.value}'.")
-        evaluateCompletion(id)
-        return game
-    }
+    ): Game =
+        gameRepo.insert(NewGame(id, codeId, null, result))
+            ?: throw DatabaseException("Failed to record a result for series '${id.value}'.")
 
-    override fun completeSeries(
+    override fun patchSeries(
         id: SeriesId,
+        status: SeriesStatus,
         winningTeamId: TeamId?,
-        losingTeamId: TeamId?,
+        doubleLoss: Boolean,
     ): Series {
-        val series = getSeries(id)
-        check(!series.completed) {
-            "Series '${id.value}' is already complete. Reopen it before completing it again."
+        require(winningTeamId == null || !doubleLoss) { "A double-loss series cannot have a winner." }
+        require(status == SeriesStatus.COMPLETE || (winningTeamId == null && !doubleLoss)) {
+            "Only a COMPLETE series can have a winner or a double loss."
         }
-        val result = winnerAndLoser(series, winningTeamId, losingTeamId)?.let { SeriesResult(it.first, it.second) }
-        logger.info("Closing series '$id' manually, winner '${result?.winningTeamId}'.")
-        return seriesRepo.complete(id, Instant.now(), result)
-            ?: throw DatabaseException("Failed to complete series with id '${id.value}'.")
-    }
-
-    override fun reopenSeries(id: SeriesId): Series {
         val series = getSeries(id)
-        check(series.completed) { "Series '${id.value}' is not complete, so it cannot be reopened." }
-        logger.info("Reopening series '$id'.")
-        return seriesRepo.reopen(id, Instant.now())
-            ?: throw DatabaseException("Failed to reopen series with id '${id.value}'.")
+        val result = winnerAndLoser(series, winningTeamId, null)?.let { SeriesResult(it.first, it.second) }
+        logger.info("Setting series '$id' to $status, winner '${result?.winningTeamId}', double loss $doubleLoss.")
+        return seriesRepo.setStatus(id, status, result, doubleLoss)
+            ?: throw DatabaseException("Failed to update series with id '${id.value}'.")
     }
 
     private fun declaredResult(
@@ -329,8 +330,8 @@ class SeriesService(
 
     /**
      * Resolve a code by id or by shortcode, whichever was supplied, and refuse one that belongs to a
-     * different series. Returns null when neither was supplied — which `reportResult` treats as "let
-     * Riot decide", and `refreshFromCode` rejects up front.
+     * different series. Returns null when neither was supplied — which `reportResult` records as a
+     * codeless game, and `refreshFromCode` rejects up front.
      */
     private fun resolveTarget(
         series: Series,
@@ -359,13 +360,19 @@ class SeriesService(
         }
     }
 
-    override suspend fun refreshFromShortcode(shortcode: Shortcode): RefreshOutcome? {
-        val code = codeRepo.getByShortcode(shortcode)
-        if (code == null) {
-            logger.warn("Callback for unknown shortcode '${shortcode.value}', ignoring.")
-            return null
-        }
-        return refreshFromRiot(code.seriesId)
+    override suspend fun pollRiot(includeStale: Boolean) {
+        val now = Instant.now()
+        val staleBefore = now.minus(STALE_CODE_AGE)
+        codeRepo
+            .getOpenForPolling(issuedBefore = now.minus(MIN_CODE_AGE))
+            .filter { includeStale || it.createdAt >= staleBefore }
+            .forEach { code ->
+                try {
+                    refreshFromCode(code.seriesId, code.id, null)
+                } catch (e: Throwable) {
+                    logger.warn("Could not poll Riot for code '${code.shortcode.value}': ${e.message}")
+                }
+            }
     }
 
     private fun seriesMetadata(id: SeriesId): String = """{"tag":"$RELAY_METADATA_TAG","seriesId":${id.value}}"""
@@ -374,9 +381,9 @@ class SeriesService(
      * Codes issued since the most recent recorded game, coded or codeless. Recording a result ends
      * the current game, so the allowance resets rather than accumulating across a long series.
      */
-    private fun codesIssuedForCurrentGame(id: SeriesId): Int {
+    private fun codesForCurrentGame(id: SeriesId): List<TournamentCode> {
         val since = gameRepo.getBySeriesId(id).maxOfOrNull { it.createdAt }
-        return codeRepo.getBySeriesId(id).count { since == null || it.createdAt > since }
+        return codeRepo.getBySeriesId(id).filter { since == null || it.createdAt > since }
     }
 
     private fun riotMatchIdOf(riotGame: RiotTournamentGamesV5Dto): RiotMatchId? {
@@ -435,7 +442,10 @@ class SeriesService(
         }
     }
 
-    override suspend fun createGame(newCode: NewTournamentCode): TournamentCode {
+    override suspend fun createGame(
+        newCode: NewTournamentCode,
+        forceNew: Boolean,
+    ): IssueOutcome {
         logger.debug("Creating new game...")
         logger.debug(newCode.toString())
         val series = getSeries(newCode.seriesId) // Throws if not found
@@ -450,23 +460,35 @@ class SeriesService(
         ) {
             "Provided teams are not part of series with id ${series.id.value}."
         }
+        // Outside the lock so a slow Riot answer only delays this press; the count below is what needs it.
         refreshQuietly(series.id)
-        val issued = codesIssuedForCurrentGame(series.id)
-        if (issued >= maxCodesPerGame) {
-            logger.warn("Series '${series.id}' has $issued code(s) for the current game, refusing to issue another.")
-            throw IllegalStateException(
-                "Series '${series.id.value}' has already been issued $issued tournament code(s) for this game. " +
-                    "Report the result of the game that was played, or play a custom game and report the winner.",
-            )
+        return issuing.computeIfAbsent(series.id) { Mutex() }.withLock {
+            val current = codesForCurrentGame(series.id)
+            if (!forceNew) {
+                current.maxByOrNull { it.createdAt }?.let { return@withLock IssueOutcome(it, issued = false) }
+            }
+            if (current.size >= maxCodesPerGame) {
+                logger.warn(
+                    "Series '${series.id}' has ${current.size} code(s) for the current game, refusing to issue another.",
+                )
+                throw ConflictException(
+                    "Series '${series.id.value}' has already been issued ${current.size} tournament code(s) for this " +
+                        "game. Report the result of the game that was played, or play a custom game and report the " +
+                        "winner.",
+                    reason = "CODE_LIMIT",
+                )
+            }
+            val event =
+                eventRepo.getById(series.eventId)
+                    ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
+            val response = gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
+            val shortcode =
+                response.codes.firstOrNull()
+                    ?: throw GatewayException("Riot returned no tournament codes for event '${event.id.value}'.")
+            val code =
+                codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
+            seriesRepo.markInProgress(series.id)
+            IssueOutcome(code, issued = true)
         }
-        logger.debug("Fetching tournament id for event '${series.eventId}'...t add")
-        val event =
-            eventRepo.getById(series.eventId)
-                ?: throw DatabaseException("Series with id '${series.id}' does not have parent event.")
-        val response = gate.getCode(event.riotTournamentId, ShortcodeOptions(metadata = seriesMetadata(series.id)))
-        val shortcode =
-            response.codes.firstOrNull()
-                ?: throw GatewayException("Riot returned no tournament codes for event '${event.id.value}'.")
-        return codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
     }
 }

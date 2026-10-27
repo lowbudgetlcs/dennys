@@ -39,7 +39,7 @@ fun Route.eventRoutesV1(
     seriesService: ISeriesService,
 ) {
     route("/event") {
-        get<EventResources> { route ->
+        get<EventResources.Search> { route ->
             val filter =
                 EventFilterParams(
                     name = route.name,
@@ -79,7 +79,7 @@ fun Route.eventRoutesV1(
                 SeriesFilterParams(
                     teamIds = route.teamIds,
                     stage = route.stage,
-                    completed = route.completed,
+                    status = route.status,
                 )
             val event = eventService.getEventWithSeries(route.eventId.toEventId(), filter.toQuery())
 

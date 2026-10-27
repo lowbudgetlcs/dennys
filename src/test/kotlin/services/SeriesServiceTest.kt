@@ -16,9 +16,10 @@ import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.SeriesQuery
 import com.lowbudgetlcs.domain.series.models.SeriesResult
-import com.lowbudgetlcs.domain.series.models.filterByCompletion
+import com.lowbudgetlcs.domain.series.models.filterByStatus
 import com.lowbudgetlcs.domain.series.models.toSeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import com.lowbudgetlcs.domain.team.models.toTeamName
@@ -91,9 +92,7 @@ class SeriesServiceTest :
                 participants = participatingTeams,
                 result = null,
                 eventStage = EventStage.REGULAR_SEASON,
-                completed = false,
-                completedAt = null,
-                reopenedAt = null,
+                status = SeriesStatus.NOT_STARTED,
             )
 
         val newSeries =
@@ -133,9 +132,7 @@ class SeriesServiceTest :
                         participants = participatingTeams,
                         result = null,
                         eventStage = EventStage.REGULAR_SEASON,
-                        completed = false,
-                        completedAt = null,
-                        reopenedAt = null,
+                        status = SeriesStatus.NOT_STARTED,
                     ),
                     Series(
                         id = SeriesId(2),
@@ -144,9 +141,7 @@ class SeriesServiceTest :
                         participants = participatingTeams,
                         result = null,
                         eventStage = EventStage.REGULAR_SEASON,
-                        completed = false,
-                        completedAt = null,
-                        reopenedAt = null,
+                        status = SeriesStatus.NOT_STARTED,
                     ),
                 )
 
@@ -176,51 +171,47 @@ class SeriesServiceTest :
                 participants = participatingTeams,
                 result = null,
                 eventStage = EventStage.PLAYOFFS,
-                completed = false,
-                completedAt = null,
-                reopenedAt = null,
+                status = SeriesStatus.NOT_STARTED,
             )
         val closedSeries =
             openSeries.copy(
                 id = SeriesId(2),
-                completed = true,
-                completedAt = Instant.parse("2026-07-14T23:12:04Z"),
+                status = SeriesStatus.COMPLETE,
             )
         val bothSeries = listOf(openSeries, closedSeries)
 
-        "filterByCompletion returns only open series for completed = false" {
-            bothSeries.filterByCompletion(
-                SeriesQuery(teamIds = null, eventStage = null, completed = false),
+        "filterByStatus returns only not-started series for status = NOT_STARTED" {
+            bothSeries.filterByStatus(
+                SeriesQuery(teamIds = null, eventStage = null, status = SeriesStatus.NOT_STARTED),
             ) shouldContainExactly listOf(openSeries)
         }
 
-        "filterByCompletion returns only closed series for completed = true" {
-            bothSeries.filterByCompletion(
-                SeriesQuery(teamIds = null, eventStage = null, completed = true),
+        "filterByStatus returns only complete series for status = COMPLETE" {
+            bothSeries.filterByStatus(
+                SeriesQuery(teamIds = null, eventStage = null, status = SeriesStatus.COMPLETE),
             ) shouldContainExactly listOf(closedSeries)
         }
 
-        "filterByCompletion is unfiltered when completed is omitted" {
-            bothSeries.filterByCompletion(
+        "filterByStatus is unfiltered when status is omitted" {
+            bothSeries.filterByStatus(
                 SeriesQuery(teamIds = null, eventStage = null),
             ) shouldContainExactly bothSeries
 
-            bothSeries.filterByCompletion(null) shouldContainExactly bothSeries
+            bothSeries.filterByStatus(null) shouldContainExactly bothSeries
         }
 
-        "filterByCompletion distinguishes two series with identical participants and stage" {
+        "filterByStatus distinguishes two series with identical participants and stage" {
             openSeries.participants shouldBe closedSeries.participants
             openSeries.eventStage shouldBe closedSeries.eventStage
 
-            bothSeries.filterByCompletion(
-                SeriesQuery(teamIds = null, eventStage = null, completed = false),
+            bothSeries.filterByStatus(
+                SeriesQuery(teamIds = null, eventStage = null, status = SeriesStatus.NOT_STARTED),
             ) shouldContainExactly listOf(openSeries)
         }
 
         fun seriesOf(
             totalGames: Int,
-            completed: Boolean = false,
-            reopenedAt: Instant? = null,
+            status: SeriesStatus = SeriesStatus.IN_PROGRESS,
         ) = Series(
             id = SeriesId(50),
             eventId = EventId(1),
@@ -228,9 +219,7 @@ class SeriesServiceTest :
             participants = participatingTeams,
             result = null,
             eventStage = EventStage.PLAYOFFS,
-            completed = completed,
-            completedAt = null,
-            reopenedAt = reopenedAt,
+            status = status,
         )
 
         fun gamesWon(winners: List<TeamId>) =
@@ -251,8 +240,10 @@ class SeriesServiceTest :
             winners: List<TeamId> = emptyList(),
         ) {
             every { seriesRepo.getById(any()) } returns series
+            every { seriesRepo.markInProgress(any()) } returns Unit
             every { gameRepo.getBySeriesId(any()) } returns gamesWon(winners)
-            every { seriesRepo.complete(series.id, any(), any()) } returns series.copy(completed = true)
+            every { seriesRepo.setStatus(series.id, any(), any(), any()) } returns
+                series.copy(status = SeriesStatus.COMPLETE)
         }
 
         "Bo3 closes at 2-0" {
@@ -262,7 +253,7 @@ class SeriesServiceTest :
             service.evaluateCompletion(series.id)
 
             verify(exactly = 1) {
-                seriesRepo.complete(series.id, any(), SeriesResult(team1.id, team2.id))
+                seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id), false)
             }
         }
 
@@ -273,7 +264,7 @@ class SeriesServiceTest :
             service.evaluateCompletion(series.id)
 
             verify(exactly = 1) {
-                seriesRepo.complete(series.id, any(), SeriesResult(team1.id, team2.id))
+                seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id), false)
             }
         }
 
@@ -283,7 +274,16 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
+        "the first game on a not-started series starts it" {
+            val series = seriesOf(3, status = SeriesStatus.NOT_STARTED)
+            arrange(series, listOf(team1.id))
+
+            service.evaluateCompletion(series.id).status shouldBe SeriesStatus.IN_PROGRESS
+
+            verify(exactly = 1) { seriesRepo.markInProgress(series.id) }
         }
 
         "Bo5 closes at 3-0, 3-1 and 3-2 but not 2-2" {
@@ -299,7 +299,7 @@ class SeriesServiceTest :
                 service.evaluateCompletion(series.id)
 
                 verify(exactly = 1) {
-                    seriesRepo.complete(series.id, any(), SeriesResult(team1.id, team2.id))
+                    seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team1.id, team2.id), false)
                 }
             }
 
@@ -309,7 +309,7 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(drawn.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
         }
 
         "the winner recorded is the team with more wins" {
@@ -319,27 +319,27 @@ class SeriesServiceTest :
             service.evaluateCompletion(series.id)
 
             verify(exactly = 1) {
-                seriesRepo.complete(series.id, any(), SeriesResult(team2.id, team1.id))
+                seriesRepo.setStatus(series.id, SeriesStatus.COMPLETE, SeriesResult(team2.id, team1.id), false)
             }
         }
 
-        "a reopened series does not re-close when another result arrives" {
-            val series = seriesOf(3, reopenedAt = Instant.parse("2026-07-15T09:00:00Z"))
+        "a cancelled series does not close when another result arrives" {
+            val series = seriesOf(3, SeriesStatus.CANCELLED)
             arrange(series, listOf(team1.id, team1.id, team1.id))
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
             verify(exactly = 0) { gameRepo.getBySeriesId(any()) }
         }
 
         "an already-completed series is not re-evaluated or double-written" {
-            val series = seriesOf(3, completed = true)
+            val series = seriesOf(3, SeriesStatus.COMPLETE)
             arrange(series, listOf(team1.id, team1.id))
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
             verify(exactly = 0) { gameRepo.getBySeriesId(any()) }
         }
 
@@ -349,6 +349,6 @@ class SeriesServiceTest :
 
             service.evaluateCompletion(series.id)
 
-            verify(exactly = 0) { seriesRepo.complete(any(), any(), any()) }
+            verify(exactly = 0) { seriesRepo.setStatus(any(), any(), any(), any()) }
         }
     })

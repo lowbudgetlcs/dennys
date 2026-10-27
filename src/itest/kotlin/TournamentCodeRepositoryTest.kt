@@ -6,14 +6,17 @@ import com.lowbudgetlcs.domain.event.models.toRiotTournamentId
 import com.lowbudgetlcs.domain.event.models.toShortcode
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.event.models.types.EventStatus
+import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.toSeriesId
+import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.NewTeam
 import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.repositories.event.EventRepository
+import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.TournamentCodeRepository
@@ -21,6 +24,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jooq.SQLDialect
@@ -155,5 +159,70 @@ class TournamentCodeRepositoryTest :
 
         "An unknown shortcode resolves to null rather than an arbitrary code" {
             repo.getByShortcode("NOT-A-REAL-CODE".toShortcode()) shouldBe null
+        }
+
+        fun pollingSeries(eventStatus: EventStatus = EventStatus.ACTIVE): Series {
+            val pollEvent =
+                if (eventStatus == event.status) {
+                    event
+                } else {
+                    EventRepository(dsl).insert(
+                        NewEvent(
+                            name = "Polling $eventStatus".toEventName(),
+                            description = "Testing polling.".toEventDescription(),
+                            startDate = Instant.now(),
+                            endDate = Instant.now().plusSeconds(3_600L),
+                            status = eventStatus,
+                            eventStages = setOf(EventStage.REGULAR_SEASON),
+                        ),
+                        riotTournamentId = 1.toRiotTournamentId(),
+                    ) ?: throw Exception("Failed to insert polling event.")
+                }
+            return SeriesRepository(dsl).insert(
+                NewSeries(
+                    eventId = pollEvent.id,
+                    totalGames = 5,
+                    participantIds = Pair(team1.id, team2.id),
+                    eventStage = EventStage.REGULAR_SEASON,
+                ),
+            ) ?: throw Exception("Failed to insert polling series.")
+        }
+
+        fun polled(s: Series) =
+            repo.getOpenForPolling(issuedBefore = Instant.now().plusSeconds(60)).filter { it.seriesId == s.id }
+
+        "Polling picks only the codes issued since the latest game" {
+            val s = pollingSeries()
+            repo.insert(newCode.copy(seriesId = s.id), shortcode = "POLL-DEAD".toShortcode()).shouldNotBeNull()
+            GameRepository(dsl).insert(NewGame(s.id, null, null, null)).shouldNotBeNull()
+            val current =
+                repo.insert(newCode.copy(seriesId = s.id), shortcode = "POLL-CURRENT".toShortcode()).shouldNotBeNull()
+
+            polled(s).map { it.id } shouldBe listOf(current.id)
+        }
+
+        "Polling skips a code younger than the cut-off" {
+            val s = pollingSeries()
+            repo.insert(newCode.copy(seriesId = s.id), shortcode = "POLL-YOUNG".toShortcode()).shouldNotBeNull()
+
+            repo
+                .getOpenForPolling(issuedBefore = Instant.now().minusSeconds(60))
+                .filter { it.seriesId == s.id }
+                .shouldBeEmpty()
+        }
+
+        "Polling skips a closed series" {
+            val s = pollingSeries()
+            repo.insert(newCode.copy(seriesId = s.id), shortcode = "POLL-CLOSED".toShortcode()).shouldNotBeNull()
+            SeriesRepository(dsl).setStatus(s.id, SeriesStatus.COMPLETE).shouldNotBeNull()
+
+            polled(s).shouldBeEmpty()
+        }
+
+        "Polling skips a series in an event that is not active" {
+            val s = pollingSeries(EventStatus.PAUSED)
+            repo.insert(newCode.copy(seriesId = s.id), shortcode = "POLL-PAUSED".toShortcode()).shouldNotBeNull()
+
+            polled(s).shouldBeEmpty()
         }
     })
