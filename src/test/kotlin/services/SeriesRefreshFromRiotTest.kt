@@ -191,6 +191,19 @@ class SeriesRefreshFromRiotTest :
             verify(exactly = 0) { f.gameRepo.insert(any()) }
         }
 
+        "a game the repository refuses because the code was reported meanwhile is skipped" {
+            val f = Fixture()
+            coEvery { f.gateway.getGames(any()) } returns listOf(f.riotGame(listOf(PUUID_A)))
+            f.withSeries(listOf(f.code(1, "SHORT-A")))
+            every { f.teamRepo.getTeamIdsByPuuids(any()) } returns listOf(TEAM_1)
+            every { f.gameRepo.insert(any()) } throws
+                IllegalStateException("Tournament code '1' already has a game recorded.")
+
+            f.service.refreshFromRiot(SERIES_ID) shouldBe RefreshOutcome.ANSWERED_EMPTY
+
+            verify(exactly = 0) { f.seriesRepo.setStatus(any(), any(), any(), any()) }
+        }
+
         "a winning roster with unregistered puuids still resolves via overlap" {
             val f = Fixture()
             coEvery { f.gateway.getGames(any()) } returns

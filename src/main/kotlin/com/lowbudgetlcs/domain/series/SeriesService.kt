@@ -188,15 +188,20 @@ class SeriesService(
             }
             val result = resolveWinner(series, riotGame)
             if (result != null) {
-                gameRepo.insert(
-                    NewGame(
-                        seriesId = series.id,
-                        tournamentCodeId = code.id,
-                        riotMatchId = matchId,
-                        result = result,
-                    ),
-                )
-                attributed = true
+                try {
+                    gameRepo.insert(
+                        NewGame(
+                            seriesId = series.id,
+                            tournamentCodeId = code.id,
+                            riotMatchId = matchId,
+                            result = result,
+                        ),
+                    )
+                    attributed = true
+                } catch (e: IllegalStateException) {
+                    // A captain's report or another refresh recorded this code after it was read above.
+                    logger.info("Skipping Riot game for code '${code.shortcode.value}': ${e.message}")
+                }
             }
         }
         return if (attributed) RefreshOutcome.ATTRIBUTED else RefreshOutcome.ANSWERED_EMPTY
@@ -240,18 +245,21 @@ class SeriesService(
         val declared = declaredResult(series, report) ?: throw IllegalArgumentException("winnerTeamId is required.")
         val target =
             resolveTarget(series, report.tournamentCodeId, report.shortcode)
-                ?: return ReportOutcome(record(id, null, declared), recorded = true)
+                ?: return ReportOutcome(record(id, null, declared), recorded = true).also { evaluateCompletion(id) }
 
         existingGame(id, target)?.let {
             logger.info("Code '${target.shortcode.value}' already has a result, returning game '${it.id.value}'.")
             return ReportOutcome(it, recorded = false)
         }
-        return try {
-            ReportOutcome(record(id, target.id, declared), recorded = true)
-        } catch (e: IllegalStateException) {
-            // A concurrent report for this code won the insert.
-            ReportOutcome(existingGame(id, target) ?: throw e, recorded = false)
-        }
+        val game =
+            try {
+                record(id, target.id, declared)
+            } catch (e: IllegalStateException) {
+                // A concurrent report or Riot refresh for this code won the insert.
+                return ReportOutcome(existingGame(id, target) ?: throw e, recorded = false)
+            }
+        evaluateCompletion(id)
+        return ReportOutcome(game, recorded = true)
     }
 
     private fun existingGame(
@@ -263,13 +271,9 @@ class SeriesService(
         id: SeriesId,
         codeId: TournamentCodeId?,
         result: GameResult,
-    ): Game {
-        val game =
-            gameRepo.insert(NewGame(id, codeId, null, result))
-                ?: throw DatabaseException("Failed to record a result for series '${id.value}'.")
-        evaluateCompletion(id)
-        return game
-    }
+    ): Game =
+        gameRepo.insert(NewGame(id, codeId, null, result))
+            ?: throw DatabaseException("Failed to record a result for series '${id.value}'.")
 
     override fun patchSeries(
         id: SeriesId,

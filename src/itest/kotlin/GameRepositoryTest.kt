@@ -174,6 +174,26 @@ class GameRepositoryTest :
             ex.message.toString() shouldContain first.id.value.toString()
         }
 
+        test("a riot game is refused on a code a captain already reported") {
+            val series = newSeries()
+            val code = issueCode(series, "REPORTED-THEN-RIOT")
+            repo.insert(NewGame(series.id, code.id, null, null)).shouldNotBeNull()
+
+            shouldThrow<IllegalStateException> {
+                repo.insert(NewGame(series.id, code.id, "NA1_AFTERREPORT".toRiotMatchId(), null))
+            }
+            repo.countBySeries(series.id) shouldBe 1
+        }
+
+        test("a remake records a second riot game on the same code") {
+            val series = newSeries()
+            val code = issueCode(series, "REMAKE")
+            repo.insert(NewGame(series.id, code.id, "NA1_REMAKE1".toRiotMatchId(), null)).shouldNotBeNull()
+
+            repo.insert(NewGame(series.id, code.id, "NA1_REMAKE2".toRiotMatchId(), null)).shouldNotBeNull()
+            repo.countBySeries(series.id) shouldBe 2
+        }
+
         test("the riot match id conflict spans series, not just one") {
             val a = newSeries()
             val b = newSeries()
