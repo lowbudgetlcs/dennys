@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.event.models.types.EventStatus
 import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.team.models.NewTeam
@@ -137,5 +138,31 @@ class GameNumberConcurrencyTest :
             repo.getBySeriesId(series.id).size shouldBe 1
             outcomes.count { it.isSuccess } shouldBe 1
             outcomes.mapNotNull { it.exceptionOrNull() }.all { it is IllegalStateException } shouldBe true
+        }
+
+        test("a report racing a riot attribution for one code records exactly one game") {
+            val series = newSeries()
+            val code =
+                TournamentCodeRepository(dsl).insert(
+                    NewTournamentCode(seriesId = series.id, blueTeamId = team1.id, redTeamId = team2.id),
+                    shortcode = "RACE-RIOT".toShortcode(),
+                ) ?: throw Exception("Failed to issue code.")
+            val result = GameResult(team1.id, team2.id)
+            val writes =
+                (1..CONCURRENT_WRITERS).map {
+                    if (it % 2 == 0) {
+                        NewGame(series.id, code.id, null, result)
+                    } else {
+                        NewGame(series.id, code.id, "NA1_RACE".toRiotMatchId(), result)
+                    }
+                }
+
+            val outcomes =
+                coroutineScope {
+                    writes.map { async(Dispatchers.IO) { runCatching { repo.insert(it) } } }.awaitAll()
+                }
+
+            repo.getBySeriesId(series.id).size shouldBe 1
+            outcomes.count { it.isSuccess } shouldBe 1
         }
     })

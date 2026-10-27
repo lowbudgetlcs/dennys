@@ -295,4 +295,15 @@ class SeriesReportResultTest :
             outcome.recorded shouldBe false
             outcome.game shouldBe winner
         }
+
+        "a failure closing the series after the insert is not reported as a lost race" {
+            val f = ReportFixture()
+            f.withSeries(listOf(f.code(1, "SHORT-A")), recorded = listOf(f.recordedGame(codeId = null)))
+            every { f.seriesRepo.setStatus(any(), any(), any(), any()) } throws IllegalStateException("boom")
+
+            shouldThrow<IllegalStateException> {
+                f.service.reportResult(REPORT_SERIES_ID, reported(HOME, codeId = 1))
+            }.message shouldBe "boom"
+            f.games.size shouldBe 2
+        }
     })
