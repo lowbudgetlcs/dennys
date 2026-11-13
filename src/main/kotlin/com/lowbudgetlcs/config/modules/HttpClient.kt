@@ -15,6 +15,17 @@ import java.time.Instant
 
 const val MAX_RIOT_RETRIES = 3
 
+val riotJson =
+    Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+        explicitNulls = false
+        serializersModule =
+            SerializersModule {
+                contextual(Instant::class, InstantSerializer)
+            }
+    }
+
 val httpClientModule =
     module {
         single {
@@ -27,17 +38,7 @@ val httpClientModule =
                     retryOnExceptionIf { _, cause -> cause is IOException }
                     exponentialDelay()
                 }
-                install(ContentNegotiation) {
-                    json(
-                        Json {
-                            encodeDefaults = true
-                            serializersModule =
-                                SerializersModule {
-                                    contextual(Instant::class, InstantSerializer)
-                                }
-                        },
-                    )
-                }
+                install(ContentNegotiation) { json(riotJson) }
             }
         }
     }
