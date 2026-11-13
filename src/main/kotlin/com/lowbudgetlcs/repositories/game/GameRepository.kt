@@ -15,6 +15,7 @@ import org.jooq.Record
 import org.jooq.impl.DSL.max
 import org.jooq.storage.tables.references.GAMES
 import org.jooq.storage.tables.references.GAME_RESULTS
+import org.jooq.storage.tables.references.RIOT_MATCH_DATA
 
 class GameRepository(
     private val dsl: DSLContext,
@@ -29,6 +30,17 @@ class GameRepository(
             .mapNotNull(::rowToGame)
 
     override fun countBySeries(id: SeriesId): Int = dsl.fetchCount(GAMES, GAMES.SERIES_ID.eq(id.value))
+
+    override fun getMissingRiotMatchData(limit: Int): List<Game> =
+        selectGames()
+            .leftJoin(RIOT_MATCH_DATA)
+            .on(GAMES.ID.eq(RIOT_MATCH_DATA.GAME_ID))
+            .where(GAMES.RIOT_MATCH_ID.isNotNull)
+            .and(RIOT_MATCH_DATA.GAME_ID.isNull)
+            .orderBy(GAMES.ID.desc())
+            .limit(limit)
+            .fetch()
+            .mapNotNull(::rowToGame)
 
     override fun insert(newGame: NewGame): Game? {
         val insertedId =

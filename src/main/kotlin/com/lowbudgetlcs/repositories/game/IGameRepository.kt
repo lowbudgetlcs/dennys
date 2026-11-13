@@ -13,6 +13,9 @@ interface IGameRepository {
 
     fun countBySeries(id: SeriesId): Int
 
+    /** Games with a Riot match id but no stored Riot match data, newest first. */
+    fun getMissingRiotMatchData(limit: Int): List<Game>
+
     fun insert(newGame: NewGame): Game?
 
     fun recordResult(

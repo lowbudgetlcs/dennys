@@ -17,6 +17,7 @@ import com.lowbudgetlcs.domain.team.models.Team
 import com.lowbudgetlcs.domain.team.models.toTeamName
 import com.lowbudgetlcs.repositories.event.EventRepository
 import com.lowbudgetlcs.repositories.game.GameRepository
+import com.lowbudgetlcs.repositories.riotmatchdata.RiotMatchDataRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.TournamentCodeRepository
@@ -28,6 +29,7 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import kotlinx.serialization.json.JsonObject
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.storage.tables.references.GAMES
@@ -137,6 +139,19 @@ class GameRepositoryTest :
             second.number shouldBe 2
             third.number shouldBe 3
             repo.getBySeriesId(series.id).map { it.number } shouldBe listOf(1, 2, 3)
+        }
+
+        test("games missing Riot match data are the riot games without a stored row, newest first") {
+            val series = newSeries()
+            val older = repo.insert(NewGame(series.id, null, "NA1_MISSING1".toRiotMatchId(), null)).shouldNotBeNull()
+            val stored = repo.insert(NewGame(series.id, null, "NA1_MISSING2".toRiotMatchId(), null)).shouldNotBeNull()
+            RiotMatchDataRepository(dsl).save(stored.id, JsonObject(emptyMap()), null)
+            val codeless = repo.insert(NewGame(series.id, null, null, null)).shouldNotBeNull()
+            val newer = repo.insert(NewGame(series.id, null, "NA1_MISSING3".toRiotMatchId(), null)).shouldNotBeNull()
+            val ours = setOf(older.id, stored.id, codeless.id, newer.id)
+
+            repo.getMissingRiotMatchData(Int.MAX_VALUE).map { it.id }.filter { it in ours } shouldBe
+                listOf(newer.id, older.id)
         }
 
         test("a codeless game still gets a number and belongs to its series") {

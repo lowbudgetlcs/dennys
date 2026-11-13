@@ -11,6 +11,7 @@ import com.lowbudgetlcs.config.modules.repositoryModule
 import com.lowbudgetlcs.config.modules.serviceModule
 import com.lowbudgetlcs.domain.auth.IAuthService
 import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.series.game.IRiotMatchIngestService
 import com.lowbudgetlcs.serializers.InstantSerializer
 import com.lowbudgetlcs.serializers.UUIDSerializer
 import io.ktor.serialization.kotlinx.json.json
@@ -61,11 +62,17 @@ fun Application.startRiotPolling() =
     CoroutineScope(Dispatchers.Default).launch {
         logger.debug("Starting Riot polling...")
         val seriesService by inject<ISeriesService>()
+        val riotMatchIngestService by inject<IRiotMatchIngestService>()
         repeat(Int.MAX_VALUE) { tick ->
             try {
                 seriesService.pollRiot(includeStale = tick % STALE_POLL_EVERY == 0)
             } catch (e: Exception) {
                 logger.warn("Riot poll failed: ${e.message}")
+            }
+            try {
+                riotMatchIngestService.ingestPending()
+            } catch (e: Exception) {
+                logger.warn("Riot match ingest failed: ${e.message}")
             }
             delay(RIOT_POLL_DELAY)
         }
