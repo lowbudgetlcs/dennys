@@ -18,6 +18,7 @@ import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
 import org.jooq.storage.tables.PlayerGameFacts
+import org.jooq.storage.tables.PlayerGameStatsV1
 import org.jooq.storage.tables.PlayerInventories
 import org.jooq.storage.tables.PlayerPings
 import org.jooq.storage.tables.PlayerVision
@@ -29,6 +30,7 @@ import org.jooq.storage.tables.RiotMatchData
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
+import org.jooq.storage.tables.TeamGameStatsV1
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
 import org.jooq.storage.tables.TournamentCodes
@@ -94,6 +96,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val PLAYER_GAME_FACTS: PlayerGameFacts get() = PlayerGameFacts.PLAYER_GAME_FACTS
 
     /**
+     * The table <code>dennys.player_game_stats_v1</code>.
+     */
+    val PLAYER_GAME_STATS_V1: PlayerGameStatsV1 get() = PlayerGameStatsV1.PLAYER_GAME_STATS_V1
+
+    /**
      * The table <code>dennys.player_inventories</code>.
      */
     val PLAYER_INVENTORIES: PlayerInventories get() = PlayerInventories.PLAYER_INVENTORIES
@@ -149,6 +156,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val SESSIONS: Sessions get() = Sessions.SESSIONS
 
     /**
+     * The table <code>dennys.team_game_stats_v1</code>.
+     */
+    val TEAM_GAME_STATS_V1: TeamGameStatsV1 get() = TeamGameStatsV1.TEAM_GAME_STATS_V1
+
+    /**
      * The table <code>dennys.team_to_series</code>.
      */
     val TEAM_TO_SERIES: TeamToSeries get() = TeamToSeries.TEAM_TO_SERIES
@@ -180,6 +192,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         PlayerCombats.PLAYER_COMBATS,
         PlayerFarming.PLAYER_FARMING,
         PlayerGameFacts.PLAYER_GAME_FACTS,
+        PlayerGameStatsV1.PLAYER_GAME_STATS_V1,
         PlayerInventories.PLAYER_INVENTORIES,
         PlayerPings.PLAYER_PINGS,
         PlayerVision.PLAYER_VISION,
@@ -191,6 +204,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         Series.SERIES,
         SeriesResults.SERIES_RESULTS,
         Sessions.SESSIONS,
+        TeamGameStatsV1.TEAM_GAME_STATS_V1,
         TeamToSeries.TEAM_TO_SERIES,
         Teams.TEAMS,
         TournamentCodes.TOURNAMENT_CODES,
