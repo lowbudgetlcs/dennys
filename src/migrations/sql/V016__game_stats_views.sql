@@ -72,7 +72,6 @@ SELECT
   COALESCE((t#>>'{objectives,baron,kills}')::int, 0) AS baron_kills,
   COALESCE((t#>>'{objectives,riftHerald,kills}')::int, 0) AS rift_herald_kills,
   COALESCE((t#>>'{objectives,horde,kills}')::int, 0) AS horde_kills,
-  COALESCE((t#>>'{objectives,atakhan,kills}')::int, 0) AS atakhan_kills,
   ARRAY(
     SELECT (b->>'championId')::int
     FROM jsonb_array_elements(COALESCE(t->'bans', '[]'::jsonb)) AS b

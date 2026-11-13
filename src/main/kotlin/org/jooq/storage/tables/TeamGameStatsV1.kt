@@ -83,7 +83,6 @@ open class TeamGameStatsV1(
      COALESCE(((t.value #>> '{objectives,baron,kills}'::text[]))::integer, 0) AS baron_kills,
      COALESCE(((t.value #>> '{objectives,riftHerald,kills}'::text[]))::integer, 0) AS rift_herald_kills,
      COALESCE(((t.value #>> '{objectives,horde,kills}'::text[]))::integer, 0) AS horde_kills,
-     COALESCE(((t.value #>> '{objectives,atakhan,kills}'::text[]))::integer, 0) AS atakhan_kills,
      ARRAY( SELECT ((b.value ->> 'championId'::text))::integer AS int4
             FROM jsonb_array_elements(COALESCE((t.value -> 'bans'::text), '[]'::jsonb)) b(value)
            WHERE (COALESCE(((b.value ->> 'championId'::text))::integer, '-1'::integer) <> '-1'::integer)
@@ -210,11 +209,6 @@ open class TeamGameStatsV1(
      * The column <code>dennys.team_game_stats_v1.horde_kills</code>.
      */
     val HORDE_KILLS: TableField<TeamGameStatsV1Record, Int?> = createField(DSL.name("horde_kills"), SQLDataType.INTEGER, this, "")
-
-    /**
-     * The column <code>dennys.team_game_stats_v1.atakhan_kills</code>.
-     */
-    val ATAKHAN_KILLS: TableField<TeamGameStatsV1Record, Int?> = createField(DSL.name("atakhan_kills"), SQLDataType.INTEGER, this, "")
 
     /**
      * The column <code>dennys.team_game_stats_v1.bans</code>.

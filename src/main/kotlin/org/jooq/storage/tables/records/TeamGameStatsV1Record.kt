@@ -94,18 +94,14 @@ open class TeamGameStatsV1Record() : TableRecordImpl<TeamGameStatsV1Record>(Team
         set(value): Unit = set(19, value)
         get(): Int? = get(19) as Int?
 
-    open var atakhanKills: Int?
-        set(value): Unit = set(20, value)
-        get(): Int? = get(20) as Int?
-
     open var bans: Array<Int?>?
-        set(value): Unit = set(21, value)
-        get(): Array<Int?>? = get(21) as Array<Int?>?
+        set(value): Unit = set(20, value)
+        get(): Array<Int?>? = get(20) as Array<Int?>?
 
     /**
      * Create a detached, initialised TeamGameStatsV1Record
      */
-    constructor(gameId: Int? = null, seriesId: Int? = null, eventId: Int? = null, eventGroupId: Int? = null, stage: String? = null, teamId: Int? = null, side: String? = null, gameDurationS: Int? = null, win: Boolean? = null, firstBlood: Boolean? = null, firstTower: Boolean? = null, firstDragon: Boolean? = null, firstBaron: Boolean? = null, kills: Int? = null, towerKills: Int? = null, inhibitorKills: Int? = null, dragonKills: Int? = null, baronKills: Int? = null, riftHeraldKills: Int? = null, hordeKills: Int? = null, atakhanKills: Int? = null, bans: Array<Int?>? = null): this() {
+    constructor(gameId: Int? = null, seriesId: Int? = null, eventId: Int? = null, eventGroupId: Int? = null, stage: String? = null, teamId: Int? = null, side: String? = null, gameDurationS: Int? = null, win: Boolean? = null, firstBlood: Boolean? = null, firstTower: Boolean? = null, firstDragon: Boolean? = null, firstBaron: Boolean? = null, kills: Int? = null, towerKills: Int? = null, inhibitorKills: Int? = null, dragonKills: Int? = null, baronKills: Int? = null, riftHeraldKills: Int? = null, hordeKills: Int? = null, bans: Array<Int?>? = null): this() {
         this.gameId = gameId
         this.seriesId = seriesId
         this.eventId = eventId
@@ -126,7 +122,6 @@ open class TeamGameStatsV1Record() : TableRecordImpl<TeamGameStatsV1Record>(Team
         this.baronKills = baronKills
         this.riftHeraldKills = riftHeraldKills
         this.hordeKills = hordeKills
-        this.atakhanKills = atakhanKills
         this.bans = bans
         resetChangedOnNotNull()
     }

@@ -182,10 +182,8 @@ class GameStatsViewsTest :
 
             val blueWith = teamRows(withNewObjectives).single { it.side == "BLUE" }
             blueWith.hordeKills shouldBe 4
-            blueWith.atakhanKills shouldBe 1
             val blueWithout = teamRows(withoutNewObjectives).single { it.side == "BLUE" }
             blueWithout.hordeKills shouldBe 0
-            blueWithout.atakhanKills shouldBe 0
         }
 
         test("player rows join to the right team, player, stage and event group") {
