@@ -85,7 +85,8 @@ open class PlayerGameStatsV1(
      COALESCE(((p.value ->> 'visionScore'::text))::integer, 0) AS vision_score,
      COALESCE(((p.value ->> 'wardsPlaced'::text))::integer, 0) AS wards_placed,
      COALESCE(((p.value ->> 'wardsKilled'::text))::integer, 0) AS wards_killed,
-     COALESCE(((p.value ->> 'visionWardsBoughtInGame'::text))::integer, 0) AS control_wards_bought
+     COALESCE(((p.value ->> 'visionWardsBoughtInGame'::text))::integer, 0) AS control_wards_bought,
+     COALESCE(((p.value #>> '{challenges,voidMonsterKill}'::text[]))::integer, 0) AS void_grubs
     FROM (((((((dennys.riot_match_data rmd
       JOIN dennys.games g ON ((g.id = rmd.game_id)))
       JOIN dennys.series s ON ((s.id = g.series_id)))
@@ -244,6 +245,11 @@ open class PlayerGameStatsV1(
      * The column <code>dennys.player_game_stats_v1.control_wards_bought</code>.
      */
     val CONTROL_WARDS_BOUGHT: TableField<PlayerGameStatsV1Record, Int?> = createField(DSL.name("control_wards_bought"), SQLDataType.INTEGER, this, "")
+
+    /**
+     * The column <code>dennys.player_game_stats_v1.void_grubs</code>.
+     */
+    val VOID_GRUBS: TableField<PlayerGameStatsV1Record, Int?> = createField(DSL.name("void_grubs"), SQLDataType.INTEGER, this, "")
 
     private constructor(alias: Name, aliased: Table<PlayerGameStatsV1Record>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<PlayerGameStatsV1Record>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

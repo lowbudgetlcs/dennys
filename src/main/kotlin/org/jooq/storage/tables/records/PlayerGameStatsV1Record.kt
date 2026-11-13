@@ -122,10 +122,14 @@ open class PlayerGameStatsV1Record() : TableRecordImpl<PlayerGameStatsV1Record>(
         set(value): Unit = set(26, value)
         get(): Int? = get(26) as Int?
 
+    open var voidGrubs: Int?
+        set(value): Unit = set(27, value)
+        get(): Int? = get(27) as Int?
+
     /**
      * Create a detached, initialised PlayerGameStatsV1Record
      */
-    constructor(gameId: Int? = null, seriesId: Int? = null, eventId: Int? = null, eventGroupId: Int? = null, stage: String? = null, teamId: Int? = null, playerId: Int? = null, gameDurationS: Int? = null, puuid: String? = null, riotIdGameName: String? = null, riotIdTagline: String? = null, championId: Int? = null, championName: String? = null, position: String? = null, win: Boolean? = null, kills: Int? = null, deaths: Int? = null, assists: Int? = null, cs: Int? = null, goldEarned: Int? = null, champLevel: Int? = null, damageToChampions: Int? = null, damageTaken: Int? = null, visionScore: Int? = null, wardsPlaced: Int? = null, wardsKilled: Int? = null, controlWardsBought: Int? = null): this() {
+    constructor(gameId: Int? = null, seriesId: Int? = null, eventId: Int? = null, eventGroupId: Int? = null, stage: String? = null, teamId: Int? = null, playerId: Int? = null, gameDurationS: Int? = null, puuid: String? = null, riotIdGameName: String? = null, riotIdTagline: String? = null, championId: Int? = null, championName: String? = null, position: String? = null, win: Boolean? = null, kills: Int? = null, deaths: Int? = null, assists: Int? = null, cs: Int? = null, goldEarned: Int? = null, champLevel: Int? = null, damageToChampions: Int? = null, damageTaken: Int? = null, visionScore: Int? = null, wardsPlaced: Int? = null, wardsKilled: Int? = null, controlWardsBought: Int? = null, voidGrubs: Int? = null): this() {
         this.gameId = gameId
         this.seriesId = seriesId
         this.eventId = eventId
@@ -153,6 +157,7 @@ open class PlayerGameStatsV1Record() : TableRecordImpl<PlayerGameStatsV1Record>(
         this.wardsPlaced = wardsPlaced
         this.wardsKilled = wardsKilled
         this.controlWardsBought = controlWardsBought
+        this.voidGrubs = voidGrubs
         resetChangedOnNotNull()
     }
 }

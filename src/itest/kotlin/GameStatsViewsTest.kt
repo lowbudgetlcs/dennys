@@ -62,7 +62,8 @@ private fun match(
             "participants": [
               {
                 "puuid": "$BLUE_PUUID", "teamId": 100, "win": true, "championId": 103, "teamPosition": "MIDDLE",
-                "kills": 5, "deaths": 1, "assists": 7, "totalMinionsKilled": 200, "neutralMinionsKilled": 30
+                "kills": 5, "deaths": 1, "assists": 7, "totalMinionsKilled": 200, "neutralMinionsKilled": 30,
+                "challenges": { "voidMonsterKill": 3 }
               },
               { "puuid": "$RED_PUUID", "teamId": 200, "win": false, "kills": 1 }
             ],
@@ -210,7 +211,10 @@ class GameStatsViewsTest :
             blue.position shouldBe "MIDDLE"
             blue.win shouldBe true
             blue.gameDurationS shouldBe 1800
-            playerRows(withNewObjectives).single { it.puuid == RED_PUUID }.cs shouldBe 0
+            blue.voidGrubs shouldBe 3
+            val red = playerRows(withNewObjectives).single { it.puuid == RED_PUUID }
+            red.cs shouldBe 0
+            red.voidGrubs shouldBe 0
 
             val teams = teamRows(withNewObjectives)
             val blueTeamRow = teams.single { it.side == "BLUE" }

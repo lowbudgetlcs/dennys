@@ -37,7 +37,8 @@ SELECT
   COALESCE((p->>'visionScore')::int, 0) AS vision_score,
   COALESCE((p->>'wardsPlaced')::int, 0) AS wards_placed,
   COALESCE((p->>'wardsKilled')::int, 0) AS wards_killed,
-  COALESCE((p->>'visionWardsBoughtInGame')::int, 0) AS control_wards_bought
+  COALESCE((p->>'visionWardsBoughtInGame')::int, 0) AS control_wards_bought,
+  COALESCE((p#>>'{challenges,voidMonsterKill}')::int, 0) AS void_grubs
 FROM riot_match_data rmd
 JOIN games g ON g.id = rmd.game_id
 JOIN series s ON s.id = g.series_id
