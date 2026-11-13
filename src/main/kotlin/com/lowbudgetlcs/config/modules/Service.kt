@@ -12,6 +12,8 @@ import com.lowbudgetlcs.domain.player.IPlayerService
 import com.lowbudgetlcs.domain.player.PlayerService
 import com.lowbudgetlcs.domain.series.ISeriesService
 import com.lowbudgetlcs.domain.series.SeriesService
+import com.lowbudgetlcs.domain.series.game.IRiotMatchIngestService
+import com.lowbudgetlcs.domain.series.game.RiotMatchIngestService
 import com.lowbudgetlcs.domain.team.ITeamService
 import com.lowbudgetlcs.domain.team.TeamService
 import com.lowbudgetlcs.domain.user.IUserService
@@ -26,6 +28,7 @@ val serviceModule =
         single<IEventGroupService> { EventGroupService(get(), get()) }
         single<IPlayerService> { PlayerService(get(), get(), get()) }
         single<ISeriesService> { SeriesService(get(), get(), get(), get(), get(), get()) }
+        single<IRiotMatchIngestService> { RiotMatchIngestService(get(), get(), get()) }
         single<IAccountService> { AccountService(get(), get(), get()) }
         single<IAuthService> {
             AuthService(
