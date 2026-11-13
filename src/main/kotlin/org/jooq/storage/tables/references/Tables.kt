@@ -13,6 +13,7 @@ import org.jooq.storage.tables.PlayerChampSelects
 import org.jooq.storage.tables.PlayerCombats
 import org.jooq.storage.tables.PlayerFarming
 import org.jooq.storage.tables.PlayerGameFacts
+import org.jooq.storage.tables.PlayerGameStatsV1
 import org.jooq.storage.tables.PlayerInventories
 import org.jooq.storage.tables.PlayerPings
 import org.jooq.storage.tables.PlayerVision
@@ -24,6 +25,7 @@ import org.jooq.storage.tables.RiotMatchData
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
+import org.jooq.storage.tables.TeamGameStatsV1
 import org.jooq.storage.tables.TeamToSeries
 import org.jooq.storage.tables.Teams
 import org.jooq.storage.tables.TournamentCodes
@@ -75,6 +77,11 @@ val PLAYER_FARMING: PlayerFarming = PlayerFarming.PLAYER_FARMING
  * The table <code>dennys.player_game_facts</code>.
  */
 val PLAYER_GAME_FACTS: PlayerGameFacts = PlayerGameFacts.PLAYER_GAME_FACTS
+
+/**
+ * The table <code>dennys.player_game_stats_v1</code>.
+ */
+val PLAYER_GAME_STATS_V1: PlayerGameStatsV1 = PlayerGameStatsV1.PLAYER_GAME_STATS_V1
 
 /**
  * The table <code>dennys.player_inventories</code>.
@@ -130,6 +137,11 @@ val SERIES_RESULTS: SeriesResults = SeriesResults.SERIES_RESULTS
  * The table <code>dennys.sessions</code>.
  */
 val SESSIONS: Sessions = Sessions.SESSIONS
+
+/**
+ * The table <code>dennys.team_game_stats_v1</code>.
+ */
+val TEAM_GAME_STATS_V1: TeamGameStatsV1 = TeamGameStatsV1.TEAM_GAME_STATS_V1
 
 /**
  * The table <code>dennys.team_to_series</code>.
