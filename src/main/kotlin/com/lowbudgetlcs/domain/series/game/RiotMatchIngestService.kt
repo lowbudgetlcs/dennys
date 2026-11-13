@@ -19,8 +19,7 @@ class RiotMatchIngestService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     // shortcut: a game Riot never returns (deleted, or past retention) is retried every run;
-    // add an attempts column if those fill the batch. A failed timeline is stored as null and not refetched;
-    // sweep `timeline IS NULL` rows too if timeline stats need it.
+    // add an attempts column if those fill the batch.
     override suspend fun ingestPending() {
         gameRepo.getMissingRiotMatchData(INGEST_BATCH).forEach { game ->
             try {

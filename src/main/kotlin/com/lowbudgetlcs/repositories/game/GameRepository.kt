@@ -36,7 +36,7 @@ class GameRepository(
             .leftJoin(RIOT_MATCH_DATA)
             .on(GAMES.ID.eq(RIOT_MATCH_DATA.GAME_ID))
             .where(GAMES.RIOT_MATCH_ID.isNotNull)
-            .and(RIOT_MATCH_DATA.GAME_ID.isNull)
+            .and(RIOT_MATCH_DATA.GAME_ID.isNull.or(RIOT_MATCH_DATA.TIMELINE.isNull))
             .orderBy(GAMES.ID.desc())
             .limit(limit)
             .fetch()

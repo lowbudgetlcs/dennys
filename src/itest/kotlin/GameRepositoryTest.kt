@@ -141,17 +141,21 @@ class GameRepositoryTest :
             repo.getBySeriesId(series.id).map { it.number } shouldBe listOf(1, 2, 3)
         }
 
-        test("games missing Riot match data are the riot games without a stored row, newest first") {
+        test("games missing Riot match data are riot games without a stored row or timeline, newest first") {
             val series = newSeries()
+            val dataRepo = RiotMatchDataRepository(dsl)
+            val empty = JsonObject(emptyMap())
             val older = repo.insert(NewGame(series.id, null, "NA1_MISSING1".toRiotMatchId(), null)).shouldNotBeNull()
             val stored = repo.insert(NewGame(series.id, null, "NA1_MISSING2".toRiotMatchId(), null)).shouldNotBeNull()
-            RiotMatchDataRepository(dsl).save(stored.id, JsonObject(emptyMap()), null)
+            dataRepo.save(stored.id, empty, empty)
+            val noTimeline = repo.insert(NewGame(series.id, null, "NA1_MISSING3".toRiotMatchId(), null)).shouldNotBeNull()
+            dataRepo.save(noTimeline.id, empty, null)
             val codeless = repo.insert(NewGame(series.id, null, null, null)).shouldNotBeNull()
-            val newer = repo.insert(NewGame(series.id, null, "NA1_MISSING3".toRiotMatchId(), null)).shouldNotBeNull()
-            val ours = setOf(older.id, stored.id, codeless.id, newer.id)
+            val newer = repo.insert(NewGame(series.id, null, "NA1_MISSING4".toRiotMatchId(), null)).shouldNotBeNull()
+            val ours = setOf(older.id, stored.id, noTimeline.id, codeless.id, newer.id)
 
             repo.getMissingRiotMatchData(Int.MAX_VALUE).map { it.id }.filter { it in ours } shouldBe
-                listOf(newer.id, older.id)
+                listOf(newer.id, noTimeline.id, older.id)
         }
 
         test("a codeless game still gets a number and belongs to its series") {
