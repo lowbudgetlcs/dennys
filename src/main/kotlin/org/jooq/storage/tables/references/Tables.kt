@@ -20,6 +20,7 @@ import org.jooq.storage.tables.Players
 import org.jooq.storage.tables.PlayersToEvent
 import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
+import org.jooq.storage.tables.RiotMatchData
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
@@ -109,6 +110,11 @@ val PLAYERS_TO_TEAM: PlayersToTeam = PlayersToTeam.PLAYERS_TO_TEAM
  * The table <code>dennys.riot_accounts</code>.
  */
 val RIOT_ACCOUNTS: RiotAccounts = RiotAccounts.RIOT_ACCOUNTS
+
+/**
+ * The table <code>dennys.riot_match_data</code>.
+ */
+val RIOT_MATCH_DATA: RiotMatchData = RiotMatchData.RIOT_MATCH_DATA
 
 /**
  * The table <code>dennys.series</code>.
