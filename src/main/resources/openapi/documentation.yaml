@@ -25,6 +25,8 @@ tags:
     description: Create games inside of a series
   - name: Games (v1)
     description: Riot match data and stats for a played game
+  - name: Stats (v1)
+    description: Stats rows across games
   - name: Teams (v1)
     description: Manage teams
   - name: Players (v1)
@@ -1273,6 +1275,109 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/stats/player-games:
+    get:
+      summary: List player rows across games
+      description: |
+        One row per player per game from `player_game_stats_v1`, newest game
+        first. Every filter is optional and they combine.
+      operationId: getPlayerGames
+      tags:
+        - Stats (v1)
+      parameters:
+        - $ref: "#/components/parameters/StatsEventGroupId"
+        - $ref: "#/components/parameters/StatsEventId"
+        - $ref: "#/components/parameters/StatsStage"
+        - $ref: "#/components/parameters/StatsTeamId"
+        - in: query
+          name: playerId
+          schema:
+            type: integer
+          description: Only this player's rows.
+        - in: query
+          name: championId
+          schema:
+            type: integer
+          description: Only rows on this champion.
+        - $ref: "#/components/parameters/StatsLimit"
+        - $ref: "#/components/parameters/StatsOffset"
+      responses:
+        "200":
+          description: Matching player rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlayerGameStatsDto"
+        "400":
+          description: A filter has the wrong type, such as an unknown `stage`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "`limit` is outside 1–1000 or `offset` is negative"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/stats/team-games:
+    get:
+      summary: List team rows across games
+      description: |
+        One row per side per game from `team_game_stats_v1`, newest game
+        first. Every filter is optional and they combine.
+      operationId: getTeamGames
+      tags:
+        - Stats (v1)
+      parameters:
+        - $ref: "#/components/parameters/StatsEventGroupId"
+        - $ref: "#/components/parameters/StatsEventId"
+        - $ref: "#/components/parameters/StatsStage"
+        - $ref: "#/components/parameters/StatsTeamId"
+        - in: query
+          name: playerId
+          schema:
+            type: integer
+          description: Only the rows of the side this player played on, in games they played.
+        - $ref: "#/components/parameters/StatsLimit"
+        - $ref: "#/components/parameters/StatsOffset"
+      responses:
+        "200":
+          description: Matching team rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamGameStatsDto"
+        "400":
+          description: A filter has the wrong type, such as an unknown `stage`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "`limit` is outside 1–1000 or `offset` is negative"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/team:
     get:
       summary: Get all teams
@@ -1786,6 +1891,46 @@ paths:
           description: Unexpected error
 
 components:
+  parameters:
+    StatsEventGroupId:
+      in: query
+      name: eventGroupId
+      schema:
+        type: integer
+      description: Only games in this event group (season).
+    StatsEventId:
+      in: query
+      name: eventId
+      schema:
+        type: integer
+      description: Only games in this event.
+    StatsStage:
+      in: query
+      name: stage
+      schema:
+        $ref: "#/components/schemas/EventStage"
+      description: Only games of series in this stage.
+    StatsTeamId:
+      in: query
+      name: teamId
+      schema:
+        type: integer
+      description: Only rows for this team.
+    StatsLimit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 100
+    StatsOffset:
+      in: query
+      name: offset
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   responses:
     Unauthorized:
       description: |

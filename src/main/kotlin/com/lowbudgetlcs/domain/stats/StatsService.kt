@@ -2,9 +2,14 @@ package com.lowbudgetlcs.domain.stats
 
 import com.lowbudgetlcs.domain.series.game.models.types.GameId
 import com.lowbudgetlcs.domain.stats.models.GameStats
+import com.lowbudgetlcs.domain.stats.models.PlayerGameStats
+import com.lowbudgetlcs.domain.stats.models.StatsQuery
+import com.lowbudgetlcs.domain.stats.models.TeamGameStats
 import com.lowbudgetlcs.repositories.riotmatchdata.IRiotMatchDataRepository
 import com.lowbudgetlcs.repositories.stats.IStatsRepository
 import kotlinx.serialization.json.JsonObject
+
+private const val MAX_LIMIT = 1000
 
 class StatsService(
     private val riotMatchDataRepo: IRiotMatchDataRepository,
@@ -24,5 +29,31 @@ class StatsService(
             throw NoSuchElementException("Game '${gameId.value}' has no Riot match data.")
         }
         return stats
+    }
+
+    override fun getPlayerGames(
+        query: StatsQuery,
+        limit: Int,
+        offset: Int,
+    ): List<PlayerGameStats> {
+        requirePage(limit, offset)
+        return statsRepo.getPlayerGames(query, limit, offset)
+    }
+
+    override fun getTeamGames(
+        query: StatsQuery,
+        limit: Int,
+        offset: Int,
+    ): List<TeamGameStats> {
+        requirePage(limit, offset)
+        return statsRepo.getTeamGames(query, limit, offset)
+    }
+
+    private fun requirePage(
+        limit: Int,
+        offset: Int,
+    ) {
+        require(limit in 1..MAX_LIMIT) { "limit must be between 1 and $MAX_LIMIT." }
+        require(offset >= 0) { "offset must not be negative." }
     }
 }
