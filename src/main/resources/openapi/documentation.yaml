@@ -23,6 +23,8 @@ tags:
     description: Manage Event
   - name: Series (v1)
     description: Create games inside of a series
+  - name: Games (v1)
+    description: Riot match data and stats for a played game
   - name: Teams (v1)
     description: Manage teams
   - name: Players (v1)
@@ -1161,6 +1163,116 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/games/{gameId}/match:
+    get:
+      summary: Get a game's Riot match data
+      description: |
+        Riot's match-v5 payload for the game, as stored. Riot never changes a
+        finished match, so the response is sent with
+        `Cache-Control: private, max-age=31536000, immutable`.
+      operationId: getGameMatch
+      tags:
+        - Games (v1)
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Riot's match-v5 `MatchDto`
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: Game not found, or its match data hasn't been ingested yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/games/{gameId}/timeline:
+    get:
+      summary: Get a game's Riot timeline
+      description: |
+        Riot's match-v5 timeline for the game, as stored. Sent with
+        `Cache-Control: private, max-age=31536000, immutable`.
+      operationId: getGameTimeline
+      tags:
+        - Games (v1)
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Riot's match-v5 `TimelineDto`
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: Game not found, or its timeline hasn't been ingested yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/games/{gameId}/stats:
+    get:
+      summary: Get a game's box score
+      description: |
+        One row per player and one per side, from the `player_game_stats_v1`
+        and `team_game_stats_v1` views. `teamId` and `playerId` can fill in
+        later (a result recorded, a Riot account linked), so the response is
+        sent with `Cache-Control: private, max-age=300`.
+      operationId: getGameStats
+      tags:
+        - Games (v1)
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The game's player and team rows
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameStatsDto"
+        "404":
+          description: Game not found, or its match data hasn't been ingested yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/team:
     get:
       summary: Get all teams
@@ -1848,6 +1960,215 @@ components:
         losingTeamId:
           type: integer
           example: 12
+
+    GameStatsDto:
+      type: object
+      required:
+        - players
+        - teams
+      properties:
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlayerGameStatsDto"
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamGameStatsDto"
+
+    PlayerGameStatsDto:
+      type: object
+      description: |
+        One participant in one game. Numbers Riot leaves out of the payload
+        read as 0.
+      required:
+        - gameId
+        - seriesId
+        - eventId
+        - stage
+        - gameDurationS
+        - championId
+        - win
+        - kills
+        - deaths
+        - assists
+        - cs
+        - goldEarned
+        - champLevel
+        - damageToChampions
+        - damageTaken
+        - visionScore
+        - wardsPlaced
+        - wardsKilled
+        - controlWardsBought
+        - voidGrubs
+      properties:
+        gameId:
+          type: integer
+          example: 88
+        seriesId:
+          type: integer
+          example: 42
+        eventId:
+          type: integer
+          example: 12
+        eventGroupId:
+          type: integer
+          nullable: true
+          example: 16
+        stage:
+          $ref: "#/components/schemas/EventStage"
+        teamId:
+          type: integer
+          nullable: true
+          description: From the game result, or the code's side when there is none.
+          example: 7
+        playerId:
+          type: integer
+          nullable: true
+          description: Null when the PUUID isn't linked to a player.
+          example: 31
+        gameDurationS:
+          type: integer
+          example: 1834
+        puuid:
+          type: string
+          nullable: true
+        riotIdGameName:
+          type: string
+          nullable: true
+          example: Faker
+        riotIdTagline:
+          type: string
+          nullable: true
+          example: KR1
+        championId:
+          type: integer
+          example: 103
+        championName:
+          type: string
+          nullable: true
+          example: Ahri
+        position:
+          type: string
+          nullable: true
+          example: MIDDLE
+        win:
+          type: boolean
+        kills:
+          type: integer
+        deaths:
+          type: integer
+        assists:
+          type: integer
+        cs:
+          type: integer
+          description: Lane and jungle minions.
+        goldEarned:
+          type: integer
+        champLevel:
+          type: integer
+        damageToChampions:
+          type: integer
+        damageTaken:
+          type: integer
+        visionScore:
+          type: integer
+        wardsPlaced:
+          type: integer
+        wardsKilled:
+          type: integer
+        controlWardsBought:
+          type: integer
+        voidGrubs:
+          type: integer
+
+    TeamGameStatsDto:
+      type: object
+      description: |
+        One side in one game. Objectives Riot leaves out of the payload read
+        as 0 or false.
+      required:
+        - gameId
+        - seriesId
+        - eventId
+        - stage
+        - gameDurationS
+        - win
+        - firstBlood
+        - firstTower
+        - firstDragon
+        - firstBaron
+        - kills
+        - towerKills
+        - inhibitorKills
+        - dragonKills
+        - baronKills
+        - riftHeraldKills
+        - hordeKills
+        - bans
+      properties:
+        gameId:
+          type: integer
+          example: 88
+        seriesId:
+          type: integer
+          example: 42
+        eventId:
+          type: integer
+          example: 12
+        eventGroupId:
+          type: integer
+          nullable: true
+          example: 16
+        stage:
+          $ref: "#/components/schemas/EventStage"
+        teamId:
+          type: integer
+          nullable: true
+          description: From the game result, or the code's side when there is none.
+          example: 7
+        side:
+          type: string
+          nullable: true
+          enum:
+            - BLUE
+            - RED
+        gameDurationS:
+          type: integer
+          example: 1834
+        win:
+          type: boolean
+        firstBlood:
+          type: boolean
+        firstTower:
+          type: boolean
+        firstDragon:
+          type: boolean
+        firstBaron:
+          type: boolean
+        kills:
+          type: integer
+        towerKills:
+          type: integer
+        inhibitorKills:
+          type: integer
+        dragonKills:
+          type: integer
+        baronKills:
+          type: integer
+        riftHeraldKills:
+          type: integer
+        hordeKills:
+          type: integer
+        bans:
+          type: array
+          description: Banned champion ids in pick order.
+          items:
+            type: integer
+          example:
+            - 55
+            - 84
 
     CreateGameDto:
       type: object

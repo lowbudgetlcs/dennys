@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api.routes
 import com.lowbudgetlcs.api.routes.v1.account.accountRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.eventRoutesV1
 import com.lowbudgetlcs.api.routes.v1.event.group.eventGroupRoutesV1
+import com.lowbudgetlcs.api.routes.v1.game.gameRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
@@ -11,6 +12,7 @@ import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
 import com.lowbudgetlcs.domain.player.IPlayerService
 import com.lowbudgetlcs.domain.series.ISeriesService
+import com.lowbudgetlcs.domain.stats.IStatsService
 import com.lowbudgetlcs.domain.team.ITeamService
 import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.Route
@@ -24,6 +26,7 @@ fun Route.apiRoutes() {
     val accountService by inject<IAccountService>()
     val seriesService by inject<ISeriesService>()
     val eventGroupService by inject<IEventGroupService>()
+    val statsService by inject<IStatsService>()
 
     route("/api/v1") {
         authenticate("auth-session", "auth-token") {
@@ -35,6 +38,7 @@ fun Route.apiRoutes() {
                 seriesService = seriesService,
             )
             eventGroupRoutesV1(eventGroupService)
+            gameRoutesV1(statsService)
         }
     }
 }

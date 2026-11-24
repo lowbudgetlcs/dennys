@@ -15,6 +15,7 @@ import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.GameResult
 import com.lowbudgetlcs.domain.series.game.models.NewGame
 import com.lowbudgetlcs.domain.series.game.models.NewTournamentCode
+import com.lowbudgetlcs.domain.series.game.models.toGameId
 import com.lowbudgetlcs.domain.series.game.models.toRiotMatchId
 import com.lowbudgetlcs.domain.series.models.NewSeries
 import com.lowbudgetlcs.domain.series.models.Series
@@ -28,15 +29,18 @@ import com.lowbudgetlcs.repositories.game.GameRepository
 import com.lowbudgetlcs.repositories.player.PlayerRepository
 import com.lowbudgetlcs.repositories.riotmatchdata.RiotMatchDataRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
+import com.lowbudgetlcs.repositories.stats.StatsRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.TournamentCodeRepository
 import io.kotest.core.extensions.install
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.extensions.testcontainers.JdbcDatabaseContainerSpecExtension
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -84,6 +88,21 @@ private fun match(
         """.trimIndent(),
     ).jsonObject
 
+private fun fullLobby(): JsonObject {
+    val participants = (1..10).joinToString(",") { """{ "puuid": "p$it", "teamId": ${if (it <= 5) 100 else 200} }""" }
+    return Json
+        .parseToJsonElement(
+            """
+            {
+              "info": {
+                "participants": [$participants],
+                "teams": [{ "teamId": 100, "win": true }, { "teamId": 200, "win": false }]
+              }
+            }
+            """.trimIndent(),
+        ).jsonObject
+}
+
 class GameStatsViewsTest :
     FunSpec({
         val postgres =
@@ -104,6 +123,7 @@ class GameStatsViewsTest :
         lateinit var withNewObjectives: Game
         lateinit var withoutNewObjectives: Game
         lateinit var swappedSides: Game
+        lateinit var fullGame: Game
         var groupId = 0
         var bluePlayerId = 0
 
@@ -167,6 +187,10 @@ class GameStatsViewsTest :
                 games.insert(NewGame(series.id, code.id, "NA1_3".toRiotMatchId(), GameResult(redTeam.id, blueTeam.id)))
                     ?: throw Exception("Failed to insert game.")
             matchData.save(swappedSides.id, match(""), null)
+            fullGame =
+                games.insert(NewGame(series.id, code.id, "NA1_4".toRiotMatchId(), null))
+                    ?: throw Exception("Failed to insert game.")
+            matchData.save(fullGame.id, fullLobby(), null)
         }
 
         fun playerRows(game: Game) =
@@ -243,5 +267,16 @@ class GameStatsViewsTest :
                   AND view_name IN ('player_game_stats_v1', 'team_game_stats_v1')
                 """.trimIndent(),
             ) shouldBe 0L
+        }
+
+        test("the stats repository returns every row of an ingested game and none for a game without data") {
+            val stats = StatsRepository(dsl).getGameStats(fullGame.id)
+            stats.players shouldHaveSize 10
+            stats.teams shouldHaveSize 2
+            stats.teams.map { it.teamId } shouldBe listOf(blueTeam.id, redTeam.id)
+
+            val missing = StatsRepository(dsl).getGameStats(Int.MAX_VALUE.toGameId())
+            missing.players.shouldBeEmpty()
+            missing.teams.shouldBeEmpty()
         }
     })
