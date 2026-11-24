@@ -31,7 +31,7 @@ val serviceModule =
         single<IPlayerService> { PlayerService(get(), get(), get()) }
         single<ISeriesService> { SeriesService(get(), get(), get(), get(), get(), get()) }
         single<IRiotMatchIngestService> { RiotMatchIngestService(get(), get(), get()) }
-        single<IStatsService> { StatsService(get(), get()) }
+        single<IStatsService> { StatsService(get(), get(), get()) }
         single<IAccountService> { AccountService(get(), get(), get()) }
         single<IAuthService> {
             AuthService(

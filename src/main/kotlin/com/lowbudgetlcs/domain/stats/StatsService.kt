@@ -1,11 +1,16 @@
 package com.lowbudgetlcs.domain.stats
 
 import com.lowbudgetlcs.domain.series.game.models.types.GameId
+import com.lowbudgetlcs.domain.stats.models.ChampionAggregate
 import com.lowbudgetlcs.domain.stats.models.GameStats
+import com.lowbudgetlcs.domain.stats.models.PlayerAggregate
 import com.lowbudgetlcs.domain.stats.models.PlayerGameStats
 import com.lowbudgetlcs.domain.stats.models.StatsQuery
+import com.lowbudgetlcs.domain.stats.models.StatsSort
+import com.lowbudgetlcs.domain.stats.models.TeamAggregate
 import com.lowbudgetlcs.domain.stats.models.TeamGameStats
 import com.lowbudgetlcs.repositories.riotmatchdata.IRiotMatchDataRepository
+import com.lowbudgetlcs.repositories.stats.IStatsAggregateRepository
 import com.lowbudgetlcs.repositories.stats.IStatsRepository
 import kotlinx.serialization.json.JsonObject
 
@@ -14,6 +19,7 @@ private const val MAX_LIMIT = 1000
 class StatsService(
     private val riotMatchDataRepo: IRiotMatchDataRepository,
     private val statsRepo: IStatsRepository,
+    private val aggregateRepo: IStatsAggregateRepository,
 ) : IStatsService {
     override fun getMatch(gameId: GameId): JsonObject =
         riotMatchDataRepo.getByGameId(gameId)?.match
@@ -47,6 +53,36 @@ class StatsService(
     ): List<TeamGameStats> {
         requirePage(limit, offset)
         return statsRepo.getTeamGames(query, limit, offset)
+    }
+
+    override fun getPlayerAggregates(
+        query: StatsQuery,
+        sort: StatsSort?,
+        limit: Int,
+        offset: Int,
+    ): List<PlayerAggregate> {
+        requirePage(limit, offset)
+        return aggregateRepo.getPlayerAggregates(query, sort ?: StatsSort("games"), limit, offset)
+    }
+
+    override fun getTeamAggregates(
+        query: StatsQuery,
+        sort: StatsSort?,
+        limit: Int,
+        offset: Int,
+    ): List<TeamAggregate> {
+        requirePage(limit, offset)
+        return aggregateRepo.getTeamAggregates(query, sort ?: StatsSort("games"), limit, offset)
+    }
+
+    override fun getChampionAggregates(
+        query: StatsQuery,
+        sort: StatsSort?,
+        limit: Int,
+        offset: Int,
+    ): List<ChampionAggregate> {
+        requirePage(limit, offset)
+        return aggregateRepo.getChampionAggregates(query, sort ?: StatsSort("picks"), limit, offset)
     }
 
     private fun requirePage(

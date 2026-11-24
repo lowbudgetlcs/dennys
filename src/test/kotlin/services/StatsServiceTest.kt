@@ -5,8 +5,10 @@ import com.lowbudgetlcs.domain.series.game.models.toGameId
 import com.lowbudgetlcs.domain.stats.StatsService
 import com.lowbudgetlcs.domain.stats.models.GameStats
 import com.lowbudgetlcs.domain.stats.models.StatsQuery
+import com.lowbudgetlcs.domain.stats.models.StatsSort
 import com.lowbudgetlcs.domain.stats.models.TeamGameStats
 import com.lowbudgetlcs.repositories.riotmatchdata.IRiotMatchDataRepository
+import com.lowbudgetlcs.repositories.stats.IStatsAggregateRepository
 import com.lowbudgetlcs.repositories.stats.IStatsRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -26,7 +28,8 @@ private val TIMELINE = buildJsonObject { put("frameInterval", JsonPrimitive(60_0
 private class StatsFixture {
     val dataRepo = mockk<IRiotMatchDataRepository>()
     val statsRepo = mockk<IStatsRepository>()
-    val service = StatsService(dataRepo, statsRepo)
+    val aggregateRepo = mockk<IStatsAggregateRepository>()
+    val service = StatsService(dataRepo, statsRepo, aggregateRepo)
 }
 
 class StatsServiceTest :
@@ -83,5 +86,18 @@ class StatsServiceTest :
 
             f.service.getPlayerGames(query, 1000, 50) shouldBe emptyList()
             f.service.getTeamGames(query, 1, 0) shouldBe emptyList()
+        }
+
+        "aggregates default to most games, or most picks for champions, and validate the page" {
+            val f = StatsFixture()
+            val query = StatsQuery(minDurationSeconds = 300)
+            every { f.aggregateRepo.getPlayerAggregates(query, StatsSort("games"), 10, 0) } returns emptyList()
+            every { f.aggregateRepo.getTeamAggregates(query, StatsSort("kills", false), 10, 0) } returns emptyList()
+            every { f.aggregateRepo.getChampionAggregates(query, StatsSort("picks"), 10, 0) } returns emptyList()
+
+            f.service.getPlayerAggregates(query, null, 10, 0) shouldBe emptyList()
+            f.service.getTeamAggregates(query, StatsSort("kills", false), 10, 0) shouldBe emptyList()
+            f.service.getChampionAggregates(query, null, 10, 0) shouldBe emptyList()
+            shouldThrow<IllegalArgumentException> { f.service.getPlayerAggregates(query, null, 0, 0) }
         }
     })

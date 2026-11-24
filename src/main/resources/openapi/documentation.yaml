@@ -1299,6 +1299,7 @@ paths:
           schema:
             type: integer
           description: Only rows on this champion.
+        - $ref: "#/components/parameters/StatsMinDurationSeconds"
         - $ref: "#/components/parameters/StatsLimit"
         - $ref: "#/components/parameters/StatsOffset"
       responses:
@@ -1348,6 +1349,7 @@ paths:
           schema:
             type: integer
           description: Only the rows of the side this player played on, in games they played.
+        - $ref: "#/components/parameters/StatsMinDurationSeconds"
         - $ref: "#/components/parameters/StatsLimit"
         - $ref: "#/components/parameters/StatsOffset"
       responses:
@@ -1361,6 +1363,192 @@ paths:
                   $ref: "#/components/schemas/TeamGameStatsDto"
         "400":
           description: A filter has the wrong type, such as an unknown `stage`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "`limit` is outside 1–1000 or `offset` is negative"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/stats/players:
+    get:
+      summary: Player totals, averages and series records
+      description: |
+        Totals and per-game averages for each registered player, grouped on read over
+        `player_game_stats_v1`. No filter means all time; `sort` plus `limit` makes a leaderboard.
+        
+        The series record counts a series as played when the player appears in one of its games,
+        and as won or lost from the series result for the team they played for. Series that
+        aren't `COMPLETE` count as played only, a double loss is lost for both teams, and a
+        forfeit with no games counts for no player. `teamId` splits a record by team.
+      operationId: getPlayerAggregates
+      tags:
+        - Stats (v1)
+      parameters:
+        - $ref: "#/components/parameters/StatsEventGroupId"
+        - $ref: "#/components/parameters/StatsEventId"
+        - $ref: "#/components/parameters/StatsStage"
+        - $ref: "#/components/parameters/StatsTeamId"
+        - in: query
+          name: playerId
+          schema:
+            type: integer
+        - in: query
+          name: championId
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/StatsMinDurationSeconds"
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: "games:desc"
+          description: |
+            `<stat>` or `<stat>:asc|desc` (desc when omitted). Ties break on id. One of:
+            `games`, `wins`, `seriesPlayed`, `seriesWon`, `seriesLost`, `kills`, `killsPerGame`, `deaths`, `deathsPerGame`, `assists`, `assistsPerGame`, `cs`, `csPerGame`, `goldEarned`, `goldEarnedPerGame`, `damageToChampions`, `damageToChampionsPerGame`, `damageTaken`, `damageTakenPerGame`, `visionScore`, `visionScorePerGame`, `wardsPlaced`, `wardsPlacedPerGame`, `wardsKilled`, `wardsKilledPerGame`, `controlWardsBought`, `controlWardsBoughtPerGame`, `voidGrubs`, `voidGrubsPerGame`, `gameDurationSeconds`, `gameDurationSecondsPerGame`.
+        - $ref: "#/components/parameters/StatsLimit"
+        - $ref: "#/components/parameters/StatsOffset"
+      responses:
+        "200":
+          description: One row per group, sorted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlayerAggregateDto"
+        "400":
+          description: An unknown or malformed `sort`, or a filter with the wrong type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "`limit` is outside 1–1000 or `offset` is negative"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/stats/teams:
+    get:
+      summary: Team totals and averages
+      description: |
+        Totals and per-game averages for each team, grouped on read over `team_game_stats_v1`.
+        `playerId` keeps the games that player played, on their side. Until #259 merges duplicate
+        team rows, a team spanning events is listed once per event.
+      operationId: getTeamAggregates
+      tags:
+        - Stats (v1)
+      parameters:
+        - $ref: "#/components/parameters/StatsEventGroupId"
+        - $ref: "#/components/parameters/StatsEventId"
+        - $ref: "#/components/parameters/StatsStage"
+        - $ref: "#/components/parameters/StatsTeamId"
+        - in: query
+          name: playerId
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/StatsMinDurationSeconds"
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: "games:desc"
+          description: |
+            `<stat>` or `<stat>:asc|desc` (desc when omitted). Ties break on id. One of:
+            `games`, `wins`, `firstBloods`, `firstBloodsPerGame`, `firstTowers`, `firstTowersPerGame`, `firstDragons`, `firstDragonsPerGame`, `firstBarons`, `firstBaronsPerGame`, `kills`, `killsPerGame`, `towerKills`, `towerKillsPerGame`, `inhibitorKills`, `inhibitorKillsPerGame`, `dragonKills`, `dragonKillsPerGame`, `baronKills`, `baronKillsPerGame`, `riftHeraldKills`, `riftHeraldKillsPerGame`, `hordeKills`, `hordeKillsPerGame`, `gameDurationSeconds`, `gameDurationSecondsPerGame`.
+        - $ref: "#/components/parameters/StatsLimit"
+        - $ref: "#/components/parameters/StatsOffset"
+      responses:
+        "200":
+          description: One row per group, sorted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamAggregateDto"
+        "400":
+          description: An unknown or malformed `sort`, or a filter with the wrong type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "`limit` is outside 1–1000 or `offset` is negative"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/stats/champions:
+    get:
+      summary: Champion picks, wins, bans and averages
+      description: |
+        Picks, wins and per-pick averages from player rows, and bans from team rows, per
+        champion. A champion that was only banned has 0 picks and no name. `teamId` and
+        `playerId` count that side's bans.
+      operationId: getChampionAggregates
+      tags:
+        - Stats (v1)
+      parameters:
+        - $ref: "#/components/parameters/StatsEventGroupId"
+        - $ref: "#/components/parameters/StatsEventId"
+        - $ref: "#/components/parameters/StatsStage"
+        - $ref: "#/components/parameters/StatsTeamId"
+        - in: query
+          name: playerId
+          schema:
+            type: integer
+        - in: query
+          name: championId
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/StatsMinDurationSeconds"
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: "picks:desc"
+          description: |
+            `<stat>` or `<stat>:asc|desc` (desc when omitted). Ties break on id. One of:
+            `picks`, `wins`, `bans`, `kills`, `killsPerGame`, `deaths`, `deathsPerGame`, `assists`, `assistsPerGame`, `cs`, `csPerGame`, `goldEarned`, `goldEarnedPerGame`, `damageToChampions`, `damageToChampionsPerGame`, `damageTaken`, `damageTakenPerGame`, `visionScore`, `visionScorePerGame`, `wardsPlaced`, `wardsPlacedPerGame`, `wardsKilled`, `wardsKilledPerGame`, `controlWardsBought`, `controlWardsBoughtPerGame`, `voidGrubs`, `voidGrubsPerGame`, `gameDurationSeconds`, `gameDurationSecondsPerGame`.
+        - $ref: "#/components/parameters/StatsLimit"
+        - $ref: "#/components/parameters/StatsOffset"
+      responses:
+        "200":
+          description: One row per group, sorted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChampionAggregateDto"
+        "400":
+          description: An unknown or malformed `sort`, or a filter with the wrong type
           content:
             application/json:
               schema:
@@ -1916,6 +2104,12 @@ components:
       schema:
         type: integer
       description: Only rows for this team.
+    StatsMinDurationSeconds:
+      in: query
+      name: minDurationSeconds
+      schema:
+        type: integer
+      description: Only games at least this long, in seconds. Use it to leave out remakes.
     StatsLimit:
       in: query
       name: limit
@@ -2131,7 +2325,7 @@ components:
         - seriesId
         - eventId
         - stage
-        - gameDurationS
+        - gameDurationSeconds
         - championId
         - win
         - kills
@@ -2173,7 +2367,7 @@ components:
           nullable: true
           description: Null when the PUUID isn't linked to a player.
           example: 31
-        gameDurationS:
+        gameDurationSeconds:
           type: integer
           example: 1834
         puuid:
@@ -2238,7 +2432,7 @@ components:
         - seriesId
         - eventId
         - stage
-        - gameDurationS
+        - gameDurationSeconds
         - win
         - firstBlood
         - firstTower
@@ -2279,7 +2473,7 @@ components:
           enum:
             - BLUE
             - RED
-        gameDurationS:
+        gameDurationSeconds:
           type: integer
           example: 1834
         win:
@@ -2314,6 +2508,379 @@ components:
           example:
             - 55
             - 84
+
+    PlayerAggregateDto:
+      type: object
+      description: |
+        One registered player's totals; each `<stat>PerGame` is the total over `games`.
+      required:
+        - playerId
+        - games
+        - wins
+        - seriesPlayed
+        - seriesWon
+        - seriesLost
+        - kills
+        - killsPerGame
+        - deaths
+        - deathsPerGame
+        - assists
+        - assistsPerGame
+        - cs
+        - csPerGame
+        - goldEarned
+        - goldEarnedPerGame
+        - damageToChampions
+        - damageToChampionsPerGame
+        - damageTaken
+        - damageTakenPerGame
+        - visionScore
+        - visionScorePerGame
+        - wardsPlaced
+        - wardsPlacedPerGame
+        - wardsKilled
+        - wardsKilledPerGame
+        - controlWardsBought
+        - controlWardsBoughtPerGame
+        - voidGrubs
+        - voidGrubsPerGame
+        - gameDurationSeconds
+        - gameDurationSecondsPerGame
+      properties:
+        playerId:
+          type: integer
+        playerName:
+          type: string
+          nullable: true
+        games:
+          type: integer
+        wins:
+          type: integer
+        seriesPlayed:
+          type: integer
+        seriesWon:
+          type: integer
+        seriesLost:
+          type: integer
+        kills:
+          type: integer
+          format: int64
+        killsPerGame:
+          type: number
+          format: double
+        deaths:
+          type: integer
+          format: int64
+        deathsPerGame:
+          type: number
+          format: double
+        assists:
+          type: integer
+          format: int64
+        assistsPerGame:
+          type: number
+          format: double
+        cs:
+          type: integer
+          format: int64
+        csPerGame:
+          type: number
+          format: double
+        goldEarned:
+          type: integer
+          format: int64
+        goldEarnedPerGame:
+          type: number
+          format: double
+        damageToChampions:
+          type: integer
+          format: int64
+        damageToChampionsPerGame:
+          type: number
+          format: double
+        damageTaken:
+          type: integer
+          format: int64
+        damageTakenPerGame:
+          type: number
+          format: double
+        visionScore:
+          type: integer
+          format: int64
+        visionScorePerGame:
+          type: number
+          format: double
+        wardsPlaced:
+          type: integer
+          format: int64
+        wardsPlacedPerGame:
+          type: number
+          format: double
+        wardsKilled:
+          type: integer
+          format: int64
+        wardsKilledPerGame:
+          type: number
+          format: double
+        controlWardsBought:
+          type: integer
+          format: int64
+        controlWardsBoughtPerGame:
+          type: number
+          format: double
+        voidGrubs:
+          type: integer
+          format: int64
+        voidGrubsPerGame:
+          type: number
+          format: double
+        gameDurationSeconds:
+          type: integer
+          format: int64
+        gameDurationSecondsPerGame:
+          type: number
+          format: double
+
+    TeamAggregateDto:
+      type: object
+      description: |
+        One team's totals; each `<stat>PerGame` is the total over `games`.
+      required:
+        - teamId
+        - games
+        - wins
+        - firstBloods
+        - firstBloodsPerGame
+        - firstTowers
+        - firstTowersPerGame
+        - firstDragons
+        - firstDragonsPerGame
+        - firstBarons
+        - firstBaronsPerGame
+        - kills
+        - killsPerGame
+        - towerKills
+        - towerKillsPerGame
+        - inhibitorKills
+        - inhibitorKillsPerGame
+        - dragonKills
+        - dragonKillsPerGame
+        - baronKills
+        - baronKillsPerGame
+        - riftHeraldKills
+        - riftHeraldKillsPerGame
+        - hordeKills
+        - hordeKillsPerGame
+        - gameDurationSeconds
+        - gameDurationSecondsPerGame
+      properties:
+        teamId:
+          type: integer
+        teamName:
+          type: string
+          nullable: true
+        games:
+          type: integer
+        wins:
+          type: integer
+        firstBloods:
+          type: integer
+          format: int64
+        firstBloodsPerGame:
+          type: number
+          format: double
+        firstTowers:
+          type: integer
+          format: int64
+        firstTowersPerGame:
+          type: number
+          format: double
+        firstDragons:
+          type: integer
+          format: int64
+        firstDragonsPerGame:
+          type: number
+          format: double
+        firstBarons:
+          type: integer
+          format: int64
+        firstBaronsPerGame:
+          type: number
+          format: double
+        kills:
+          type: integer
+          format: int64
+        killsPerGame:
+          type: number
+          format: double
+        towerKills:
+          type: integer
+          format: int64
+        towerKillsPerGame:
+          type: number
+          format: double
+        inhibitorKills:
+          type: integer
+          format: int64
+        inhibitorKillsPerGame:
+          type: number
+          format: double
+        dragonKills:
+          type: integer
+          format: int64
+        dragonKillsPerGame:
+          type: number
+          format: double
+        baronKills:
+          type: integer
+          format: int64
+        baronKillsPerGame:
+          type: number
+          format: double
+        riftHeraldKills:
+          type: integer
+          format: int64
+        riftHeraldKillsPerGame:
+          type: number
+          format: double
+        hordeKills:
+          type: integer
+          format: int64
+        hordeKillsPerGame:
+          type: number
+          format: double
+        gameDurationSeconds:
+          type: integer
+          format: int64
+        gameDurationSecondsPerGame:
+          type: number
+          format: double
+
+    ChampionAggregateDto:
+      type: object
+      description: |
+        One champion's totals; each `<stat>PerGame` is the total over `picks`, and 0 with no picks.
+      required:
+        - championId
+        - picks
+        - wins
+        - bans
+        - kills
+        - killsPerGame
+        - deaths
+        - deathsPerGame
+        - assists
+        - assistsPerGame
+        - cs
+        - csPerGame
+        - goldEarned
+        - goldEarnedPerGame
+        - damageToChampions
+        - damageToChampionsPerGame
+        - damageTaken
+        - damageTakenPerGame
+        - visionScore
+        - visionScorePerGame
+        - wardsPlaced
+        - wardsPlacedPerGame
+        - wardsKilled
+        - wardsKilledPerGame
+        - controlWardsBought
+        - controlWardsBoughtPerGame
+        - voidGrubs
+        - voidGrubsPerGame
+        - gameDurationSeconds
+        - gameDurationSecondsPerGame
+      properties:
+        championId:
+          type: integer
+        championName:
+          type: string
+          nullable: true
+        picks:
+          type: integer
+        wins:
+          type: integer
+        bans:
+          type: integer
+        kills:
+          type: integer
+          format: int64
+        killsPerGame:
+          type: number
+          format: double
+        deaths:
+          type: integer
+          format: int64
+        deathsPerGame:
+          type: number
+          format: double
+        assists:
+          type: integer
+          format: int64
+        assistsPerGame:
+          type: number
+          format: double
+        cs:
+          type: integer
+          format: int64
+        csPerGame:
+          type: number
+          format: double
+        goldEarned:
+          type: integer
+          format: int64
+        goldEarnedPerGame:
+          type: number
+          format: double
+        damageToChampions:
+          type: integer
+          format: int64
+        damageToChampionsPerGame:
+          type: number
+          format: double
+        damageTaken:
+          type: integer
+          format: int64
+        damageTakenPerGame:
+          type: number
+          format: double
+        visionScore:
+          type: integer
+          format: int64
+        visionScorePerGame:
+          type: number
+          format: double
+        wardsPlaced:
+          type: integer
+          format: int64
+        wardsPlacedPerGame:
+          type: number
+          format: double
+        wardsKilled:
+          type: integer
+          format: int64
+        wardsKilledPerGame:
+          type: number
+          format: double
+        controlWardsBought:
+          type: integer
+          format: int64
+        controlWardsBoughtPerGame:
+          type: number
+          format: double
+        voidGrubs:
+          type: integer
+          format: int64
+        voidGrubsPerGame:
+          type: number
+          format: double
+        gameDurationSeconds:
+          type: integer
+          format: int64
+        gameDurationSecondsPerGame:
+          type: number
+          format: double
 
     CreateGameDto:
       type: object
