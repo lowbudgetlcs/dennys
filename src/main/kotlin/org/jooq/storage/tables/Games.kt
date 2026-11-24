@@ -38,7 +38,9 @@ import org.jooq.storage.keys.GAMES_SERIES_NUMBER_UNIQUE
 import org.jooq.storage.keys.GAMES__GAMES_SERIES_ID_FKEY
 import org.jooq.storage.keys.GAMES__GAMES_TOURNAMENT_CODE_ID_FKEY
 import org.jooq.storage.keys.GAME_RESULTS__GAME_RESULTS_GAME_ID_FKEY
+import org.jooq.storage.keys.RIOT_MATCH_DATA__RIOT_MATCH_DATA_GAME_ID_FKEY
 import org.jooq.storage.tables.GameResults.GameResultsPath
+import org.jooq.storage.tables.RiotMatchData.RiotMatchDataPath
 import org.jooq.storage.tables.Series.SeriesPath
 import org.jooq.storage.tables.TournamentCodes.TournamentCodesPath
 import org.jooq.storage.tables.records.GamesRecord
@@ -194,6 +196,22 @@ open class Games(
 
     val gameResults: GameResultsPath
         get(): GameResultsPath = gameResults()
+
+    private lateinit var _riotMatchData: RiotMatchDataPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>dennys.riot_match_data</code> table
+     */
+    fun riotMatchData(): RiotMatchDataPath {
+        if (!this::_riotMatchData.isInitialized)
+            _riotMatchData = RiotMatchDataPath(this, null, RIOT_MATCH_DATA__RIOT_MATCH_DATA_GAME_ID_FKEY.inverseKey)
+
+        return _riotMatchData;
+    }
+
+    val riotMatchData: RiotMatchDataPath
+        get(): RiotMatchDataPath = riotMatchData()
     override fun `as`(alias: String): Games = Games(DSL.name(alias), this)
     override fun `as`(alias: Name): Games = Games(alias, this)
     override fun `as`(alias: Table<*>): Games = Games(alias.qualifiedName, this)

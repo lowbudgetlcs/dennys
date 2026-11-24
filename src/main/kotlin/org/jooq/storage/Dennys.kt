@@ -25,6 +25,7 @@ import org.jooq.storage.tables.Players
 import org.jooq.storage.tables.PlayersToEvent
 import org.jooq.storage.tables.PlayersToTeam
 import org.jooq.storage.tables.RiotAccounts
+import org.jooq.storage.tables.RiotMatchData
 import org.jooq.storage.tables.Series
 import org.jooq.storage.tables.SeriesResults
 import org.jooq.storage.tables.Sessions
@@ -128,6 +129,11 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val RIOT_ACCOUNTS: RiotAccounts get() = RiotAccounts.RIOT_ACCOUNTS
 
     /**
+     * The table <code>dennys.riot_match_data</code>.
+     */
+    val RIOT_MATCH_DATA: RiotMatchData get() = RiotMatchData.RIOT_MATCH_DATA
+
+    /**
      * The table <code>dennys.series</code>.
      */
     val SERIES: Series get() = Series.SERIES
@@ -181,6 +187,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         PlayersToEvent.PLAYERS_TO_EVENT,
         PlayersToTeam.PLAYERS_TO_TEAM,
         RiotAccounts.RIOT_ACCOUNTS,
+        RiotMatchData.RIOT_MATCH_DATA,
         Series.SERIES,
         SeriesResults.SERIES_RESULTS,
         Sessions.SESSIONS,
