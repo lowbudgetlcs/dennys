@@ -61,22 +61,23 @@ class StatsAggregateRepository(
         limit: Int,
         offset: Int,
     ): List<PlayerAggregate> {
+        val rows = playerRows(query)
+        val playerId = rows.field(P.PLAYER_ID)!!
+        val seriesId = rows.field(P.SERIES_ID)!!
+        val teamId = rows.field(P.TEAM_ID)!!
         val complete = SERIES.STATUS.eq(SeriesStatus.COMPLETE.name)
         val games = count()
-        val wins = count().filterWhere(P.WIN.isTrue)
-        val seriesPlayed = countDistinct(P.SERIES_ID)
-        val seriesWon =
-            countDistinct(
-                P.SERIES_ID,
-            ).filterWhere(complete.and(SERIES_RESULTS.WINNER_TEAM_ID.eq(P.TEAM_ID)))
+        val wins = count().filterWhere(rows.field(P.WIN)!!.isTrue)
+        val seriesPlayed = countDistinct(seriesId)
+        val seriesWon = countDistinct(seriesId).filterWhere(complete.and(SERIES_RESULTS.WINNER_TEAM_ID.eq(teamId)))
         val seriesLost =
-            countDistinct(P.SERIES_ID).filterWhere(
+            countDistinct(seriesId).filterWhere(
                 complete
                     .and(SERIES_RESULTS.SERIES_ID.isNotNull)
-                    .and(SERIES_RESULTS.LOSER_TEAM_ID.eq(P.TEAM_ID).or(SERIES_RESULTS.WINNER_TEAM_ID.isNull)),
+                    .and(SERIES_RESULTS.LOSER_TEAM_ID.eq(teamId).or(SERIES_RESULTS.WINNER_TEAM_ID.isNull)),
             )
         val playerName = max(PLAYERS.NAME)
-        val totals = PLAYER_STATS.associate { (stat, column) -> stat to sum(column) }
+        val totals = PLAYER_STATS.associate { (stat, column) -> stat to sum(rows.field(column)!!) }
         val counts =
             mapOf(
                 "games" to games,
@@ -87,23 +88,23 @@ class StatsAggregateRepository(
             )
         val order = sortBy(counts + totals + perGame(totals, games), sort)
         return dsl
-            .select(P.PLAYER_ID, playerName, games, wins, seriesPlayed, seriesWon, seriesLost)
+            .with(rows)
+            .select(playerId, playerName, games, wins, seriesPlayed, seriesWon, seriesLost)
             .select(totals.values)
-            .from(P)
+            .from(rows)
             .join(SERIES)
-            .on(SERIES.ID.eq(P.SERIES_ID))
+            .on(SERIES.ID.eq(seriesId))
             .leftJoin(SERIES_RESULTS)
-            .on(SERIES_RESULTS.SERIES_ID.eq(P.SERIES_ID))
+            .on(SERIES_RESULTS.SERIES_ID.eq(seriesId))
             .leftJoin(PLAYERS)
-            .on(PLAYERS.ID.eq(P.PLAYER_ID))
-            .where(playerConditions(query) + P.PLAYER_ID.isNotNull)
-            .groupBy(P.PLAYER_ID)
-            .orderBy(order, P.PLAYER_ID.asc())
+            .on(PLAYERS.ID.eq(playerId))
+            .groupBy(playerId)
+            .orderBy(order, playerId.asc())
             .limit(limit)
             .offset(offset)
             .fetch { r ->
                 PlayerAggregate(
-                    playerId = r.get(P.PLAYER_ID)!!.toPlayerId(),
+                    playerId = r.get(playerId)!!.toPlayerId(),
                     playerName = r.get(playerName),
                     games = r.get(games),
                     wins = r.get(wins),
@@ -236,6 +237,15 @@ class StatsAggregateRepository(
                 )
             }
     }
+
+    // Materialized so the distinct-count sort carries plain numbers, not each row's match JSON.
+    private fun playerRows(query: StatsQuery) =
+        name("rows").asMaterialized(
+            select(P.PLAYER_ID, P.SERIES_ID, P.TEAM_ID, P.WIN)
+                .select(PLAYER_STATS.map { (_, column) -> column })
+                .from(P)
+                .where(playerConditions(query) + P.PLAYER_ID.isNotNull),
+        )
 
     private fun perGame(
         totals: Map<String, Field<out Number>>,
