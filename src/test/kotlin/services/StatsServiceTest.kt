@@ -4,6 +4,7 @@ import com.lowbudgetlcs.domain.series.game.models.RiotMatchData
 import com.lowbudgetlcs.domain.series.game.models.toGameId
 import com.lowbudgetlcs.domain.stats.StatsService
 import com.lowbudgetlcs.domain.stats.models.GameStats
+import com.lowbudgetlcs.domain.stats.models.StatsQuery
 import com.lowbudgetlcs.domain.stats.models.TeamGameStats
 import com.lowbudgetlcs.repositories.riotmatchdata.IRiotMatchDataRepository
 import com.lowbudgetlcs.repositories.stats.IStatsRepository
@@ -13,6 +14,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkClass
+import io.mockk.verify
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import java.time.Instant
@@ -61,5 +63,25 @@ class StatsServiceTest :
             every { f.statsRepo.getGameStats(GAME) } returns stats
 
             f.service.getGameStats(GAME) shouldBe stats
+        }
+
+        "row lookups reject a limit outside 1..1000 or a negative offset" {
+            val f = StatsFixture()
+            listOf(0 to 0, 1001 to 0, 100 to -1).forEach { (limit, offset) ->
+                shouldThrow<IllegalArgumentException> { f.service.getPlayerGames(StatsQuery(), limit, offset) }
+                shouldThrow<IllegalArgumentException> { f.service.getTeamGames(StatsQuery(), limit, offset) }
+            }
+            verify(exactly = 0) { f.statsRepo.getPlayerGames(any(), any(), any()) }
+            verify(exactly = 0) { f.statsRepo.getTeamGames(any(), any(), any()) }
+        }
+
+        "row lookups pass the query and page through" {
+            val f = StatsFixture()
+            val query = StatsQuery(championId = 103)
+            every { f.statsRepo.getPlayerGames(query, 1000, 50) } returns emptyList()
+            every { f.statsRepo.getTeamGames(query, 1, 0) } returns emptyList()
+
+            f.service.getPlayerGames(query, 1000, 50) shouldBe emptyList()
+            f.service.getTeamGames(query, 1, 0) shouldBe emptyList()
         }
     })
