@@ -1514,6 +1514,53 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/stats/records:
+    get:
+      summary: Team series and game records
+      description: |
+        Series W-L and game W-L per team from recorded results, so forfeits and games without
+        Riot match data count. Only `COMPLETE` series count toward series W-L, and a double loss
+        is a loss for both teams. Counts add up across stages and events. Sorted by series won,
+        then games won. Until #259 merges duplicate team rows, a team spanning events is listed
+        once per event.
+      operationId: getTeamRecords
+      tags:
+        - Stats (v1)
+      parameters:
+        - $ref: "#/components/parameters/StatsEventGroupId"
+        - $ref: "#/components/parameters/StatsEventId"
+        - $ref: "#/components/parameters/StatsStage"
+        - $ref: "#/components/parameters/StatsTeamId"
+        - $ref: "#/components/parameters/StatsLimit"
+        - $ref: "#/components/parameters/StatsOffset"
+      responses:
+        "200":
+          description: One row per team in a matching series
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamRecordDto"
+        "400":
+          description: A filter with the wrong type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "`limit` is outside 1–1000 or `offset` is negative"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/stats/champions:
     get:
       summary: Champion picks, wins, bans and averages
@@ -2655,6 +2702,29 @@ components:
         gameDurationSecondsPerGame:
           type: number
           format: double
+
+    TeamRecordDto:
+      type: object
+      required:
+        - teamId
+        - seriesWon
+        - seriesLost
+        - gamesWon
+        - gamesLost
+      properties:
+        teamId:
+          type: integer
+        teamName:
+          type: string
+          nullable: true
+        seriesWon:
+          type: integer
+        seriesLost:
+          type: integer
+        gamesWon:
+          type: integer
+        gamesLost:
+          type: integer
 
     TeamAggregateDto:
       type: object

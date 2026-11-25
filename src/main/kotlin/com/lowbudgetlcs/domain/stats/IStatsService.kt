@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.stats.models.StatsQuery
 import com.lowbudgetlcs.domain.stats.models.StatsSort
 import com.lowbudgetlcs.domain.stats.models.TeamAggregate
 import com.lowbudgetlcs.domain.stats.models.TeamGameStats
+import com.lowbudgetlcs.domain.stats.models.TeamRecord
 import kotlinx.serialization.json.JsonObject
 
 /**
@@ -51,6 +52,12 @@ interface IStatsService {
         offset: Int,
         minGames: Int? = null,
     ): List<TeamAggregate>
+
+    fun getTeamRecords(
+        query: StatsQuery,
+        limit: Int,
+        offset: Int,
+    ): List<TeamRecord>
 
     fun getChampionAggregates(
         query: StatsQuery,

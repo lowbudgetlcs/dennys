@@ -132,6 +132,27 @@ class StatsRouteTest :
             }
         }
 
+        "team record filters reach the repository and the rest are ignored" {
+            val aggregateRepo = mockk<IStatsAggregateRepository>()
+            val query = StatsQuery(EventGroupId(5), EventId(2), EventStage.PLAYOFFS, TeamId(7))
+            every { aggregateRepo.getTeamRecords(query, 10, 20) } returns emptyList()
+
+            getStats(
+                mockk(),
+                "/stats/records?eventGroupId=5&eventId=2&stage=PLAYOFFS&teamId=7&playerId=31&limit=10&offset=20",
+                aggregateRepo,
+            ) {
+                it.status shouldBe HttpStatusCode.OK
+                it.bodyAsText() shouldBe "[]"
+            }
+            getStats(mockk(), "/stats/records?stage=FINALS", aggregateRepo) {
+                it.status shouldBe HttpStatusCode.BadRequest
+            }
+            getStats(mockk(), "/stats/records?limit=0", aggregateRepo) {
+                it.status shouldBe HttpStatusCode.UnprocessableEntity
+            }
+        }
+
         "an unknown or malformed sort is a 400 that says why" {
             val aggregateRepo = mockk<IStatsAggregateRepository>()
             every { aggregateRepo.getPlayerAggregates(any(), StatsSort("nope"), any(), any()) } throws

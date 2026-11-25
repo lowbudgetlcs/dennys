@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.stats.models.StatsQuery
 import com.lowbudgetlcs.domain.stats.models.StatsSort
 import com.lowbudgetlcs.domain.stats.models.TeamAggregate
 import com.lowbudgetlcs.domain.stats.models.TeamGameStats
+import com.lowbudgetlcs.domain.stats.models.TeamRecord
 import com.lowbudgetlcs.repositories.riotmatchdata.IRiotMatchDataRepository
 import com.lowbudgetlcs.repositories.stats.IStatsAggregateRepository
 import com.lowbudgetlcs.repositories.stats.IStatsRepository
@@ -75,6 +76,15 @@ class StatsService(
     ): List<TeamAggregate> {
         requirePage(limit, offset)
         return aggregateRepo.getTeamAggregates(query, sort ?: StatsSort("games"), limit, offset, minGames)
+    }
+
+    override fun getTeamRecords(
+        query: StatsQuery,
+        limit: Int,
+        offset: Int,
+    ): List<TeamRecord> {
+        requirePage(limit, offset)
+        return aggregateRepo.getTeamRecords(query, limit, offset)
     }
 
     override fun getChampionAggregates(
