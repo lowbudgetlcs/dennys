@@ -60,6 +60,7 @@ class StatsAggregateRepository(
         sort: StatsSort,
         limit: Int,
         offset: Int,
+        minGames: Int?,
     ): List<PlayerAggregate> {
         val rows = playerRows(query)
         val playerId = rows.field(P.PLAYER_ID)!!
@@ -99,6 +100,7 @@ class StatsAggregateRepository(
             .leftJoin(PLAYERS)
             .on(PLAYERS.ID.eq(playerId))
             .groupBy(playerId)
+            .having(listOfNotNull(minGames?.let { games.ge(it) }))
             .orderBy(order, playerId.asc())
             .limit(limit)
             .offset(offset)
@@ -121,6 +123,7 @@ class StatsAggregateRepository(
         sort: StatsSort,
         limit: Int,
         offset: Int,
+        minGames: Int?,
     ): List<TeamAggregate> {
         val games = count()
         val wins = count().filterWhere(T.WIN.isTrue)
@@ -149,6 +152,7 @@ class StatsAggregateRepository(
             .on(TEAMS.ID.eq(T.TEAM_ID))
             .where(teamConditions(query) + T.TEAM_ID.isNotNull)
             .groupBy(T.TEAM_ID)
+            .having(listOfNotNull(minGames?.let { games.ge(it) }))
             .orderBy(order, T.TEAM_ID.asc())
             .limit(limit)
             .offset(offset)
@@ -180,6 +184,7 @@ class StatsAggregateRepository(
         sort: StatsSort,
         limit: Int,
         offset: Int,
+        minGames: Int?,
     ): List<ChampionAggregate> {
         val picked =
             name("picked").`as`(
@@ -223,6 +228,7 @@ class StatsAggregateRepository(
             .from(picked)
             .fullJoin(banned)
             .on(pickedId.eq(banned.field("champion_id", SQLDataType.INTEGER)))
+            .where(listOfNotNull(minGames?.let { picks.ge(it) }))
             .orderBy(order, championId.asc())
             .limit(limit)
             .offset(offset)

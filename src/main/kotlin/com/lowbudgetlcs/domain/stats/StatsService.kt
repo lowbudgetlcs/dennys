@@ -60,9 +60,10 @@ class StatsService(
         sort: StatsSort?,
         limit: Int,
         offset: Int,
+        minGames: Int?,
     ): List<PlayerAggregate> {
         requirePage(limit, offset)
-        return aggregateRepo.getPlayerAggregates(query, sort ?: StatsSort("games"), limit, offset)
+        return aggregateRepo.getPlayerAggregates(query, sort ?: StatsSort("games"), limit, offset, minGames)
     }
 
     override fun getTeamAggregates(
@@ -70,9 +71,10 @@ class StatsService(
         sort: StatsSort?,
         limit: Int,
         offset: Int,
+        minGames: Int?,
     ): List<TeamAggregate> {
         requirePage(limit, offset)
-        return aggregateRepo.getTeamAggregates(query, sort ?: StatsSort("games"), limit, offset)
+        return aggregateRepo.getTeamAggregates(query, sort ?: StatsSort("games"), limit, offset, minGames)
     }
 
     override fun getChampionAggregates(
@@ -80,9 +82,10 @@ class StatsService(
         sort: StatsSort?,
         limit: Int,
         offset: Int,
+        minGames: Int?,
     ): List<ChampionAggregate> {
         requirePage(limit, offset)
-        return aggregateRepo.getChampionAggregates(query, sort ?: StatsSort("picks"), limit, offset)
+        return aggregateRepo.getChampionAggregates(query, sort ?: StatsSort("picks"), limit, offset, minGames)
     }
 
     private fun requirePage(

@@ -43,6 +43,7 @@ class StatsResources {
         val championId: Int? = null,
         val minDurationSeconds: Int? = null,
         val sort: String? = null,
+        val minGames: Int? = null,
         val limit: Int = 100,
         val offset: Int = 0,
     )
@@ -57,6 +58,7 @@ class StatsResources {
         val playerId: Int? = null,
         val minDurationSeconds: Int? = null,
         val sort: String? = null,
+        val minGames: Int? = null,
         val limit: Int = 100,
         val offset: Int = 0,
     )
@@ -72,6 +74,7 @@ class StatsResources {
         val championId: Int? = null,
         val minDurationSeconds: Int? = null,
         val sort: String? = null,
+        val minPicks: Int? = null,
         val limit: Int = 100,
         val offset: Int = 0,
     )

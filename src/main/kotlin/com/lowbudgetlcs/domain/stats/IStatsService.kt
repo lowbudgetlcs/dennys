@@ -41,6 +41,7 @@ interface IStatsService {
         sort: StatsSort?,
         limit: Int,
         offset: Int,
+        minGames: Int? = null,
     ): List<PlayerAggregate>
 
     fun getTeamAggregates(
@@ -48,6 +49,7 @@ interface IStatsService {
         sort: StatsSort?,
         limit: Int,
         offset: Int,
+        minGames: Int? = null,
     ): List<TeamAggregate>
 
     fun getChampionAggregates(
@@ -55,5 +57,6 @@ interface IStatsService {
         sort: StatsSort?,
         limit: Int,
         offset: Int,
+        minGames: Int? = null,
     ): List<ChampionAggregate>
 }

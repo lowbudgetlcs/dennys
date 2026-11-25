@@ -29,18 +29,22 @@ fun Route.statsRoutesV1(statsService: IStatsService) {
             val query =
                 statsQuery(r.eventGroupId, r.eventId, r.stage, r.teamId, r.playerId, r.championId, r.minDurationSeconds)
             val sort = r.sort?.let(StatsSort::parse)
-            call.respond(statsService.getPlayerAggregates(query, sort, r.limit, r.offset).map { it.toDto() })
+            call.respond(
+                statsService.getPlayerAggregates(query, sort, r.limit, r.offset, r.minGames).map { it.toDto() },
+            )
         }
         get<StatsResources.Teams> { r ->
             val query = statsQuery(r.eventGroupId, r.eventId, r.stage, r.teamId, r.playerId, null, r.minDurationSeconds)
             val sort = r.sort?.let(StatsSort::parse)
-            call.respond(statsService.getTeamAggregates(query, sort, r.limit, r.offset).map { it.toDto() })
+            call.respond(statsService.getTeamAggregates(query, sort, r.limit, r.offset, r.minGames).map { it.toDto() })
         }
         get<StatsResources.Champions> { r ->
             val query =
                 statsQuery(r.eventGroupId, r.eventId, r.stage, r.teamId, r.playerId, r.championId, r.minDurationSeconds)
             val sort = r.sort?.let(StatsSort::parse)
-            call.respond(statsService.getChampionAggregates(query, sort, r.limit, r.offset).map { it.toDto() })
+            call.respond(
+                statsService.getChampionAggregates(query, sort, r.limit, r.offset, r.minPicks).map { it.toDto() },
+            )
         }
     }
 }

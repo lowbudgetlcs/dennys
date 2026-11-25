@@ -116,6 +116,22 @@ class StatsRouteTest :
             getStats(mockk(), "/stats/teams?teamId=7", aggregateRepo) { it.status shouldBe HttpStatusCode.OK }
         }
 
+        "minGames and minPicks reach the repository" {
+            val aggregateRepo = mockk<IStatsAggregateRepository>()
+            every { aggregateRepo.getPlayerAggregates(StatsQuery(), StatsSort("games"), 100, 0, 15) } returns
+                emptyList()
+            every { aggregateRepo.getTeamAggregates(StatsQuery(), StatsSort("games"), 100, 0, 10) } returns emptyList()
+            every { aggregateRepo.getChampionAggregates(StatsQuery(), StatsSort("picks"), 100, 0, 20) } returns
+                emptyList()
+
+            getStats(mockk(), "/stats/players?minGames=15", aggregateRepo) { it.status shouldBe HttpStatusCode.OK }
+            getStats(mockk(), "/stats/teams?minGames=10", aggregateRepo) { it.status shouldBe HttpStatusCode.OK }
+            getStats(mockk(), "/stats/champions?minPicks=20", aggregateRepo) { it.status shouldBe HttpStatusCode.OK }
+            getStats(mockk(), "/stats/players?minGames=abc", aggregateRepo) {
+                it.status shouldBe HttpStatusCode.BadRequest
+            }
+        }
+
         "an unknown or malformed sort is a 400 that says why" {
             val aggregateRepo = mockk<IStatsAggregateRepository>()
             every { aggregateRepo.getPlayerAggregates(any(), StatsSort("nope"), any(), any()) } throws

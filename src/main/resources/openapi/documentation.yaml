@@ -1416,6 +1416,11 @@ paths:
           description: |
             `<stat>` or `<stat>:asc|desc` (desc when omitted). Ties break on id. One of:
             `games`, `wins`, `seriesPlayed`, `seriesWon`, `seriesLost`, `kills`, `killsPerGame`, `deaths`, `deathsPerGame`, `assists`, `assistsPerGame`, `cs`, `csPerGame`, `goldEarned`, `goldEarnedPerGame`, `damageToChampions`, `damageToChampionsPerGame`, `damageTaken`, `damageTakenPerGame`, `visionScore`, `visionScorePerGame`, `wardsPlaced`, `wardsPlacedPerGame`, `wardsKilled`, `wardsKilledPerGame`, `controlWardsBought`, `controlWardsBoughtPerGame`, `voidGrubs`, `voidGrubsPerGame`, `gameDurationSeconds`, `gameDurationSecondsPerGame`.
+        - in: query
+          name: minGames
+          schema:
+            type: integer
+          description: Leave out players with fewer games, before sorting and paging.
         - $ref: "#/components/parameters/StatsLimit"
         - $ref: "#/components/parameters/StatsOffset"
       responses:
@@ -1474,6 +1479,11 @@ paths:
           description: |
             `<stat>` or `<stat>:asc|desc` (desc when omitted). Ties break on id. One of:
             `games`, `wins`, `firstBloods`, `firstBloodsPerGame`, `firstTowers`, `firstTowersPerGame`, `firstDragons`, `firstDragonsPerGame`, `firstBarons`, `firstBaronsPerGame`, `kills`, `killsPerGame`, `towerKills`, `towerKillsPerGame`, `inhibitorKills`, `inhibitorKillsPerGame`, `dragonKills`, `dragonKillsPerGame`, `baronKills`, `baronKillsPerGame`, `riftHeraldKills`, `riftHeraldKillsPerGame`, `hordeKills`, `hordeKillsPerGame`, `gameDurationSeconds`, `gameDurationSecondsPerGame`.
+        - in: query
+          name: minGames
+          schema:
+            type: integer
+          description: Leave out teams with fewer games, before sorting and paging.
         - $ref: "#/components/parameters/StatsLimit"
         - $ref: "#/components/parameters/StatsOffset"
       responses:
@@ -1536,6 +1546,11 @@ paths:
           description: |
             `<stat>` or `<stat>:asc|desc` (desc when omitted). Ties break on id. One of:
             `picks`, `wins`, `bans`, `kills`, `killsPerGame`, `deaths`, `deathsPerGame`, `assists`, `assistsPerGame`, `cs`, `csPerGame`, `goldEarned`, `goldEarnedPerGame`, `damageToChampions`, `damageToChampionsPerGame`, `damageTaken`, `damageTakenPerGame`, `visionScore`, `visionScorePerGame`, `wardsPlaced`, `wardsPlacedPerGame`, `wardsKilled`, `wardsKilledPerGame`, `controlWardsBought`, `controlWardsBoughtPerGame`, `voidGrubs`, `voidGrubsPerGame`, `gameDurationSeconds`, `gameDurationSecondsPerGame`.
+        - in: query
+          name: minPicks
+          schema:
+            type: integer
+          description: Leave out champions with fewer picks, before sorting and paging. `1` drops banned-only champions.
         - $ref: "#/components/parameters/StatsLimit"
         - $ref: "#/components/parameters/StatsOffset"
       responses:

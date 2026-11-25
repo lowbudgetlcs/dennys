@@ -284,7 +284,8 @@ class StatsAggregatesTest :
             query: StatsQuery = StatsQuery(eventGroupId = season.eventGroupId),
             sort: StatsSort = StatsSort("games"),
             limit: Int = 100,
-        ) = aggregates.getPlayerAggregates(query, sort, limit, 0)
+            minGames: Int? = null,
+        ) = aggregates.getPlayerAggregates(query, sort, limit, 0, minGames)
 
         fun List<PlayerAggregate>.of(player: Player) = single { it.playerId == player.id }
 
@@ -364,6 +365,20 @@ class StatsAggregatesTest :
                 ).single { it.teamId == teamC.id }
                 .games shouldBe
                 1
+        }
+
+        test("minGames drops small samples before sorting and paging") {
+            players(sort = StatsSort("killsPerGame"), limit = 1, minGames = 2).single().playerId shouldBe veteran.id
+            players(minGames = 2).none { it.games < 2 } shouldBe true
+            val inSeason = StatsQuery(eventGroupId = season.eventGroupId)
+            aggregates.getTeamAggregates(inSeason, StatsSort("games"), 100, 0, minGames = 3).map { it.teamId } shouldBe
+                listOf(teamA.id, teamB.id)
+
+            fun champions(minPicks: Int) =
+                aggregates.getChampionAggregates(inSeason, StatsSort("picks"), 100, 0, minPicks).map { it.championId }
+            champions(1).contains(55) shouldBe false
+            champions(2).contains(84) shouldBe false
+            champions(2).contains(103) shouldBe true
         }
 
         test("an unknown sort is rejected before any SQL runs") {
