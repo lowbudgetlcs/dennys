@@ -7,7 +7,9 @@ import com.lowbudgetlcs.api.routes.v1.game.gameRoutesV1
 import com.lowbudgetlcs.api.routes.v1.player.playerRoutesV1
 import com.lowbudgetlcs.api.routes.v1.series.seriesRoutesV1
 import com.lowbudgetlcs.api.routes.v1.stats.statsRoutesV1
+import com.lowbudgetlcs.api.routes.v1.stream.streamRoutesV1
 import com.lowbudgetlcs.api.routes.v1.team.teamRoutesV1
+import com.lowbudgetlcs.domain.LiveEvents
 import com.lowbudgetlcs.domain.account.IAccountService
 import com.lowbudgetlcs.domain.event.IEventService
 import com.lowbudgetlcs.domain.eventgroup.IEventGroupService
@@ -28,6 +30,7 @@ fun Route.apiRoutes() {
     val seriesService by inject<ISeriesService>()
     val eventGroupService by inject<IEventGroupService>()
     val statsService by inject<IStatsService>()
+    val liveEvents by inject<LiveEvents>()
 
     route("/api/v1") {
         authenticate("auth-session", "auth-token") {
@@ -41,6 +44,7 @@ fun Route.apiRoutes() {
             eventGroupRoutesV1(eventGroupService)
             gameRoutesV1(statsService)
             statsRoutesV1(statsService)
+            streamRoutesV1(liveEvents)
         }
     }
 }

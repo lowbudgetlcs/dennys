@@ -1,6 +1,7 @@
 package com.lowbudgetlcs.domain.series
 
 import com.lowbudgetlcs.domain.ConflictException
+import com.lowbudgetlcs.domain.LiveEvents
 import com.lowbudgetlcs.domain.account.models.types.Puuid
 import com.lowbudgetlcs.domain.event.models.Shortcode
 import com.lowbudgetlcs.domain.event.models.ShortcodeOptions
@@ -66,6 +67,7 @@ class SeriesService(
     private val gameRepo: IGameRepository,
     private val gate: IRiotTournamentGateway,
     private val maxCodesPerGame: Int = DEFAULT_MAX_CODES_PER_GAME,
+    private val liveEvents: LiveEvents = LiveEvents(),
 ) : ISeriesService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -104,7 +106,9 @@ class SeriesService(
         return series.toSeriesWithGames(codeRepo.getBySeriesId(id), gameRepo.getBySeriesId(id))
     }
 
-    override fun evaluateCompletion(id: SeriesId): Series {
+    override fun evaluateCompletion(id: SeriesId): Series = completeIfWon(id).also(liveEvents::seriesUpdated)
+
+    private fun completeIfWon(id: SeriesId): Series {
         val series = getSeries(id)
         if (series.status != SeriesStatus.NOT_STARTED && series.status != SeriesStatus.IN_PROGRESS) {
             logger.debug("Series '$id' is not eligible for auto-close, skipping evaluation.")
@@ -297,8 +301,11 @@ class SeriesService(
         val series = getSeries(id)
         val result = winnerAndLoser(series, winningTeamId, null)?.let { SeriesResult(it.first, it.second) }
         logger.info("Setting series '$id' to $status, winner '${result?.winningTeamId}', double loss $doubleLoss.")
-        return seriesRepo.setStatus(id, status, result, doubleLoss)
-            ?: throw DatabaseException("Failed to update series with id '${id.value}'.")
+        val updated =
+            seriesRepo.setStatus(id, status, result, doubleLoss)
+                ?: throw DatabaseException("Failed to update series with id '${id.value}'.")
+        liveEvents.seriesUpdated(updated)
+        return updated
     }
 
     private fun declaredResult(
@@ -488,6 +495,8 @@ class SeriesService(
             val code =
                 codeRepo.insert(newCode, shortcode.toShortcode()) ?: throw DatabaseException("Failed to save game.")
             seriesRepo.markInProgress(series.id)
+            val status = if (series.status == SeriesStatus.NOT_STARTED) SeriesStatus.IN_PROGRESS else series.status
+            liveEvents.seriesUpdated(series.copy(status = status))
             IssueOutcome(code, issued = true)
         }
     }

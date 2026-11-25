@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.config.modules
 
+import com.lowbudgetlcs.domain.LiveEvents
 import com.lowbudgetlcs.domain.account.AccountService
 import com.lowbudgetlcs.domain.account.IAccountService
 import com.lowbudgetlcs.domain.auth.AuthService
@@ -29,8 +30,9 @@ val serviceModule =
         single<IEventService> { EventService(get(), get(), get(), get()) }
         single<IEventGroupService> { EventGroupService(get(), get()) }
         single<IPlayerService> { PlayerService(get(), get(), get()) }
-        single<ISeriesService> { SeriesService(get(), get(), get(), get(), get(), get()) }
-        single<IRiotMatchIngestService> { RiotMatchIngestService(get(), get(), get()) }
+        single { LiveEvents() }
+        single<ISeriesService> { SeriesService(get(), get(), get(), get(), get(), get(), liveEvents = get()) }
+        single<IRiotMatchIngestService> { RiotMatchIngestService(get(), get(), get(), get()) }
         single<IStatsService> { StatsService(get(), get(), get()) }
         single<IAccountService> { AccountService(get(), get(), get()) }
         single<IAuthService> {

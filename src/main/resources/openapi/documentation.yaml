@@ -1275,6 +1275,41 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/stream:
+    get:
+      summary: Live update stream
+      description: |
+        Server-sent events that say what changed, so clients refetch through the
+        normal GETs instead of polling. Events carry ids only.
+
+        | Event | Data | Sent when |
+        |---|---|---|
+        | `series.updated` | `{"seriesId": 1, "eventId": 2, "status": "IN_PROGRESS"}` | a game is recorded (report, Riot refresh or poll), a series is patched, or a code is issued |
+        | `game.stats_ready` | `{"gameId": 3, "seriesId": 1}` | a game's Riot match data is stored |
+
+        A `: heartbeat` comment line is sent every 25 s so proxies keep the
+        connection open. `EventSource` ignores comments.
+        Duplicate events are possible and harmless. Nothing is replayed: open the
+        stream, then fetch the current state, and refetch after reconnecting.
+      operationId: getStream
+      tags:
+        - Series (v1)
+      responses:
+        "200":
+          description: An open `text/event-stream`
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          description: Not signed in
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/stats/player-games:
     get:
       summary: List player rows across games

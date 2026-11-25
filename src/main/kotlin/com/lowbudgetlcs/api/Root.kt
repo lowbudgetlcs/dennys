@@ -14,6 +14,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sse.SSE
 import org.jooq.DSLContext
 import org.koin.ktor.ext.inject
 import org.slf4j.Logger
@@ -32,6 +33,7 @@ fun Application.routes() {
         setupSessions()
         install(Resources)
         install(AutoHeadResponse)
+        install(SSE)
         route("/") {
             singlePageApplication {
                 vue("/frontend")
