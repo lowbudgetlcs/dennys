@@ -63,6 +63,17 @@ class StatsResources {
         val offset: Int = 0,
     )
 
+    @Resource("records")
+    data class Records(
+        val parent: StatsResources = StatsResources(),
+        val eventGroupId: Int? = null,
+        val eventId: Int? = null,
+        val stage: EventStage? = null,
+        val teamId: Int? = null,
+        val limit: Int = 100,
+        val offset: Int = 0,
+    )
+
     @Resource("champions")
     data class Champions(
         val parent: StatsResources = StatsResources(),

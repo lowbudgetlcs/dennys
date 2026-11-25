@@ -9,6 +9,7 @@ import com.lowbudgetlcs.domain.stats.models.StatTotals
 import com.lowbudgetlcs.domain.stats.models.StatsQuery
 import com.lowbudgetlcs.domain.stats.models.StatsSort
 import com.lowbudgetlcs.domain.stats.models.TeamAggregate
+import com.lowbudgetlcs.domain.stats.models.TeamRecord
 import com.lowbudgetlcs.domain.team.models.toTeamId
 import org.jooq.DSLContext
 import org.jooq.Field
@@ -24,12 +25,16 @@ import org.jooq.impl.DSL.select
 import org.jooq.impl.DSL.sum
 import org.jooq.impl.DSL.unnest
 import org.jooq.impl.SQLDataType
+import org.jooq.storage.tables.references.EVENTS
+import org.jooq.storage.tables.references.GAMES
+import org.jooq.storage.tables.references.GAME_RESULTS
 import org.jooq.storage.tables.references.PLAYERS
 import org.jooq.storage.tables.references.PLAYER_GAME_STATS_V1
 import org.jooq.storage.tables.references.SERIES
 import org.jooq.storage.tables.references.SERIES_RESULTS
 import org.jooq.storage.tables.references.TEAMS
 import org.jooq.storage.tables.references.TEAM_GAME_STATS_V1
+import org.jooq.storage.tables.references.TEAM_TO_SERIES
 import java.math.BigDecimal
 
 private val P = PLAYER_GAME_STATS_V1
@@ -175,6 +180,62 @@ class StatsAggregateRepository(
                     riftHeraldKills = total("riftHeraldKills"),
                     hordeKills = total("hordeKills"),
                     gameDurationSeconds = total("gameDurationSeconds"),
+                )
+            }
+    }
+
+    override fun getTeamRecords(
+        query: StatsQuery,
+        limit: Int,
+        offset: Int,
+    ): List<TeamRecord> {
+        val teamId = TEAM_TO_SERIES.TEAM_ID
+        val complete = SERIES.STATUS.eq(SeriesStatus.COMPLETE.name)
+        // The game join repeats each series once per game, so series are counted distinct.
+        val seriesWon = countDistinct(SERIES.ID).filterWhere(complete.and(SERIES_RESULTS.WINNER_TEAM_ID.eq(teamId)))
+        val seriesLost =
+            countDistinct(SERIES.ID).filterWhere(
+                complete
+                    .and(SERIES_RESULTS.SERIES_ID.isNotNull)
+                    .and(SERIES_RESULTS.LOSER_TEAM_ID.eq(teamId).or(SERIES_RESULTS.WINNER_TEAM_ID.isNull)),
+            )
+        val gamesWon = count(GAME_RESULTS.GAME_ID).filterWhere(GAME_RESULTS.WINNER_TEAM_ID.eq(teamId))
+        val gamesLost = count(GAME_RESULTS.GAME_ID).filterWhere(GAME_RESULTS.LOSER_TEAM_ID.eq(teamId))
+        val teamName = max(TEAMS.NAME)
+        return dsl
+            .select(teamId, teamName, seriesWon, seriesLost, gamesWon, gamesLost)
+            .from(TEAM_TO_SERIES)
+            .join(SERIES)
+            .on(SERIES.ID.eq(TEAM_TO_SERIES.SERIES_ID))
+            .join(EVENTS)
+            .on(EVENTS.ID.eq(SERIES.EVENT_ID))
+            .leftJoin(SERIES_RESULTS)
+            .on(SERIES_RESULTS.SERIES_ID.eq(SERIES.ID))
+            .leftJoin(GAMES)
+            .on(GAMES.SERIES_ID.eq(SERIES.ID))
+            .leftJoin(GAME_RESULTS)
+            .on(GAME_RESULTS.GAME_ID.eq(GAMES.ID))
+            .leftJoin(TEAMS)
+            .on(TEAMS.ID.eq(teamId))
+            .where(
+                listOfNotNull(
+                    query.eventGroupId?.let { EVENTS.EVENT_GROUP_ID.eq(it.value) },
+                    query.eventId?.let { SERIES.EVENT_ID.eq(it.value) },
+                    query.stage?.let { SERIES.STAGE.eq(it.name) },
+                    query.teamId?.let { teamId.eq(it.value) },
+                ),
+            ).groupBy(teamId)
+            .orderBy(seriesWon.desc(), gamesWon.desc(), teamId.asc())
+            .limit(limit)
+            .offset(offset)
+            .fetch { r ->
+                TeamRecord(
+                    teamId = r.get(teamId)!!.toTeamId(),
+                    teamName = r.get(teamName),
+                    seriesWon = r.get(seriesWon),
+                    seriesLost = r.get(seriesLost),
+                    gamesWon = r.get(gamesWon),
+                    gamesLost = r.get(gamesLost),
                 )
             }
     }

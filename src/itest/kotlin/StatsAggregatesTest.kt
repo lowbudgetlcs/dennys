@@ -270,6 +270,10 @@ class StatsAggregatesTest :
                 lobby(listOf(seat(joiner, 2, 1)), listOf(seat(switcher, 3, 6)), false, durationSeconds = 200),
                 false,
             )
+            // A result recorded without Riot match data.
+            games.insert(
+                NewGame(inProgress.id, null, "NA1_${++matchNumber}".toRiotMatchId(), GameResult(teamA.id, teamC.id)),
+            )
 
             // B wins by forfeit with no games played.
             close(series(season, EventStage.REGULAR_SEASON, teamB, teamC), teamB, teamC)
@@ -379,6 +383,35 @@ class StatsAggregatesTest :
             champions(1).contains(55) shouldBe false
             champions(2).contains(84) shouldBe false
             champions(2).contains(103) shouldBe true
+        }
+
+        fun records(query: StatsQuery) =
+            aggregates.getTeamRecords(query, 100, 0).associate {
+                it.teamId to listOf(it.seriesWon, it.seriesLost, it.gamesWon, it.gamesLost)
+            }
+
+        test("team records count forfeits, double losses and games without match data") {
+            val seasonRecords = aggregates.getTeamRecords(StatsQuery(eventGroupId = season.eventGroupId), 100, 0)
+            seasonRecords.map { it.teamId } shouldBe listOf(teamA.id, teamB.id, teamC.id)
+            seasonRecords.first().teamName shouldBe "Team A"
+            records(StatsQuery(eventGroupId = season.eventGroupId)) shouldBe
+                mapOf(
+                    teamA.id to listOf(2, 1, 5, 2),
+                    teamB.id to listOf(1, 2, 1, 3),
+                    teamC.id to listOf(0, 2, 1, 2),
+                )
+            records(StatsQuery(teamId = teamB.id)) shouldBe mapOf(teamB.id to listOf(2, 2, 2, 3))
+        }
+
+        test("an event's team records are the sum of its stages") {
+            val regular = records(StatsQuery(eventId = season.id, stage = EventStage.REGULAR_SEASON))
+            val playoffs = records(StatsQuery(eventId = season.id, stage = EventStage.PLAYOFFS))
+            playoffs shouldBe mapOf(teamA.id to listOf(0, 0, 1, 1), teamC.id to listOf(0, 0, 1, 1))
+            val summed =
+                regular.mapValues { (team, counts) ->
+                    counts.zip(playoffs[team] ?: listOf(0, 0, 0, 0), Int::plus)
+                }
+            records(StatsQuery(eventId = season.id)) shouldBe summed
         }
 
         test("an unknown sort is rejected before any SQL runs") {

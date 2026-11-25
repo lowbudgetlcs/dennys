@@ -3,6 +3,7 @@ package com.lowbudgetlcs.api.dto.stats
 import com.lowbudgetlcs.domain.stats.models.ChampionAggregate
 import com.lowbudgetlcs.domain.stats.models.PlayerAggregate
 import com.lowbudgetlcs.domain.stats.models.TeamAggregate
+import com.lowbudgetlcs.domain.stats.models.TeamRecord
 
 private fun Long.per(games: Int): Double = if (games == 0) 0.0 else toDouble() / games
 
@@ -108,4 +109,14 @@ fun TeamAggregate.toDto(): TeamAggregateDto =
         hordeKillsPerGame = hordeKills.per(games),
         gameDurationSeconds = gameDurationSeconds,
         gameDurationSecondsPerGame = gameDurationSeconds.per(games),
+    )
+
+fun TeamRecord.toDto(): TeamRecordDto =
+    TeamRecordDto(
+        teamId = teamId.value,
+        teamName = teamName,
+        seriesWon = seriesWon,
+        seriesLost = seriesLost,
+        gamesWon = gamesWon,
+        gamesLost = gamesLost,
     )

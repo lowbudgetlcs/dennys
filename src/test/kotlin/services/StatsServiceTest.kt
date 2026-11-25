@@ -94,10 +94,13 @@ class StatsServiceTest :
             every { f.aggregateRepo.getPlayerAggregates(query, StatsSort("games"), 10, 0, null) } returns emptyList()
             every { f.aggregateRepo.getTeamAggregates(query, StatsSort("kills", false), 10, 0, 5) } returns emptyList()
             every { f.aggregateRepo.getChampionAggregates(query, StatsSort("picks"), 10, 0, null) } returns emptyList()
+            every { f.aggregateRepo.getTeamRecords(query, 10, 0) } returns emptyList()
 
             f.service.getPlayerAggregates(query, null, 10, 0, null) shouldBe emptyList()
             f.service.getTeamAggregates(query, StatsSort("kills", false), 10, 0, 5) shouldBe emptyList()
             f.service.getChampionAggregates(query, null, 10, 0, null) shouldBe emptyList()
+            f.service.getTeamRecords(query, 10, 0) shouldBe emptyList()
             shouldThrow<IllegalArgumentException> { f.service.getPlayerAggregates(query, null, 0, 0, null) }
+            shouldThrow<IllegalArgumentException> { f.service.getTeamRecords(query, 10, -1) }
         }
     })

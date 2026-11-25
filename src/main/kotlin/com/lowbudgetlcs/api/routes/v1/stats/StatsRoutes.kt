@@ -38,6 +38,10 @@ fun Route.statsRoutesV1(statsService: IStatsService) {
             val sort = r.sort?.let(StatsSort::parse)
             call.respond(statsService.getTeamAggregates(query, sort, r.limit, r.offset, r.minGames).map { it.toDto() })
         }
+        get<StatsResources.Records> { r ->
+            val query = statsQuery(r.eventGroupId, r.eventId, r.stage, r.teamId, null, null, null)
+            call.respond(statsService.getTeamRecords(query, r.limit, r.offset).map { it.toDto() })
+        }
         get<StatsResources.Champions> { r ->
             val query =
                 statsQuery(r.eventGroupId, r.eventId, r.stage, r.teamId, r.playerId, r.championId, r.minDurationSeconds)
