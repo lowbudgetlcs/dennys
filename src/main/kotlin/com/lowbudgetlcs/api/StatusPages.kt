@@ -2,6 +2,7 @@ package com.lowbudgetlcs.api
 
 import com.lowbudgetlcs.api.dto.Error
 import com.lowbudgetlcs.domain.ConflictException
+import com.lowbudgetlcs.domain.InvalidRequestException
 import com.lowbudgetlcs.domain.auth.UnauthorizedException
 import com.lowbudgetlcs.gateways.GatewayException
 import com.lowbudgetlcs.gateways.riot.RiotApiException
@@ -25,6 +26,12 @@ fun Application.setupStatusPages() {
             logger.warn("⚠️ JSON deserialization failed", cause)
             val code = HttpStatusCode.BadRequest
             val e = Error(code = code.value, message = "Invalid JSON format: ${cause.message}")
+            call.respond(code, e)
+        }
+        exception<InvalidRequestException> { call, cause ->
+            logger.warn("⚠️ Invalid request: ${cause.message}")
+            val code = HttpStatusCode.BadRequest
+            val e = Error(code = code.value, message = cause.message ?: "Invalid request")
             call.respond(code, e)
         }
         exception<IllegalArgumentException> { call, cause ->

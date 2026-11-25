@@ -16,7 +16,9 @@ import com.lowbudgetlcs.repositories.series.ISeriesRepository
 import com.lowbudgetlcs.repositories.series.SeriesRepository
 import com.lowbudgetlcs.repositories.session.ISessionRepository
 import com.lowbudgetlcs.repositories.session.SessionRepository
+import com.lowbudgetlcs.repositories.stats.IStatsAggregateRepository
 import com.lowbudgetlcs.repositories.stats.IStatsRepository
+import com.lowbudgetlcs.repositories.stats.StatsAggregateRepository
 import com.lowbudgetlcs.repositories.stats.StatsRepository
 import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.team.TeamRepository
@@ -34,6 +36,7 @@ val repositoryModule =
         single<IGameRepository> { GameRepository(get()) }
         single<IRiotMatchDataRepository> { RiotMatchDataRepository(get()) }
         single<IStatsRepository> { StatsRepository(get()) }
+        single<IStatsAggregateRepository> { StatsAggregateRepository(get()) }
         single<ITeamRepository> { TeamRepository(get()) }
         single<IEventRepository> { EventRepository(get()) }
         single<IEventGroupRepository> { EventGroupRepository(get()) }

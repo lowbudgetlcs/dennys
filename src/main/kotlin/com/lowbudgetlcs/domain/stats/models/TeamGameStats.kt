@@ -15,7 +15,7 @@ data class TeamGameStats(
     val stage: EventStage,
     val teamId: TeamId?,
     val side: String?,
-    val gameDurationS: Int,
+    val gameDurationSeconds: Int,
     val win: Boolean,
     val firstBlood: Boolean,
     val firstTower: Boolean,

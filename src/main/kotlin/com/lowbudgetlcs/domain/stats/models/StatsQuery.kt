@@ -13,4 +13,5 @@ data class StatsQuery(
     val teamId: TeamId? = null,
     val playerId: PlayerId? = null,
     val championId: Int? = null,
+    val minDurationSeconds: Int? = null,
 )

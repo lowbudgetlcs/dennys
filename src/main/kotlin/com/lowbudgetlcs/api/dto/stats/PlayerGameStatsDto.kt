@@ -12,7 +12,7 @@ data class PlayerGameStatsDto(
     val stage: EventStage,
     val teamId: Int?,
     val playerId: Int?,
-    val gameDurationS: Int,
+    val gameDurationSeconds: Int,
     val puuid: String?,
     val riotIdGameName: String?,
     val riotIdTagline: String?,

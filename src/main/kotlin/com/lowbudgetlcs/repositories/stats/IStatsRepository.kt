@@ -16,7 +16,6 @@ interface IStatsRepository {
         offset: Int,
     ): List<PlayerGameStats>
 
-    /** [StatsQuery.playerId] keeps the rows of the side that player played on; [StatsQuery.championId] is ignored. */
     fun getTeamGames(
         query: StatsQuery,
         limit: Int,
