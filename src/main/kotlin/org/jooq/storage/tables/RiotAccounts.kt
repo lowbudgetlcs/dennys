@@ -30,11 +30,9 @@ import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
 import org.jooq.storage.Dennys
-import org.jooq.storage.keys.PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_PKEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS_RIOT_PUUID_KEY
 import org.jooq.storage.keys.RIOT_ACCOUNTS__RIOT_ACCOUNTS_PLAYER_ID_FKEY
-import org.jooq.storage.tables.PlayerGameFacts.PlayerGameFactsPath
 import org.jooq.storage.tables.Players.PlayersPath
 import org.jooq.storage.tables.records.RiotAccountsRecord
 
@@ -142,22 +140,6 @@ open class RiotAccounts(
 
     val players: PlayersPath
         get(): PlayersPath = players()
-
-    private lateinit var _playerGameFacts: PlayerGameFactsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>dennys.player_game_facts</code> table
-     */
-    fun playerGameFacts(): PlayerGameFactsPath {
-        if (!this::_playerGameFacts.isInitialized)
-            _playerGameFacts = PlayerGameFactsPath(this, null, PLAYER_GAME_FACTS__PLAYER_GAME_FACTS_RIOT_ACCOUNT_ID_FKEY.inverseKey)
-
-        return _playerGameFacts;
-    }
-
-    val playerGameFacts: PlayerGameFactsPath
-        get(): PlayerGameFactsPath = playerGameFacts()
     override fun `as`(alias: String): RiotAccounts = RiotAccounts(DSL.name(alias), this)
     override fun `as`(alias: Name): RiotAccounts = RiotAccounts(alias, this)
     override fun `as`(alias: Table<*>): RiotAccounts = RiotAccounts(alias.qualifiedName, this)

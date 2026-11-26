@@ -14,14 +14,7 @@ import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
-import org.jooq.storage.tables.PlayerChampSelects
-import org.jooq.storage.tables.PlayerCombats
-import org.jooq.storage.tables.PlayerFarming
-import org.jooq.storage.tables.PlayerGameFacts
 import org.jooq.storage.tables.PlayerGameStatsV1
-import org.jooq.storage.tables.PlayerInventories
-import org.jooq.storage.tables.PlayerPings
-import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
 import org.jooq.storage.tables.PlayersToEvent
 import org.jooq.storage.tables.PlayersToTeam
@@ -76,44 +69,9 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
     val GAMES: Games get() = Games.GAMES
 
     /**
-     * The table <code>dennys.player_champ_selects</code>.
-     */
-    val PLAYER_CHAMP_SELECTS: PlayerChampSelects get() = PlayerChampSelects.PLAYER_CHAMP_SELECTS
-
-    /**
-     * The table <code>dennys.player_combats</code>.
-     */
-    val PLAYER_COMBATS: PlayerCombats get() = PlayerCombats.PLAYER_COMBATS
-
-    /**
-     * The table <code>dennys.player_farming</code>.
-     */
-    val PLAYER_FARMING: PlayerFarming get() = PlayerFarming.PLAYER_FARMING
-
-    /**
-     * The table <code>dennys.player_game_facts</code>.
-     */
-    val PLAYER_GAME_FACTS: PlayerGameFacts get() = PlayerGameFacts.PLAYER_GAME_FACTS
-
-    /**
      * The table <code>dennys.player_game_stats_v1</code>.
      */
     val PLAYER_GAME_STATS_V1: PlayerGameStatsV1 get() = PlayerGameStatsV1.PLAYER_GAME_STATS_V1
-
-    /**
-     * The table <code>dennys.player_inventories</code>.
-     */
-    val PLAYER_INVENTORIES: PlayerInventories get() = PlayerInventories.PLAYER_INVENTORIES
-
-    /**
-     * The table <code>dennys.player_pings</code>.
-     */
-    val PLAYER_PINGS: PlayerPings get() = PlayerPings.PLAYER_PINGS
-
-    /**
-     * The table <code>dennys.player_vision</code>.
-     */
-    val PLAYER_VISION: PlayerVision get() = PlayerVision.PLAYER_VISION
 
     /**
      * The table <code>dennys.players</code>.
@@ -188,14 +146,7 @@ open class Dennys : SchemaImpl("dennys", DefaultCatalog.DEFAULT_CATALOG) {
         Events.EVENTS,
         GameResults.GAME_RESULTS,
         Games.GAMES,
-        PlayerChampSelects.PLAYER_CHAMP_SELECTS,
-        PlayerCombats.PLAYER_COMBATS,
-        PlayerFarming.PLAYER_FARMING,
-        PlayerGameFacts.PLAYER_GAME_FACTS,
         PlayerGameStatsV1.PLAYER_GAME_STATS_V1,
-        PlayerInventories.PLAYER_INVENTORIES,
-        PlayerPings.PLAYER_PINGS,
-        PlayerVision.PLAYER_VISION,
         Players.PLAYERS,
         PlayersToEvent.PLAYERS_TO_EVENT,
         PlayersToTeam.PLAYERS_TO_TEAM,

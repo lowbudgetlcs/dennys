@@ -66,7 +66,7 @@ open class PlayerGameStatsV1(
              ELSE NULL::integer
          END) AS team_id,
      ra.player_id,
-     COALESCE((((rmd.match -> 'info'::text) ->> 'gameDuration'::text))::integer, 0) AS game_duration_s,
+     COALESCE(((m.info ->> 'gameDuration'::text))::integer, 0) AS game_duration_s,
      (p.value ->> 'puuid'::text) AS puuid,
      (p.value ->> 'riotIdGameName'::text) AS riot_id_game_name,
      (p.value ->> 'riotIdTagline'::text) AS riot_id_tagline,
@@ -87,13 +87,15 @@ open class PlayerGameStatsV1(
      COALESCE(((p.value ->> 'wardsKilled'::text))::integer, 0) AS wards_killed,
      COALESCE(((p.value ->> 'visionWardsBoughtInGame'::text))::integer, 0) AS control_wards_bought,
      COALESCE(((p.value #>> '{challenges,voidMonsterKill}'::text[]))::integer, 0) AS void_grubs
-    FROM (((((((dennys.riot_match_data rmd
+    FROM ((((((((dennys.riot_match_data rmd
+      CROSS JOIN LATERAL ( SELECT (rmd.match -> 'info'::text) AS info
+          OFFSET 0) m)
       JOIN dennys.games g ON ((g.id = rmd.game_id)))
       JOIN dennys.series s ON ((s.id = g.series_id)))
       JOIN dennys.events e ON ((e.id = s.event_id)))
       LEFT JOIN dennys.tournament_codes tc ON ((tc.id = g.tournament_code_id)))
       LEFT JOIN dennys.game_results gr ON ((gr.game_id = g.id)))
-      CROSS JOIN LATERAL jsonb_array_elements(COALESCE(((rmd.match -> 'info'::text) -> 'participants'::text), '[]'::jsonb)) p(value))
+      CROSS JOIN LATERAL jsonb_array_elements(COALESCE((m.info -> 'participants'::text), '[]'::jsonb)) p(value))
       LEFT JOIN dennys.riot_accounts ra ON ((ra.riot_puuid = (p.value ->> 'puuid'::text))));
     """),
     where,
