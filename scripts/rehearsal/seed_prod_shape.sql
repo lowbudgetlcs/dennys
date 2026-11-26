@@ -43,10 +43,6 @@ INSERT INTO games (id, shortcode, blue_team_id, red_team_id, series_id) VALUES
   (2179, 'REH-00002179', 31, 36, 1309),
   (2180, 'REH-00002180', 31, 36, 1310);
 
-INSERT INTO player_game_facts (side, shortcode)
-SELECT CASE WHEN n % 2 = 0 THEN 100 ELSE 200 END, 'REH-' || lpad(n::text, 8, '0')
-FROM generate_series(1, 50) AS n;
-
 SELECT setval(pg_get_serial_sequence('dennys.events', 'id'), 4);
 SELECT setval(pg_get_serial_sequence('dennys.teams', 'id'), 40);
 SELECT setval(pg_get_serial_sequence('dennys.series', 'id'), 1320);

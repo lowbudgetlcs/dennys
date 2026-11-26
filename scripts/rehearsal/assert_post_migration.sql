@@ -81,8 +81,11 @@ BEGIN
                       'tournament_codes_series_id_fkey');
   IF n <> 3 THEN RAISE EXCEPTION 'renamed foreign keys incomplete (found %/3)', n; END IF;
 
-  SELECT count(*) INTO n FROM player_game_facts;
-  IF n <> 50 THEN RAISE EXCEPTION 'player_game_facts lost rows (% of 50)', n; END IF;
+  SELECT count(*) INTO n FROM information_schema.tables
+    WHERE table_schema = 'dennys'
+      AND table_name IN ('player_game_facts', 'player_champ_selects', 'player_inventories', 'player_combats',
+                         'player_vision', 'player_pings', 'player_farming');
+  IF n <> 0 THEN RAISE EXCEPTION 'V018 left % of the V001 stats tables', n; END IF;
 
   SELECT count(*) INTO n FROM flyway_schema_history WHERE success AND version IN ('011', '012', '013', '014');
   IF n <> 4 THEN RAISE EXCEPTION 'ledger does not record V011-V014 as applied (found %/4)', n; END IF;

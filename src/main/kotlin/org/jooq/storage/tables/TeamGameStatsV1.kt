@@ -70,7 +70,7 @@ open class TeamGameStatsV1(
              WHEN 200 THEN 'RED'::text
              ELSE NULL::text
          END AS side,
-     COALESCE((((rmd.match -> 'info'::text) ->> 'gameDuration'::text))::integer, 0) AS game_duration_s,
+     COALESCE(((m.info ->> 'gameDuration'::text))::integer, 0) AS game_duration_s,
      COALESCE(((t.value ->> 'win'::text))::boolean, false) AS win,
      COALESCE(((t.value #>> '{objectives,champion,first}'::text[]))::boolean, false) AS first_blood,
      COALESCE(((t.value #>> '{objectives,tower,first}'::text[]))::boolean, false) AS first_tower,
@@ -87,13 +87,15 @@ open class TeamGameStatsV1(
             FROM jsonb_array_elements(COALESCE((t.value -> 'bans'::text), '[]'::jsonb)) b(value)
            WHERE (COALESCE(((b.value ->> 'championId'::text))::integer, '-1'::integer) <> '-1'::integer)
            ORDER BY ((b.value ->> 'pickTurn'::text))::integer) AS bans
-    FROM ((((((dennys.riot_match_data rmd
+    FROM (((((((dennys.riot_match_data rmd
+      CROSS JOIN LATERAL ( SELECT (rmd.match -> 'info'::text) AS info
+          OFFSET 0) m)
       JOIN dennys.games g ON ((g.id = rmd.game_id)))
       JOIN dennys.series s ON ((s.id = g.series_id)))
       JOIN dennys.events e ON ((e.id = s.event_id)))
       LEFT JOIN dennys.tournament_codes tc ON ((tc.id = g.tournament_code_id)))
       LEFT JOIN dennys.game_results gr ON ((gr.game_id = g.id)))
-      CROSS JOIN LATERAL jsonb_array_elements(COALESCE(((rmd.match -> 'info'::text) -> 'teams'::text), '[]'::jsonb)) t(value));
+      CROSS JOIN LATERAL jsonb_array_elements(COALESCE((m.info -> 'teams'::text), '[]'::jsonb)) t(value));
     """),
     where,
 ) {

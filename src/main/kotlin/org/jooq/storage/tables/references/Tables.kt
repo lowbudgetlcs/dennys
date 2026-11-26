@@ -9,14 +9,7 @@ import org.jooq.storage.tables.EventGroups
 import org.jooq.storage.tables.Events
 import org.jooq.storage.tables.GameResults
 import org.jooq.storage.tables.Games
-import org.jooq.storage.tables.PlayerChampSelects
-import org.jooq.storage.tables.PlayerCombats
-import org.jooq.storage.tables.PlayerFarming
-import org.jooq.storage.tables.PlayerGameFacts
 import org.jooq.storage.tables.PlayerGameStatsV1
-import org.jooq.storage.tables.PlayerInventories
-import org.jooq.storage.tables.PlayerPings
-import org.jooq.storage.tables.PlayerVision
 import org.jooq.storage.tables.Players
 import org.jooq.storage.tables.PlayersToEvent
 import org.jooq.storage.tables.PlayersToTeam
@@ -59,44 +52,9 @@ val GAME_RESULTS: GameResults = GameResults.GAME_RESULTS
 val GAMES: Games = Games.GAMES
 
 /**
- * The table <code>dennys.player_champ_selects</code>.
- */
-val PLAYER_CHAMP_SELECTS: PlayerChampSelects = PlayerChampSelects.PLAYER_CHAMP_SELECTS
-
-/**
- * The table <code>dennys.player_combats</code>.
- */
-val PLAYER_COMBATS: PlayerCombats = PlayerCombats.PLAYER_COMBATS
-
-/**
- * The table <code>dennys.player_farming</code>.
- */
-val PLAYER_FARMING: PlayerFarming = PlayerFarming.PLAYER_FARMING
-
-/**
- * The table <code>dennys.player_game_facts</code>.
- */
-val PLAYER_GAME_FACTS: PlayerGameFacts = PlayerGameFacts.PLAYER_GAME_FACTS
-
-/**
  * The table <code>dennys.player_game_stats_v1</code>.
  */
 val PLAYER_GAME_STATS_V1: PlayerGameStatsV1 = PlayerGameStatsV1.PLAYER_GAME_STATS_V1
-
-/**
- * The table <code>dennys.player_inventories</code>.
- */
-val PLAYER_INVENTORIES: PlayerInventories = PlayerInventories.PLAYER_INVENTORIES
-
-/**
- * The table <code>dennys.player_pings</code>.
- */
-val PLAYER_PINGS: PlayerPings = PlayerPings.PLAYER_PINGS
-
-/**
- * The table <code>dennys.player_vision</code>.
- */
-val PLAYER_VISION: PlayerVision = PlayerVision.PLAYER_VISION
 
 /**
  * The table <code>dennys.players</code>.
