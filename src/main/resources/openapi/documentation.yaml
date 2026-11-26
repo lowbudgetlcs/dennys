@@ -24,9 +24,21 @@ tags:
   - name: Series (v1)
     description: Create games inside of a series
   - name: Games (v1)
-    description: Riot match data and stats for a played game
+    description: |
+      Riot match data and stats for a played game. `/match` and `/timeline` are Riot's
+      payload as stored, so their shape follows Riot. `/stats` is backed by the `_v1` views,
+      under the same field contract as Stats (v1).
   - name: Stats (v1)
-    description: Stats rows across games
+    description: |
+      Stats across games: per-game rows, totals and leaderboards, and team records.
+
+      **Shared filters:** `eventGroupId`, `eventId`, `stage`, `teamId`, `playerId`,
+      `championId` and `minDurationSeconds`. They're all optional and combine, no filter
+      means all time, and each endpoint lists the ones it takes.
+
+      **Field contract:** fields backed by the `_v1` views are only ever added, so clients
+      must ignore fields they don't know. Renaming or removing one ships as a new view
+      version and a new endpoint version, never as a change to these.
   - name: Teams (v1)
     description: Manage teams
   - name: Players (v1)
@@ -1172,6 +1184,9 @@ paths:
         Riot's match-v5 payload for the game, as stored. Riot never changes a
         finished match, so the response is sent with
         `Cache-Control: private, max-age=31536000, immutable`.
+
+        Use it for data the parsed stats don't cover yet (items, runes, objective
+        timing) and for debugging ingest. For a box score, use `/games/{gameId}/stats`.
       operationId: getGameMatch
       tags:
         - Games (v1)
@@ -1208,6 +1223,9 @@ paths:
       description: |
         Riot's match-v5 timeline for the game, as stored. Sent with
         `Cache-Control: private, max-age=31536000, immutable`.
+
+        Use it for anything minute by minute, such as gold graphs and kill maps. It
+        can be missing for a game whose match data was stored without one (404).
       operationId: getGameTimeline
       tags:
         - Games (v1)
@@ -1246,6 +1264,9 @@ paths:
         and `team_game_stats_v1` views. `teamId` and `playerId` can fill in
         later (a result recorded, a Riot account linked), so the response is
         sent with `Cache-Control: private, max-age=300`.
+
+        Use it for a match page or a post-game summary. For one game, prefer it over
+        filtering `/stats/player-games` or `/stats/team-games`.
       operationId: getGameStats
       tags:
         - Games (v1)
@@ -1289,8 +1310,12 @@ paths:
 
         A `: heartbeat` comment line is sent every 25 s so proxies keep the
         connection open. `EventSource` ignores comments.
-        Duplicate events are possible and harmless. Nothing is replayed: open the
-        stream, then fetch the current state, and refetch after reconnecting.
+        Duplicate events are possible and harmless, and nothing is replayed. Clients:
+
+        1. Open the stream, then fetch the current state.
+        2. On `series.updated`, refetch that series. On `game.stats_ready`, refetch
+           `/games/{gameId}/stats` and any leaderboards on screen.
+        3. After a reconnect, refetch, since events sent while disconnected are lost.
       operationId: getStream
       tags:
         - Series (v1)
@@ -1316,6 +1341,10 @@ paths:
       description: |
         One row per player per game from `player_game_stats_v1`, newest game
         first. Every filter is optional and they combine.
+
+        Use it for match history, a champion's game log, head-to-head scouting and
+        exports. Unlike `/stats/players`, it returns Riot accounts not linked to a
+        player, by `puuid` and Riot ID. For totals, use the aggregate endpoints.
       operationId: getPlayerGames
       tags:
         - Stats (v1)
@@ -1371,6 +1400,9 @@ paths:
       description: |
         One row per side per game from `team_game_stats_v1`, newest game
         first. Every filter is optional and they combine.
+
+        Use it for a team's game log and head-to-head scouting. For totals, use
+        `/stats/teams`. For a team's record, use `/stats/records`.
       operationId: getTeamGames
       tags:
         - Stats (v1)
@@ -1426,6 +1458,10 @@ paths:
         and as won or lost from the series result for the team they played for. Series that
         aren't `COMPLETE` count as played only, a double loss is lost for both teams, and a
         forfeit with no games counts for no player. `teamId` splits a record by team.
+
+        Use it for leaderboards, season cards and awards. Pair a per-game sort with
+        `minGames`, or small samples rank first. Riot accounts not linked to a player
+        are left out, so look for them in `/stats/player-games`.
       operationId: getPlayerAggregates
       tags:
         - Stats (v1)
@@ -1493,6 +1529,10 @@ paths:
         Totals and per-game averages for each team, grouped on read over `team_game_stats_v1`.
         `playerId` keeps the games that player played, on their side. Until #259 merges duplicate
         team rows, a team spanning events is listed once per event.
+
+        Use it for team leaderboards (first objectives, game length). `wins` counts
+        only games with Riot match data, so use `/stats/records` for a team's record.
+        Pair a per-game sort with `minGames`.
       operationId: getTeamAggregates
       tags:
         - Stats (v1)
@@ -1558,6 +1598,9 @@ paths:
         is a loss for both teams. Counts add up across stages and events. Sorted by series won,
         then games won. Until #259 merges duplicate team rows, a team spanning events is listed
         once per event.
+
+        Use it for standings, seeding and a team's record. It's the only stats
+        endpoint that counts forfeits, double losses and games without Riot match data.
       operationId: getTeamRecords
       tags:
         - Stats (v1)
@@ -1603,6 +1646,9 @@ paths:
         Picks, wins and per-pick averages from player rows, and bans from team rows, per
         champion. A champion that was only banned has 0 picks and no name. `teamId` and
         `playerId` count that side's bans.
+
+        Use it for pick/ban tables and champion win rates. Pair a per-pick sort with
+        `minPicks`, and `minPicks=1` leaves out champions that were only banned.
       operationId: getChampionAggregates
       tags:
         - Stats (v1)
@@ -2210,6 +2256,7 @@ components:
     StatsLimit:
       in: query
       name: limit
+      description: Rows per page.
       schema:
         type: integer
         minimum: 1
@@ -2218,6 +2265,7 @@ components:
     StatsOffset:
       in: query
       name: offset
+      description: Rows to skip, for paging. Results have a stable order, so pages don't overlap.
       schema:
         type: integer
         minimum: 0
