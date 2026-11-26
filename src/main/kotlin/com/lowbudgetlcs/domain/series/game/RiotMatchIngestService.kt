@@ -1,5 +1,6 @@
 package com.lowbudgetlcs.domain.series.game
 
+import com.lowbudgetlcs.domain.LiveEvents
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.gateways.riot.match.IRiotMatchGateway
 import com.lowbudgetlcs.repositories.game.IGameRepository
@@ -15,6 +16,7 @@ class RiotMatchIngestService(
     private val gameRepo: IGameRepository,
     private val riotMatchGateway: IRiotMatchGateway,
     private val riotMatchDataRepo: IRiotMatchDataRepository,
+    private val liveEvents: LiveEvents = LiveEvents(),
 ) : IRiotMatchIngestService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -45,5 +47,6 @@ class RiotMatchIngestService(
                 null
             }
         riotMatchDataRepo.save(game.id, match, timeline)
+        liveEvents.gameStatsReady(game)
     }
 }

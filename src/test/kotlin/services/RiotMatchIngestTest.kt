@@ -1,5 +1,7 @@
 package services
 
+import com.lowbudgetlcs.domain.LiveEvent
+import com.lowbudgetlcs.domain.LiveEvents
 import com.lowbudgetlcs.domain.series.game.RiotMatchIngestService
 import com.lowbudgetlcs.domain.series.game.models.Game
 import com.lowbudgetlcs.domain.series.game.models.toGameId
@@ -10,12 +12,18 @@ import com.lowbudgetlcs.gateways.riot.match.IRiotMatchGateway
 import com.lowbudgetlcs.repositories.game.IGameRepository
 import com.lowbudgetlcs.repositories.riotmatchdata.IRiotMatchDataRepository
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.time.Instant
 
 private fun game(
@@ -39,7 +47,8 @@ private class IngestFixture(
     val gameRepo = mockk<IGameRepository>()
     val gateway = mockk<IRiotMatchGateway>()
     val dataRepo = mockk<IRiotMatchDataRepository>()
-    val service = RiotMatchIngestService(gameRepo, gateway, dataRepo)
+    val live = LiveEvents()
+    val service = RiotMatchIngestService(gameRepo, gateway, dataRepo, live)
 
     init {
         every { gameRepo.getMissingRiotMatchData(any()) } returns games.toList()
@@ -69,6 +78,26 @@ class RiotMatchIngestTest :
 
             verify(exactly = 0) { f.dataRepo.save(1.toGameId(), any(), any()) }
             verify { f.dataRepo.save(2.toGameId(), payload("NA1_2"), payload("timeline")) }
+        }
+
+        "storing a game emits game.stats_ready, and a skipped game emits nothing" {
+            val f = IngestFixture(game(1, "NA1_1"), game(2, "NA1_2"))
+            coEvery { f.gateway.getMatch("NA1_1".toRiotMatchId()) } throws NoSuchElementException("404")
+            coEvery { f.gateway.getMatch("NA1_2".toRiotMatchId()) } returns payload("NA1_2")
+            coEvery { f.gateway.getTimeline("NA1_2".toRiotMatchId()) } returns payload("timeline")
+
+            coroutineScope {
+                val first = async(start = CoroutineStart.UNDISPATCHED) { f.live.events.first() }
+                f.service.ingestPending()
+                first.await() shouldBe
+                    LiveEvent(
+                        "game.stats_ready",
+                        buildJsonObject {
+                            put("gameId", 2)
+                            put("seriesId", 1)
+                        },
+                    )
+            }
         }
 
         "a failed timeline still stores the match" {

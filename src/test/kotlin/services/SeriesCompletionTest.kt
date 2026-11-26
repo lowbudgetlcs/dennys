@@ -1,5 +1,7 @@
 package services
 
+import com.lowbudgetlcs.domain.LiveEvent
+import com.lowbudgetlcs.domain.LiveEvents
 import com.lowbudgetlcs.domain.event.models.types.EventId
 import com.lowbudgetlcs.domain.event.models.types.EventStage
 import com.lowbudgetlcs.domain.series.SeriesService
@@ -16,9 +18,16 @@ import com.lowbudgetlcs.repositories.team.ITeamRepository
 import com.lowbudgetlcs.repositories.tournamentcode.ITournamentCodeRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 private val WINNER = TeamId(1)
 private val LOSER = TeamId(2)
@@ -32,7 +41,8 @@ private class CompletionFixture {
     val teamRepo = mockk<ITeamRepository>(relaxed = false)
     val gameRepo = mockk<IGameRepository>(relaxed = false)
     val gateway = mockk<IRiotTournamentGateway>(relaxed = false)
-    val service = SeriesService(codeRepo, seriesRepo, eventRepo, teamRepo, gameRepo, gateway)
+    val live = LiveEvents()
+    val service = SeriesService(codeRepo, seriesRepo, eventRepo, teamRepo, gameRepo, gateway, liveEvents = live)
 
     fun series(status: SeriesStatus = SeriesStatus.IN_PROGRESS) =
         Series(
@@ -63,6 +73,25 @@ class SeriesCompletionTest :
                 f.seriesRepo.setStatus(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, SeriesResult(WINNER, LOSER), false)
             }
             verify(exactly = 0) { f.gameRepo.getBySeriesId(any()) }
+        }
+
+        "patching a series emits series.updated with the stored status" {
+            val f = CompletionFixture()
+            f.withSeries(f.series())
+
+            coroutineScope {
+                val first = async(start = CoroutineStart.UNDISPATCHED) { f.live.events.first() }
+                f.service.patchSeries(COMPLETION_SERIES_ID, SeriesStatus.COMPLETE, WINNER, false)
+                first.await() shouldBe
+                    LiveEvent(
+                        "series.updated",
+                        buildJsonObject {
+                            put("seriesId", COMPLETION_SERIES_ID.value)
+                            put("eventId", 1)
+                            put("status", "COMPLETE")
+                        },
+                    )
+            }
         }
 
         "a double loss records no winner" {
