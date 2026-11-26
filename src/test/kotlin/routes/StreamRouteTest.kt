@@ -8,6 +8,7 @@ import com.lowbudgetlcs.domain.series.models.Series
 import com.lowbudgetlcs.domain.series.models.types.SeriesId
 import com.lowbudgetlcs.domain.series.models.types.SeriesStatus
 import com.lowbudgetlcs.domain.team.models.types.TeamId
+import io.kotest.core.annotation.Isolate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.plugins.sse.sse
@@ -21,6 +22,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import io.ktor.client.plugins.sse.SSE as ClientSSE
 
+// testApplication blocks its thread, and among concurrent specs on a small runner this endless stream can starve.
+@Isolate
 class StreamRouteTest :
     StringSpec({
         "the stream relays live events as named server-sent events" {
